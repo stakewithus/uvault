@@ -314,10 +314,10 @@ def withdraw(_shares: uint256):
     @param _shares Shares owned by msg.sender
     """
 
-    # s = shares to mint
-    # T = total supply of shares before minting
-    # a = amount of tokens to deposit
-    # B = balance of tokens before deposit
+    # s = shares
+    # T = total supply
+    # a = amount of tokens
+    # B = balance of tokens
     # s / T = a / B
     # a = s * B / T
     amount: uint256 = (self._getBalance() * _shares) / self.totalSupply
