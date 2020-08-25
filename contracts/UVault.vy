@@ -285,24 +285,24 @@ def deposit(_amount: uint256):
     @notice Deposit token
     @param _amount The amount that will be burned
     """
-    bal: uint256 = self._getBalance()
+    poolBalance: uint256 = self._getBalance()
     before: uint256 = ERC20(self.token).balanceOf(self)
     self._safeTransferFrom(self.token, msg.sender, self, _amount)
     after: uint256 = ERC20(self.token).balanceOf(self)
-    # TODO: is this necessary?
-    diff: uint256 = after - before # dev: additional check for deflationary tokens
+    # Additional check for deflationary tokens
+    diff: uint256 = after - before
 
     shares: uint256 = 0
     if self.totalSupply == 0:
-        shares = _amount
+        shares = diff
     else:
         # s = shares to mint
         # T = total supply of shares before minting
-        # a = amount of tokens to deposit
+        # a = amount of tokens deposited
         # B = balance of tokens before deposit
         # s / (T + s) = a / (B + a)
         # s = a * T / B
-        shares = (_amount * self.totalSupply) / bal
+        shares = (diff * self.totalSupply) / poolBalance
 
     self._mint(msg.sender, shares)
 
