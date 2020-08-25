@@ -3,7 +3,7 @@
 @title StakeWithUs UVault
 @author StakeWithUs
 @dev Based on https://github.com/curvefi/curve-dao-contracts/blob/master/contracts/ERC20CRV.vy
-@dev Vyper implementation of https://github.com/iearn-finance/vaults/blob/master/contracts/yVault.sol
+@dev Vyper implementation / fork of https://github.com/iearn-finance/vaults/blob/master/contracts/yVault.sol
 """
 
 from vyper.interfaces import ERC20
