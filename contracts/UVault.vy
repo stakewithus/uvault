@@ -75,10 +75,12 @@ def transfer(_to : address, _amount : uint256) -> bool:
     @param _amount The amount to be transferred
     @return bool success
     """
-    assert _to != ZERO_ADDRESS  # dev: transfers to 0x0 are not allowed
+    assert _to != ZERO_ADDRESS, "zero address"
+
     self.balanceOf[msg.sender] -= _amount
     self.balanceOf[_to] += _amount
     log Transfer(msg.sender, _to, _amount)
+
     return True
 
 
@@ -91,13 +93,15 @@ def transferFrom(_from : address, _to : address, _amount : uint256) -> bool:
      @param _amount uint256 the amount of tokens to be transferred
      @return bool success
     """
-    assert _to != ZERO_ADDRESS  # dev: transfers to 0x0 are not allowed
+    assert _to != ZERO_ADDRESS, "zero address"
+
     # NOTE: vyper does not allow underflows
     #       so the following subtraction would revert on insufficient balance
     self.balanceOf[_from] -= _amount
     self.balanceOf[_to] += _amount
     self.allowances[_from][msg.sender] -= _amount
     log Transfer(_from, _to, _amount)
+
     return True
 
 
@@ -112,9 +116,11 @@ def approve(_spender : address, _amount : uint256) -> bool:
     @param _amount The amount of tokens to be spent
     @return bool success
     """
-    assert _amount == 0 or self.allowances[msg.sender][_spender] == 0
+    assert _amount == 0 or self.allowances[msg.sender][_spender] == 0, "amount != 0 and allowance != 0"
+
     self.allowances[msg.sender][_spender] = _amount
     log Approval(msg.sender, _spender, _amount)
+
     return True
 
 
@@ -126,7 +132,7 @@ def _mint(_to: address, _amount: uint256):
     @param _to The account that will receive the created tokens
     @param _amount The amount that will be created
     """
-    assert _to != ZERO_ADDRESS  # dev: zero address
+    assert _to != ZERO_ADDRESS, "zero address"
 
     self.totalSupply += _amount
     self.balanceOf[_to] += _amount
@@ -142,7 +148,7 @@ def _burn(_from: address, _amount: uint256):
     @param _from The account to burn tokens from
     @param _amount The amount that will be burned
     """
-    assert _from != ZERO_ADDRESS # dev: zero address
+    assert _from != ZERO_ADDRESS, "zero address"
 
     self.balanceOf[_from] -= _amount
     self.totalSupply -= _amount
@@ -156,7 +162,8 @@ def setAdmin(_admin: address):
     @notice Set the new admin.
     @param _admin New admin address
     """
-    assert msg.sender == self.admin  # dev: admin only
+    assert msg.sender == self.admin, "!admin"
+
     self.admin = _admin
     log SetAdmin(_admin)
 
@@ -167,7 +174,8 @@ def setController(_controller: address):
     @notice Set the new controller.
     @param _controller New controller address
     """
-    assert msg.sender == self.admin
+    assert msg.sender == self.admin, "!admin"
+
     self.controller = _controller
     log SetController(_controller)
 
