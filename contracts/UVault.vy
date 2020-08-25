@@ -15,6 +15,8 @@ interface Controller:
 
 implements: ERC20
 
+# TODO: reentrancy lock
+# TODO: doc
 
 event Transfer:
     _from: indexed(address)
@@ -32,6 +34,13 @@ event SetAdmin:
 event SetController:
     controller: address
 
+# log to keep track of nonces that were used in a transaction
+event TxNonce:
+    _addr: indexed(address)
+    _nonce: uint256
+
+SIGN_PREFIX: constant(Bytes[28]) = b"\x19Ethereum Signed Message:\n32"
+
 TRANSFER: constant(Bytes[4]) = method_id(
     "transfer(address,uint256)", output_type=Bytes[4]
 )
@@ -46,6 +55,10 @@ totalSupply: public(uint256)
 token: public(address)
 controller: public(address)
 admin: public(address)
+
+# mapping from signed and execute hash to bool
+# true if tx corresponding to hash was executed
+executed: public(HashMap[bytes32, bool])
 
 
 @external
@@ -279,15 +292,60 @@ def earn():
     Controller(self.controller).earn(self.token, bal)
 
 
+@internal
+def _is_valid_sig(_digest: bytes32, _v: uint256, _r: uint256, _s: uint256, _signer: address) -> bool:
+    """
+    @notice Call approve for an array of tokens
+    @param _digest Hash that was signed
+    @param _v Signature param
+    @param _r Signature param
+    @param _s Signature param
+    @param _signer Expected signer
+    """
+    return _signer == ecrecover(keccak256(concat(SIGN_PREFIX, _digest)), _v, _r, _s)
+
+
+@internal
+@view
+def _get_transfer_hash(_from: address, _to: address, _amount: uint256, _nonce: uint256) -> bytes32:
+    return keccak256(concat(
+        convert(self, bytes32),
+        convert(_from, bytes32),
+        convert(_to, bytes32),
+        convert(_amount, bytes32),
+        convert(_nonce, bytes32)
+    ))
+
+
 @external
-def deposit(_amount: uint256):
+@view
+def get_transfer_hash(_from: address, _to: address, _amount: uint256, _nonce: uint256) -> bytes32:
+    return self._get_transfer_hash(_from, _to, _amount, _nonce)
+
+
+@internal
+def _deposit(
+    _from: address, _amount: uint256, _nonce: uint256,
+    _v: uint256, _r: uint256, _s: uint256
+):
     """
     @notice Deposit token
+    @param _from Address to transfer token from
     @param _amount The amount that will be burned
+    @param _nonce Nonce used to sign
+    @param _v Signature param
+    @param _r Signature param
+    @param _s Signature param
     """
+    digest: bytes32 = self._get_transfer_hash(_from, self, _amount, _nonce)
+    assert not self.executed[digest], "tx executed"
+    assert self._is_valid_sig(digest, _v, _r, _s, _from), "invalid sig"
+
+    self.executed[digest] = True
+
     poolBalance: uint256 = self._getBalance()
     before: uint256 = ERC20(self.token).balanceOf(self)
-    self._safeTransferFrom(self.token, msg.sender, self, _amount)
+    self._safeTransferFrom(self.token, _from, self, _amount)
     after: uint256 = ERC20(self.token).balanceOf(self)
     # Additional check for deflationary tokens
     diff: uint256 = after - before
@@ -304,15 +362,68 @@ def deposit(_amount: uint256):
         # s = a * T / B
         shares = (diff * self.totalSupply) / poolBalance
 
-    self._mint(msg.sender, shares)
+    self._mint(_from, shares)
+
+    log TxNonce(_from, _nonce)
 
 
 @external
-def withdraw(_shares: uint256):
+def deposit(
+    _from: address, _amount: uint256, _nonce: uint256,
+    _v: uint256, _r: uint256, _s: uint256
+):
+    """
+    @notice Deposit token
+    @param _from Address to transfer token from
+    @param _amount The amount that will be burned
+    @param _nonce Nonce used to sign
+    @param _v Signature param
+    @param _r Signature param
+    @param _s Signature param
+    """
+    self._deposit(_from, _amount, _nonce, _v, _r, _s)
+
+
+@external
+def batchDeposit(
+    _addresses: address[1000], _amounts: uint256[1000], _nonces: uint256[1000],
+    _vs: uint256[1000], _rs: uint256[1000], _ss: uint256[1000],
+):
+    # TODO: verify signature (address, token, amount, nonce)? or only allow admin to batch? call from gas relayer?
+    for i in range(1000):
+        addr: address = _addresses[i]
+        amount: uint256 = _amounts[i]
+        nonce: uint256 = _nonces[i]
+        v: uint256 = _vs[i]
+        r: uint256 = _rs[i]
+        s: uint256 = _ss[i]
+
+        # TODO: check balance and approval or let all tx fail?
+        # TODO: _safeTransfer can fail
+        # TODO signature verification can fail
+        if ERC20(self.token).balanceOf(addr) >= amount and ERC20(self.token).allowance(addr, self) >= amount:
+            self._deposit(addr, amount, nonce, v, r, s)
+
+
+@internal
+def _withdraw(
+    _to: address, _shares: uint256, _nonce: uint256,
+    _v: uint256, _r: uint256, _s: uint256
+):
     """
     @notice Withdraw token for shares
-    @param _shares Shares owned by msg.sender
+    @param _to Address to withdraw shares and transfer underlying token to
+    @param _shares Shares owned by _to
+    @param _nonce Nonce used to sign
+    @param _v Signature param
+    @param _r Signature param
+    @param _s Signature param
     """
+    digest: bytes32 = self._get_transfer_hash(self, _to, _shares, _nonce)
+    assert not self.executed[digest], "tx executed"
+    assert self._is_valid_sig(digest, _v, _r, _s, _to), "invalid sig"
+
+    self.executed[digest] = True
 
     # s = shares
     # T = total supply
@@ -321,9 +432,9 @@ def withdraw(_shares: uint256):
     # s / T = a / B
     # a = s * B / T
     amount: uint256 = (self._getBalance() * _shares) / self.totalSupply
-    self._burn(msg.sender, amount)
+    self._burn(_to, amount)
 
-    # Withdraw from controller if token balance of this contract < amount to transfer to msg.sender
+    # Withdraw from controller if token balance of this contract < amount to transfer to _to
     bal: uint256 = ERC20(self.token).balanceOf(self)
     if bal < amount:
         withdrawAmount: uint256 = amount - bal
@@ -333,4 +444,44 @@ def withdraw(_shares: uint256):
         if after < amount:
             amount = after
 
-    self._safeTransfer(self.token, msg.sender, amount)
+    self._safeTransfer(self.token, _to, amount)
+
+    log TxNonce(_to, _nonce)
+
+
+@external
+def withdraw(
+    _to: address, _shares: uint256, _nonce: uint256,
+    _v: uint256, _r: uint256, _s: uint256
+):
+    """
+    @notice Withdraw token for shares
+    @param _to Address to withdraw shares and transfer underlying token to
+    @param _shares Shares owned by _to
+    @param _nonce Nonce used to sign
+    @param _v Signature param
+    @param _r Signature param
+    @param _s Signature param
+    """
+    self._withdraw(_to, _shares, _nonce, _v, _r, _s)
+
+
+@external
+def batchWithdraw(
+    _addresses: address[1000], _amounts: uint256[1000], _nonces: uint256[1000],
+    _vs: uint256[1000], _rs: uint256[1000], _ss: uint256[1000],
+):
+    # TODO: verify signature (address, token, amount, nonce)? or only allow admin to batch? call from gas relayer?
+    for i in range(1000):
+        addr: address = _addresses[i]
+        amount: uint256 = _amounts[i]
+        nonce: uint256 = _nonces[i]
+        v: uint256 = _vs[i]
+        r: uint256 = _rs[i]
+        s: uint256 = _ss[i]
+
+        # TODO: let all tx fail?
+        # TODO: _safeTransfer can fail
+        # TODO signature verification can fail
+        # TODO: check total _amounts >= total supply
+        self._withdraw(addr, amount, nonce, v, r, s)
