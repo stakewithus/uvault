@@ -293,7 +293,7 @@ def earn():
 
 
 @internal
-def _is_valid_sig(_digest: bytes32, _v: uint256, _r: uint256, _s: uint256, _signer: address) -> bool:
+def _isValidSig(_digest: bytes32, _v: uint256, _r: uint256, _s: uint256, _signer: address) -> bool:
     """
     @notice Call approve for an array of tokens
     @param _digest Hash that was signed
@@ -307,7 +307,7 @@ def _is_valid_sig(_digest: bytes32, _v: uint256, _r: uint256, _s: uint256, _sign
 
 @internal
 @view
-def _get_transfer_hash(_from: address, _to: address, _amount: uint256, _nonce: uint256) -> bytes32:
+def _getTransferHash(_from: address, _to: address, _amount: uint256, _nonce: uint256) -> bytes32:
     return keccak256(concat(
         convert(self, bytes32),
         convert(_from, bytes32),
@@ -319,8 +319,8 @@ def _get_transfer_hash(_from: address, _to: address, _amount: uint256, _nonce: u
 
 @external
 @view
-def get_transfer_hash(_from: address, _to: address, _amount: uint256, _nonce: uint256) -> bytes32:
-    return self._get_transfer_hash(_from, _to, _amount, _nonce)
+def getTransferHash(_from: address, _to: address, _amount: uint256, _nonce: uint256) -> bytes32:
+    return self._getTransferHash(_from, _to, _amount, _nonce)
 
 
 @internal
@@ -337,9 +337,9 @@ def _deposit(
     @param _r Signature param
     @param _s Signature param
     """
-    digest: bytes32 = self._get_transfer_hash(_from, self, _amount, _nonce)
+    digest: bytes32 = self._getTransferHash(_from, self, _amount, _nonce)
     assert not self.executed[digest], "tx executed"
-    assert self._is_valid_sig(digest, _v, _r, _s, _from), "invalid sig"
+    assert self._isValidSig(digest, _v, _r, _s, _from), "invalid sig"
 
     self.executed[digest] = True
 
@@ -419,9 +419,9 @@ def _withdraw(
     @param _r Signature param
     @param _s Signature param
     """
-    digest: bytes32 = self._get_transfer_hash(self, _to, _shares, _nonce)
+    digest: bytes32 = self._getTransferHash(self, _to, _shares, _nonce)
     assert not self.executed[digest], "tx executed"
-    assert self._is_valid_sig(digest, _v, _r, _s, _to), "invalid sig"
+    assert self._isValidSig(digest, _v, _r, _s, _to), "invalid sig"
 
     self.executed[digest] = True
 
@@ -440,7 +440,6 @@ def _withdraw(
         withdrawAmount: uint256 = amount - bal
         Controller(self.controller).withdraw(self, withdrawAmount)
         after: uint256 = ERC20(self.token).balanceOf(self)
-        diff: uint256 = after - bal
         if after < amount:
             amount = after
 
@@ -473,6 +472,7 @@ def batchWithdraw(
 ):
     # TODO: verify signature (address, token, amount, nonce)? or only allow admin to batch? call from gas relayer?
     for i in range(1000):
+        # TODO break if less than 1000
         addr: address = _addresses[i]
         amount: uint256 = _amounts[i]
         nonce: uint256 = _nonces[i]
