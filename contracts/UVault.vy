@@ -32,6 +32,13 @@ event SetAdmin:
 event SetController:
     controller: address
 
+TRANSFER: constant(Bytes[4]) = method_id(
+    "transfer(address,uint256)", output_type=Bytes[4]
+)
+TRANSFER_FROM: constant(Bytes[4]) = method_id(
+    "transferFrom(address,address,uint256)", output_type=Bytes[4]
+)
+
 balanceOf: public(HashMap[address, uint256])
 allowances: HashMap[address, HashMap[address, uint256]]
 totalSupply: public(uint256)
@@ -87,11 +94,11 @@ def transfer(_to : address, _amount : uint256) -> bool:
 @external
 def transferFrom(_from : address, _to : address, _amount : uint256) -> bool:
     """
-     @notice Transfer `_amount` tokens from `_from` to `_to`
-     @param _from address The address which you want to send tokens from
-     @param _to address The address which you want to transfer to
-     @param _amount uint256 the amount of tokens to be transferred
-     @return bool success
+    @notice Transfer `_amount` tokens from `_from` to `_to`
+    @param _from address The address which you want to send tokens from
+    @param _to address The address which you want to transfer to
+    @param _amount uint256 the amount of tokens to be transferred
+    @return bool success
     """
     assert _to != ZERO_ADDRESS, "zero address"
 
@@ -156,6 +163,70 @@ def _burn(_from: address, _amount: uint256):
     log Transfer(_from, ZERO_ADDRESS, _amount)
 
 
+@internal
+def _call(_token: address, _data: Bytes[100]):
+    """
+    @notice Low level function to call ERC20 `transfer` or `transferFrom`,
+            handle cases whether the transfer returns bool or not
+    @dev Reverts if bool is returned and == False
+    @param _token ERC20 token address
+    @param _data Data to call `transfer` or `transferFrom`
+    @dev Max size of `_data` is 100 bytes
+         4  bytes method id
+         32 bytes from address
+         32 bytes to address
+         32 bytes amount (uint256)
+    """
+    _response: Bytes[32] = raw_call(
+        _token,
+        _data,
+        max_outsize=32
+    )
+    if len(_response) > 0:
+        assert convert(_response, bool), "ERC20 transfer failed!"
+
+
+@internal
+def _safeTransfer(_token: address, _to: address, _amount: uint256):
+    """
+    @notice call ERC20 transfer and handle the two cases whether boolean is returned or not
+    @param _token ERC20 token address
+    @param _to Address to transfer to
+    @param _amount Amount to transfer
+    """
+    # data = 68 bytes
+    # 4  bytes method id
+    # 32 bytes to address
+    # 32 bytes amount (uint256)
+    self._call(_token, concat(
+        TRANSFER,
+        convert(_to, bytes32),
+        convert(_amount, bytes32)
+    ))
+
+
+@internal
+def _safeTransferFrom(_token: address, _from: address, _to: address, _amount: uint256):
+    """
+    @notice call ERC20 transfer and handle the two cases whether boolean is returned or not
+    @param _token ERC20 token address
+    @param _from Address to transfer from
+    @param _to Address to transfer to
+    @param _amount Amount to transfer
+    """
+    # data = 100 bytes
+    # 4  bytes method id
+    # 32 bytes from address
+    # 32 bytes to address
+    # 32 bytes amount (uint256)
+    self._call(_token, concat(
+        TRANSFER_FROM,
+        convert(_from, bytes32),
+        convert(_to, bytes32),
+        convert(_amount, bytes32)
+    ))
+
+
 @external
 def setAdmin(_admin: address):
     """
@@ -204,8 +275,7 @@ def earn():
     @notice Transfer token to controller
     """
     bal: uint256 = self._getBalance()
-    # TODO: ERC20().safeTransfer
-    ERC20(self.token).transfer(self.controller, bal)
+    self._safeTransfer(self.token, self.controller, bal)
     Controller(self.controller).earn(self.token, bal)
 
 
@@ -217,8 +287,7 @@ def deposit(_amount: uint256):
     """
     bal: uint256 = self._getBalance()
     before: uint256 = ERC20(self.token).balanceOf(self)
-    # TODO: ERC20().safeTransfer
-    ERC20(self.token).transferFrom(msg.sender, self, _amount)
+    self._safeTransferFrom(self.token, msg.sender, self, _amount)
     after: uint256 = ERC20(self.token).balanceOf(self)
     # TODO: is this necessary?
     diff: uint256 = after - before # dev: additional check for deflationary tokens
@@ -264,5 +333,4 @@ def withdraw(_shares: uint256):
         if after < amount:
             amount = after
 
-    # TODO safe transfer
-    ERC20(self.token).transfer(msg.sender, amount)
+    self._safeTransfer(self.token, msg.sender, amount)
