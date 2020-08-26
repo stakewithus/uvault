@@ -1,39 +1,31 @@
 # @version 0.2.4
 """
-@title StakeWithUs Controller
+@title StakeWithUs StrategyYVault
 @author StakeWithUs
-@dev Vyper implementation / fork of https://github.com/iearn-finance/vaults/blob/master/contracts/StrategyControllerV2.sol
 """
 
 from vyper.interfaces import ERC20
 
-interface Strategy:
-    def want() -> address: view
-    def withdraw(amount: uint256): nonpayable
-    def withdrawAll(): nonpayable
+interface YVault:
     def deposit(amount: uint256): nonpayable
-    def getBalance() -> uint256: view
-
+    def withdraw(amount: uint256): nonpayable
 
 interface Vault:
     def token() -> address: view
 
-# TODO: docs
-# TODO: test
-# TODO: events
-# TODO: invest dust
-# TODO create file for interfaces Vault, Strategy, Controller
+
+interface Controller:
+    def treasury() -> address: view
+    def vaults(strategy: address) -> address: view
+
+
 event SetAdmin:
     admin: address
 
-event SetStrategy:
-    token: indexed(address)
-    strategy: indexed(address)
+event SetController:
+    controller: address
 
-event Withdraw:
-    vault: indexed(address)
-    amount: uint256
-
+# TODO: events, doc, test
 TRANSFER: constant(Bytes[4]) = method_id(
     "transfer(address,uint256)", output_type=Bytes[4]
 )
@@ -42,21 +34,23 @@ TRANSFER_FROM: constant(Bytes[4]) = method_id(
     "transferFrom(address,address,uint256)", output_type=Bytes[4]
 )
 
-# vault to strategy mapping
-strategies: public(HashMap[address, address])
-# strategy to vault mapping
-vaults: public(HashMap[address, address])
-isVault: public(HashMap[address, bool])
-
+# TODO set addresses to yVault
+# TODO is this needed?
+WANT: constant(address) = 0xdF5e0e81Dff6FAF3A7e52BA697820c5e32D806A8
+POOL: constant(address) = 0xFA712EE4788C042e2B7BB55E6cb8ec569C4530c1
+controller: public(address)
 admin: public(address)
-# TODO withdraw to treasury
-treasury: public(address)
 
+withdrawFee: public(uint256)
+withdrawFeeMax: public(uint256)
 
 @external
-def __init__(_treasury: address):
+def __init__(_controller: address):
     self.admin = msg.sender
-    self.treasury = _treasury
+    self.controller = _controller
+
+    self.withdrawFee = 50
+    self.withdrawFeeMax = 10000
 
 
 @external
@@ -69,20 +63,28 @@ def setAdmin(_admin: address):
 
 
 @external
-def setStrategy(_vault: address, _strategy: address):
+def setController(_controller: address):
+    """
+    @notice Set the new controller.
+    @param _controller New controller address
+    """
     assert msg.sender == self.admin, "!admin"
-    assert _vault != ZERO_ADDRESS, "zero address"
-    assert _strategy != ZERO_ADDRESS, "zero address"
+    assert _controller != ZERO_ADDRESS, "zero address"
 
-    current: address = self.strategies[_vault]
-    if current != ZERO_ADDRESS:
-        Strategy(current).withdrawAll()
+    self.controller = _controller
+    log SetController(_controller)
 
-    self.strategies[_vault] = _strategy
-    self.vaults[_strategy] = _vault
-    self.isVault[_vault] = True
+@external
+def setWithdrawFee(_fee: uint256):
+    assert msg.sender == self.admin, "!admin"
 
-    log SetStrategy(_vault, _strategy)
+    self.withdrawFee = _fee
+
+
+@external
+@view
+def want() -> address:
+    return WANT
 
 
 @internal
@@ -150,42 +152,33 @@ def _safeTransferFrom(_token: address, _from: address, _to: address, _amount: ui
 
 
 @external
-@view
-def balanceOf(_vault: address) -> uint256:
-    return Strategy(self.strategies[_vault]).getBalance()
-
-
-@external
 def deposit(_amount: uint256):
-    assert self.isVault[msg.sender], "!vault"
+    self._safeTransferFrom(WANT, self.controller, self, _amount)
 
-    strategy: address = self.strategies[msg.sender]
-    assert strategy != ZERO_ADDRESS, "zero address"
-
-    token: address = Vault(msg.sender).token()
-
-    self._safeTransferFrom(token, msg.sender, self, _amount)
-    # Many ERC20s require approval from zero to nonzero or nonzero to zero
-    ERC20(token).approve(strategy, 0)
-    ERC20(token).approve(strategy, _amount)
-
-    Strategy(strategy).deposit(_amount)
+    bal: uint256 = ERC20(WANT).balanceOf(self)
+    if bal > 0:
+        ERC20(WANT).approve(POOL, 0)
+        ERC20(WANT).approve(POOL, bal)
+        YVault(POOL).deposit(bal)
 
 
 @external
-def withdraw(_vault: address, _amount: uint256):
-    assert self.isVault[msg.sender], "!vault"
-    Strategy(self.strategies[_vault]).withdraw(_amount)
+def withdraw(_amount: uint256):
+    assert msg.sender == self.controller, "!controller"
 
-    log Withdraw(_vault, _amount)
+    bal: uint256 = ERC20(WANT).balanceOf(self)
+    amount: uint256 = _amount
+    if bal < amount:
+        YVault(POOL).withdraw(amount - bal)
+        after: uint256 = ERC20(WANT).balanceOf(self)
+        if after < amount:
+            amount = after
 
+    fee: uint256 = (amount * self.withdrawFee) / self.withdrawFeeMax
+    self._safeTransfer(WANT, Controller(self.controller).treasury(), fee)
 
+    vault: address = Controller(self.controller).vaults(self)
+    assert vault != ZERO_ADDRESS, "vault == zero address"
 
-
-
-
-
-
-
-
+    self._safeTransfer(WANT, vault, amount - fee)
 

@@ -10,7 +10,7 @@ from vyper.interfaces import ERC20
 
 interface Controller:
     def balanceOf(addr: address) -> uint256: view
-    def earn(addr: address, amount: uint256): nonpayable
+    def deposit(amount: uint256): nonpayable
     def withdraw(addr: address, amount: uint256): nonpayable
 
 implements: ERC20
@@ -290,8 +290,10 @@ def earn():
     @notice Transfer token to controller
     """
     bal: uint256 = self._getBalance()
-    self._safeTransfer(self.token, self.controller, bal)
-    Controller(self.controller).earn(self.token, bal)
+    # Many ERC20s require approval from zero to nonzero or nonzero to zero
+    ERC20(self.token).approve(self.controller, 0)
+    ERC20(self.token).approve(self.controller, bal)
+    Controller(self.controller).deposit(bal)
 
 
 @internal
