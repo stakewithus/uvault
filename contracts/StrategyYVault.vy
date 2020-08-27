@@ -11,7 +11,7 @@ interface Controller:
     def vaults(strategy: address) -> address: view
 
 interface YVault:
-    def balanceOf() -> uint256: nonpayable
+    def balanceOf(addr: address) -> uint256: view
     def deposit(amount: uint256): nonpayable
     def withdraw(amount: uint256): nonpayable
 
@@ -34,9 +34,11 @@ TRANSFER_FROM: constant(Bytes[4]) = method_id(
 )
 
 # yCRV
-WANT: constant(address) = 0xdF5e0e81Dff6FAF3A7e52BA697820c5e32D806A8
+# WANT: constant(address) = 0xdF5e0e81Dff6FAF3A7e52BA697820c5e32D806A8
+want: public(address)
 # yVault
-POOL: constant(address) = 0x5dbcF33D8c2E976c6b560249878e6F1491Bca25c
+# POOL: constant(address) = 0x5dbcF33D8c2E976c6b560249878e6F1491Bca25c
+pool: public(address)
 
 controller: public(address)
 admin: public(address)
@@ -45,9 +47,12 @@ withdrawFee: public(uint256)
 withdrawFeeMax: public(uint256)
 
 @external
-def __init__(_controller: address):
+def __init__(_controller: address, _yCRV: address, _yVault: address):
     self.admin = msg.sender
     self.controller = _controller
+
+    self.want = _yCRV
+    self.pool = _yVault
 
     self.withdrawFee = 50
     self.withdrawFeeMax = 10000
@@ -89,16 +94,6 @@ def setWithdrawFee(_fee: uint256):
 
     self.withdrawFee = _fee
     log SetWithdrawFee(_fee)
-
-
-@external
-@view
-def want() -> address:
-    """
-    @notice Get address of token to invest
-    @return address of token to invest
-    """
-    return WANT
 
 
 @internal
@@ -166,35 +161,45 @@ def _safeTransferFrom(_token: address, _from: address, _to: address, _amount: ui
 
 
 @internal
+@view
 def _getBalance() -> uint256:
-    return ERC20(WANT).balanceOf(self) + YVault(POOL).balanceOf()
+    """
+    @notice Get balance of `want` in this contract and pool
+    @return uint256 balance
+    """
+    return ERC20(self.want).balanceOf(self) + YVault(self.pool).balanceOf(self)
 
 
 @external
+@view
 def getBalance() -> uint256:
+    """
+    @notice Get balance of `want` in this contract and pool
+    @return uint256 balance
+    """
     return self._getBalance()
 
 
 @external
 def deposit(_amount: uint256):
-    self._safeTransferFrom(WANT, self.controller, self, _amount)
+    self._safeTransferFrom(self.want, self.controller, self, _amount)
 
-    bal: uint256 = ERC20(WANT).balanceOf(self)
+    bal: uint256 = ERC20(self.want).balanceOf(self)
     if bal > 0:
-        ERC20(WANT).approve(POOL, 0)
-        ERC20(WANT).approve(POOL, bal)
-        YVault(POOL).deposit(bal)
+        ERC20(self.want).approve(self.pool, 0)
+        ERC20(self.want).approve(self.pool, bal)
+        YVault(self.pool).deposit(bal)
 
 
 @external
 def withdraw(_amount: uint256):
     assert msg.sender == self.controller, "!controller"
 
-    bal: uint256 = ERC20(WANT).balanceOf(self)
+    bal: uint256 = ERC20(self.want).balanceOf(self)
     amount: uint256 = _amount
     if bal < amount:
-        YVault(POOL).withdraw(amount - bal)
-        after: uint256 = ERC20(WANT).balanceOf(self)
+        YVault(self.pool).withdraw(amount - bal)
+        after: uint256 = ERC20(self.want).balanceOf(self)
         if after < amount:
             amount = after
 
@@ -203,10 +208,10 @@ def withdraw(_amount: uint256):
         treasury: address = Controller(self.controller).treasury()
         assert treasury != ZERO_ADDRESS, "treasury == zero address"
         # fee can be lost if treasury is an address not controlled by StakeWithUs
-        self._safeTransfer(WANT, treasury, fee)
+        self._safeTransfer(self.want, treasury, fee)
 
     vault: address = Controller(self.controller).vaults(self)
     assert vault != ZERO_ADDRESS, "vault == zero address"
 
     # TODO: use pull pattern?
-    self._safeTransfer(WANT, vault, amount - fee)
+    self._safeTransfer(self.want, vault, amount - fee)
