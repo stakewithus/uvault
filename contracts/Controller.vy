@@ -1,6 +1,6 @@
 # @version 0.2.4
 """
-@title StakeWithUs Controller
+@title StakeWithUs ControllerV1
 @author StakeWithUs
 @dev Vyper implementation / fork of https://github.com/iearn-finance/vaults/blob/master/contracts/StrategyControllerV2.sol
 """
@@ -9,14 +9,9 @@ from vyper.interfaces import ERC20
 
 interface Strategy:
     def want() -> address: view
-    def withdraw(amount: uint256): nonpayable
-    def withdrawAll(): nonpayable
-    def deposit(amount: uint256): nonpayable
     def getBalance() -> uint256: view
-
-
-interface Vault:
-    def token() -> address: view
+    def deposit(amount: uint256): nonpayable
+    def withdraw(amount: uint256): nonpayable
 
 # TODO: docs
 # TODO: test
@@ -76,7 +71,8 @@ def setStrategy(_vault: address, _strategy: address):
 
     current: address = self.strategies[_vault]
     if current != ZERO_ADDRESS:
-        Strategy(current).withdrawAll()
+        bal: uint256 = Strategy(current).getBalance()
+        Strategy(current).withdraw(bal)
 
     self.strategies[_vault] = _strategy
     self.vaults[_strategy] = _vault
@@ -162,22 +158,26 @@ def deposit(_amount: uint256):
     strategy: address = self.strategies[msg.sender]
     assert strategy != ZERO_ADDRESS, "zero address"
 
-    token: address = Vault(msg.sender).token()
+    want: address = Strategy(strategy).want()
 
-    self._safeTransferFrom(token, msg.sender, self, _amount)
+    self._safeTransferFrom(want, msg.sender, self, _amount)
     # Many ERC20s require approval from zero to nonzero or nonzero to zero
-    ERC20(token).approve(strategy, 0)
-    ERC20(token).approve(strategy, _amount)
+    ERC20(want).approve(strategy, 0)
+    ERC20(want).approve(strategy, _amount)
 
     Strategy(strategy).deposit(_amount)
 
 
 @external
-def withdraw(_vault: address, _amount: uint256):
+def withdraw(_amount: uint256):
     assert self.isVault[msg.sender], "!vault"
-    Strategy(self.strategies[_vault]).withdraw(_amount)
 
-    log Withdraw(_vault, _amount)
+    strategy: address = self.strategies[msg.sender]
+    assert strategy != ZERO_ADDRESS, "zero address"
+
+    Strategy(strategy).withdraw(_amount)
+
+    log Withdraw(msg.sender, _amount)
 
 
 

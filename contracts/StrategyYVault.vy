@@ -6,18 +6,14 @@
 
 from vyper.interfaces import ERC20
 
-interface YVault:
-    def deposit(amount: uint256): nonpayable
-    def withdraw(amount: uint256): nonpayable
-
-interface Vault:
-    def token() -> address: view
-
-
 interface Controller:
     def treasury() -> address: view
     def vaults(strategy: address) -> address: view
 
+interface YVault:
+    def balanceOf() -> uint256: nonpayable
+    def deposit(amount: uint256): nonpayable
+    def withdraw(amount: uint256): nonpayable
 
 event SetAdmin:
     admin: address
@@ -35,7 +31,7 @@ TRANSFER_FROM: constant(Bytes[4]) = method_id(
 )
 
 # TODO set addresses to yVault
-# TODO is this needed?
+# TODO use Vault.token()?
 WANT: constant(address) = 0xdF5e0e81Dff6FAF3A7e52BA697820c5e32D806A8
 POOL: constant(address) = 0xFA712EE4788C042e2B7BB55E6cb8ec569C4530c1
 controller: public(address)
@@ -74,12 +70,12 @@ def setController(_controller: address):
     self.controller = _controller
     log SetController(_controller)
 
+
 @external
 def setWithdrawFee(_fee: uint256):
     assert msg.sender == self.admin, "!admin"
 
     self.withdrawFee = _fee
-
 
 @external
 @view
@@ -151,6 +147,16 @@ def _safeTransferFrom(_token: address, _from: address, _to: address, _amount: ui
     ))
 
 
+@internal
+def _getBalance() -> uint256:
+    return ERC20(WANT).balanceOf(self) + YVault(POOL).balanceOf()
+
+
+@external
+def getBalance() -> uint256:
+    return self._getBalance()
+
+
 @external
 def deposit(_amount: uint256):
     self._safeTransferFrom(WANT, self.controller, self, _amount)
@@ -175,10 +181,14 @@ def withdraw(_amount: uint256):
             amount = after
 
     fee: uint256 = (amount * self.withdrawFee) / self.withdrawFeeMax
-    self._safeTransfer(WANT, Controller(self.controller).treasury(), fee)
+    if fee > 0:
+        treasury: address = Controller(self.controller).treasury()
+        assert treasury != ZERO_ADDRESS, "treasury == zero address"
+        # fee can be lost if treasury is an address not controlled by StakeWithUs
+        self._safeTransfer(WANT, treasury, fee)
 
     vault: address = Controller(self.controller).vaults(self)
     assert vault != ZERO_ADDRESS, "vault == zero address"
 
+    # TODO: use pull pattern?
     self._safeTransfer(WANT, vault, amount - fee)
-

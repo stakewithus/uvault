@@ -1,6 +1,6 @@
 # @version 0.2.4
 """
-@title StakeWithUs UVault
+@title StakeWithUs UVaultV1
 @author StakeWithUs
 @dev Based on https://github.com/curvefi/curve-dao-contracts/blob/master/contracts/ERC20CRV.vy
 @dev Vyper implementation / fork of https://github.com/iearn-finance/vaults/blob/master/contracts/yVault.sol
@@ -11,12 +11,14 @@ from vyper.interfaces import ERC20
 interface Controller:
     def balanceOf(addr: address) -> uint256: view
     def deposit(amount: uint256): nonpayable
-    def withdraw(addr: address, amount: uint256): nonpayable
+    def withdraw(amount: uint256): nonpayable
 
 implements: ERC20
 
 # TODO: reentrancy lock
 # TODO: doc
+# TODO: test
+# TODO: events
 
 event Transfer:
     _from: indexed(address)
@@ -86,6 +88,25 @@ def allowance(_owner : address, _spender : address) -> uint256:
 
 
 @external
+def approve(_spender : address, _amount : uint256) -> bool:
+    """
+    @notice Approve `_spender` to transfer `_amount` tokens on behalf of `msg.sender`
+    @dev Approval may only be from zero -> nonzero or from nonzero -> zero in order
+        to mitigate the potential race condition described here:
+        https://github.com/ethereum/EIPs/issues/20#issuecomment-263524729
+    @param _spender The address which will spend the funds
+    @param _amount The amount of tokens to be spent
+    @return bool success
+    """
+    assert _amount == 0 or self.allowances[msg.sender][_spender] == 0, "amount != 0 and allowance != 0"
+
+    self.allowances[msg.sender][_spender] = _amount
+    log Approval(msg.sender, _spender, _amount)
+
+    return True
+
+
+@external
 def transfer(_to : address, _amount : uint256) -> bool:
     """
     @notice Transfer `_amount` tokens from `msg.sender` to `_to`
@@ -121,25 +142,6 @@ def transferFrom(_from : address, _to : address, _amount : uint256) -> bool:
     self.balanceOf[_to] += _amount
     self.allowances[_from][msg.sender] -= _amount
     log Transfer(_from, _to, _amount)
-
-    return True
-
-
-@external
-def approve(_spender : address, _amount : uint256) -> bool:
-    """
-    @notice Approve `_spender` to transfer `_amount` tokens on behalf of `msg.sender`
-    @dev Approval may only be from zero -> nonzero or from nonzero -> zero in order
-        to mitigate the potential race condition described here:
-        https://github.com/ethereum/EIPs/issues/20#issuecomment-263524729
-    @param _spender The address which will spend the funds
-    @param _amount The amount of tokens to be spent
-    @return bool success
-    """
-    assert _amount == 0 or self.allowances[msg.sender][_spender] == 0, "amount != 0 and allowance != 0"
-
-    self.allowances[msg.sender][_spender] = _amount
-    log Approval(msg.sender, _spender, _amount)
 
     return True
 
@@ -274,7 +276,6 @@ def _getBalance() -> uint256:
     """
     return ERC20(self.token).balanceOf(self) + Controller(self.controller).balanceOf(self)
 
-
 @external
 @view
 def getBalance() -> uint256:
@@ -289,7 +290,7 @@ def earn():
     """
     @notice Transfer token to controller
     """
-    bal: uint256 = self._getBalance()
+    bal: uint256 = ERC20(self.token).balanceOf(self)
     # Many ERC20s require approval from zero to nonzero or nonzero to zero
     ERC20(self.token).approve(self.controller, 0)
     ERC20(self.token).approve(self.controller, bal)
@@ -390,18 +391,19 @@ def deposit(
 
 @external
 def batchDeposit(
-    _addresses: address[1000], _amounts: uint256[1000], _nonces: uint256[1000],
+    _accounts: address[1000], _amounts: uint256[1000], _nonces: uint256[1000],
     _vs: uint256[1000], _rs: uint256[1000], _ss: uint256[1000],
 ):
     # TODO: verify signature (address, token, amount, nonce)? or only allow admin to batch? call from gas relayer?
     for i in range(1000):
-        addr: address = _addresses[i]
+        addr: address = _accounts[i]
         amount: uint256 = _amounts[i]
         nonce: uint256 = _nonces[i]
         v: uint256 = _vs[i]
         r: uint256 = _rs[i]
         s: uint256 = _ss[i]
 
+        # TODO: vulnerable to DOS
         # TODO: check balance and approval or let all tx fail?
         # TODO: _safeTransfer can fail
         # TODO signature verification can fail
@@ -441,8 +443,7 @@ def _withdraw(
     # Withdraw from controller if token balance of this contract < amount to transfer to _to
     bal: uint256 = ERC20(self.token).balanceOf(self)
     if bal < amount:
-        withdrawAmount: uint256 = amount - bal
-        Controller(self.controller).withdraw(self, withdrawAmount)
+        Controller(self.controller).withdraw(amount - bal)
         after: uint256 = ERC20(self.token).balanceOf(self)
         if after < amount:
             amount = after
@@ -471,19 +472,21 @@ def withdraw(
 
 @external
 def batchWithdraw(
-    _addresses: address[1000], _amounts: uint256[1000], _nonces: uint256[1000],
+    _accounts: address[1000], _amounts: uint256[1000], _nonces: uint256[1000],
     _vs: uint256[1000], _rs: uint256[1000], _ss: uint256[1000],
 ):
     # TODO: verify signature (address, token, amount, nonce)? or only allow admin to batch? call from gas relayer?
     for i in range(1000):
         # TODO break if less than 1000
-        addr: address = _addresses[i]
+        addr: address = _accounts[i]
         amount: uint256 = _amounts[i]
         nonce: uint256 = _nonces[i]
         v: uint256 = _vs[i]
         r: uint256 = _rs[i]
         s: uint256 = _ss[i]
 
+        # valid sig proves account exists, so we can safely transfer
+        # TODO: vulnerable to DOS
         # TODO: let all tx fail?
         # TODO: _safeTransfer can fail
         # TODO signature verification can fail
