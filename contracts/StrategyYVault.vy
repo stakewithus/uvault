@@ -90,9 +90,14 @@ def setWithdrawFee(_fee: uint256):
     self.withdrawFee = _fee
     log SetWithdrawFee(_fee)
 
+
 @external
 @view
 def want() -> address:
+    """
+    @notice Get address of token to invest
+    @return address of token to invest
+    """
     return WANT
 
 
