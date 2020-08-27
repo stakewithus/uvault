@@ -21,6 +21,9 @@ event SetAdmin:
 event SetController:
     controller: address
 
+event SetWithdrawFee:
+    fee: uint256
+
 # TODO: events, doc, test
 TRANSFER: constant(Bytes[4]) = method_id(
     "transfer(address,uint256)", output_type=Bytes[4]
@@ -78,9 +81,14 @@ def setController(_controller: address):
 
 @external
 def setWithdrawFee(_fee: uint256):
+    """
+    @notice Set withdraw fee
+    @param _fee New withdraw fee
+    """
     assert msg.sender == self.admin, "!admin"
 
     self.withdrawFee = _fee
+    log SetWithdrawFee(_fee)
 
 @external
 @view
