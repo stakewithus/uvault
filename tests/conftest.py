@@ -13,3 +13,13 @@ def isolate(fn_isolation):
 @pytest.fixture(scope="module")
 def token(Token, accounts):
     return Token.deploy("Test Token", "TST", 18, 1e21, {'from': accounts[0]})
+
+
+@pytest.fixture(scope="module")
+def mockController(MockController, accounts):
+    yield MockController.deploy(accounts[0], {'from': accounts[0]})
+
+
+@pytest.fixture(scope="module")
+def strategyYVault(StrategyYVault, accounts, mockController):
+    yield StrategyYVault.deploy(mockController, {'from': accounts[0]})
