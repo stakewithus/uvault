@@ -30,10 +30,11 @@ TRANSFER_FROM: constant(Bytes[4]) = method_id(
     "transferFrom(address,address,uint256)", output_type=Bytes[4]
 )
 
-# TODO set addresses to yVault
-# TODO use Vault.token()?
+# yCRV
 WANT: constant(address) = 0xdF5e0e81Dff6FAF3A7e52BA697820c5e32D806A8
-POOL: constant(address) = 0xFA712EE4788C042e2B7BB55E6cb8ec569C4530c1
+# yVault
+POOL: constant(address) = 0x5dbcF33D8c2E976c6b560249878e6F1491Bca25c
+
 controller: public(address)
 admin: public(address)
 
