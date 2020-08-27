@@ -24,11 +24,6 @@ def mockController(MockController, accounts):
 # strategy
 
 @pytest.fixture(scope="module")
-def mockYVault(MockYVault, accounts):
-    yield MockYVault.deploy({'from': accounts[0]})
-
-
-@pytest.fixture(scope="module")
 def mockYCRV(MockERC20, accounts):
     yield MockERC20.deploy(
         "Curve.fi yDAI/yUSDC/yUSDT/yTUSD",
@@ -37,6 +32,11 @@ def mockYCRV(MockERC20, accounts):
         10000,
         {'from': accounts[0]}
     )
+
+
+@pytest.fixture(scope="module")
+def mockYVault(MockYVault, accounts, mockYCRV):
+    yield MockYVault.deploy(mockYCRV, {'from': accounts[0]})
 
 
 @pytest.fixture(scope="module")

