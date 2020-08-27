@@ -52,8 +52,12 @@ def __init__(_controller: address):
 
 @external
 def setAdmin(_admin: address):
+    """
+    @notice Set admin
+    @param _admin New admin address
+    """
     assert msg.sender == self.admin, "!admin"
-    assert _admin != ZERO_ADDRESS, "zero address"
+    assert _admin != ZERO_ADDRESS, "admin == zero address"
 
     self.admin = _admin
     log SetAdmin(_admin)
@@ -66,7 +70,7 @@ def setController(_controller: address):
     @param _controller New controller address
     """
     assert msg.sender == self.admin, "!admin"
-    assert _controller != ZERO_ADDRESS, "zero address"
+    assert _controller != ZERO_ADDRESS, "controller == zero address"
 
     self.controller = _controller
     log SetController(_controller)
