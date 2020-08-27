@@ -491,4 +491,5 @@ def batchWithdraw(
         # TODO: _safeTransfer can fail
         # TODO signature verification can fail
         # TODO: check total _amounts >= total supply
+        # TODO withdraw total from controller and then burn shares
         self._withdraw(addr, amount, nonce, v, r, s)
