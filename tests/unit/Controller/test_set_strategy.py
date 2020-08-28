@@ -7,7 +7,7 @@ VAULT = "0x0000000000000000000000000000000000000002"
 
 
 def test_set_strategy(accounts, controller):
-    controller.setStrategy(VAULT, STRATEGY, { 'from': accounts[0] })
+    controller.setStrategy(VAULT, STRATEGY, {'from': accounts[0]})
 
     assert controller.strategies(VAULT) == STRATEGY
     assert controller.isVault(VAULT)
@@ -29,20 +29,17 @@ def test_set_strategy_strategy_zero_address(accounts, controller):
 
 
 def test_set_strategy_withdraw_from_strategy(accounts, controller, mockStrategy):
-    # mint tokens to test withdraw
-    mockStrategy.mintTo(controller, 1000)
-    controller.setStrategy(VAULT, mockStrategy, { 'from': accounts[0] })
+    # mock balance of strategy
+    balance = 1000
+    mockStrategy.setBalance(balance)
 
-    assert mockStrategy.balanceOf(controller) == 1000
+    controller.setStrategy(VAULT, mockStrategy, {'from': accounts[0]})
 
     # mock new strategy
     newStrategy = accounts[1]
-    controller.setStrategy(VAULT, newStrategy, { 'from': accounts[0] })
+    controller.setStrategy(VAULT, newStrategy, {'from': accounts[0]})
 
     # check Strategy.withdraw was called
-    assert mockStrategy.balanceOf(controller) == 0
+    assert mockStrategy.withdrawAmount() == balance
     assert controller.strategies(VAULT) == newStrategy
     assert controller.isVault(VAULT)
-
-
-
