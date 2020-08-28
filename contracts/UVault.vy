@@ -371,7 +371,7 @@ def _deposit(
 
     log TxNonce(_from, _nonce)
 
-
+# TODO: compare gas with direct transfer
 @external
 def deposit(
     _from: address, _amount: uint256, _nonce: uint256,
