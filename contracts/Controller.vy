@@ -36,8 +36,6 @@ TRANSFER_FROM: constant(Bytes[4]) = method_id(
 
 # vault to strategy mapping
 strategies: public(HashMap[address, address])
-# strategy to vault mapping
-vaults: public(HashMap[address, address])
 isVault: public(HashMap[address, bool])
 
 admin: public(address)
@@ -82,9 +80,14 @@ def setTreasury(_treasury: address):
 
 @external
 def setStrategy(_vault: address, _strategy: address):
+    """
+    @notice Set mapping from `_vault` to `_strategy`
+    @param _vault Address of vault
+    @param _strategy Address of strategy
+    """
     assert msg.sender == self.admin # dev: !admin
-    assert _vault != ZERO_ADDRESS # dev: zero address
-    assert _strategy != ZERO_ADDRESS # dev: zero address
+    assert _vault != ZERO_ADDRESS # dev: vault == zero address
+    assert _strategy != ZERO_ADDRESS # dev: strategy == zero address
 
     current: address = self.strategies[_vault]
     if current != ZERO_ADDRESS:
@@ -92,7 +95,6 @@ def setStrategy(_vault: address, _strategy: address):
         Strategy(current).withdraw(bal)
 
     self.strategies[_vault] = _strategy
-    self.vaults[_strategy] = _vault
     self.isVault[_vault] = True
 
 
