@@ -1,6 +1,6 @@
 # @version 0.2.4
 """
-@title StakeWithUs ControllerV1
+@title StakeWithUs Controller
 @author StakeWithUs
 @dev Vyper implementation / fork of https://github.com/iearn-finance/vaults/blob/master/contracts/StrategyControllerV2.sol
 """
@@ -21,16 +21,6 @@ interface Strategy:
 # TODO: circuit breaker
 # TODO remove log to save gas?
 
-
-event SetAdmin:
-    admin: address
-
-event SetTreasury:
-    treasury: address
-
-event SetStrategy:
-    token: indexed(address)
-    strategy: indexed(address)
 
 event Withdraw:
     vault: indexed(address)
@@ -57,7 +47,10 @@ treasury: public(address)
 
 @external
 def __init__(_treasury: address):
-    assert _treasury != ZERO_ADDRESS, "treasury == zero address"
+    """
+    @param _treasury Address of treasury to send withdrawal fees from strategy
+    """
+    assert _treasury != ZERO_ADDRESS # dev: treasury == zero address
 
     self.admin = msg.sender
     self.treasury = _treasury
@@ -65,27 +58,29 @@ def __init__(_treasury: address):
 
 @external
 def setAdmin(_admin: address):
-    assert msg.sender == self.admin, "!admin"
-    assert _admin != ZERO_ADDRESS, "zero address"
+    """
+    @notice Set admin
+    @param _admin Address of new admin
+    """
+    assert msg.sender == self.admin # dev: !admin
+    assert _admin != ZERO_ADDRESS # dev: zero address
 
     self.admin = _admin
-    log SetAdmin(_admin)
 
 
 @external
 def setTreasury(_treasury: address):
-    assert msg.sender == self.admin, "!admin"
-    assert _treasury != ZERO_ADDRESS, "treasury == zero address"
+    assert msg.sender == self.admin # dev: !admin
+    assert _treasury != ZERO_ADDRESS # dev: treasury == zero address
 
     self.treasury = _treasury
-    log SetTreasury(_treasury)
 
 
 @external
 def setStrategy(_vault: address, _strategy: address):
-    assert msg.sender == self.admin, "!admin"
-    assert _vault != ZERO_ADDRESS, "zero address"
-    assert _strategy != ZERO_ADDRESS, "zero address"
+    assert msg.sender == self.admin # dev: !admin
+    assert _vault != ZERO_ADDRESS # dev: zero address
+    assert _strategy != ZERO_ADDRESS # dev: zero address
 
     current: address = self.strategies[_vault]
     if current != ZERO_ADDRESS:
@@ -95,8 +90,6 @@ def setStrategy(_vault: address, _strategy: address):
     self.strategies[_vault] = _strategy
     self.vaults[_strategy] = _vault
     self.isVault[_vault] = True
-
-    log SetStrategy(_vault, _strategy)
 
 
 @internal
@@ -119,7 +112,7 @@ def _call(_token: address, _data: Bytes[100]):
         max_outsize=32
     )
     if len(_response) > 0:
-        assert convert(_response, bool), "ERC20 transfer failed!"
+        assert convert(_response, bool) # dev: ERC20 transfer failed!
 
 
 @internal
@@ -171,10 +164,10 @@ def balanceOf(_vault: address) -> uint256:
 
 @external
 def deposit(_amount: uint256):
-    assert self.isVault[msg.sender], "!vault"
+    assert self.isVault[msg.sender] # dev: !vault
 
     strategy: address = self.strategies[msg.sender]
-    assert strategy != ZERO_ADDRESS, "zero address"
+    assert strategy != ZERO_ADDRESS # dev: zero address
 
     want: address = Strategy(strategy).want()
 
@@ -188,10 +181,10 @@ def deposit(_amount: uint256):
 
 @external
 def withdraw(_amount: uint256):
-    assert self.isVault[msg.sender], "!vault"
+    assert self.isVault[msg.sender] # dev: !vault
 
     strategy: address = self.strategies[msg.sender]
-    assert strategy != ZERO_ADDRESS, "zero address"
+    assert strategy != ZERO_ADDRESS # dev: zero address
 
     want: address = Strategy(strategy).want()
 
