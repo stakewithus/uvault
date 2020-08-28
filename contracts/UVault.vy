@@ -19,6 +19,7 @@ implements: ERC20
 # TODO: doc
 # TODO: test
 # TODO: events
+# TODO: circuit breaker
 
 event Transfer:
     _from: indexed(address)
@@ -372,6 +373,7 @@ def _deposit(
     log TxNonce(_from, _nonce)
 
 # TODO: compare gas with direct transfer
+# TODO: deposit need signature if token approved?
 @external
 def deposit(
     _from: address, _amount: uint256, _nonce: uint256,
