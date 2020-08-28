@@ -195,7 +195,7 @@ def _call(_token: address, _data: Bytes[100]):
         max_outsize=32
     )
     if len(_response) > 0:
-        assert convert(_response, bool) # dev: ERC20 transfer failed!
+        assert convert(_response, bool) # dev: ERC20 transfer failed
 
 
 @internal
@@ -246,7 +246,7 @@ def setAdmin(_admin: address):
     @param _admin New admin address
     """
     assert msg.sender == self.admin # dev: !admin
-    assert _admin != ZERO_ADDRESS # dev: zero address
+    assert _admin != ZERO_ADDRESS # dev: admin == zero address
 
     self.admin = _admin
 

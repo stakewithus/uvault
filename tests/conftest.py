@@ -38,6 +38,11 @@ def controller(Controller, accounts):
     yield Controller.deploy(treasury, {'from': accounts[0]})
 
 
+@pytest.fixture(scope="function")
+def vault(Vault, accounts, mockERC20, mockController):
+    yield Vault.deploy(mockERC20, mockController, {'from': accounts[0]})
+
+
 # strategy
 @pytest.fixture(scope="function")
 def mockYCRV(MockERC20, accounts):
@@ -63,4 +68,3 @@ def strategyYVault(
         mockController, mockYCRV, mockYVault,
         {'from': accounts[0]}
     )
-
