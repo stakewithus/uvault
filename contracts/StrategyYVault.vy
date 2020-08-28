@@ -34,6 +34,7 @@ event Withdraw:
 # TODO: harvest?
 # TODO: reentrancy
 # TODO: circuit breaker
+# TODO remove log to save gas?
 TRANSFER: constant(Bytes[4]) = method_id(
     "transfer(address,uint256)", output_type=Bytes[4]
 )
@@ -73,8 +74,8 @@ def setAdmin(_admin: address):
     @notice Set admin
     @param _admin New admin address
     """
-    assert msg.sender == self.admin, "!admin"
-    assert _admin != ZERO_ADDRESS, "admin == zero address"
+    assert msg.sender == self.admin # dev: !admin
+    assert _admin != ZERO_ADDRESS # dev: admin == zero address
 
     self.admin = _admin
     log SetAdmin(_admin)
@@ -86,8 +87,8 @@ def setController(_controller: address):
     @notice Set the new controller.
     @param _controller New controller address
     """
-    assert msg.sender == self.admin, "!admin"
-    assert _controller != ZERO_ADDRESS, "controller == zero address"
+    assert msg.sender == self.admin # dev: !admin
+    assert _controller != ZERO_ADDRESS # dev: controller == zero address
 
     self.controller = _controller
     log SetController(_controller)
@@ -99,7 +100,7 @@ def setWithdrawFee(_fee: uint256):
     @notice Set withdraw fee
     @param _fee New withdraw fee
     """
-    assert msg.sender == self.admin, "!admin"
+    assert msg.sender == self.admin # dev: !admin
 
     self.withdrawFee = _fee
     log SetWithdrawFee(_fee)
@@ -125,7 +126,7 @@ def _call(_token: address, _data: Bytes[100]):
         max_outsize=32
     )
     if len(_response) > 0:
-        assert convert(_response, bool), "ERC20 transfer failed!"
+        assert convert(_response, bool) # dev: ERC20 transfer failed!
 
 
 @internal
@@ -195,7 +196,7 @@ def deposit(_amount: uint256):
     @notice Deposit `_amount` into yVault
     @param _amount Amount of yCRV to deposit
     """
-    assert msg.sender == self.controller, "!controller"
+    assert msg.sender == self.controller # dev: !controller
 
     self._safeTransferFrom(self.want, msg.sender, self, _amount)
 
@@ -215,7 +216,7 @@ def withdraw(_amount: uint256):
     @notice Withdraw `_amount` from yVault
     @param _amount Amount of yCRV to withdraw
     """
-    assert msg.sender == self.controller, "!controller"
+    assert msg.sender == self.controller # dev: !controller
 
     bal: uint256 = ERC20(self.want).balanceOf(self)
     amount: uint256 = _amount
@@ -228,7 +229,7 @@ def withdraw(_amount: uint256):
     fee: uint256 = (amount * self.withdrawFee) / self.withdrawFeeMax
     if fee > 0:
         treasury: address = Controller(self.controller).treasury()
-        assert treasury != ZERO_ADDRESS, "treasury == zero address"
+        assert treasury != ZERO_ADDRESS # dev: treasury == zero address
         # TODO: transfer fee to controller?
         # fee can be lost if treasury is an address not controlled by StakeWithUs
         self._safeTransfer(self.want, treasury, fee)
