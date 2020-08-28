@@ -308,187 +308,212 @@ def _isValidSig(_digest: bytes32, _v: uint256, _r: uint256, _s: uint256, _signer
 
 @internal
 @view
-def _getTransferHash(_from: address, _to: address, _amount: uint256, _nonce: uint256) -> bytes32:
+def _getTxHash(
+    _from: address, _to: address, _inAmount: uint256, _minOutAmount: uint256,
+    _nonce: uint256
+) -> bytes32:
+    """
+    @notice Get hash of transfer between Vault token and underlying token
+    @dev hash is used to sign deposit and withdraw
+    @param _from Address to transfer from
+    @param _inAmount The amount that will be transferred
+    @param _minOutAmount Minimum amount of token to return to prevent slippage
+    @param _nonce Nonce used to sign
+    @return bytes32 hash
+    """
     return keccak256(concat(
         convert(self, bytes32),
         convert(_from, bytes32),
         convert(_to, bytes32),
-        convert(_amount, bytes32),
+        convert(_inAmount, bytes32),
+        convert(_minOutAmount, bytes32),
         convert(_nonce, bytes32)
     ))
 
 
 @external
 @view
-def getTransferHash(_from: address, _to: address, _amount: uint256, _nonce: uint256) -> bytes32:
-    return self._getTransferHash(_from, _to, _amount, _nonce)
+def getTxHash(
+    _from: address, _to: address, _inAmount: uint256, _minOutAmount: uint256,
+    _nonce: uint256
+) -> bytes32:
+    """
+    @notice Get hash of transfer between Vault token and underlying token
+    @dev hash is used to sign deposit and withdraw
+    @param _from Address to transfer from
+    @param _inAmount The amount that will be transferred
+    @param _minOutAmount Minimum amount of token to return to prevent slippage
+    @param _nonce Nonce used to sign
+    @return bytes32 hash
+    """
+    return self._getTxHash(_from, _to, _inAmount, _minOutAmount, _nonce)
 
 
 @internal
 def _deposit(
-    _from: address, _amount: uint256, _nonce: uint256,
+    _from: address, _amount: uint256, _minSharesToMint: uint256, _nonce: uint256,
     _v: uint256, _r: uint256, _s: uint256
 ):
     """
     @notice Deposit token
     @param _from Address to transfer token from
-    @param _amount The amount that will be burned
+    @param _amount The amount of tokens to deposit
+    @param _minSharesToMint Minimum amount of shares to mint to prevent slippage
     @param _nonce Nonce used to sign
     @param _v Signature param
     @param _r Signature param
     @param _s Signature param
+    @dev `_from` will not be zero address unless signer is zero address
     """
-    digest: bytes32 = self._getTransferHash(_from, self, _amount, _nonce)
-    assert not self.executed[digest] # dev: tx executed
-    assert self._isValidSig(digest, _v, _r, _s, _from) # dev: invalid sig
+    txHash: bytes32 = self._getTxHash(
+        _from, self, _amount, _minSharesToMint, _nonce
+    )
+    assert not self.executed[txHash] # dev: tx executed
+    assert self._isValidSig(txHash, _v, _r, _s, _from) # dev: invalid sig
 
-    self.executed[digest] = True
+    # self.executed[txHash] = True
 
-    poolBalance: uint256 = self._getBalance()
-    before: uint256 = ERC20(self.token).balanceOf(self)
-    self._safeTransferFrom(self.token, _from, self, _amount)
-    after: uint256 = ERC20(self.token).balanceOf(self)
-    # Additional check for deflationary tokens
-    diff: uint256 = after - before
+    # # TODO view function to calculate shares to be minted?
+    # bal: uint256 = self._getBalance()
+    # before: uint256 = ERC20(self.token).balanceOf(self)
+    # self._safeTransferFrom(self.token, _from, self, _amount)
+    # after: uint256 = ERC20(self.token).balanceOf(self)
+    # # Additional check for deflationary tokens
+    # diff: uint256 = after - before
 
-    shares: uint256 = 0
-    if self.totalSupply == 0:
-        shares = diff
-    else:
-        # s = shares to mint
-        # T = total supply of shares before minting
-        # a = amount of tokens deposited
-        # B = balance of tokens before deposit
-        # s / (T + s) = a / (B + a)
-        # s = a * T / B
-        shares = (diff * self.totalSupply) / poolBalance
+    # shares: uint256 = 0
+    # if self.totalSupply == 0:
+    #     shares = diff
+    # else:
+    #     # s = shares to mint
+    #     # T = total supply of shares before minting
+    #     # a = amount of tokens deposited
+    #     # B = balance of tokens before deposit
+    #     # s / (T + s) = a / (B + a)
+    #     # s = a * T / B
+    #     shares = (diff * self.totalSupply) / bal
 
-    self._mint(_from, shares)
+    # assert shares >= _minSharesToMint # dev: shares < min shares to mint
 
-    log TxNonce(_from, _nonce)
+    # self._mint(_from, shares)
 
-# TODO: compare gas with direct transfer
-# TODO: deposit need signature if token approved?
+    # log TxNonce(_from, _nonce)
+
+
 @external
 def deposit(
-    _from: address, _amount: uint256, _nonce: uint256,
+    _from: address, _amount: uint256, _minSharesToMint: uint256, _nonce: uint256,
     _v: uint256, _r: uint256, _s: uint256
 ):
     """
     @notice Deposit token
     @param _from Address to transfer token from
-    @param _amount The amount that will be burned
+    @param _amount The amount of tokens to deposit
+    @param _minSharesToMint Minimum amount of shares to mint to prevent slippage
     @param _nonce Nonce used to sign
     @param _v Signature param
     @param _r Signature param
     @param _s Signature param
     """
-    self._deposit(_from, _amount, _nonce, _v, _r, _s)
+    self._deposit(_from, _amount, _minSharesToMint, _nonce, _v, _r, _s)
 
 
-@external
-def batchDeposit(
-    _accounts: address[1000], _amounts: uint256[1000], _nonces: uint256[1000],
-    _vs: uint256[1000], _rs: uint256[1000], _ss: uint256[1000],
-):
-    # TODO: prevent slippage
-    # TODO: verify signature (address, token, amount, nonce)? or only allow admin to batch? call from gas relayer?
-    for i in range(1000):
-        addr: address = _accounts[i]
-        amount: uint256 = _amounts[i]
-        nonce: uint256 = _nonces[i]
-        v: uint256 = _vs[i]
-        r: uint256 = _rs[i]
-        s: uint256 = _ss[i]
+# @external
+# def batchDeposit(_accounts: address[100], _amounts: uint256[100]):
+#     # TODO: prevent slippage
+#     # TODO: verify signature (address, token, amount, nonce)? or only allow admin to batch? call from gas relayer?
+#     for i in range(100):
+#         addr: address = _accounts[i]
+#         amount: uint256 = _amounts[i]
 
-        # TODO: vulnerable to DOS
-        # TODO: check balance and approval or let all tx fail?
-        # TODO: _safeTransfer can fail
-        # TODO signature verification can fail
-        if ERC20(self.token).balanceOf(addr) >= amount and ERC20(self.token).allowance(addr, self) >= amount:
-            self._deposit(addr, amount, nonce, v, r, s)
+#         # TODO: vulnerable to DOS
+#         # TODO: check balance and approval or let all tx fail?
+#         # TODO: _safeTransfer can fail
+#         # TODO signature verification can fail
+#         if ERC20(self.token).balanceOf(addr) >= amount and ERC20(self.token).allowance(addr, self) >= amount:
+#             self._deposit(addr, amount, nonce, v, r, s)
 
 
-@internal
-def _withdraw(
-    _to: address, _shares: uint256, _nonce: uint256,
-    _v: uint256, _r: uint256, _s: uint256
-):
-    """
-    @notice Withdraw token for shares
-    @param _to Address to withdraw shares and transfer underlying token to
-    @param _shares Shares owned by _to
-    @param _nonce Nonce used to sign
-    @param _v Signature param
-    @param _r Signature param
-    @param _s Signature param
-    """
-    digest: bytes32 = self._getTransferHash(self, _to, _shares, _nonce)
-    assert not self.executed[digest] # dev: tx executed
-    assert self._isValidSig(digest, _v, _r, _s, _to) # dev: invalid sig
+# @internal
+# def _withdraw(
+#     _to: address, _shares: uint256, _nonce: uint256,
+#     _v: uint256, _r: uint256, _s: uint256
+# ):
+#     """
+#     @notice Withdraw token for shares
+#     @param _to Address to withdraw shares and transfer underlying token to
+#     @param _shares Shares owned by _to
+#     @param _nonce Nonce used to sign
+#     @param _v Signature param
+#     @param _r Signature param
+#     @param _s Signature param
+#     """
+#     txHash: bytes32 = self._getTxHash(self, _to, _shares, _nonce)
+#     assert not self.executed[txHash] # dev: tx executed
+#     assert self._isValidSig(txHash, _v, _r, _s, _to) # dev: invalid sig
 
-    self.executed[digest] = True
+#     self.executed[txHash] = True
 
-    # s = shares
-    # T = total supply
-    # a = amount of tokens
-    # B = balance of tokens
-    # s / T = a / B
-    # a = s * B / T
-    amount: uint256 = (self._getBalance() * _shares) / self.totalSupply
-    self._burn(_to, amount)
+#     # s = shares
+#     # T = total supply
+#     # a = amount of tokens
+#     # B = balance of tokens
+#     # s / T = a / B
+#     # a = s * B / T
+#     amount: uint256 = (self._getBalance() * _shares) / self.totalSupply
+#     self._burn(_to, amount)
 
-    # Withdraw from controller if token balance of this contract < amount to transfer to _to
-    bal: uint256 = ERC20(self.token).balanceOf(self)
-    if bal < amount:
-        Controller(self.controller).withdraw(amount - bal)
-        after: uint256 = ERC20(self.token).balanceOf(self)
-        if after < amount:
-            amount = after
+#     # Withdraw from controller if token balance of this contract < amount to transfer to _to
+#     bal: uint256 = ERC20(self.token).balanceOf(self)
+#     if bal < amount:
+#         Controller(self.controller).withdraw(amount - bal)
+#         after: uint256 = ERC20(self.token).balanceOf(self)
+#         if after < amount:
+#             amount = after
 
-    self._safeTransfer(self.token, _to, amount)
+#     self._safeTransfer(self.token, _to, amount)
 
-    log TxNonce(_to, _nonce)
-
-
-@external
-def withdraw(
-    _to: address, _shares: uint256, _nonce: uint256,
-    _v: uint256, _r: uint256, _s: uint256
-):
-    """
-    @notice Withdraw token for shares
-    @param _to Address to withdraw shares and transfer underlying token to
-    @param _shares Shares owned by _to
-    @param _nonce Nonce used to sign
-    @param _v Signature param
-    @param _r Signature param
-    @param _s Signature param
-    """
-    self._withdraw(_to, _shares, _nonce, _v, _r, _s)
+#     log TxNonce(_to, _nonce)
 
 
-@external
-def batchWithdraw(
-    _accounts: address[1000], _amounts: uint256[1000], _nonces: uint256[1000],
-    _vs: uint256[1000], _rs: uint256[1000], _ss: uint256[1000],
-):
-    # TODO: prevent slippage
-    # TODO: verify signature (address, token, amount, nonce)? or only allow admin to batch? call from gas relayer?
-    for i in range(1000):
-        # TODO break if less than 1000
-        addr: address = _accounts[i]
-        amount: uint256 = _amounts[i]
-        nonce: uint256 = _nonces[i]
-        v: uint256 = _vs[i]
-        r: uint256 = _rs[i]
-        s: uint256 = _ss[i]
+# @external
+# def withdraw(
+#     _to: address, _shares: uint256, _nonce: uint256,
+#     _v: uint256, _r: uint256, _s: uint256
+# ):
+#     """
+#     @notice Withdraw token for shares
+#     @param _to Address to withdraw shares and transfer underlying token to
+#     @param _shares Shares owned by _to
+#     @param _nonce Nonce used to sign
+#     @param _v Signature param
+#     @param _r Signature param
+#     @param _s Signature param
+#     """
+#     self._withdraw(_to, _shares, _nonce, _v, _r, _s)
 
-        # valid sig proves account exists, so we can safely transfer
-        # TODO: vulnerable to DOS
-        # TODO: let all tx fail?
-        # TODO: _safeTransfer can fail
-        # TODO signature verification can fail
-        # TODO: check total _amounts >= total supply
-        # TODO withdraw total from controller and then burn shares
-        self._withdraw(addr, amount, nonce, v, r, s)
+
+# @external
+# def batchWithdraw(
+#     _accounts: address[100], _amounts: uint256[100], _nonces: uint256[100],
+#     _vs: uint256[100], _rs: uint256[100], _ss: uint256[100],
+# ):
+#     # TODO: prevent slippage
+#     # TODO: verify signature (address, token, amount, nonce)? or only allow admin to batch? call from gas relayer?
+#     for i in range(100):
+#         # TODO break if less than 100
+#         addr: address = _accounts[i]
+#         amount: uint256 = _amounts[i]
+#         nonce: uint256 = _nonces[i]
+#         v: uint256 = _vs[i]
+#         r: uint256 = _rs[i]
+#         s: uint256 = _ss[i]
+
+#         # valid sig proves account exists, so we can safely transfer
+#         # TODO: vulnerable to DOS
+#         # TODO: let all tx fail?
+#         # TODO: _safeTransfer can fail
+#         # TODO signature verification can fail
+#         # TODO: check total _amounts >= total supply
+#         # TODO withdraw total from controller and then burn shares
+#         self._withdraw(addr, amount, nonce, v, r, s)
