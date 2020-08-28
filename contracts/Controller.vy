@@ -18,8 +18,12 @@ interface Strategy:
 # TODO: events
 # TODO: invest dust
 # TODO create file for interfaces Vault, Strategy, Controller
+# TODO: circuit breaker
 event SetAdmin:
     admin: address
+
+event SetTreasury:
+    treasury: address
 
 event SetStrategy:
     token: indexed(address)
@@ -50,6 +54,8 @@ treasury: public(address)
 
 @external
 def __init__(_treasury: address):
+    assert _treasury != ZERO_ADDRESS, "treasury == zero address"
+
     self.admin = msg.sender
     self.treasury = _treasury
 
@@ -61,6 +67,15 @@ def setAdmin(_admin: address):
 
     self.admin = _admin
     log SetAdmin(_admin)
+
+
+@external
+def setTreasury(_treasury: address):
+    assert msg.sender == self.admin, "!admin"
+    assert _treasury != ZERO_ADDRESS, "treasury == zero address"
+
+    self.treasury = _treasury
+    log SetTreasury(_treasury)
 
 
 @external
@@ -175,7 +190,13 @@ def withdraw(_amount: uint256):
     strategy: address = self.strategies[msg.sender]
     assert strategy != ZERO_ADDRESS, "zero address"
 
+    want: address = Strategy(strategy).want()
+
+    before: uint256 = ERC20(want).balanceOf(self)
     Strategy(strategy).withdraw(_amount)
+    after: uint256 = ERC20(want).balanceOf(self)
+
+    self._safeTransfer(want, msg.sender, after - before)
 
     log Withdraw(msg.sender, _amount)
 
