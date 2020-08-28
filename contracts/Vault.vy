@@ -32,12 +32,6 @@ event Approval:
     _spender: indexed(address)
     _amount: uint256
 
-event SetAdmin:
-    admin: address
-
-event SetController:
-    controller: address
-
 # log to keep track of nonces that were used in a transaction
 event TxNonce:
     _addr: indexed(address)
@@ -76,7 +70,7 @@ def __init__(_token: address, _controller: address):
     self.controller = _controller
     self.admin = msg.sender
 
-
+### ERC20 ###
 @external
 @view
 def allowance(_owner : address, _spender : address) -> uint256:
@@ -179,7 +173,7 @@ def _burn(_from: address, _amount: uint256):
 
     log Transfer(_from, ZERO_ADDRESS, _amount)
 
-
+### low level call ###
 @internal
 def _call(_token: address, _data: Bytes[100]):
     """
@@ -243,7 +237,7 @@ def _safeTransferFrom(_token: address, _from: address, _to: address, _amount: ui
         convert(_amount, bytes32)
     ))
 
-
+### Vault functions ###
 @external
 def setAdmin(_admin: address):
     """
@@ -254,7 +248,6 @@ def setAdmin(_admin: address):
     assert _admin != ZERO_ADDRESS, "zero address"
 
     self.admin = _admin
-    log SetAdmin(_admin)
 
 
 @external
@@ -267,7 +260,6 @@ def setController(_controller: address):
     assert _controller != ZERO_ADDRESS, "zero address"
 
     self.controller = _controller
-    log SetController(_controller)
 
 
 @internal
@@ -277,6 +269,7 @@ def _getBalance() -> uint256:
     @notice Sum of token balances of this contract and controller
     """
     return ERC20(self.token).balanceOf(self) + Controller(self.controller).balanceOf(self)
+
 
 @external
 @view
