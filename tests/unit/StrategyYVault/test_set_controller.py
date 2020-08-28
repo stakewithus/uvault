@@ -13,10 +13,10 @@ def test_set_controller(accounts, strategyYVault):
 
 
 def test_set_controller_not_admin(accounts, strategyYVault):
-    with brownie.reverts("!admin"):
+    with brownie.reverts("dev: !admin"):
         strategyYVault.setController(CONTROLLER_ADDRESS, {'from': accounts[1]})
 
 
 def test_set_controller_to_zero_address(accounts, strategyYVault):
-    with brownie.reverts("controller == zero address"):
+    with brownie.reverts("dev: controller == zero address"):
         strategyYVault.setController(ZERO_ADDRESS, {'from': accounts[0]})

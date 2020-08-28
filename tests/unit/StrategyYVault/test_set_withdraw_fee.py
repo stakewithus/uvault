@@ -14,5 +14,5 @@ def test_set_withdraw_fee(accounts, strategyYVault):
 
 def test_set_controller_not_admin(accounts, strategyYVault):
     fee = 123
-    with brownie.reverts("!admin"):
+    with brownie.reverts("dev: !admin"):
         strategyYVault.setWithdrawFee(fee, {'from': accounts[1]})

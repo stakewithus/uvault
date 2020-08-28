@@ -12,10 +12,10 @@ def test_set_admin(accounts, strategyYVault):
 
 
 def test_set_admin_not_admin(accounts, strategyYVault):
-    with brownie.reverts("!admin"):
+    with brownie.reverts("dev: !admin"):
         strategyYVault.setAdmin(accounts[1], {'from': accounts[1]})
 
 
 def test_set_admin_to_zero_address(accounts, strategyYVault):
-    with brownie.reverts("admin == zero address"):
+    with brownie.reverts("dev: admin == zero address"):
         strategyYVault.setAdmin(ZERO_ADDRESS, {'from': accounts[0]})

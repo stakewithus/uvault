@@ -1,6 +1,7 @@
 # @version 0.2.4
 
 interface Strategy:
+    def deposit(amount: uint256): nonpayable
     def withdraw(amount: uint256): nonpayable
 
 
@@ -21,6 +22,11 @@ def setStrategy(_vault: address, _strategy: address):
 @external
 def setTreasury(_treasury: address):
     self.treasury = _treasury
+
+
+@external
+def deposit(_strategy: address, _amount: uint256):
+   Strategy(_strategy).deposit(_amount)
 
 
 @external
