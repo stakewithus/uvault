@@ -63,7 +63,7 @@ def setAdmin(_admin: address):
     @param _admin Address of new admin
     """
     assert msg.sender == self.admin # dev: !admin
-    assert _admin != ZERO_ADDRESS # dev: zero address
+    assert _admin != ZERO_ADDRESS # dev: admin == zero address
 
     self.admin = _admin
 

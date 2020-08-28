@@ -47,3 +47,9 @@ def strategyYVault(
         mockController, mockYCRV, mockYVault,
         {'from': accounts[0]}
     )
+
+
+@pytest.fixture(scope="function")
+def controller(Controller, accounts):
+    treasury = accounts[1]
+    yield Controller.deploy(treasury, {'from': accounts[0]})
