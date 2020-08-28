@@ -19,6 +19,9 @@ interface Strategy:
 # TODO: invest dust
 # TODO create file for interfaces Vault, Strategy, Controller
 # TODO: circuit breaker
+# TODO remove log to save gas?
+
+
 event SetAdmin:
     admin: address
 

@@ -20,6 +20,7 @@ implements: ERC20
 # TODO: test
 # TODO: events
 # TODO: circuit breaker
+# TODO remove log to save gas?
 
 event Transfer:
     _from: indexed(address)
