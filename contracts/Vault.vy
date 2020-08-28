@@ -1,6 +1,6 @@
 # @version 0.2.4
 """
-@title StakeWithUs UVaultV1
+@title StakeWithUs Vault
 @author StakeWithUs
 @dev Based on https://github.com/curvefi/curve-dao-contracts/blob/master/contracts/ERC20CRV.vy
 @dev Vyper implementation / fork of https://github.com/iearn-finance/vaults/blob/master/contracts/yVault.sol
