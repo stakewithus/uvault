@@ -13,9 +13,6 @@ interface Strategy:
     def deposit(amount: uint256): nonpayable
     def withdraw(amount: uint256): nonpayable
 
-interface Vault:
-    def token() -> address: view
-
 # TODO: create file for interfaces Vault, Strategy, Controller
 # TODO: reentrancy lock
 # TODO: circuit breaker
@@ -180,6 +177,7 @@ def deposit(_amount: uint256):
     assert strategy != ZERO_ADDRESS # dev: strategy == zero address
 
     want: address = Strategy(strategy).want()
+    # TODO: assert Vault.token == Strategy.want?
 
     self._safeTransferFrom(want, msg.sender, self, _amount)
     # Many ERC20s require approval from zero to nonzero or nonzero to zero
@@ -207,4 +205,5 @@ def withdraw(_amount: uint256):
     Strategy(strategy).withdraw(_amount)
     after: uint256 = ERC20(want).balanceOf(self)
 
+    # TODO: assert Vault.token == Strategy.want?
     self._safeTransfer(want, msg.sender, after - before)
