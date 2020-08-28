@@ -8,6 +8,7 @@ want: public(address)
 
 # test helpers
 depositAmount: public(uint256)
+withdrawAmount: public(uint256)
 
 @external
 def __init__(_want: address):
@@ -23,17 +24,8 @@ def getBalance() -> uint256:
 @external
 def deposit(_amount: uint256):
     self.depositAmount = _amount
-    # self.balanceOf[msg.sender] += _amount
-    # ERC20(self.want).transferFrom(msg.sender, self, _amount)
 
 
 @external
 def withdraw(_amount: uint256):
-    self.balanceOf[msg.sender] -= _amount
-    ERC20(self.want).transfer(msg.sender, _amount)
-
-
-# test helper
-@external
-def mintTo(_to: address, _amount: uint256):
-    self.balanceOf[_to] += _amount
+    self.withdrawAmount = _amount

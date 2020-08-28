@@ -13,18 +13,13 @@ interface Strategy:
     def deposit(amount: uint256): nonpayable
     def withdraw(amount: uint256): nonpayable
 
-# TODO: docs
-# TODO: test
-# TODO: events
-# TODO: invest dust
+interface Vault:
+    def token() -> address: view
+
 # TODO: create file for interfaces Vault, Strategy, Controller
+# TODO: reentrancy lock
 # TODO: circuit breaker
-# TODO remove log to save gas?
 
-
-event Withdraw:
-    vault: indexed(address)
-    amount: uint256
 
 TRANSFER: constant(Bytes[4]) = method_id(
     "transfer(address,uint256)", output_type=Bytes[4]
@@ -39,7 +34,6 @@ strategies: public(HashMap[address, address])
 isVault: public(HashMap[address, bool])
 
 admin: public(address)
-# TODO withdraw to treasury
 treasury: public(address)
 
 
@@ -197,10 +191,15 @@ def deposit(_amount: uint256):
 
 @external
 def withdraw(_amount: uint256):
+    """
+    @notice Withdraw from strategy
+    @param _amount Amount of tokens to withdraw from strategy into vault
+    @dev `msg.sender` must be a vault
+    """
     assert self.isVault[msg.sender] # dev: !vault
 
     strategy: address = self.strategies[msg.sender]
-    assert strategy != ZERO_ADDRESS # dev: zero address
+    assert strategy != ZERO_ADDRESS # dev: strategy == zero address
 
     want: address = Strategy(strategy).want()
 
@@ -209,5 +208,3 @@ def withdraw(_amount: uint256):
     after: uint256 = ERC20(want).balanceOf(self)
 
     self._safeTransfer(want, msg.sender, after - before)
-
-    log Withdraw(msg.sender, _amount)
