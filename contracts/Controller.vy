@@ -70,6 +70,10 @@ def setAdmin(_admin: address):
 
 @external
 def setTreasury(_treasury: address):
+    """
+    @notice Set treasury
+    @param _treasury Address of new treasury
+    """
     assert msg.sender == self.admin # dev: !admin
     assert _treasury != ZERO_ADDRESS # dev: treasury == zero address
 
