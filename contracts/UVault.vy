@@ -394,6 +394,7 @@ def batchDeposit(
     _accounts: address[1000], _amounts: uint256[1000], _nonces: uint256[1000],
     _vs: uint256[1000], _rs: uint256[1000], _ss: uint256[1000],
 ):
+    # TODO: prevent slippage
     # TODO: verify signature (address, token, amount, nonce)? or only allow admin to batch? call from gas relayer?
     for i in range(1000):
         addr: address = _accounts[i]
@@ -475,6 +476,7 @@ def batchWithdraw(
     _accounts: address[1000], _amounts: uint256[1000], _nonces: uint256[1000],
     _vs: uint256[1000], _rs: uint256[1000], _ss: uint256[1000],
 ):
+    # TODO: prevent slippage
     # TODO: verify signature (address, token, amount, nonce)? or only allow admin to batch? call from gas relayer?
     for i in range(1000):
         # TODO break if less than 1000
