@@ -11,18 +11,34 @@ def isolate(fn_isolation):
 
 
 @pytest.fixture(scope="function")
-def token(Token, accounts):
-    return Token.deploy("Test Token", "TST", 18, 1e21, {'from': accounts[0]})
+def mockERC20(MockERC20, accounts):
+    yield MockERC20.deploy(
+        "erc20",
+        "erc20",
+        18,
+        10000,
+        {'from': accounts[0]}
+    )
+
 
 # core
-
 @pytest.fixture(scope="function")
 def mockController(MockController, accounts):
     yield MockController.deploy(accounts[0], {'from': accounts[0]})
 
 
-# strategy
+@pytest.fixture(scope="function")
+def mockStrategy(MockStrategy, accounts, mockERC20):
+    yield MockStrategy.deploy(mockERC20, {'from': accounts[0]})
 
+
+@pytest.fixture(scope="function")
+def controller(Controller, accounts):
+    treasury = accounts[1]
+    yield Controller.deploy(treasury, {'from': accounts[0]})
+
+
+# strategy
 @pytest.fixture(scope="function")
 def mockYCRV(MockERC20, accounts):
     yield MockERC20.deploy(
@@ -48,13 +64,3 @@ def strategyYVault(
         {'from': accounts[0]}
     )
 
-
-@pytest.fixture(scope="function")
-def mockStrategy(MockStrategy, accounts):
-    yield MockStrategy.deploy({'from': accounts[0]})
-
-
-@pytest.fixture(scope="function")
-def controller(Controller, accounts):
-    treasury = accounts[1]
-    yield Controller.deploy(treasury, {'from': accounts[0]})

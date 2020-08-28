@@ -17,7 +17,7 @@ interface Strategy:
 # TODO: test
 # TODO: events
 # TODO: invest dust
-# TODO create file for interfaces Vault, Strategy, Controller
+# TODO: create file for interfaces Vault, Strategy, Controller
 # TODO: circuit breaker
 # TODO remove log to save gas?
 
@@ -165,15 +165,25 @@ def _safeTransferFrom(_token: address, _from: address, _to: address, _amount: ui
 @external
 @view
 def balanceOf(_vault: address) -> uint256:
+    """
+    @notice Get balance of vault
+    @param _vault Address of vault
+    @return balance of `_vault`
+    """
     return Strategy(self.strategies[_vault]).getBalance()
 
 
 @external
 def deposit(_amount: uint256):
+    """
+    @notice Deposit into strategy
+    @param _amount Amount of tokens to deposit from vault into strategy
+    @dev `msg.sender` must be a vault
+    """
     assert self.isVault[msg.sender] # dev: !vault
 
     strategy: address = self.strategies[msg.sender]
-    assert strategy != ZERO_ADDRESS # dev: zero address
+    assert strategy != ZERO_ADDRESS # dev: strategy == zero address
 
     want: address = Strategy(strategy).want()
 
@@ -201,14 +211,3 @@ def withdraw(_amount: uint256):
     self._safeTransfer(want, msg.sender, after - before)
 
     log Withdraw(msg.sender, _amount)
-
-
-
-
-
-
-
-
-
-
-
