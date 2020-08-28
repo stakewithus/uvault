@@ -71,6 +71,7 @@ def __init__(_token: address, _controller: address):
     self.admin = msg.sender
 
 ### ERC20 ###
+# TODO: test ERC20 functions
 @external
 @view
 def allowance(_owner : address, _spender : address) -> uint256:
@@ -94,7 +95,7 @@ def approve(_spender : address, _amount : uint256) -> bool:
     @param _amount The amount of tokens to be spent
     @return bool success
     """
-    assert _amount == 0 or self.allowances[msg.sender][_spender] == 0, "amount != 0 and allowance != 0"
+    assert _amount == 0 or self.allowances[msg.sender][_spender] == 0 # dev: amount != 0 and allowance != 0
 
     self.allowances[msg.sender][_spender] = _amount
     log Approval(msg.sender, _spender, _amount)
@@ -112,7 +113,7 @@ def transfer(_to : address, _amount : uint256) -> bool:
     @param _amount The amount to be transferred
     @return bool success
     """
-    assert _to != ZERO_ADDRESS, "zero address"
+    assert _to != ZERO_ADDRESS # dev: to == zero addresss
 
     self.balanceOf[msg.sender] -= _amount
     self.balanceOf[_to] += _amount
@@ -130,7 +131,7 @@ def transferFrom(_from : address, _to : address, _amount : uint256) -> bool:
     @param _amount uint256 the amount of tokens to be transferred
     @return bool success
     """
-    assert _to != ZERO_ADDRESS, "zero address"
+    assert _to != ZERO_ADDRESS # dev: to == zero address
 
     # NOTE: vyper does not allow underflows
     #       so the following subtraction would revert on insufficient balance
@@ -150,7 +151,7 @@ def _mint(_to: address, _amount: uint256):
     @param _to The account that will receive the created tokens
     @param _amount The amount that will be created
     """
-    assert _to != ZERO_ADDRESS, "zero address"
+    assert _to != ZERO_ADDRESS # dev: to == zero address
 
     self.totalSupply += _amount
     self.balanceOf[_to] += _amount
@@ -166,7 +167,7 @@ def _burn(_from: address, _amount: uint256):
     @param _from The account to burn tokens from
     @param _amount The amount that will be burned
     """
-    assert _from != ZERO_ADDRESS, "zero address"
+    assert _from != ZERO_ADDRESS # dev: from == zero address
 
     self.balanceOf[_from] -= _amount
     self.totalSupply -= _amount
@@ -194,7 +195,7 @@ def _call(_token: address, _data: Bytes[100]):
         max_outsize=32
     )
     if len(_response) > 0:
-        assert convert(_response, bool), "ERC20 transfer failed!"
+        assert convert(_response, bool) # dev: ERC20 transfer failed!
 
 
 @internal
@@ -244,8 +245,8 @@ def setAdmin(_admin: address):
     @notice Set the new admin.
     @param _admin New admin address
     """
-    assert msg.sender == self.admin, "!admin"
-    assert _admin != ZERO_ADDRESS, "zero address"
+    assert msg.sender == self.admin # dev: !admin
+    assert _admin != ZERO_ADDRESS # dev: zero address
 
     self.admin = _admin
 
@@ -256,8 +257,8 @@ def setController(_controller: address):
     @notice Set the new controller.
     @param _controller New controller address
     """
-    assert msg.sender == self.admin, "!admin"
-    assert _controller != ZERO_ADDRESS, "zero address"
+    assert msg.sender == self.admin # dev: !admin
+    assert _controller != ZERO_ADDRESS # dev: controller == zero address
 
     self.controller = _controller
 
@@ -338,8 +339,8 @@ def _deposit(
     @param _s Signature param
     """
     digest: bytes32 = self._getTransferHash(_from, self, _amount, _nonce)
-    assert not self.executed[digest], "tx executed"
-    assert self._isValidSig(digest, _v, _r, _s, _from), "invalid sig"
+    assert not self.executed[digest] # dev: tx executed
+    assert self._isValidSig(digest, _v, _r, _s, _from) # dev: invalid sig
 
     self.executed[digest] = True
 
@@ -423,8 +424,8 @@ def _withdraw(
     @param _s Signature param
     """
     digest: bytes32 = self._getTransferHash(self, _to, _shares, _nonce)
-    assert not self.executed[digest], "tx executed"
-    assert self._isValidSig(digest, _v, _r, _s, _to), "invalid sig"
+    assert not self.executed[digest] # dev: tx executed
+    assert self._isValidSig(digest, _v, _r, _s, _to) # dev: invalid sig
 
     self.executed[digest] = True
 
