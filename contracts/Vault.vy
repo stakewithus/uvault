@@ -16,11 +16,7 @@ interface Controller:
 implements: ERC20
 
 # TODO: reentrancy lock
-# TODO: doc
-# TODO: test
-# TODO: events
 # TODO: circuit breaker
-# TODO remove log to save gas?
 
 event Transfer:
     _from: indexed(address)
@@ -34,7 +30,7 @@ event Approval:
 
 # log to keep track of nonces that were used in a transaction
 event TxNonce:
-    _addr: indexed(address)
+    _signer: indexed(address)
     _nonce: uint256
 
 SIGN_PREFIX: constant(Bytes[28]) = b"\x19Ethereum Signed Message:\n32"
@@ -58,7 +54,7 @@ admin: public(address)
 # true if tx corresponding to hash was executed
 executed: public(HashMap[bytes32, bool])
 
-
+# TODO: set name, symbol, decimals
 @external
 def __init__(_token: address, _controller: address):
     """
@@ -69,6 +65,7 @@ def __init__(_token: address, _controller: address):
     self.token = _token
     self.controller = _controller
     self.admin = msg.sender
+
 
 ### ERC20 ###
 # TODO: test ERC20 functions
@@ -309,15 +306,15 @@ def _isValidSig(_digest: bytes32, _v: uint256, _r: uint256, _s: uint256, _signer
 @internal
 @view
 def _getTxHash(
-    _from: address, _to: address, _inAmount: uint256, _minOutAmount: uint256,
+    _from: address, _to: address, _amount: uint256, _min: uint256,
     _nonce: uint256
 ) -> bytes32:
     """
     @notice Get hash of transfer between Vault token and underlying token
     @dev hash is used to sign deposit and withdraw
     @param _from Address to transfer from
-    @param _inAmount The amount that will be transferred
-    @param _minOutAmount Minimum amount of token to return to prevent slippage
+    @param _amount The amount that will be transferred
+    @param _min Minimum amount of token to return to prevent slippage
     @param _nonce Nonce used to sign
     @return bytes32 hash
     """
@@ -325,8 +322,8 @@ def _getTxHash(
         convert(self, bytes32),
         convert(_from, bytes32),
         convert(_to, bytes32),
-        convert(_inAmount, bytes32),
-        convert(_minOutAmount, bytes32),
+        convert(_amount, bytes32),
+        convert(_min, bytes32),
         convert(_nonce, bytes32)
     ))
 
@@ -334,31 +331,31 @@ def _getTxHash(
 @external
 @view
 def getTxHash(
-    _from: address, _to: address, _inAmount: uint256, _minOutAmount: uint256,
+    _from: address, _to: address, _amount: uint256, _min: uint256,
     _nonce: uint256
 ) -> bytes32:
     """
     @notice Get hash of transfer between Vault token and underlying token
     @dev hash is used to sign deposit and withdraw
     @param _from Address to transfer from
-    @param _inAmount The amount that will be transferred
-    @param _minOutAmount Minimum amount of token to return to prevent slippage
+    @param _amount The amount that will be transferred
+    @param _min Minimum amount of token to return to prevent slippage
     @param _nonce Nonce used to sign
     @return bytes32 hash
     """
-    return self._getTxHash(_from, _to, _inAmount, _minOutAmount, _nonce)
+    return self._getTxHash(_from, _to, _amount, _min, _nonce)
 
 
 @internal
 def _deposit(
-    _from: address, _amount: uint256, _minSharesToMint: uint256, _nonce: uint256,
+    _from: address, _amount: uint256, _min: uint256, _nonce: uint256,
     _v: uint256, _r: uint256, _s: uint256
 ):
     """
     @notice Deposit token
     @param _from Address to transfer token from
     @param _amount The amount of tokens to deposit
-    @param _minSharesToMint Minimum amount of shares to mint to prevent slippage
+    @param _min Minimum amount of shares to mint to prevent slippage
     @param _nonce Nonce used to sign
     @param _v Signature param
     @param _r Signature param
@@ -366,7 +363,7 @@ def _deposit(
     @dev `_from` will not be zero address unless signer is zero address
     """
     txHash: bytes32 = self._getTxHash(
-        _from, self, _amount, _minSharesToMint, _nonce
+        _from, self, _amount, _min, _nonce
     )
     assert not self.executed[txHash] # dev: tx executed
     assert self._isValidSig(txHash, _v, _r, _s, _from) # dev: invalid sig
@@ -393,7 +390,7 @@ def _deposit(
         # s = a * T / B
         shares = (diff * self.totalSupply) / bal
 
-    assert shares >= _minSharesToMint # dev: shares < min shares to mint
+    assert shares >= _min # dev: shares < min shares to mint
 
     self._mint(_from, shares)
 
@@ -402,20 +399,20 @@ def _deposit(
 
 @external
 def deposit(
-    _from: address, _amount: uint256, _minSharesToMint: uint256, _nonce: uint256,
+    _from: address, _amount: uint256, _min: uint256, _nonce: uint256,
     _v: uint256, _r: uint256, _s: uint256
 ):
     """
     @notice Deposit token
     @param _from Address to transfer token from
     @param _amount The amount of tokens to deposit
-    @param _minSharesToMint Minimum amount of shares to mint to prevent slippage
+    @param _min Minimum amount of shares to mint to prevent slippage
     @param _nonce Nonce used to sign
     @param _v Signature param
     @param _r Signature param
     @param _s Signature param
     """
-    self._deposit(_from, _amount, _minSharesToMint, _nonce, _v, _r, _s)
+    self._deposit(_from, _amount, _min, _nonce, _v, _r, _s)
 
 
 # @external
@@ -434,63 +431,68 @@ def deposit(
 #             self._deposit(addr, amount, nonce, v, r, s)
 
 
-# @internal
-# def _withdraw(
-#     _to: address, _shares: uint256, _nonce: uint256,
-#     _v: uint256, _r: uint256, _s: uint256
-# ):
-#     """
-#     @notice Withdraw token for shares
-#     @param _to Address to withdraw shares and transfer underlying token to
-#     @param _shares Shares owned by _to
-#     @param _nonce Nonce used to sign
-#     @param _v Signature param
-#     @param _r Signature param
-#     @param _s Signature param
-#     """
-#     txHash: bytes32 = self._getTxHash(self, _to, _shares, _nonce)
-#     assert not self.executed[txHash] # dev: tx executed
-#     assert self._isValidSig(txHash, _v, _r, _s, _to) # dev: invalid sig
+@internal
+def _withdraw(
+    _to: address, _shares: uint256, _min: uint256, _nonce: uint256,
+    _v: uint256, _r: uint256, _s: uint256
+):
+    """
+    @notice Withdraw token for shares
+    @param _to Address to withdraw shares and transfer underlying token to
+    @param _shares Shares to burn
+    @param _min Minimum tokens to return, prevent slippage
+    @param _nonce Nonce used to sign
+    @param _v Signature param
+    @param _r Signature param
+    @param _s Signature param
+    """
+    txHash: bytes32 = self._getTxHash(self, _to, _shares, _min, _nonce)
+    assert not self.executed[txHash] # dev: tx executed
+    assert self._isValidSig(txHash, _v, _r, _s, _to) # dev: invalid sig
 
-#     self.executed[txHash] = True
+    self.executed[txHash] = True
 
-#     # s = shares
-#     # T = total supply
-#     # a = amount of tokens
-#     # B = balance of tokens
-#     # s / T = a / B
-#     # a = s * B / T
-#     amount: uint256 = (self._getBalance() * _shares) / self.totalSupply
-#     self._burn(_to, amount)
+    # s = shares
+    # T = total supply
+    # a = amount of tokens
+    # B = balance of tokens
+    # s / T = a / B
+    # a = s * B / T
+    amount: uint256 = (self._getBalance() * _shares) / self.totalSupply
+    self._burn(_to, amount)
 
-#     # Withdraw from controller if token balance of this contract < amount to transfer to _to
-#     bal: uint256 = ERC20(self.token).balanceOf(self)
-#     if bal < amount:
-#         Controller(self.controller).withdraw(amount - bal)
-#         after: uint256 = ERC20(self.token).balanceOf(self)
-#         if after < amount:
-#             amount = after
+    # Withdraw from controller if token balance of this contract < amount to transfer to _to
+    bal: uint256 = ERC20(self.token).balanceOf(self)
+    if bal < amount:
+        Controller(self.controller).withdraw(amount - bal)
+        after: uint256 = ERC20(self.token).balanceOf(self)
+        if after < amount:
+            amount = after
 
-#     self._safeTransfer(self.token, _to, amount)
+    assert amount >= _min # dev: amount < min tokens to return
 
-#     log TxNonce(_to, _nonce)
+    self._safeTransfer(self.token, _to, amount)
+
+    log TxNonce(_to, _nonce)
 
 
-# @external
-# def withdraw(
-#     _to: address, _shares: uint256, _nonce: uint256,
-#     _v: uint256, _r: uint256, _s: uint256
-# ):
-#     """
-#     @notice Withdraw token for shares
-#     @param _to Address to withdraw shares and transfer underlying token to
-#     @param _shares Shares owned by _to
-#     @param _nonce Nonce used to sign
-#     @param _v Signature param
-#     @param _r Signature param
-#     @param _s Signature param
-#     """
-#     self._withdraw(_to, _shares, _nonce, _v, _r, _s)
+@external
+def withdraw(
+    _to: address, _shares: uint256, _min: uint256, _nonce: uint256,
+    _v: uint256, _r: uint256, _s: uint256
+):
+    """
+    @notice Withdraw token for shares
+    @param _to Address to withdraw shares and transfer underlying token to
+    @param _shares Shares to burn
+    @param _min Minimum tokens to return, prevent slippage
+    @param _nonce Nonce used to sign
+    @param _v Signature param
+    @param _r Signature param
+    @param _s Signature param
+    """
+    self._withdraw(_to, _shares, _min, _nonce, _v, _r, _s)
+
 
 # @external
 # TODO: frontrunning?
