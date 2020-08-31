@@ -363,95 +363,47 @@ def getTxHash(
 
 
 @internal
-def _deposit(
-    _from: address, _amount: uint256, _min: uint256, _nonce: uint256,
-    _v: uint256, _r: uint256, _s: uint256
-):
+def _deposit(_from: address, _amount: uint256):
     """
     @notice Deposit token
     @param _from Address to transfer token from
     @param _amount The amount of tokens to deposit
-    @param _min Minimum amount of shares to mint to prevent slippage
-    @param _nonce Nonce used to sign
-    @param _v Signature param
-    @param _r Signature param
-    @param _s Signature param
-    @dev `_from` will not be zero address unless signer is zero address
     """
-    txHash: bytes32 = self._getTxHash(
-        _from, self, _amount, _min, _nonce
-    )
-    assert not self.executed[txHash] # dev: tx executed
-    assert self._isValidSig(txHash, _v, _r, _s, _from) # dev: invalid sig
-
-    self.executed[txHash] = True
-
-    # TODO view function to calculate shares to be minted?
-    bal: uint256 = self._getBalance()
-    before: uint256 = ERC20(self.token).balanceOf(self)
+    self._mint(_from, _amount)
     self._safeTransferFrom(self.token, _from, self, _amount)
-    after: uint256 = ERC20(self.token).balanceOf(self)
-    # Additional check for deflationary tokens
-    diff: uint256 = after - before
-
-    shares: uint256 = 0
-    if self.totalSupply == 0:
-        shares = diff
-    else:
-        # s = shares to mint
-        # T = total supply of shares before minting
-        # a = amount of tokens deposited
-        # B = balance of tokens before deposit
-        # s / (T + s) = a / (B + a)
-        # s = a * T / B
-        shares = (diff * self.totalSupply) / bal
-
-    assert shares >= _min # dev: shares < min shares to mint
-
-    self._mint(_from, shares)
-
-    log TxNonce(_from, _nonce)
 
 
 @external
-def deposit(
-    _from: address, _amount: uint256, _min: uint256, _nonce: uint256,
-    _v: uint256, _r: uint256, _s: uint256
-):
+def deposit(_from: address, _amount: uint256):
     """
     @notice Deposit token
     @param _from Address to transfer token from
     @param _amount The amount of tokens to deposit
-    @param _min Minimum amount of shares to mint to prevent slippage
-    @param _nonce Nonce used to sign
-    @param _v Signature param
-    @param _r Signature param
-    @param _s Signature param
     """
-    self._deposit(_from, _amount, _min, _nonce, _v, _r, _s)
+    self._deposit(_from, _amount)
 
 
-@external
-def batchDeposit(
-    _signers: address[BATCH_SIZE], _amounts: uint256[BATCH_SIZE], _mins: uint256[BATCH_SIZE],
-    _nonces: uint256[BATCH_SIZE],
-    _vs: uint256[BATCH_SIZE], _rs: uint256[BATCH_SIZE], _ss: uint256[BATCH_SIZE]
-):
-    for i in range(BATCH_SIZE):
-        signer: address = _signers[i]
+# @external
+# def batchDeposit(
+#     _signers: address[BATCH_SIZE], _amounts: uint256[BATCH_SIZE], _mins: uint256[BATCH_SIZE],
+#     _nonces: uint256[BATCH_SIZE],
+#     _vs: uint256[BATCH_SIZE], _rs: uint256[BATCH_SIZE], _ss: uint256[BATCH_SIZE]
+# ):
+#     for i in range(BATCH_SIZE):
+#         signer: address = _signers[i]
 
-        # break on first zero address
-        if signer == ZERO_ADDRESS:
-            break
+#         # break on first zero address
+#         if signer == ZERO_ADDRESS:
+#             break
 
-        amount: uint256 = _amounts[i]
-        _min: uint256 = _mins[i]
-        nonce: uint256 = _nonces[i]
-        v: uint256 = _vs[i]
-        r: uint256 = _rs[i]
-        s: uint256 = _ss[i]
+#         amount: uint256 = _amounts[i]
+#         _min: uint256 = _mins[i]
+#         nonce: uint256 = _nonces[i]
+#         v: uint256 = _vs[i]
+#         r: uint256 = _rs[i]
+#         s: uint256 = _ss[i]
 
-        self._deposit(signer, amount, _min, nonce, v, r, s)
+#         self._deposit(signer, amount, _min, nonce, v, r, s)
 
 
 @internal
