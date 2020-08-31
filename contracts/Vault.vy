@@ -42,6 +42,9 @@ TRANSFER_FROM: constant(Bytes[4]) = method_id(
     "transferFrom(address,address,uint256)", output_type=Bytes[4]
 )
 
+# number of batches
+BATCH_SIZE: constant(uint256) = 100
+
 name: public(String[64])
 symbol: public(String[32])
 decimals: public(uint256)
@@ -428,20 +431,27 @@ def deposit(
     self._deposit(_from, _amount, _min, _nonce, _v, _r, _s)
 
 
-# @external
-# def batchDeposit(_accounts: address[100], _amounts: uint256[100]):
-#     # TODO: prevent slippage
-#     # TODO: verify signature (address, token, amount, nonce)? or only allow admin to batch? call from gas relayer?
-#     for i in range(100):
-#         addr: address = _accounts[i]
-#         amount: uint256 = _amounts[i]
+@external
+def batchDeposit(
+    _signers: address[BATCH_SIZE], _amounts: uint256[BATCH_SIZE], _mins: uint256[BATCH_SIZE],
+    _nonces: uint256[BATCH_SIZE],
+    _vs: uint256[BATCH_SIZE], _rs: uint256[BATCH_SIZE], _ss: uint256[BATCH_SIZE]
+):
+    for i in range(BATCH_SIZE):
+        signer: address = _signers[i]
 
-#         # TODO: vulnerable to DOS
-#         # TODO: check balance and approval or let all tx fail?
-#         # TODO: _safeTransfer can fail
-#         # TODO signature verification can fail
-#         if ERC20(self.token).balanceOf(addr) >= amount and ERC20(self.token).allowance(addr, self) >= amount:
-#             self._deposit(addr, amount, nonce, v, r, s)
+        # break on first zero address
+        if signer == ZERO_ADDRESS:
+            break
+
+        amount: uint256 = _amounts[i]
+        _min: uint256 = _mins[i]
+        nonce: uint256 = _nonces[i]
+        v: uint256 = _vs[i]
+        r: uint256 = _rs[i]
+        s: uint256 = _ss[i]
+
+        self._deposit(signer, amount, _min, nonce, v, r, s)
 
 
 @internal
