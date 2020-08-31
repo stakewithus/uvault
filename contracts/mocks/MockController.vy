@@ -8,6 +8,8 @@ interface Strategy:
 treasury: public(address)
 vaults: public(HashMap[address, address])
 
+balanceOf: public(HashMap[address, uint256])
+
 @external
 def __init__(_treasury: address):
     self.treasury = _treasury
@@ -32,3 +34,7 @@ def deposit(_strategy: address, _amount: uint256):
 @external
 def withdraw(_strategy: address, _amount: uint256):
    Strategy(_strategy).withdraw(_amount)
+
+@external
+def setBalanceOf(_vault: address, _amount: uint256):
+    self.balanceOf[_vault] = _amount

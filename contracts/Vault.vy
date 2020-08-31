@@ -371,33 +371,33 @@ def _deposit(
     assert not self.executed[txHash] # dev: tx executed
     assert self._isValidSig(txHash, _v, _r, _s, _from) # dev: invalid sig
 
-    # self.executed[txHash] = True
+    self.executed[txHash] = True
 
-    # # TODO view function to calculate shares to be minted?
-    # bal: uint256 = self._getBalance()
-    # before: uint256 = ERC20(self.token).balanceOf(self)
-    # self._safeTransferFrom(self.token, _from, self, _amount)
-    # after: uint256 = ERC20(self.token).balanceOf(self)
-    # # Additional check for deflationary tokens
-    # diff: uint256 = after - before
+    # TODO view function to calculate shares to be minted?
+    bal: uint256 = self._getBalance()
+    before: uint256 = ERC20(self.token).balanceOf(self)
+    self._safeTransferFrom(self.token, _from, self, _amount)
+    after: uint256 = ERC20(self.token).balanceOf(self)
+    # Additional check for deflationary tokens
+    diff: uint256 = after - before
 
-    # shares: uint256 = 0
-    # if self.totalSupply == 0:
-    #     shares = diff
-    # else:
-    #     # s = shares to mint
-    #     # T = total supply of shares before minting
-    #     # a = amount of tokens deposited
-    #     # B = balance of tokens before deposit
-    #     # s / (T + s) = a / (B + a)
-    #     # s = a * T / B
-    #     shares = (diff * self.totalSupply) / bal
+    shares: uint256 = 0
+    if self.totalSupply == 0:
+        shares = diff
+    else:
+        # s = shares to mint
+        # T = total supply of shares before minting
+        # a = amount of tokens deposited
+        # B = balance of tokens before deposit
+        # s / (T + s) = a / (B + a)
+        # s = a * T / B
+        shares = (diff * self.totalSupply) / bal
 
-    # assert shares >= _minSharesToMint # dev: shares < min shares to mint
+    assert shares >= _minSharesToMint # dev: shares < min shares to mint
 
-    # self._mint(_from, shares)
+    self._mint(_from, shares)
 
-    # log TxNonce(_from, _nonce)
+    log TxNonce(_from, _nonce)
 
 
 @external
@@ -492,8 +492,8 @@ def deposit(
 #     """
 #     self._withdraw(_to, _shares, _nonce, _v, _r, _s)
 
-
 # @external
+# TODO: frontrunning?
 # def batchWithdraw(
 #     _accounts: address[100], _amounts: uint256[100], _nonces: uint256[100],
 #     _vs: uint256[100], _rs: uint256[100], _ss: uint256[100],

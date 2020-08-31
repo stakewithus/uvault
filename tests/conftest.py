@@ -1,6 +1,7 @@
 #!/usr/bin/python3
 
 import pytest
+from eth_account import Account
 
 
 @pytest.fixture(scope="function", autouse=True)
@@ -10,8 +11,18 @@ def isolate(fn_isolation):
     pass
 
 
+@pytest.fixture(scope="session")
+def signers(accounts):
+    # create accounts to get access to private key
+    accounts.add()
+    accounts.add()
+    accounts.add()
+
+    return [accounts[-3], accounts[-2], accounts[-1]]
+
+
 @pytest.fixture(scope="function")
-def mockERC20(MockERC20, accounts):
+def erc20(MockERC20, accounts):
     yield MockERC20.deploy(
         "erc20",
         "erc20",
@@ -39,8 +50,8 @@ def controller(Controller, accounts):
 
 
 @pytest.fixture(scope="function")
-def vault(Vault, accounts, mockERC20, mockController):
-    yield Vault.deploy(mockERC20, mockController, {'from': accounts[0]})
+def vault(Vault, accounts, erc20, mockController):
+    yield Vault.deploy(erc20, mockController, {'from': accounts[0]})
 
 
 # strategy
