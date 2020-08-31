@@ -78,11 +78,13 @@ def isolate(fn_isolation):
 @pytest.fixture(scope="session")
 def signers(accounts):
     # create accounts to get access to private key
-    accounts.add()
-    accounts.add()
-    accounts.add()
+    # number of accounts to create
+    n = 100
 
-    return [accounts[-3], accounts[-2], accounts[-1]]
+    for i in range(n):
+        accounts.add()
+
+    return accounts[-n:]
 
 
 @pytest.fixture(scope="function")
