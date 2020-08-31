@@ -177,3 +177,26 @@ def test_deposit_invalid_sig(
             "minOut": minOut,
             "nonce": nonce,
         })
+
+
+def test_deposit_slippage(
+    accounts, vault, erc20, signers, vault_helper
+):
+    deposit = vault_helper.deposit
+
+    signer = signers[0]
+    amount = 1000
+
+    # mint ERC20 to signer, approve vault to spend
+    erc20.mint(signer, amount)
+    erc20.approve(vault, amount, {'from': signer})
+
+    # deposit again with same signature
+    with brownie.reverts("dev: shares < min shares to mint"):
+        deposit(vault, {
+            "signer": signer,
+            "from": signer,
+            "amount": amount,
+            "minOut": amount + 1,
+            "nonce": 123,
+        })
