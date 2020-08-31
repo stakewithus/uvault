@@ -42,6 +42,10 @@ TRANSFER_FROM: constant(Bytes[4]) = method_id(
     "transferFrom(address,address,uint256)", output_type=Bytes[4]
 )
 
+name: public(String[64])
+symbol: public(String[32])
+decimals: public(uint256)
+
 balanceOf: public(HashMap[address, uint256])
 allowances: HashMap[address, HashMap[address, uint256]]
 totalSupply: public(uint256)
@@ -54,17 +58,26 @@ admin: public(address)
 # true if tx corresponding to hash was executed
 executed: public(HashMap[bytes32, bool])
 
-# TODO: set name, symbol, decimals
 @external
-def __init__(_token: address, _controller: address):
+def __init__(
+    _token: address, _controller: address,
+    _name: String[64], _symbol: String[32], _decimals: uint256
+):
     """
     @notice Contract constructor
     @param _token Token address
     @param _controller Controller address
+    @param _name Token full name
+    @param _symbol Token symbol
+    @param _decimals Number of decimals for token
     """
     self.token = _token
     self.controller = _controller
     self.admin = msg.sender
+
+    self.name = _name
+    self.symbol = _symbol
+    self.decimals = _decimals
 
 
 ### ERC20 ###
