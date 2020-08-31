@@ -34,6 +34,34 @@ class VaultHelper:
             "txHash": txHash
         }
 
+    @staticmethod
+    def withdraw(vault, params):
+        signer = params["signer"]
+        tokenHolder = params["to"]
+        shares = params["shares"]
+        minOut = params["minOut"]
+        nonce = params["nonce"]
+
+        # signer sign message
+        txHash = vault.getTxHash(
+            vault, signer.address, shares, minOut, nonce
+        )
+        sig = Account.from_key(signer.private_key).sign_message(
+            encode_defunct(hexstr=str(txHash))
+        )
+
+        # withdraw
+        tx = vault.withdraw(
+            tokenHolder, shares, minOut, nonce,
+            sig.v, sig.r, sig.s
+        )
+
+        return {
+            "tx": tx,
+            "sig": sig,
+            "txHash": txHash
+        }
+
 
 @pytest.fixture
 def vault_helper():
