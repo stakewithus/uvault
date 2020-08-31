@@ -2,6 +2,42 @@
 
 import pytest
 from eth_account import Account
+from eth_account.messages import encode_defunct
+
+
+class VaultHelper:
+    @staticmethod
+    def deposit(vault, params):
+        signer = params["signer"]
+        tokenHolder = params["from"]
+        amount = params["amount"]
+        minOut = params["minOut"]
+        nonce = params["nonce"]
+
+        # signer sign message
+        txHash = vault.getTxHash(
+            signer.address, vault, amount, minOut, nonce
+        )
+        sig = Account.from_key(signer.private_key).sign_message(
+            encode_defunct(hexstr=str(txHash))
+        )
+
+        # deposit
+        tx = vault.deposit(
+            tokenHolder, amount, minOut, nonce,
+            sig.v, sig.r, sig.s
+        )
+
+        return {
+            "tx": tx,
+            "sig": sig,
+            "txHash": txHash
+        }
+
+
+@pytest.fixture
+def vault_helper():
+    return VaultHelper
 
 
 @pytest.fixture(scope="function", autouse=True)

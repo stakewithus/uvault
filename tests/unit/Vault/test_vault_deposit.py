@@ -1,41 +1,13 @@
 import brownie
-from eth_account import Account
-from eth_account.messages import encode_defunct
 
 ZERO_ADDRESS = "0x0000000000000000000000000000000000000000"
 
 
-def deposit(vault, params):
-    signer = params["signer"]
-    tokenHolder = params["from"]
-    amount = params["amount"]
-    minOut = params["minOut"]
-    nonce = params["nonce"]
-
-    # signer sign message
-    txHash = vault.getTxHash(
-        signer.address, vault, amount, minOut, nonce
-    )
-    sig = Account.from_key(signer.private_key).sign_message(
-        encode_defunct(hexstr=str(txHash))
-    )
-
-    # deposit
-    tx = vault.deposit(
-        tokenHolder, amount, minOut, nonce,
-        sig.v, sig.r, sig.s
-    )
-
-    return {
-        "tx": tx,
-        "sig": sig,
-        "txHash": txHash
-    }
-
-
 def test_deposit_total_supply_is_zero(
-    accounts, vault, erc20, signers
+    accounts, vault, erc20, signers, vault_helper
 ):
+    deposit = vault_helper.deposit
+
     signer = signers[0]
     amount = 1000
     minOut = 1000
@@ -81,7 +53,9 @@ def test_deposit_total_supply_is_zero(
     assert vault.executed(txHash)
 
 
-def test_deposit_total_supply_is_not_zero(accounts, vault, erc20, signers):
+def test_deposit_total_supply_is_not_zero(accounts, vault, erc20, signers, vault_helper):
+    deposit = vault_helper.deposit
+
     amounts = [1000, 2000]
     minOuts = [1000, 2000]
     nonces = [123, 456]
@@ -146,8 +120,10 @@ def test_deposit_total_supply_is_not_zero(accounts, vault, erc20, signers):
 
 
 def test_deposit_tx_executed(
-    accounts, vault, erc20, signers
+    accounts, vault, erc20, signers, vault_helper
 ):
+    deposit = vault_helper.deposit
+
     signer = signers[0]
     amount = 1000
     minOut = 1000
@@ -182,8 +158,10 @@ def test_deposit_tx_executed(
 
 
 def test_deposit_invalid_sig(
-    accounts, vault, erc20, signers
+    accounts, vault, erc20, signers, vault_helper
 ):
+    deposit = vault_helper.deposit
+
     not_signer = signers[1]
     signer = signers[0]
     amount = 1000
