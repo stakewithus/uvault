@@ -16,7 +16,6 @@ interface Controller:
 implements: ERC20
 
 # TODO: reentrancy lock
-# TODO: worst case users should be able to deposit and withdraw
 # TODO: circuit breaker
 
 event Transfer:
@@ -408,7 +407,9 @@ def deposit(_from: address, _amount: uint256):
     @notice Deposit token
     @param _from Address to transfer token from
     @param _amount The amount of tokens to deposit
+    @dev This function can be called by relayer
     """
+    assert _amount > 0 # dev: amount == 0
     self._deposit(_from, _amount)
 
 
@@ -429,13 +430,13 @@ def batchDeposit(_accounts: address[BATCH_SIZE], _amounts: uint256[BATCH_SIZE]):
             break
 
         amount: uint256 = _amounts[i]
-        # skip if balance or allowance < amount
-        if ERC20(self.token).balanceOf(account) < amount or ERC20(self.token).allowance(account, self) < amount:
+        # skip if amount == 0, balance or allowance < amount
+        if amount == 0 or ERC20(self.token).balanceOf(account) < amount or ERC20(self.token).allowance(account, self) < amount:
             continue
 
         self._deposit(account, amount)
 
-# TODO: remove signatures
+
 @external
 def withdraw(
     _to: address, _shares: uint256, _min: uint256, _nonce: uint256,
@@ -450,12 +451,13 @@ def withdraw(
     @param _v Signature param
     @param _r Signature param
     @param _s Signature param
+    @dev This function can be called by relayer
     """
+    assert _shares > 0 # dev: shares == 0
+
     txHash: bytes32 = self._getTxHash(self, _to, _shares, _min, _nonce)
     assert not self.executed[txHash] # dev: tx executed
     assert self._isValidSig(txHash, _v, _r, _s, _to) # dev: invalid sig
-
-    self.executed[txHash] = True
 
     # s = shares
     # T = total supply
@@ -464,7 +466,6 @@ def withdraw(
     # s / T = a / B
     # a = s * B / T
     amount: uint256 = (self._getBalance() * _shares) / self.totalSupply
-    self._burn(_to, amount)
 
     # Withdraw from controller if token balance of this contract < amount to transfer to _to
     bal: uint256 = ERC20(self.token).balanceOf(self)
@@ -476,6 +477,9 @@ def withdraw(
 
     assert amount >= _min # dev: amount < min tokens to return
 
+    self.executed[txHash] = True
+    self._burn(_to, amount)
+    # NOTE: valid sig implies address exists
     self._safeTransfer(self.token, _to, amount)
 
     log TxNonce(_to, _nonce)
@@ -513,9 +517,8 @@ def batchWithdraw(
     before: uint256 = ERC20(self.token).balanceOf(self)
     if before < _total:
         Controller(self.controller).withdraw(_total - before)
-
-    after: uint256 = ERC20(self.token).balanceOf(self)
-    assert after >= _total # dev: after < total
+        after: uint256 = ERC20(self.token).balanceOf(self)
+        assert after >= _total # dev: after < total
 
     for i in range(BATCH_SIZE):
         addr: address = _accounts[i]
@@ -551,7 +554,6 @@ def batchWithdraw(
 
         # withdraw
         self.executed[txHash] = True
-
         self._burn(addr, amount)
         # NOTE: valid sig implies address exists
         self._safeTransfer(self.token, addr, amount)
