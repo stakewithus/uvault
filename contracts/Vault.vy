@@ -15,7 +15,6 @@ interface Controller:
 
 implements: ERC20
 
-# TODO: reentrancy lock
 # TODO: circuit breaker
 
 event Transfer:
@@ -91,6 +90,7 @@ def __init__(
 
 ### ERC20 ###
 # TODO: test ERC20 functions
+# TODO: reentrancy lock?
 @external
 @view
 def allowance(_owner : address, _spender : address) -> uint256:
@@ -382,6 +382,7 @@ def _earn():
         Controller(self.controller).deposit(bal)
 
 
+@nonreentrant("lock")
 @external
 def earn():
     """
@@ -401,6 +402,7 @@ def _deposit(_from: address, _amount: uint256):
     self._safeTransferFrom(self.token, _from, self, _amount)
 
 
+@nonreentrant("lock")
 @external
 def deposit(_from: address, _amount: uint256):
     """
@@ -437,6 +439,7 @@ def batchDeposit(_accounts: address[BATCH_SIZE], _amounts: uint256[BATCH_SIZE]):
         self._deposit(account, amount)
 
 
+@nonreentrant("lock")
 @external
 def withdraw(
     _to: address, _shares: uint256, _min: uint256, _nonce: uint256,
