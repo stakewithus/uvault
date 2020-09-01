@@ -385,6 +385,11 @@ def deposit(_from: address, _amount: uint256):
 
 @external
 def batchDeposit(_accounts: address[BATCH_SIZE], _amounts: uint256[BATCH_SIZE]):
+    """
+    @notice Batch deposit tokens
+    @param _accounts Addresses of token holders
+    @param _amounts Amounts to deposit
+    """
     for i in range(BATCH_SIZE):
         account: address = _accounts[i]
 
