@@ -1,16 +1,24 @@
 import pytest
 import brownie
+from brownie.test import given, strategy
 
 ZERO_ADDRESS = "0x0000000000000000000000000000000000000000"
 
+# NOTE: uint overflows at
+#       amount: uint256 = (self._getBalance() * _shares) / self.totalSupply
+# NOTE: division by zero when amount = 0
 
+
+@given(
+    amount=strategy("uint256", exclude=0, max_value=2**127-1),
+    nonce=strategy("uint256"),
+)
 def test_withdraw(
-    accounts, vault, erc20, signers, vault_helper
+    accounts, vault, erc20, signers, vault_helper, amount, nonce
 ):
     withdraw = vault_helper.withdraw
 
     signer = signers[0]
-    amount = 1000
 
     # mint ERC20 to signer, approve vault to spend
     erc20.mint(signer, amount)
@@ -41,8 +49,8 @@ def test_withdraw(
         "signer": signer,
         "to": signer,
         "shares": shares,
-        "minOut": 1000,
-        "nonce": 456
+        "minOut": shares,
+        "nonce": nonce
     })
     tx = res["tx"]
     txHash = res["txHash"]
@@ -63,14 +71,14 @@ def test_withdraw(
         },
     }
 
-    assert tx.events["TxNonce"].values() == [signer.address, 456]
+    assert tx.events["TxNonce"].values() == [signer.address, nonce]
 
     # check ERC20 balances
     assert after["erc20"]["balances"]["signer"] == before["erc20"]["balances"]["signer"] + amount
     assert after["erc20"]["balances"]["vault"] == before["erc20"]["balances"]["vault"] - amount
 
     # check vault shares
-    assert after["vault"]["balances"]["signer"] == 0
+    assert after["vault"]["balances"]["signer"] == before["vault"]["balances"]["signer"] - shares
     assert after["vault"]["totalSupply"] == before["vault"]["totalSupply"] - shares
 
     # check txHash is set as executed
