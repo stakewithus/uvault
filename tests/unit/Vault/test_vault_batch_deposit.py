@@ -5,6 +5,8 @@ BATCH_SIZE = 1000
 
 
 def test_batch_deposit(accounts, vault, erc20):
+    relayer = accounts[1]
+
     _accounts = []
     amounts = []
 
@@ -43,7 +45,7 @@ def test_batch_deposit(accounts, vault, erc20):
         before["vault"]["balances"][addr] = shares
 
     # batch deposit
-    vault.batchDeposit(_accounts, amounts)
+    vault.batchDeposit(_accounts, amounts, {'from': relayer})
 
     # snapshot after
     after = {
@@ -73,3 +75,15 @@ def test_batch_deposit(accounts, vault, erc20):
     for i, account in enumerate(accounts):
         addr = account.address
         assert after["vault"]["balances"][addr] == before["vault"]["balances"][addr] + amounts[i]
+
+
+def test_batch_deposit_not_relayer(accounts, vault, erc20, signers, account_helper):
+    _accounts = []
+    amounts = []
+
+    for i in range(BATCH_SIZE):
+        _accounts.append(ZERO_ADDRESS)
+        amounts.append(0)
+
+    with brownie.reverts("dev: !relayer"):
+        vault.batchDeposit(_accounts, amounts)
