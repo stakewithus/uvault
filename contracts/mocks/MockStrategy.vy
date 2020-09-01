@@ -6,7 +6,7 @@ want: public(address)
 
 # test helpers
 _balance: uint256
-depositAmount: public(uint256)
+depositWasCalled: public(bool)
 withdrawAmount: public(uint256)
 
 @external
@@ -21,8 +21,8 @@ def getBalance() -> uint256:
 
 
 @external
-def deposit(_amount: uint256):
-    self.depositAmount = _amount
+def deposit():
+    self.depositWasCalled = True
 
 
 @external

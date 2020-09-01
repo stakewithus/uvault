@@ -13,19 +13,27 @@ def test_deposit(accounts, controller, mockStrategy, erc20):
     erc20.mint(vault, amount)
     erc20.approve(controller, amount, {'from': vault})
 
-    balanceBefore = {
-        "vault": erc20.balanceOf(vault)
+    before = {
+        "erc20": {
+            "balances": {
+                "vault": erc20.balanceOf(vault)
+            }
+        }
     }
 
     controller.deposit(amount, {'from': vault})
 
-    balanceAfter = {
-        "vault": erc20.balanceOf(vault)
+    after = {
+        "erc20": {
+            "balances": {
+                "vault": erc20.balanceOf(vault)
+            }
+        }
     }
 
-    # check deposit was called with amount
-    assert mockStrategy.depositAmount() == amount
-    assert balanceAfter["vault"] == balanceBefore["vault"] - amount
+    assert after["erc20"]["balances"]["vault"] == before["erc20"]["balances"]["vault"] - amount
+    # check Strategy.deposit was called
+    assert mockStrategy.depositWasCalled()
 
 
 def test_deposit_not_vault(accounts, controller):

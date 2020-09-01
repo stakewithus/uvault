@@ -10,16 +10,12 @@ from vyper.interfaces import ERC20
 interface Strategy:
     def want() -> address: view
     def getBalance() -> uint256: view
-    def deposit(amount: uint256): nonpayable
+    def deposit(): nonpayable
     def withdraw(amount: uint256): nonpayable
 
 # TODO: create file for interfaces Vault, Strategy, Controller
 # TODO: circuit breaker
 
-
-TRANSFER: constant(Bytes[4]) = method_id(
-    "transfer(address,uint256)", output_type=Bytes[4]
-)
 
 TRANSFER_FROM: constant(Bytes[4]) = method_id(
     "transferFrom(address,address,uint256)", output_type=Bytes[4]
@@ -27,6 +23,8 @@ TRANSFER_FROM: constant(Bytes[4]) = method_id(
 
 # vault to strategy mapping
 strategies: public(HashMap[address, address])
+# strategy to vault mapping
+vaults: public(HashMap[address, address])
 isVault: public(HashMap[address, bool])
 
 admin: public(address)
@@ -71,7 +69,7 @@ def setTreasury(_treasury: address):
 @external
 def setStrategy(_vault: address, _strategy: address):
     """
-    @notice Set mapping from `_vault` to `_strategy`
+    @notice Set mapping between `_vault` and `_strategy`
     @param _vault Address of vault
     @param _strategy Address of strategy
     """
@@ -85,6 +83,7 @@ def setStrategy(_vault: address, _strategy: address):
         Strategy(current).withdraw(bal)
 
     self.strategies[_vault] = _strategy
+    self.vaults[_strategy] = _vault
     self.isVault[_vault] = True
 
 
@@ -109,25 +108,6 @@ def _call(_token: address, _data: Bytes[100]):
     )
     if len(_response) > 0:
         assert convert(_response, bool) # dev: ERC20 transfer failed!
-
-
-@internal
-def _safeTransfer(_token: address, _to: address, _amount: uint256):
-    """
-    @notice call ERC20 transfer and handle the two cases whether boolean is returned or not
-    @param _token ERC20 token address
-    @param _to Address to transfer to
-    @param _amount Amount to transfer
-    """
-    # data = 68 bytes
-    # 4  bytes method id
-    # 32 bytes to address
-    # 32 bytes amount (uint256)
-    self._call(_token, concat(
-        TRANSFER,
-        convert(_to, bytes32),
-        convert(_amount, bytes32)
-    ))
 
 
 @internal
@@ -176,14 +156,9 @@ def deposit(_amount: uint256):
     assert strategy != ZERO_ADDRESS # dev: strategy == zero address
 
     want: address = Strategy(strategy).want()
-    # TODO: assert Vault.token == Strategy.want?
 
-    self._safeTransferFrom(want, msg.sender, self, _amount)
-    # Many ERC20s require approval from zero to nonzero or nonzero to zero
-    ERC20(want).approve(strategy, 0)
-    ERC20(want).approve(strategy, _amount)
-
-    Strategy(strategy).deposit(_amount)
+    self._safeTransferFrom(want, msg.sender, strategy, _amount)
+    Strategy(strategy).deposit()
 
 
 @external
@@ -198,11 +173,4 @@ def withdraw(_amount: uint256):
     strategy: address = self.strategies[msg.sender]
     assert strategy != ZERO_ADDRESS # dev: strategy == zero address
 
-    want: address = Strategy(strategy).want()
-
-    before: uint256 = ERC20(want).balanceOf(self)
     Strategy(strategy).withdraw(_amount)
-    after: uint256 = ERC20(want).balanceOf(self)
-
-    # TODO: assert Vault.token == Strategy.want?
-    self._safeTransfer(want, msg.sender, after - before)

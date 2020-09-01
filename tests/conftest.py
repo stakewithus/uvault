@@ -91,8 +91,8 @@ def mockController(MockController, accounts):
 
 
 @pytest.fixture(scope="function")
-def mockStrategy(MockStrategy, accounts, mockERC20):
-    yield MockStrategy.deploy(mockERC20, {'from': accounts[0]})
+def mockStrategy(MockStrategy, accounts, erc20):
+    yield MockStrategy.deploy(erc20, {'from': accounts[0]})
 
 
 @pytest.fixture(scope="function")
