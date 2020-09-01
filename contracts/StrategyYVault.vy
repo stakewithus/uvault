@@ -8,33 +8,17 @@ from vyper.interfaces import ERC20
 
 interface Controller:
     def treasury() -> address: view
+    def vaults(_strategy: address) -> address: view
 
 interface YVault:
     def balanceOf(addr: address) -> uint256: view
     def deposit(amount: uint256): nonpayable
     def withdraw(amount: uint256): nonpayable
 
-event SetAdmin:
-    admin: address
-
-event SetController:
-    controller: address
-
-event SetWithdrawFee:
-    fee: uint256
-
-event Deposit:
-    sender: indexed(address)
-    amount: uint256
-
-event Withdraw:
-    to: indexed(address)
-    amount: uint256
-
 # TODO: harvest?
 # TODO: reentrancy
 # TODO: circuit breaker
-# TODO remove log to save gas?
+
 TRANSFER: constant(Bytes[4]) = method_id(
     "transfer(address,uint256)", output_type=Bytes[4]
 )
@@ -78,7 +62,6 @@ def setAdmin(_admin: address):
     assert _admin != ZERO_ADDRESS # dev: admin == zero address
 
     self.admin = _admin
-    log SetAdmin(_admin)
 
 
 @external
@@ -91,7 +74,6 @@ def setController(_controller: address):
     assert _controller != ZERO_ADDRESS # dev: controller == zero address
 
     self.controller = _controller
-    log SetController(_controller)
 
 
 @external
@@ -103,7 +85,6 @@ def setWithdrawFee(_fee: uint256):
     assert msg.sender == self.admin # dev: !admin
 
     self.withdrawFee = _fee
-    log SetWithdrawFee(_fee)
 
 
 @internal
@@ -191,14 +172,11 @@ def getBalance() -> uint256:
 
 
 @external
-def deposit(_amount: uint256):
+def deposit():
     """
-    @notice Deposit `_amount` into yVault
-    @param _amount Amount of yCRV to deposit
+    @notice Deposit balance into yVault
     """
     assert msg.sender == self.controller # dev: !controller
-
-    self._safeTransferFrom(self.want, msg.sender, self, _amount)
 
     bal: uint256 = ERC20(self.want).balanceOf(self)
     if bal > 0:
@@ -207,13 +185,11 @@ def deposit(_amount: uint256):
         ERC20(self.want).approve(self.pool, bal)
         YVault(self.pool).deposit(bal)
 
-    log Deposit(msg.sender, _amount)
-
 
 @external
 def withdraw(_amount: uint256):
     """
-    @notice Withdraw `_amount` from yVault
+    @notice Withdraw `_amount` from yVault to vault
     @param _amount Amount of yCRV to withdraw
     """
     assert msg.sender == self.controller # dev: !controller
@@ -226,6 +202,7 @@ def withdraw(_amount: uint256):
         if after < amount:
             amount = after
 
+    # transfer to treasury
     fee: uint256 = (amount * self.withdrawFee) / self.withdrawFeeMax
     if fee > 0:
         treasury: address = Controller(self.controller).treasury()
@@ -234,6 +211,8 @@ def withdraw(_amount: uint256):
         # fee can be lost if treasury is an address not controlled by StakeWithUs
         self._safeTransfer(self.want, treasury, fee)
 
-    self._safeTransfer(self.want, msg.sender, amount - fee)
+    # transfer to vault
+    vault: address = Controller(self.controller).vaults(self)
+    assert vault != ZERO_ADDRESS # dev: vault == zero address
 
-    log Withdraw(msg.sender, _amount)
+    self._safeTransfer(self.want, vault, amount - fee)
