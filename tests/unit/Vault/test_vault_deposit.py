@@ -6,7 +6,7 @@ ZERO_ADDRESS = "0x0000000000000000000000000000000000000000"
 
 @given(
     sender=strategy('address'),
-    amount=strategy('uint256')
+    amount=strategy('uint256', exclude=0)
 )
 def test_deposit(accounts, vault, erc20, sender, amount):
     # mint ERC20 to sender, approve vault to spend
@@ -53,3 +53,8 @@ def test_deposit(accounts, vault, erc20, sender, amount):
     # check vault shares
     assert after["vault"]["balances"]["sender"] == before["vault"]["balances"]["sender"] + amount
     assert after["vault"]["totalSupply"] == before["vault"]["totalSupply"] + amount
+
+
+def test_deposit(accounts, vault, erc20):
+    with brownie.reverts("dev: amount == 0"):
+        vault.deposit(accounts[0], 0)
