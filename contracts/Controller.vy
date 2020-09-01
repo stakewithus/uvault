@@ -14,7 +14,6 @@ interface Strategy:
     def withdraw(amount: uint256): nonpayable
 
 # TODO: create file for interfaces Vault, Strategy, Controller
-# TODO: reentrancy lock
 # TODO: circuit breaker
 
 
