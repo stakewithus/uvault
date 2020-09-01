@@ -16,6 +16,7 @@ interface Controller:
 implements: ERC20
 
 # TODO: reentrancy lock
+# TODO: worst case users should be able to deposit and withdraw
 # TODO: circuit breaker
 
 event Transfer:
@@ -294,18 +295,6 @@ def getBalance() -> uint256:
     return self._getBalance()
 
 
-@external
-def earn():
-    """
-    @notice Transfer token to controller
-    """
-    bal: uint256 = ERC20(self.token).balanceOf(self)
-    # Many ERC20s require approval from zero to nonzero or nonzero to zero
-    ERC20(self.token).approve(self.controller, 0)
-    ERC20(self.token).approve(self.controller, bal)
-    Controller(self.controller).deposit(bal)
-
-
 @internal
 def _isValidSig(_digest: bytes32, _v: uint256, _r: uint256, _s: uint256, _signer: address) -> bool:
     """
@@ -363,6 +352,28 @@ def getTxHash(
 
 
 @internal
+def _earn():
+    """
+    @notice Transfer token to controller
+    """
+    bal: uint256 = ERC20(self.token).balanceOf(self)
+
+    if bal > 0:
+        # Many ERC20s require approval from zero to nonzero or nonzero to zero
+        ERC20(self.token).approve(self.controller, 0)
+        ERC20(self.token).approve(self.controller, bal)
+        Controller(self.controller).deposit(bal)
+
+
+@external
+def earn():
+    """
+    @notice Transfer token to controller
+    """
+    self._earn()
+
+
+@internal
 def _deposit(_from: address, _amount: uint256):
     """
     @notice Deposit token
@@ -382,7 +393,7 @@ def deposit(_from: address, _amount: uint256):
     """
     self._deposit(_from, _amount)
 
-
+# TODO: only relayer
 @external
 def batchDeposit(_accounts: address[BATCH_SIZE], _amounts: uint256[BATCH_SIZE]):
     """
@@ -405,8 +416,8 @@ def batchDeposit(_accounts: address[BATCH_SIZE], _amounts: uint256[BATCH_SIZE]):
         self._deposit(account, amount)
 
 
-@internal
-def _withdraw(
+@external
+def withdraw(
     _to: address, _shares: uint256, _min: uint256, _nonce: uint256,
     _v: uint256, _r: uint256, _s: uint256
 ):
@@ -449,47 +460,79 @@ def _withdraw(
 
     log TxNonce(_to, _nonce)
 
-
+# TODO: only relayer
 @external
-def withdraw(
-    _to: address, _shares: uint256, _min: uint256, _nonce: uint256,
-    _v: uint256, _r: uint256, _s: uint256
+def batchWithdraw(
+    _accounts: address[BATCH_SIZE], _amounts: uint256[BATCH_SIZE], _mins: uint256[BATCH_SIZE],
+    _total: uint256, _nonces: uint256[BATCH_SIZE],
+    _vs: uint256[BATCH_SIZE], _rs: uint256[BATCH_SIZE], _ss: uint256[BATCH_SIZE],
 ):
     """
-    @notice Withdraw token for shares
-    @param _to Address to withdraw shares and transfer underlying token to
-    @param _shares Shares to burn
-    @param _min Minimum tokens to return, prevent slippage
-    @param _nonce Nonce used to sign
-    @param _v Signature param
-    @param _r Signature param
-    @param _s Signature param
+    @notice Batch withdraw token
+    @param _accounts Account to withdraw from
+    @param _amounts Amount of shares to burn
+    @param _mins Minimum tokens to return, prevent slippage
+    @param _total Total amount to withdraw
+    @param _nonces Nonces used to sign
+    @param _vs Signature params
+    @param _rs Signature params
+    @param _ss Signature params
+    @dev `_total` must be >= `sum(_amounts)`
     """
-    self._withdraw(_to, _shares, _min, _nonce, _v, _r, _s)
+    # total supply and pool before any withdraw
+    _totalSupply: uint256 = self.totalSupply
+    pool: uint256 = self._getBalance()
 
+    assert _total <= pool # dev total > pool
 
-# @external
-# TODO: frontrunning?
-# def batchWithdraw(
-#     _accounts: address[100], _amounts: uint256[100], _nonces: uint256[100],
-#     _vs: uint256[100], _rs: uint256[100], _ss: uint256[100],
-# ):
-#     # TODO: prevent slippage
-#     # TODO: verify signature (address, token, amount, nonce)? or only allow admin to batch? call from gas relayer?
-#     for i in range(100):
-#         # TODO break if less than 100
-#         addr: address = _accounts[i]
-#         amount: uint256 = _amounts[i]
-#         nonce: uint256 = _nonces[i]
-#         v: uint256 = _vs[i]
-#         r: uint256 = _rs[i]
-#         s: uint256 = _ss[i]
+    # Withdraw from controller if balance < total
+    before: uint256 = ERC20(self.token).balanceOf(self)
+    if before < _total:
+        Controller(self.controller).withdraw(_total - before)
 
-#         # valid sig proves account exists, so we can safely transfer
-#         # TODO: vulnerable to DOS
-#         # TODO: let all tx fail?
-#         # TODO: _safeTransfer can fail
-#         # TODO signature verification can fail
-#         # TODO: check total _amounts >= total supply
-#         # TODO withdraw total from controller and then burn shares
-#         self._withdraw(addr, amount, nonce, v, r, s)
+    after: uint256 = ERC20(self.token).balanceOf(self)
+    assert after >= _total # dev: after < total
+
+    for i in range(BATCH_SIZE):
+        addr: address = _accounts[i]
+
+        # break on first zero address
+        if addr == ZERO_ADDRESS:
+            break
+
+        shares: uint256 = _amounts[i]
+        _min: uint256 = _mins[i]
+        nonce: uint256 = _nonces[i]
+
+        # skip if shares < balance of shares of addr
+        if self.balanceOf[addr] < shares:
+            continue
+
+        # s = shares
+        # T = total supply
+        # a = amount of tokens
+        # P = balance of pool
+        # s / T = a / P
+        # a = s * P / T
+        amount: uint256 = (pool * shares) / _totalSupply
+
+        # skip if amount to withdraw < min return amount
+        if amount < _min:
+            continue
+
+        # skip if signature invalid or tx already executed
+        txHash: bytes32 = self._getTxHash(self, addr, shares, _min, nonce)
+        if self.executed[txHash] or (not self._isValidSig(txHash, _vs[i], _rs[i], _ss[i], addr)):
+            continue
+
+        # withdraw
+        self.executed[txHash] = True
+
+        self._burn(addr, amount)
+        # NOTE: valid sig implies address exists
+        self._safeTransfer(self.token, addr, amount)
+
+        log TxNonce(addr, nonce)
+
+    # deposit remainder
+    self._earn()
