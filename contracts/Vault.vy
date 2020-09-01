@@ -57,6 +57,7 @@ totalSupply: public(uint256)
 token: public(address)
 controller: public(address)
 admin: public(address)
+relayer: public(address)
 
 # mapping from signed and execute hash to bool
 # true if tx corresponding to hash was executed
@@ -64,7 +65,7 @@ executed: public(HashMap[bytes32, bool])
 
 @external
 def __init__(
-    _token: address, _controller: address,
+    _token: address, _controller: address, _relayer: address,
     _name: String[64], _symbol: String[32], _decimals: uint256
 ):
     """
@@ -75,8 +76,11 @@ def __init__(
     @param _symbol Token symbol
     @param _decimals Number of decimals for token
     """
+    # TODO: validate inputs
+
     self.token = _token
     self.controller = _controller
+    self.relayer = _relayer
     self.admin = msg.sender
 
     self.name = _name
@@ -277,6 +281,18 @@ def setController(_controller: address):
     self.controller = _controller
 
 
+@external
+def setRelayer(_relayer: address):
+    """
+    @notice Set the new relayer.
+    @param _relayer New relayer address
+    """
+    assert msg.sender == self.admin # dev: !admin
+    assert _relayer != ZERO_ADDRESS # dev: relayer == zero address
+
+    self.relayer = _relayer
+
+
 @internal
 @view
 def _getBalance() -> uint256:
@@ -393,7 +409,7 @@ def deposit(_from: address, _amount: uint256):
     """
     self._deposit(_from, _amount)
 
-# TODO: only relayer
+
 @external
 def batchDeposit(_accounts: address[BATCH_SIZE], _amounts: uint256[BATCH_SIZE]):
     """
@@ -401,6 +417,8 @@ def batchDeposit(_accounts: address[BATCH_SIZE], _amounts: uint256[BATCH_SIZE]):
     @param _accounts Addresses of token holders
     @param _amounts Amounts to deposit
     """
+    assert msg.sender == self.relayer # dev: !relayer
+
     for i in range(BATCH_SIZE):
         account: address = _accounts[i]
 
@@ -415,7 +433,7 @@ def batchDeposit(_accounts: address[BATCH_SIZE], _amounts: uint256[BATCH_SIZE]):
 
         self._deposit(account, amount)
 
-
+# TODO: remove signatures
 @external
 def withdraw(
     _to: address, _shares: uint256, _min: uint256, _nonce: uint256,
@@ -460,7 +478,7 @@ def withdraw(
 
     log TxNonce(_to, _nonce)
 
-# TODO: only relayer
+
 @external
 def batchWithdraw(
     _accounts: address[BATCH_SIZE], _amounts: uint256[BATCH_SIZE], _mins: uint256[BATCH_SIZE],
@@ -478,7 +496,11 @@ def batchWithdraw(
     @param _rs Signature params
     @param _ss Signature params
     @dev `_total` must be >= `sum(_amounts)`
+    @dev only `relayer` can call this function, this prevents callers from
+         withdrawing into to this vault just to extract withdrawal fees from pool
     """
+    assert msg.sender == self.relayer # dev: !relayer
+
     # total supply and pool before any withdraw
     _totalSupply: uint256 = self.totalSupply
     pool: uint256 = self._getBalance()
