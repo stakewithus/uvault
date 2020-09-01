@@ -43,7 +43,7 @@ TRANSFER_FROM: constant(Bytes[4]) = method_id(
 )
 
 # number of batches
-BATCH_SIZE: constant(uint256) = 100
+BATCH_SIZE: constant(uint256) = 1000
 
 name: public(String[64])
 symbol: public(String[32])
@@ -383,27 +383,21 @@ def deposit(_from: address, _amount: uint256):
     self._deposit(_from, _amount)
 
 
-# @external
-# def batchDeposit(
-#     _signers: address[BATCH_SIZE], _amounts: uint256[BATCH_SIZE], _mins: uint256[BATCH_SIZE],
-#     _nonces: uint256[BATCH_SIZE],
-#     _vs: uint256[BATCH_SIZE], _rs: uint256[BATCH_SIZE], _ss: uint256[BATCH_SIZE]
-# ):
-#     for i in range(BATCH_SIZE):
-#         signer: address = _signers[i]
+@external
+def batchDeposit(_accounts: address[BATCH_SIZE], _amounts: uint256[BATCH_SIZE]):
+    for i in range(BATCH_SIZE):
+        account: address = _accounts[i]
 
-#         # break on first zero address
-#         if signer == ZERO_ADDRESS:
-#             break
+        # break on first zero address
+        if account == ZERO_ADDRESS:
+            break
 
-#         amount: uint256 = _amounts[i]
-#         _min: uint256 = _mins[i]
-#         nonce: uint256 = _nonces[i]
-#         v: uint256 = _vs[i]
-#         r: uint256 = _rs[i]
-#         s: uint256 = _ss[i]
+        amount: uint256 = _amounts[i]
+        # skip if balance or allowance < amount
+        if ERC20(self.token).balanceOf(account) < amount or ERC20(self.token).allowance(account, self) < amount:
+            continue
 
-#         self._deposit(signer, amount, _min, nonce, v, r, s)
+        self._deposit(account, amount)
 
 
 @internal
