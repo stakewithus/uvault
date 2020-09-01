@@ -7,7 +7,6 @@ ZERO_ADDRESS = "0x0000000000000000000000000000000000000000"
 def test_withdraw(
     accounts, vault, erc20, signers, vault_helper
 ):
-    deposit = vault_helper.deposit
     withdraw = vault_helper.withdraw
 
     signer = signers[0]
@@ -17,13 +16,8 @@ def test_withdraw(
     erc20.mint(signer, amount)
     erc20.approve(vault, amount, {'from': signer})
 
-    deposit(vault, {
-        "signer": signer,
-        "from": signer,
-        "amount": amount,
-        "minOut": 1000,
-        "nonce": 123
-    })
+    # deposit
+    vault.deposit(signer, amount)
 
     # snapshot before tx
     before = {
@@ -94,7 +88,6 @@ def test_withdraw_from_controller(
 def test_withdraw_tx_executed(
     accounts, vault, erc20, signers, vault_helper
 ):
-    deposit = vault_helper.deposit
     withdraw = vault_helper.withdraw
 
     signer = signers[0]
@@ -105,13 +98,7 @@ def test_withdraw_tx_executed(
     erc20.approve(vault, amount, {'from': signer})
 
     # deposit
-    deposit(vault, {
-        "signer": signer,
-        "from": signer,
-        "amount": amount,
-        "minOut": 1000,
-        "nonce": 123,
-    })
+    vault.deposit(signer, amount)
 
     shares = vault.balanceOf(signer)
 
@@ -137,7 +124,6 @@ def test_withdraw_tx_executed(
 def test_deposit_invalid_sig(
     accounts, vault, erc20, signers, vault_helper
 ):
-    deposit = vault_helper.deposit
     withdraw = vault_helper.withdraw
 
     not_signer = signers[1]
@@ -153,4 +139,30 @@ def test_deposit_invalid_sig(
             "nonce": 123,
         })
 
-# # test slippage
+
+def test_withdraw_slippage(
+    accounts, vault, erc20, signers, vault_helper
+):
+    withdraw = vault_helper.withdraw
+
+    signer = signers[0]
+    amount = 1000
+
+    # mint ERC20 to signer, approve vault to spend
+    erc20.mint(signer, amount)
+    erc20.approve(vault, amount, {'from': signer})
+
+    # deposit
+    vault.deposit(signer, amount)
+
+    shares = vault.balanceOf(signer)
+
+    # withdraw
+    with brownie.reverts("dev: amount < min tokens to return"):
+        withdraw(vault, {
+            "signer": signer,
+            "to": signer,
+            "shares": shares,
+            "minOut": shares + 1,
+            "nonce": 456
+        })

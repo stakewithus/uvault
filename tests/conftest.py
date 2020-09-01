@@ -5,35 +5,21 @@ from eth_account import Account
 from eth_account.messages import encode_defunct
 
 
-class VaultHelper:
+class AccountHelper:
     @staticmethod
-    def deposit(vault, params):
-        signer = params["signer"]
-        tokenHolder = params["from"]
-        amount = params["amount"]
-        minOut = params["minOut"]
-        nonce = params["nonce"]
-
-        # signer sign message
-        txHash = vault.getTxHash(
-            signer.address, vault, amount, minOut, nonce
-        )
-        sig = Account.from_key(signer.private_key).sign_message(
+    def sign(account, txHash):
+        # account must be account created by accounts.add()
+        return Account.from_key(account.private_key).sign_message(
             encode_defunct(hexstr=str(txHash))
         )
 
-        # deposit
-        tx = vault.deposit(
-            tokenHolder, amount, minOut, nonce,
-            sig.v, sig.r, sig.s
-        )
 
-        return {
-            "tx": tx,
-            "sig": sig,
-            "txHash": txHash
-        }
+@pytest.fixture
+def account_helper():
+    return AccountHelper
 
+
+class VaultHelper:
     @staticmethod
     def withdraw(vault, params):
         signer = params["signer"]
@@ -79,7 +65,7 @@ def isolate(fn_isolation):
 def signers(accounts):
     # create accounts to get access to private key
     # number of accounts to create
-    n = 100
+    n = 10
 
     for i in range(n):
         accounts.add()
