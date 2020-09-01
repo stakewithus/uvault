@@ -10,6 +10,7 @@ def test_set_strategy(accounts, controller):
     controller.setStrategy(VAULT, STRATEGY, {'from': accounts[0]})
 
     assert controller.strategies(VAULT) == STRATEGY
+    assert controller.vaults(STRATEGY) == VAULT
     assert controller.isVault(VAULT)
 
 
@@ -42,4 +43,5 @@ def test_set_strategy_withdraw_from_strategy(accounts, controller, mockStrategy)
     # check Strategy.withdraw was called
     assert mockStrategy.withdrawAmount() == balance
     assert controller.strategies(VAULT) == newStrategy
+    assert controller.vaults(newStrategy) == VAULT
     assert controller.isVault(VAULT)
