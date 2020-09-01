@@ -76,7 +76,9 @@ def __init__(
     @param _symbol Token symbol
     @param _decimals Number of decimals for token
     """
-    # TODO: validate inputs
+    assert _token != ZERO_ADDRESS # dev: token == zero address
+    assert _controller != ZERO_ADDRESS # dev: controller == zero address
+    assert _relayer != ZERO_ADDRESS # dev: relayer == zero address
 
     self.token = _token
     self.controller = _controller
