@@ -18,6 +18,7 @@ interface YVault:
 # TODO: harvest?
 # TODO: reentrancy
 # TODO: circuit breaker
+# TODO harvest
 
 TRANSFER: constant(Bytes[4]) = method_id(
     "transfer(address,uint256)", output_type=Bytes[4]
