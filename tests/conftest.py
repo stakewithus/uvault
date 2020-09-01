@@ -103,8 +103,10 @@ def controller(Controller, accounts):
 
 @pytest.fixture(scope="function")
 def vault(Vault, accounts, erc20, mockController):
+    relayer = accounts[1]
+
     yield Vault.deploy(
-        erc20, mockController,
+        erc20, mockController, relayer,
         "uERC20", "uERC20", 18,
         {'from': accounts[0]}
     )
