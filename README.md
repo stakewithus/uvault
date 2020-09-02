@@ -52,6 +52,8 @@ export WEB3_INFURA_PROJECT_ID=ab8ed427a2544fdb869871b7e853243d
 
 #### Deploy to Ropsten
 
+Deploy to dev
+
 ```
 brownie run scripts/deploy_dev.py
 ```
