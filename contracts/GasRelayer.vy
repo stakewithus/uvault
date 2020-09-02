@@ -26,7 +26,7 @@ def addWhitelist(_addresses: address[5]):
     @notice Adds operators to the whitelist
     @param _addresses An fixed array of addresses to add to whitelist
     """
-    assert msg.sender == self.owner, "Only owner can add whitelist"
+    assert msg.sender == self.owner  # dev: !owner
     for i in range(5):
         _address: address = _addresses[i]
         if _address != ZERO_ADDRESS:
@@ -39,7 +39,7 @@ def removeWhitelist(_addresses: address[5]):
     @notice Removes operators from the whitelist
     @param _addresses An fixed array of addresses to remove from whitelist
     """
-    assert msg.sender == self.owner, "Only owner can remove whitelist"
+    assert msg.sender == self.owner # dev: !owner
     for i in range(5):
         _address: address = _addresses[i]
         if _address != ZERO_ADDRESS:
@@ -53,8 +53,6 @@ def mintGasToken(_value: uint256):
     @dev GST2 Tokens are stored in the smart contract, accessible by operators on the whitelist
     @param _value The amount of cGST2 to mint. 100 cGST2 = GST2
     """
-    # TODO: no need for assert? Tx will fail if msg.gas == 0?
-    assert msg.gas > 0 # No spending of gas on this contract!
     GasToken(self.gasToken).mint(_value)
 
 
@@ -65,8 +63,8 @@ def transferGasToken(_to: address, _value: uint256):
     @param _to The destination address
     @param _value Amount of GST2 to transfer in cGST2
     """
-    assert msg.sender == self.owner, "Only owner can transfer"
-    assert ERC20(self.gasToken).balanceOf(self) >= _value, "Insufficient balance to transfer"
+    assert msg.sender == self.owner # dev: !owner
+    assert ERC20(self.gasToken).balanceOf(self) >= _value # dev: gas token balance < value
     ERC20(self.gasToken).transfer(_to, _value)
 
 
@@ -79,8 +77,8 @@ def relayTx(_value: uint256, _to: address, _to_data: Bytes[6000]):
     @param _to Address to relay the tx to
     @param _to_data Calldata payload for the tx
     """
-    assert self.whitelist[msg.sender] != False, "Unauthorized Relayer"
-    assert ERC20(self.gasToken).balanceOf(self) >= _value, "Insufficient gas banked!"
+    assert self.whitelist[msg.sender] # dev: !whitelist
+    assert ERC20(self.gasToken).balanceOf(self) >= _value # dev: gas token balance < value
 
     if _value > 0:
         GasToken(self.gasToken).freeUpTo(_value)
