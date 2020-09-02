@@ -45,7 +45,7 @@ def removeWhitelist(_addresses: address[5]):
         if _address != ZERO_ADDRESS:
             self.whitelist[_address] = False
 
-
+# TODO whitelist can set gas token
 @external
 def mintGasToken(_value: uint256):
     """
@@ -70,6 +70,7 @@ def transferGasToken(_to: address, _value: uint256):
     ERC20(self.gasToken).transfer(_to, _value)
 
 
+# TODO: find out max bytes size for batching deposit and withdraw
 @external
 def relayTx(_value: uint256, _to: address, _to_data: Bytes[6000]):
     """
