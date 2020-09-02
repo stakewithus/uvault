@@ -19,6 +19,9 @@ virtualenv -p python3 venv
 source venv/bin/activate
 
 pip install -r requirements.txt
+
+# install Brownie PM
+brownie pm install OpenZeppelin/openzeppelin-contracts@3.0.0
 ```
 
 ### Test
@@ -39,4 +42,16 @@ export ETHERSCAN_TOKEN=4C8V4NVUK8KC5SBRR8NMPEV785JKTCI1NS
 #       That means you will have to restart ganache-cli every 128 blocks (~30 minutes)
 ganache-cli -f https://mainnet.infura.io/v3/ab8ed427a2544fdb869871b7e853243d -i 1
 brownie test --network --mainnet-fork
+```
+
+### Scripts
+
+```bash
+export WEB3_INFURA_PROJECT_ID=ab8ed427a2544fdb869871b7e853243d
+```
+
+#### Deploy to Ropsten
+
+```
+brownie run scripts/deploy_dev.py
 ```
