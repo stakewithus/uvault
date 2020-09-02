@@ -72,6 +72,8 @@ def signers(accounts):
 
     return accounts[-n:]
 
+# test / mock
+
 
 @pytest.fixture(scope="function")
 def erc20(ERC20, accounts):
@@ -84,7 +86,16 @@ def erc20(ERC20, accounts):
     )
 
 
-# core
+@pytest.fixture(scope="function")
+def chiToken(ChiToken, accounts):
+    yield ChiToken.deploy({'from': accounts[0]})
+
+
+@pytest.fixture(scope="function")
+def txReceiver(TxReceiver, accounts):
+    yield TxReceiver.deploy({'from': accounts[0]})
+
+
 @pytest.fixture(scope="function")
 def mockController(MockController, accounts):
     yield MockController.deploy(accounts[0], {'from': accounts[0]})
@@ -93,6 +104,13 @@ def mockController(MockController, accounts):
 @pytest.fixture(scope="function")
 def mockStrategy(MockStrategy, accounts, erc20):
     yield MockStrategy.deploy(erc20, {'from': accounts[0]})
+
+# core
+
+
+@pytest.fixture(scope="function")
+def gasRelayer(GasRelayer, accounts, chiToken):
+    yield GasRelayer.deploy(chiToken, {'from': accounts[0]})
 
 
 @pytest.fixture(scope="function")
