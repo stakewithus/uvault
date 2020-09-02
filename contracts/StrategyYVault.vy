@@ -194,6 +194,7 @@ def withdraw(_amount: uint256):
     @param _amount Amount of yCRV to withdraw
     """
     assert msg.sender == self.controller # dev: !controller
+    assert _amount > 0 # dev: amount == 0
 
     bal: uint256 = ERC20(self.want).balanceOf(self)
     amount: uint256 = _amount
@@ -212,7 +213,7 @@ def withdraw(_amount: uint256):
         # fee can be lost if treasury is an address not controlled by StakeWithUs
         self._safeTransfer(self.want, treasury, fee)
 
-    # transfer to vault
+    # # transfer to vault
     vault: address = Controller(self.controller).vaults(self)
     assert vault != ZERO_ADDRESS # dev: vault == zero address
 

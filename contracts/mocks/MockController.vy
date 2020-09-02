@@ -48,3 +48,8 @@ def setBalanceOf(_vault: address, _amount: uint256):
 @external
 def depositToStrategy(_strategy: address):
     Strategy(_strategy).deposit()
+
+
+@external
+def withdrawFromStrategy(_strategy: address, _amount: uint256):
+    Strategy(_strategy).withdraw(_amount)
