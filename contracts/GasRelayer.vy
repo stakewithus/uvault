@@ -5,6 +5,7 @@ interface GasToken:
     def free(amount: uint256) -> bool: nonpayable
     def freeUpTo(amount: uint256) -> uint256: nonpayable
 
+# TODO test
 
 owner: public(address)
 gasToken: public(address)
@@ -27,8 +28,6 @@ def addWhitelist(_addresses: address[5]):
     """
     assert msg.sender == self.owner, "Only owner can add whitelist"
     for i in range(5):
-        # TODO: no need to convert?
-        # idx: uint256 = convert(i, uint256)
         _address: address = _addresses[i]
         if _address != ZERO_ADDRESS:
             self.whitelist[_address] = True
@@ -42,9 +41,7 @@ def removeWhitelist(_addresses: address[5]):
     """
     assert msg.sender == self.owner, "Only owner can remove whitelist"
     for i in range(5):
-        # TODO: no need to convert?
-        idx: uint256 = convert(i, uint256)
-        _address: address = _addresses[idx]
+        _address: address = _addresses[i]
         if _address != ZERO_ADDRESS:
             self.whitelist[_address] = False
 
@@ -69,7 +66,6 @@ def transferGasToken(_to: address, _value: uint256):
     @param _value Amount of GST2 to transfer in cGST2
     """
     assert msg.sender == self.owner, "Only owner can transfer"
-    # TODO: no need to assert?
     assert ERC20(self.gasToken).balanceOf(self) >= _value, "Insufficient balance to transfer"
     ERC20(self.gasToken).transfer(_to, _value)
 
@@ -83,7 +79,6 @@ def relayTx(_value: uint256, _to: address, _to_data: Bytes[6000]):
     @param _to_data Calldata payload for the tx
     """
     assert self.whitelist[msg.sender] != False, "Unauthorized Relayer"
-    # TODO no need to assert?
     assert ERC20(self.gasToken).balanceOf(self) >= _value, "Insufficient gas banked!"
 
     if _value > 0:
