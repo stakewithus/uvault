@@ -74,8 +74,8 @@ def signers(accounts):
 
 
 @pytest.fixture(scope="function")
-def erc20(MockERC20, accounts):
-    yield MockERC20.deploy(
+def erc20(ERC20, accounts):
+    yield ERC20.deploy(
         "erc20",
         "erc20",
         18,
@@ -114,8 +114,8 @@ def vault(Vault, accounts, erc20, mockController):
 
 # strategy
 @pytest.fixture(scope="function")
-def mockYCRV(MockERC20, accounts):
-    yield MockERC20.deploy(
+def mockYCRV(ERC20, accounts):
+    yield ERC20.deploy(
         "Curve.fi yDAI/yUSDC/yUSDT/yTUSD",
         "yDAI+yUSDC+yUSDT+yTUSD",
         18,

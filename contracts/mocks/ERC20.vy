@@ -1,4 +1,5 @@
-# @dev Implementation of ERC-20 token standard.
+# @dev Implementation of ERC-20 token standard
+# @dev Use for testing
 # @author Takayuki Jimba (@yudetamago)
 # https://github.com/ethereum/EIPs/blob/master/EIPS/eip-20.md
 
