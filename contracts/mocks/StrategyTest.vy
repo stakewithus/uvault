@@ -145,7 +145,7 @@ def _getBalance() -> uint256:
     @notice Get balance of `want` in this contract and pool
     @return uint256 balance
     """
-    return ERC20(self.want).balanceOf(self) + ERC20(self.pool).balanceOf(self)
+    return ERC20(self.want).balanceOf(self) + ERC20(self.want).balanceOf(self.pool)
 
 
 @external
