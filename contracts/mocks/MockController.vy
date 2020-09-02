@@ -11,8 +11,8 @@ vaults: public(HashMap[address, address])
 balanceOf: public(HashMap[address, uint256])
 
 # test helpers
-depositAmount: public(uint256)
-withdrawAmount: public(uint256)
+__depositAmount: public(uint256)
+__withdrawAmount: public(uint256)
 
 @external
 def __init__(_treasury: address):
@@ -25,31 +25,37 @@ def setStrategy(_vault: address, _strategy: address):
 
 
 @external
-def deposit(_amount: uint256):
-    self.depositAmount = _amount
-
-
-@external
-def withdraw(_amount: uint256):
-    self.withdrawAmount = _amount
-
-
-# test helpeur
-@external
 def setTreasury(_treasury: address):
     self.treasury = _treasury
 
 
 @external
-def setBalanceOf(_vault: address, _amount: uint256):
+def deposit(_amount: uint256):
+    self.__depositAmount = _amount
+
+
+@external
+def withdraw(_amount: uint256):
+    self.__withdrawAmount = _amount
+
+
+
+# test helpeur
+@external
+def __setTreasury(_treasury: address):
+    self.treasury = _treasury
+
+
+@external
+def __setBalanceOf(_vault: address, _amount: uint256):
     self.balanceOf[_vault] = _amount
 
 
 @external
-def depositToStrategy(_strategy: address):
+def __depositToStrategy(_strategy: address):
     Strategy(_strategy).deposit()
 
 
 @external
-def withdrawFromStrategy(_strategy: address, _amount: uint256):
+def __withdrawFromStrategy(_strategy: address, _amount: uint256):
     Strategy(_strategy).withdraw(_amount)

@@ -32,7 +32,7 @@ def test_set_strategy_strategy_zero_address(accounts, controller):
 def test_set_strategy_withdraw_from_strategy(accounts, controller, mockStrategy):
     # mock balance of strategy
     balance = 1000
-    mockStrategy.setBalance(balance)
+    mockStrategy.__setBalance(balance)
 
     controller.setStrategy(VAULT, mockStrategy, {'from': accounts[0]})
 
@@ -41,7 +41,7 @@ def test_set_strategy_withdraw_from_strategy(accounts, controller, mockStrategy)
     controller.setStrategy(VAULT, newStrategy, {'from': accounts[0]})
 
     # check Strategy.withdraw was called
-    assert mockStrategy.withdrawAmount() == balance
+    assert mockStrategy.__withdrawAmount() == balance
     assert controller.strategies(VAULT) == newStrategy
     assert controller.vaults(newStrategy) == VAULT
     assert controller.isVault(VAULT)

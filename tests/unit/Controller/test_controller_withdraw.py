@@ -14,7 +14,7 @@ def test_withdraw(accounts, controller, mockStrategy, erc20):
     controller.withdraw(amount, {'from': vault})
 
     # check deposit was called with amount
-    assert mockStrategy.withdrawAmount() == amount
+    assert mockStrategy.__withdrawAmount() == amount
     # cannot test vault's balance of erc20 since mockStrategy
     # does not transfer erc20
 

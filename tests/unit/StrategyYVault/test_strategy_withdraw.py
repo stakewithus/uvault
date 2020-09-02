@@ -30,7 +30,7 @@ def test_withdraw_zero_amount(
     # to mockController
     with brownie.reverts():
         # need to call withdraw from controller
-        mockController.withdrawFromStrategy(strategyYVault, 0)
+        mockController.__withdrawFromStrategy(strategyYVault, 0)
 
 
 def test_withdraw_no_withdraw_from_yvault(
@@ -52,7 +52,7 @@ def test_withdraw_no_withdraw_from_yvault(
     )
 
     # need to call withdraw from controller
-    mockController.withdrawFromStrategy(strategyYVault, amount)
+    mockController.__withdrawFromStrategy(strategyYVault, amount)
 
     # snapshot after
     after = get_snapshot(
@@ -80,7 +80,7 @@ def test_withdraw_from_yvault(
     mockYCRV.mint(strategyYVault, amount - 1000)
 
     # strategyYVault owns 20000 yCRV inside yVault
-    mockYVault.setBalanceOf(strategyYVault, 20000)
+    mockYVault.__setBalanceOf(strategyYVault, 20000)
     mockYCRV.mint(mockYVault, 20000)
 
     # set strategy to vault mapping
@@ -93,7 +93,7 @@ def test_withdraw_from_yvault(
     )
 
     # need to call withdraw from controller
-    mockController.withdrawFromStrategy(strategyYVault, amount)
+    mockController.__withdrawFromStrategy(strategyYVault, amount)
 
     # snapshot after tx
     after = get_snapshot(
@@ -102,7 +102,7 @@ def test_withdraw_from_yvault(
 
     # check yVault.withdraw was called
     diff = amount - before["yCRV"]["balances"]["strategyYVault"]
-    assert mockYVault.withdrawAmount() == diff
+    assert mockYVault.__withdrawAmount() == diff
 
     # withdraww amount = balance of strategy + amount withdrawn from yVault
     withdrawAmount = before["yCRV"]["balances"]["strategyYVault"] + \
@@ -121,7 +121,7 @@ def test_withdraw_from_yvault(
 def test_withdraw_treasury_is_zero_address(
     accounts, strategyYVault, mockController, mockYCRV, mockYVault
 ):
-    mockController.setTreasury(ZERO_ADDRESS)
+    mockController.__setTreasury(ZERO_ADDRESS)
 
     amount = 1000
     mockYCRV.mint(strategyYVault, amount)
@@ -130,4 +130,4 @@ def test_withdraw_treasury_is_zero_address(
     # to mockController
     with brownie.reverts():
         # need to call withdraw from controller
-        mockController.withdrawFromStrategy(strategyYVault, amount)
+        mockController.__withdrawFromStrategy(strategyYVault, amount)

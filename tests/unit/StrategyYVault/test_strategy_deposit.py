@@ -9,9 +9,9 @@ def test_deposit(
     mockYCRV.mint(strategyYVault, amount)
 
     # need to call from controller
-    mockController.depositToStrategy(strategyYVault)
+    mockController.__depositToStrategy(strategyYVault)
 
-    assert mockYVault.depositAmount() == amount
+    assert mockYVault.__depositAmount() == amount
 
 
 def test_deposit_not_controller(

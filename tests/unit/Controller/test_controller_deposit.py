@@ -33,7 +33,7 @@ def test_deposit(accounts, controller, mockStrategy, erc20):
 
     assert after["erc20"]["balances"]["vault"] == before["erc20"]["balances"]["vault"] - amount
     # check Strategy.deposit was called
-    assert mockStrategy.depositWasCalled()
+    assert mockStrategy.__depositWasCalled()
 
 
 def test_deposit_not_vault(accounts, controller):

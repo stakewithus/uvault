@@ -36,4 +36,4 @@ def test_earn(accounts, vault, erc20, mockController, amount):
     vault.earn()
 
     # NOTE: cannot check ERC20 balances since controller calls transferFrom
-    assert mockController.depositAmount() == amount
+    assert mockController.__depositAmount() == amount

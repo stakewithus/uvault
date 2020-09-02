@@ -156,5 +156,5 @@ def burn(_value: uint256):
 
 # test helper
 @external
-def approveFrom(_from: address, _to: address, _amount: uint256):
+def __approveFrom(_from: address, _to: address, _amount: uint256):
     self.allowances[_from][_to] = _amount

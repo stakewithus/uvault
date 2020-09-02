@@ -5,9 +5,9 @@ from vyper.interfaces import ERC20
 want: public(address)
 
 # test helpers
-_balance: uint256
-depositWasCalled: public(bool)
-withdrawAmount: public(uint256)
+__balance: uint256
+__depositWasCalled: public(bool)
+__withdrawAmount: public(uint256)
 
 @external
 def __init__(_want: address):
@@ -17,19 +17,20 @@ def __init__(_want: address):
 @external
 @view
 def getBalance() -> uint256:
-    return self._balance
+    return self.__balance
 
 
 @external
 def deposit():
-    self.depositWasCalled = True
+    self.__depositWasCalled = True
 
 
 @external
 def withdraw(_amount: uint256):
-    self.withdrawAmount = _amount
+    self.__withdrawAmount = _amount
 
 
+# test helper
 @external
-def setBalance(_amount: uint256):
-    self._balance = _amount
+def __setBalance(_amount: uint256):
+    self.__balance = _amount
