@@ -5,11 +5,9 @@ CONTROLLER_ADDRESS = "0x0000000000000000000000000000000000000001"
 
 
 def test_set_controller(accounts, strategyYVault):
-    tx = strategyYVault.setController(CONTROLLER_ADDRESS, { 'from': accounts[0] })
+    strategyYVault.setController(CONTROLLER_ADDRESS, {'from': accounts[0]})
 
     assert strategyYVault.controller() == CONTROLLER_ADDRESS
-    assert len(tx.events) == 1
-    assert tx.events["SetController"].values() == [CONTROLLER_ADDRESS]
 
 
 def test_set_controller_not_admin(accounts, strategyYVault):
