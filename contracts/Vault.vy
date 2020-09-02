@@ -85,6 +85,8 @@ def __init__(
 
     self.name = _name
     self.symbol = _symbol
+    # NOTE: decimals must equal token.decimals
+    # NOTE: ERC20 does not implement decimals() so set decimals from input
     self.decimals = _decimals
 
 
