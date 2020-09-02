@@ -1,8 +1,10 @@
 from brownie import (
-    accounts, GasRelayer, ChiToken,
-    Controller, Vault,
+    accounts,
+    GasRelayer, ChiToken, Controller, Vault,
     StrategyTest, ERC20
 )
+from eth_account import Account
+from eth_account.messages import encode_defunct
 
 ZERO_ADDRESS = "0x0000000000000000000000000000000000000000"
 
@@ -10,8 +12,14 @@ BATCH_SIZE = 1000
 NUM_SIGNERS = 10
 
 
-def batch_deposit(signers, vault, gasRelayer):
-    amount = 10 * 10 ** 18
+def sign(account, txHash):
+    return Account.from_key(account.private_key).sign_message(
+        encode_defunct(hexstr=str(txHash))
+    )
+
+
+def batchDeposit(signers, vault, gasRelayer):
+    amount = 20 * 10 ** 18
 
     _accounts = []
     amounts = []
@@ -27,7 +35,52 @@ def batch_deposit(signers, vault, gasRelayer):
     # call batchDeposit through gas relayer
     call_data = vault.batchDeposit.encode_input(_accounts, amounts)
 
-    gasRelayer.mintGasToken(100)
+    gasRelayer.relayTx(100, vault, call_data)
+
+
+def batchWithdraw(signers, vault, gasRelayer):
+    _signers = []
+    amounts = []
+    mins = []
+    nonces = []
+    vs = []
+    rs = []
+    ss = []
+    total = 0
+
+    for i in range(BATCH_SIZE):
+        if i < len(signers):
+            signer = signers[i]
+            amount = 1 * 10 * 18
+            _min = 0
+            nonce = 0
+
+            txHash = vault.getTxHash(vault, signer, amount, _min, nonce)
+            sig = sign(signer, txHash)
+
+            total += amount
+            _signers.append(signer)
+            amounts.append(amount)
+            mins.append(_min)
+            nonces.append(nonce)
+            vs.append(sig.v)
+            rs.append(sig.r)
+            ss.append(sig.s)
+        else:
+            _signers.append(ZERO_ADDRESS)
+            amounts.append(0)
+            mins.append(0)
+            nonces.append(0)
+            vs.append(0)
+            rs.append(0)
+            ss.append(0)
+
+    # call batchWithdraw through gas relayer
+    call_data = vault.batchWithdraw.encode_input(
+        _signers, amounts, mins, total, nonces,
+        vs, rs, ss
+    )
+
     gasRelayer.relayTx(100, vault, call_data)
 
 
@@ -68,6 +121,8 @@ def main():
 
     # ----------------------------------------------------------------------
     # test gas costs
+    gasRelayer.mintGasToken(100)
+    gasRelayer.mintGasToken(100)
 
     # add signers
     signers = []
@@ -79,11 +134,14 @@ def main():
     for signer in signers:
         erc20.mint(signer, 100 * 10 ** 18)
 
-    amount = 10 * 10 ** 18
+    amount = 100 * 10 ** 18
 
     # approve vault to deposit
     for signer in signers:
         erc20.approve(vault, amount, {'from': signer})
 
     # test batch deposit
-    batch_deposit(signers, vault, gasRelayer)
+    batchDeposit(signers, vault, gasRelayer)
+
+    # test batch withdraw
+    batchWithdraw(signers, vault, gasRelayer)
