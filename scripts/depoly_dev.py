@@ -6,6 +6,30 @@ from brownie import (
 
 ZERO_ADDRESS = "0x0000000000000000000000000000000000000000"
 
+BATCH_SIZE = 1000
+NUM_SIGNERS = 10
+
+
+def batch_deposit(signers, vault, gasRelayer):
+    amount = 10 * 10 ** 18
+
+    _accounts = []
+    amounts = []
+
+    for i in range(BATCH_SIZE):
+        if i < len(signers):
+            _accounts.append(signers[i])
+            amounts.append(amount)
+        else:
+            _accounts.append(ZERO_ADDRESS)
+            amounts.append(0)
+
+    # call batchDeposit through gas relayer
+    call_data = vault.batchDeposit.encode_input(_accounts, amounts)
+
+    gasRelayer.mintGasToken(100)
+    gasRelayer.relayTx(100, vault, call_data)
+
 
 def main():
     admin = accounts[0]
@@ -45,9 +69,6 @@ def main():
     # ----------------------------------------------------------------------
     # test gas costs
 
-    BATCH_SIZE = 1000
-    NUM_SIGNERS = 100
-
     # add signers
     signers = []
     for i in range(NUM_SIGNERS):
@@ -58,26 +79,11 @@ def main():
     for signer in signers:
         erc20.mint(signer, 100 * 10 ** 18)
 
-    amount = 100 * 10 ** 18
+    amount = 10 * 10 ** 18
 
     # approve vault to deposit
     for signer in signers:
         erc20.approve(vault, amount, {'from': signer})
 
     # test batch deposit
-    _accounts = []
-    amounts = []
-
-    for i in range(BATCH_SIZE):
-        if i < len(signers):
-            _accounts.append(signers[i])
-            amounts.append(amount)
-        else:
-            _accounts.append(ZERO_ADDRESS)
-            amounts.append(0)
-
-    # call batchDeposit through gas relayer
-    call_data = vault.batchDeposit.encode_input(_accounts, amounts)
-
-    gasRelayer.mintGasToken(100)
-    gasRelayer.relayTx(100, vault, call_data)
+    batch_deposit(signers, vault, gasRelayer)
