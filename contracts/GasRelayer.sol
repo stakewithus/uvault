@@ -20,13 +20,15 @@ contract GasRelayer {
     mapping(address => bool) public whitelist;
 
     constructor(address _gasToken) public {
+        require(_gasToken != ZERO_ADDRESS); // dev: gas token == zero address
+
         owner = msg.sender;
         gasToken = _gasToken;
         whitelist[msg.sender] = true;
     }
 
     modifier onlyOwner() {
-        require(msg.sender == owner);
+        require(msg.sender == owner); // dev: !owner
         _;
     }
 
@@ -67,13 +69,13 @@ contract GasRelayer {
     }
 
     function relayTx(uint _value, address _to, bytes calldata _data) external {
-        require(whitelist[msg.sender]);
+        require(whitelist[msg.sender]); // dev: !whitelist
 
         if (_value > 0) {
             GasToken(gasToken).freeUpTo(_value);
         }
 
         (bool success,) = _to.call(_data);
-        require(success);
+        require(success); // dev: relay tx failed
     }
 }
