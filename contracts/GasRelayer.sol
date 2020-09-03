@@ -10,7 +10,7 @@ interface GasToken {
     function freeUpTo(uint amount) external returns (uint);
 }
 
-contract GasRelayerV2 {
+contract GasRelayer {
     using SafeERC20 for IERC20;
 
     address constant ZERO_ADDRESS = address(0);
