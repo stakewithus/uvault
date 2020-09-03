@@ -34,5 +34,5 @@ def test_replay_tx_not_whitelist(accounts, gasRelayer, txReceiver):
 
 
 def test_replay_tx_not_enough_gas_token(accounts, gasRelayer, txReceiver):
-    with brownie.reverts("dev: gas token balance < value"):
+    with brownie.reverts():
         gasRelayer.relayTx(100, txReceiver, "0x00", {'from': accounts[0]})
