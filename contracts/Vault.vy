@@ -301,6 +301,7 @@ def setRelayer(_relayer: address):
 def _getBalance() -> uint256:
     """
     @notice Sum of token balances of this contract and controller
+    @dev total balance = balance of vault + strategy + pool
     """
     return ERC20(self.token).balanceOf(self) + Controller(self.controller).balanceOf(self)
 
