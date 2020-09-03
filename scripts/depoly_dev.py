@@ -8,7 +8,7 @@ from eth_account.messages import encode_defunct
 
 ZERO_ADDRESS = "0x0000000000000000000000000000000000000000"
 
-BATCH_SIZE = 1000
+BATCH_SIZE = 100
 NUM_SIGNERS = 10
 
 
@@ -16,6 +16,38 @@ def sign(account, txHash):
     return Account.from_key(account.private_key).sign_message(
         encode_defunct(hexstr=str(txHash))
     )
+
+
+def withdraw(signer, vault):
+    txHash = vault.getTxHash(
+        vault, signer, 1 * 10 ** 18, 1 * 10 ** 18, 123)
+    sig = sign(signer, txHash)
+
+    vault.withdraw(
+        signer, 1 * 10 ** 18, 1 * 10 ** 18, 123,
+        sig.v, sig.r, sig.s
+    )
+
+
+def depositWithGasRelayer(signer, vault, gasRelayer):
+    gasRelayer.relayTx(
+        1,
+        vault,
+        vault.deposit.encode_input(signer, 10 * 10 ** 18)
+    )
+
+
+def withdrawWithGasRelayer(signer, vault, gasRelayer):
+    txHash = vault.getTxHash(
+        vault, signer, 1 * 10 ** 18, 1 * 10 ** 18, 123)
+    sig = sign(signer, txHash)
+
+    callData = vault.withdraw.encode_input(
+        signer, 1 * 10 ** 18, 1 * 10 ** 18, 123,
+        sig.v, sig.r, sig.s
+    )
+
+    gasRelayer.relayTx(1, vault, callData)
 
 
 def batchDeposit(signers, vault, gasRelayer):
@@ -33,9 +65,9 @@ def batchDeposit(signers, vault, gasRelayer):
             amounts.append(0)
 
     # call batchDeposit through gas relayer
-    call_data = vault.batchDeposit.encode_input(_accounts, amounts)
+    callData = vault.batchDeposit.encode_input(_accounts, amounts)
 
-    gasRelayer.relayTx(100, vault, call_data)
+    gasRelayer.relayTx(100, vault, callData)
 
 
 def batchWithdraw(signers, vault, gasRelayer):
@@ -51,7 +83,7 @@ def batchWithdraw(signers, vault, gasRelayer):
     for i in range(BATCH_SIZE):
         if i < len(signers):
             signer = signers[i]
-            amount = 1 * 10 * 18
+            amount = 1 * 10 ** 18
             _min = 0
             nonce = 0
 
@@ -76,12 +108,12 @@ def batchWithdraw(signers, vault, gasRelayer):
             ss.append(0)
 
     # call batchWithdraw through gas relayer
-    call_data = vault.batchWithdraw.encode_input(
+    callData = vault.batchWithdraw.encode_input(
         _signers, amounts, mins, total, nonces,
         vs, rs, ss
     )
 
-    gasRelayer.relayTx(100, vault, call_data)
+    gasRelayer.relayTx(100, vault, callData)
 
 
 def main():
@@ -123,6 +155,8 @@ def main():
     # test gas costs
     gasRelayer.mintGasToken(100)
     gasRelayer.mintGasToken(100)
+    gasRelayer.mintGasToken(100)
+    gasRelayer.mintGasToken(100)
 
     # add signers
     signers = []
@@ -139,6 +173,20 @@ def main():
     # approve vault to deposit
     for signer in signers:
         erc20.approve(vault, amount, {'from': signer})
+
+    # uncomment to test gas cost
+
+    # test deposit without gas relayer
+    # vault.deposit(signers[0], 10 * 10 ** 18)
+
+    # test withdraw without gas relayer
+    # withdraw(signers[0], vault)
+
+    # test deposit with gas relayer
+    # depositWithGasRelayer(signers[0], vault, gasRelayer)
+
+    # test withdraw with gas relayer
+    # withdrawWithGasRelayer(signers[0], vault, gasRelayer)
 
     # test batch deposit
     batchDeposit(signers, vault, gasRelayer)
