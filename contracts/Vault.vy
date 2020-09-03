@@ -464,6 +464,8 @@ def withdraw(
     assert not self.executed[txHash] # dev: tx executed
     assert self._isValidSig(txHash, _v, _r, _s, _to) # dev: invalid sig
 
+    self.executed[txHash] = True
+
     # s = shares
     # T = total supply
     # a = amount of tokens
@@ -482,7 +484,6 @@ def withdraw(
 
     assert amount >= _min # dev: amount < min tokens to return
 
-    self.executed[txHash] = True
     self._burn(_to, amount)
     # NOTE: valid sig implies address exists
     self._safeTransfer(self.token, _to, amount)
