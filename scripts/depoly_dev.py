@@ -176,6 +176,10 @@ def main():
 
     # uncomment to test gas cost
 
+    # test simple ERC20 transfer
+    # erc20.mint(accounts[0], 100 * 10 ** 18, {'from': accounts[0]})
+    # erc20.transfer(accounts[1], 10 * 10 ** 18, {'from': accounts[0]})
+
     # test deposit without gas relayer
     # vault.deposit(signers[0], 10 * 10 ** 18)
 
@@ -189,7 +193,7 @@ def main():
     # withdrawWithGasRelayer(signers[0], vault, gasRelayer)
 
     # test batch deposit
-    batchDeposit(signers, vault, gasRelayer)
+    # batchDeposit(signers, vault, gasRelayer)
 
     # test batch withdraw
-    batchWithdraw(signers, vault, gasRelayer)
+    # batchWithdraw(signers, vault, gasRelayer)
