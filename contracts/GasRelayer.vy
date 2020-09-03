@@ -69,8 +69,9 @@ def transferGasToken(_to: address, _value: uint256):
 
 
 # TODO: find out max bytes size for batching deposit and withdraw
+# batch size 100, withdraw Bytes[30000]
 @external
-def relayTx(_value: uint256, _to: address, _to_data: Bytes[100000]):
+def relayTx(_value: uint256, _to: address, _to_data: Bytes[30000]):
     """
     @notice Relays a tx
     @param _value Amount of GST2 to burn

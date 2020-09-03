@@ -42,7 +42,7 @@ TRANSFER_FROM: constant(Bytes[4]) = method_id(
 )
 
 # number of batches
-BATCH_SIZE: constant(uint256) = 1000
+BATCH_SIZE: constant(uint256) = 100
 
 name: public(String[64])
 symbol: public(String[32])
