@@ -1,6 +1,7 @@
 // TODO: lock solidity version
 pragma solidity ^0.6.0;
 
+import "@openzeppelin/contracts/math/SafeMath.sol";
 // TODO SafeERC20 lite
 import "@openzeppelin/contracts/token/ERC20/SafeERC20.sol";
 import "@openzeppelin/contracts/token/ERC20/IERC20.sol";
@@ -22,30 +23,21 @@ contract VaultV2 is IVault, ERC20 {
     event Deposit(address indexed from, uint amount);
     event Withdraw(address indexed to, uint amount);
 
-    address public override admin;
-    address public override controller;
+    address public admin;
     address public override token;
     address public override strategy;
 
     constructor(
-        address _token, address _controller,
-        string memory _name, string memory _symbol
+        address _token, string memory _name, string memory _symbol
     ) ERC20(_name, _symbol) public  {
         require(_token != address(0)); // dev: token == zero address
-        require(_controller != address(0)); // dev: controller == zero address
 
         admin = msg.sender;
         token = _token;
-        controller = _controller;
     }
 
     modifier onlyAdmin() {
         require(msg.sender == admin); // dev: !admin
-        _;
-    }
-
-    modifier onlyController() {
-        require(msg.sender == controller); // dev: !controller
         _;
     }
 
@@ -55,16 +47,11 @@ contract VaultV2 is IVault, ERC20 {
     }
 
     function setAdmin(address _admin) external onlyAdmin {
-        require(_admin != address(0)); // admin == zero address
+        require(_admin != address(0)); // dev: admin == zero address
         admin = _admin;
     }
 
-    function setController(address _controller) external onlyAdmin {
-        require(_controller != address(0)); // controller == zero address
-        controller = _controller;
-    }
-
-    function setStrategy(address _strategy) override public onlyController {
+    function setStrategy(address _strategy) override public onlyAdmin {
         require(_strategy != address(0)); // dev: strategy == zero address
         require(IStrategy(_strategy).token() == token); // dev: strategy.token != vault.token
         require(_strategy != strategy); // dev: new strategy == current strategy
@@ -98,7 +85,7 @@ contract VaultV2 is IVault, ERC20 {
         uint bal = IERC20(token).balanceOf(address(this));
 
         if (bal > 0) {
-            IERC20(token).safeTransfer(strategy, bal);
+            IStrategy(strategy).deposit(bal);
             emit Invest(bal);
         }
     }
@@ -112,7 +99,7 @@ contract VaultV2 is IVault, ERC20 {
         emit Deposit(msg.sender, _amount);
     }
 
-    function withdraw(uint _shares, uint _min) override external {
+    function withdraw(uint _shares, uint _min) override external whenStrategyDefined {
         uint totalSupply = totalSupply();
         require(totalSupply > 0); // dev: total supply == 0
         require(_shares > 0); // dev: amount == 0
@@ -130,7 +117,7 @@ contract VaultV2 is IVault, ERC20 {
 
         if (bal < amount) {
             // NOTE: can skip check for underflow here since bal < amount
-            IStrategy(controller).withdraw(amount - bal);
+            IStrategy(strategy).withdraw(amount - bal);
             uint balAfter = ERC20(token).balanceOf(address(this));
 
             if (balAfter < amount) {
