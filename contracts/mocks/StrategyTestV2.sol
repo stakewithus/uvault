@@ -76,7 +76,7 @@ contract StrategyTestV2 is IStrategy {
 
         // NOTE: msg.sender == vault
         IERC20(token).safeTransferFrom(msg.sender, address(this), _amount);
-        IERC20(token).safeTransferFrom(address(this), pool, _amount);
+        IERC20(token).safeTransfer(pool, _amount);
     }
 
     function withdraw(uint _amount) override external onlyVault {
