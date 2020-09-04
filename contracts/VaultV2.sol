@@ -54,6 +54,7 @@ contract VaultV2 is IVault, ERC20 {
     function setStrategy(address _strategy) override public onlyAdmin {
         require(_strategy != address(0)); // dev: strategy == zero address
         require(IStrategy(_strategy).token() == token); // dev: strategy.token != vault.token
+        require(IStrategy(_strategy).vault() == address(this)); // dev: strategy.vault != vault
         require(_strategy != strategy); // dev: new strategy == current strategy
 
         // withdraw from current strategy
