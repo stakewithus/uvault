@@ -14,6 +14,7 @@ import "./interfaces/IVault.sol";
 // TODO: test
 // TODO: doc
 // TODO: reentrancy lock
+// TODO circuit breaker
 
 contract VaultV2 is IVault, ERC20 {
     using SafeERC20 for IERC20;
