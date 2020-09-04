@@ -13,14 +13,12 @@ interface GasToken {
 contract GasRelayer {
     using SafeERC20 for IERC20;
 
-    address constant ZERO_ADDRESS = address(0);
-
     address public owner;
     address public gasToken;
     mapping(address => bool) public whitelist;
 
     constructor(address _gasToken) public {
-        require(_gasToken != ZERO_ADDRESS); // dev: gas token == zero address
+        require(_gasToken != address(0)); // dev: gas token == zero address
 
         owner = msg.sender;
         gasToken = _gasToken;
@@ -44,7 +42,7 @@ contract GasRelayer {
         // NOTE: using uint8 for index
         for (uint8 i = 0; i < 5; i++) {
             address addr = _addresses[i];
-            if (addr != ZERO_ADDRESS) {
+            if (addr != address(0)) {
                 whitelist[addr] = true;
             }
         }
@@ -54,7 +52,7 @@ contract GasRelayer {
         // NOTE: using uint8 for index
         for (uint8 i = 0; i < 5; i++) {
             address addr = _addresses[i];
-            if (addr != ZERO_ADDRESS) {
+            if (addr != address(0)) {
                 whitelist[addr] = false;
             }
         }
