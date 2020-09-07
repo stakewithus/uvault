@@ -10,6 +10,7 @@ import "@openzeppelin/contracts/token/ERC20/ERC20.sol";
 
 import "../interfaces/IController.sol";
 import "../interfaces/IStrategy.sol";
+import "../interfaces/IVault.sol";
 
 contract StrategyTestV2 is IStrategy {
     using SafeERC20 for IERC20;
@@ -33,6 +34,7 @@ contract StrategyTestV2 is IStrategy {
         require(_vault != address(0)); // dev: vault == zero address
         require(_token != address(0)); // dev: token == zero address
         require(_pool != address(0)); // dev: pool == zero address
+        require(IVault(_vault).token() == _token); // dev: vault.token !== strategy.token
 
         admin = msg.sender;
         controller = _controller;
