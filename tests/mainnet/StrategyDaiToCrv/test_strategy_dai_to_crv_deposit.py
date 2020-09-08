@@ -10,7 +10,8 @@ def test_deposit(accounts, strategyDaiToCrv, dai, dai_holder, gauge):
     vault = accounts[2]
 
     amount = 10 * 10 ** 18
-    min_return = 0
+    # allow 3% splippage
+    min_return = amount * 0.97
 
     # check dai balance
     dai_holder_bal = dai.balanceOf(dai_holder)
@@ -52,7 +53,5 @@ def test_deposit(accounts, strategyDaiToCrv, dai, dai_holder, gauge):
     assert after["strategy"]["totalUnderlying"] == before["strategy"]["totalUnderlying"] + amount
     # test transfer of DAI from vault to yCRV into gauge
     assert after["dai"]["balanceOf"][vault] == before["dai"]["balanceOf"][vault] - amount
-    # dai to yCrv exchange diff
-    delta = amount * 0.03
     assert after["gauge"]["balanceOf"][strategyDaiToCrv] - \
-        before["gauge"]["balanceOf"][strategyDaiToCrv] > delta
+        before["gauge"]["balanceOf"][strategyDaiToCrv] >= min_return

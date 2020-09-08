@@ -8,8 +8,9 @@ import "@openzeppelin/contracts/math/Math.sol";
 import "@openzeppelin/contracts/math/SafeMath.sol";
 
 import "./interfaces/ICurveFi.sol";
-import "./interfaces/Guage.sol";
+import "./interfaces/Gauge.sol";
 import "./interfaces/yVault.sol";
+import "../interfaces/IController.sol";
 import "../interfaces/IStrategy.sol";
 import "../interfaces/IVault.sol";
 
@@ -106,6 +107,11 @@ contract StrategyDaiToCrv {
         return (_getBalance(), totalUnderlying);
     }
 
+    /*
+    @notice Deposit `_amount` DAI, swap to `yCrv`, deposit `yCrv` into Curve `Gauge`
+    @param _amount Amount of DAI to deposit
+    @param _min Minimum amount of `yCrv` that must be returned
+    */
     function _deposit(address _from, uint _amount, uint _min) internal {
         require(_amount > 0); // amount == 0
 
@@ -126,11 +132,12 @@ contract StrategyDaiToCrv {
         if (yDaiBal > 0) {
             // IERC20(yDai).approve(curve, 0);
             IERC20(yDai).approve(curve, yDaiBal); // TODO: infinite approve?
-            // NOTE: mints yCRV, reverts if amount of yCRV < _min
-            ICurveFi(curve).add_liquidity([yDaiBal, 0, 0, 0], _min);
+            // mint yCRV
+            ICurveFi(curve).add_liquidity([yDaiBal, 0, 0, 0], 0);
         }
 
         uint256 yCrvBal = IERC20(yCrv).balanceOf(address(this));
+        require(yCrvBal >= _min); // dev: yCrv < min
         if (yCrvBal > 0) {
             // IERC20(underlying).safeApprove(gauge, 0);
             IERC20(yCrv).safeApprove(gauge, yCrvBal);
@@ -143,21 +150,26 @@ contract StrategyDaiToCrv {
         _deposit(msg.sender, _amount, _min);
     }
 
-    // NOTE: amount of DAI to withdraw
     // TODO: how to handle dust?
-    // function withdraw(uint _amount, uint _min) override external onlyVault {
+
+    /*
+    @notice Withdraw `_amount` DAI of `yCrv` from Curve `Gauge`
+    @param _amount Amount of DAI to withdraw
+    @param _min Minimum amount of DAI that must be returned
+    */
+    // function withdraw(uint _amount, uint _min) external onlyVault {
     //     require(_amount > 0); // dev: amount == 0
 
-    //     // NOTE: save underlying total before withdraw
-    //     uint underlyingTotalBefore = totalUnderlying;
-    //     totalUnderlying = underlyingTotal.sub(_amount);
+    //     // yCrv in Gauge
+    //     uint yCrvTotal = Gauge(gauge).balanceOf(address(this));
+    //     // calculate yCrv amount to withdraw from dai amount
+    //     // yCrv / DAI exchange rate = yCrv total / DAI total
+    //     uint yCrvAmount = _amount.mul(yCrvTotal).div(totalUnderlying);
 
-    //     uint yCrvTotal = Guage(gauge).balanceOf(address(this));
+    //     // update total after exchange amount is calculated above
+    //     totalUnderlying = totalUnderlying.sub(_amount);
 
-    //     // get yCrv amount from dai amount * yCrv / dai exchange rate
-    //     uint yCrvAmount = _amount.mul(yCrvTotal).div(underlyingTotalBefore);
-
-    //     Guage(gauge).withdraw(yCrvAmount);
+    //     Gauge(gauge).withdraw(yCrvAmount);
 
     //     uint yCrvBal = IERC20(yCrv).balanceOf(address(this));
     //     if (yCrvBal < yCrvAmount) {
@@ -165,13 +177,15 @@ contract StrategyDaiToCrv {
     //     }
 
     //     // yCrv to yDai
-    //     ICurveFi(curve).remove_liquidity(yCrvAmount, [_min, 0, 0, 0])
+    //     ICurveFi(curve).remove_liquidity(yCrvAmount, [0, 0, 0, 0]);
 
     //     // withdraw yDai for Dai
     //     uint yDaiBal = yVault(yDai).balanceOf(address(this));
     //     yVault(yDai).withdraw(yDaiBal);
 
-    //     uint daiBal = IERC(dai).balanceOf(address(this));
+    //     uint daiBal = IERC20(dai).balanceOf(address(this));
+    //     require(daiBal >= _min); // dev: dai amount < min
+    //     // transfer fee to treasury
     //     uint fee = daiBal.mul(withdrawFee).div(withdrawFeeMax);
     //     if (fee > 0) {
     //         address treasury = IController(controller).treasury();
@@ -181,6 +195,7 @@ contract StrategyDaiToCrv {
     //     }
 
     //     // NOTE: msg.sender == vault
+    //     // transfer to vault
     //     IERC20(dai).safeTransfer(msg.sender, daiBal.sub(fee));
     // }
 
