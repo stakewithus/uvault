@@ -157,47 +157,48 @@ contract StrategyDaiToCrv {
     @param _amount Amount of DAI to withdraw
     @param _min Minimum amount of DAI that must be returned
     */
-    // function withdraw(uint _amount, uint _min) external onlyVault {
-    //     require(_amount > 0); // dev: amount == 0
+    function withdraw(uint _amount, uint _min) external onlyVault {
+        require(_amount > 0); // dev: amount == 0
 
-    //     // yCrv in Gauge
-    //     uint yCrvTotal = Gauge(gauge).balanceOf(address(this));
-    //     // calculate yCrv amount to withdraw from dai amount
-    //     // yCrv / DAI exchange rate = yCrv total / DAI total
-    //     uint yCrvAmount = _amount.mul(yCrvTotal).div(totalUnderlying);
+        // yCrv in Gauge
+        uint yCrvTotal = Gauge(gauge).balanceOf(address(this));
+        // calculate yCrv amount to withdraw from dai amount
+        // yCrv / DAI exchange rate = yCrv total / DAI total
+        uint yCrvAmount = _amount.mul(yCrvTotal).div(totalUnderlying);
 
-    //     // update total after exchange amount is calculated above
-    //     totalUnderlying = totalUnderlying.sub(_amount);
+        // update total after exchange amount is calculated above
+        totalUnderlying = totalUnderlying.sub(_amount);
 
-    //     Gauge(gauge).withdraw(yCrvAmount);
+        Gauge(gauge).withdraw(yCrvAmount);
 
-    //     uint yCrvBal = IERC20(yCrv).balanceOf(address(this));
-    //     if (yCrvBal < yCrvAmount) {
-    //         yCrvAmount = yCrvBal;
-    //     }
+        uint yCrvBal = IERC20(yCrv).balanceOf(address(this));
+        if (yCrvBal < yCrvAmount) {
+            yCrvAmount = yCrvBal;
+        }
 
-    //     // yCrv to yDai
-    //     ICurveFi(curve).remove_liquidity(yCrvAmount, [0, 0, 0, 0]);
+        // yCrv to yDai
+        uint minYDai = 0; // declare variable to fix compiler error (implicit conversion)
+        ICurveFi(curve).remove_liquidity(yCrvAmount, [minYDai, 0, 0, 0]);
 
-    //     // withdraw yDai for Dai
-    //     uint yDaiBal = yVault(yDai).balanceOf(address(this));
-    //     yVault(yDai).withdraw(yDaiBal);
+        // withdraw yDai for Dai
+        uint yDaiBal = yVault(yDai).balanceOf(address(this));
+        yVault(yDai).withdraw(yDaiBal);
 
-    //     uint daiBal = IERC20(dai).balanceOf(address(this));
-    //     require(daiBal >= _min); // dev: dai amount < min
-    //     // transfer fee to treasury
-    //     uint fee = daiBal.mul(withdrawFee).div(withdrawFeeMax);
-    //     if (fee > 0) {
-    //         address treasury = IController(controller).treasury();
-    //         require(treasury != address(0)); // dev: treasury == zero address
+        uint daiBal = IERC20(dai).balanceOf(address(this));
+        require(daiBal >= _min); // dev: dai amount < min
+        // transfer fee to treasury
+        uint fee = daiBal.mul(withdrawFee).div(withdrawFeeMax);
+        if (fee > 0) {
+            address treasury = IController(controller).treasury();
+            require(treasury != address(0)); // dev: treasury == zero address
 
-    //         IERC20(dai).safeTransfer(treasury, fee);
-    //     }
+            IERC20(dai).safeTransfer(treasury, fee);
+        }
 
-    //     // NOTE: msg.sender == vault
-    //     // transfer to vault
-    //     IERC20(dai).safeTransfer(msg.sender, daiBal.sub(fee));
-    // }
+        // NOTE: msg.sender == vault
+        // transfer to vault
+        IERC20(dai).safeTransfer(msg.sender, daiBal.sub(fee));
+    }
 
     // function harvest() external onlyAdmin {
     //     Minter(minter).mint(gauge);
