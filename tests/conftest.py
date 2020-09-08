@@ -1,8 +1,17 @@
 #!/usr/bin/python3
-
+import os
+from pathlib import Path
+from dotenv import load_dotenv
 import pytest
+import brownie
+from brownie import Contract
 from eth_account import Account
 from eth_account.messages import encode_defunct
+
+env_path = Path('.') / '.env.test'
+load_dotenv(dotenv_path=env_path)
+
+DAI_HOLDER = os.getenv("DAI_HOLDER")
 
 
 class AccountHelper:
@@ -155,3 +164,29 @@ def strategyYVault(
         mockController, mockYCRV, mockYVault,
         {'from': accounts[0]}
     )
+
+
+@pytest.fixture(scope="function")
+def strategyDaiToCrv(StrategyDaiToCrv, accounts):
+    admin = accounts[0]
+    controller = accounts[1]
+    vault = accounts[2]
+
+    yield StrategyDaiToCrv.deploy(controller, vault, {'from': admin})
+
+# Mainnet
+
+
+@pytest.fixture
+def dai_holder(accounts):
+    yield accounts.at(DAI_HOLDER, force=True)
+
+
+@pytest.fixture
+def dai():
+    yield Contract.from_explorer("0x6B175474E89094C44Da98b954EedeAC495271d0F")
+
+
+@pytest.fixture
+def gauge():
+    yield Contract.from_explorer("0xFA712EE4788C042e2B7BB55E6cb8ec569C4530c1")
