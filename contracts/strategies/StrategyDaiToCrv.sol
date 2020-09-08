@@ -32,7 +32,7 @@ contract StrategyDaiToCrv {
     uint public performanceFeeMax = 10000;
 
     // total amount of underlying token in this contract
-    uint public daiTotal;
+    uint public totalUnderlying;
     address constant private dai = address(0x6B175474E89094C44Da98b954EedeAC495271d0F);
 
     // Curve
@@ -94,10 +94,6 @@ contract StrategyDaiToCrv {
         return dai;
     }
 
-    function totalUnderlying() external view returns (uint) {
-        return daiTotal;
-    }
-
     function _getBalance() internal view returns (uint) {
         return Gauge(gauge).balanceOf(address(this));
     }
@@ -107,13 +103,13 @@ contract StrategyDaiToCrv {
     }
 
     function getExchangeRate() external view returns (uint, uint) {
-        return (_getBalance(), daiTotal);
+        return (_getBalance(), totalUnderlying);
     }
 
     function _deposit(address _from, uint _amount, uint _min) internal {
         require(_amount > 0); // amount == 0
 
-        daiTotal = daiTotal.add(_amount);
+        totalUnderlying = totalUnderlying.add(_amount);
 
         IERC20(dai).safeTransferFrom(_from, address(this), _amount);
 
@@ -149,12 +145,12 @@ contract StrategyDaiToCrv {
 
     // NOTE: amount of DAI to withdraw
     // TODO: how to handle dust?
-    // function withdraw(uint _amount) override external onlyVault {
+    // function withdraw(uint _amount, uint _min) override external onlyVault {
     //     require(_amount > 0); // dev: amount == 0
 
     //     // NOTE: save underlying total before withdraw
-    //     uint underlyingTotalBefore = daiTotal;
-    //     daiTotal = underlyingTotal.sub(_amount);
+    //     uint underlyingTotalBefore = totalUnderlying;
+    //     totalUnderlying = underlyingTotal.sub(_amount);
 
     //     uint yCrvTotal = Guage(gauge).balanceOf(address(this));
 
@@ -169,9 +165,7 @@ contract StrategyDaiToCrv {
     //     }
 
     //     // yCrv to yDai
-    //     // TODO: set min?
-    //     uint min = 0;
-    //     ICurveFi(curve).remove_liquidity(yCrvAmount, [min, 0, 0, 0])
+    //     ICurveFi(curve).remove_liquidity(yCrvAmount, [_min, 0, 0, 0])
 
     //     // withdraw yDai for Dai
     //     uint yDaiBal = yVault(yDai).balanceOf(address(this));
