@@ -90,6 +90,14 @@ contract StrategyDaiToCrv {
         performanceFee = _fee;
     }
 
+    function underlyingToken() external view returns (address) {
+        return dai;
+    }
+
+    function totalUnderlying() external view returns (uint) {
+        return daiTotal;
+    }
+
     function _getBalance() internal view returns (uint) {
         return Gauge(gauge).balanceOf(address(this));
     }
