@@ -22,6 +22,9 @@ pip install -r requirements.txt
 
 # install Brownie PM
 brownie pm install OpenZeppelin/openzeppelin-contracts@3.0.0
+
+# copy .env.sample and edit
+cp .env.sample .env.test
 ```
 
 ### Test
@@ -35,12 +38,16 @@ brownie test --gas
 brownie test --coverage
 
 # test by forking mainnet
-export WEB3_INFURA_PROJECT_ID=ab8ed427a2544fdb869871b7e853243d
-export ETHERSCAN_TOKEN=4C8V4NVUK8KC5SBRR8NMPEV785JKTCI1NS
+source .env.test
+
 # run mainnet fork with ganache
 # NOTE: Unfortunately the Infura key does not point to an archival node.
 #       That means you will have to restart ganache-cli every 128 blocks (~30 minutes)
-ganache-cli -f https://mainnet.infura.io/v3/ab8ed427a2544fdb869871b7e853243d -i 1
+ganache-cli \
+--fork https://mainnet.infura.io/v3/$WEB3_INFURA_PROJECT_ID \
+--unlock $DAI_HOLDER \
+--networkId 1
+
 brownie test --network mainnet-fork
 ```
 
