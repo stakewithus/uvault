@@ -33,23 +33,22 @@ contract StrategyDAItoYCRV {
 
     // total amount of underlying token in this contract
     uint public daiTotal;
-    address public dai = address(0x6B175474E89094C44Da98b954EedeAC495271d0F);
+    address constant private dai = address(0x6B175474E89094C44Da98b954EedeAC495271d0F);
 
     // Curve
     // yDAIyUSDCyUSDTyTUSD
-    address constant yCrv = address(0xdF5e0e81Dff6FAF3A7e52BA697820c5e32D806A8);
-    address constant gauge = address(0xFA712EE4788C042e2B7BB55E6cb8ec569C4530c1);
+    address constant private yCrv = address(0xdF5e0e81Dff6FAF3A7e52BA697820c5e32D806A8);
+    address constant private gauge = address(0xFA712EE4788C042e2B7BB55E6cb8ec569C4530c1);
     // Curve Minter
-    address constant minter = address(0xd061D61a4d941c39E5453435B6345Dc261C2fcE0);
+    address constant private minter = address(0xd061D61a4d941c39E5453435B6345Dc261C2fcE0);
     // CRV DAO token
-    address constant crv = address(0xD533a949740bb3306d119CC777fa900bA034cd52);
+    address constant private crv = address(0xD533a949740bb3306d119CC777fa900bA034cd52);
     // Curve
-    address constant curve = address(0x45F783CCE6B7FF23B2ab2D70e416cdb7D6055f51);
+    address constant private curve = address(0x45F783CCE6B7FF23B2ab2D70e416cdb7D6055f51);
 
-    address constant uniswap = address(0x7a250d5630B4cF539739dF2C5dAcb4c659F2488D);
-    address constant weth = address(0xC02aaA39b223FE8D0A0e5C4F27eAD9083C756Cc2); // used for crv <> weth <> dai route
-    address constant dai = address(0x6B175474E89094C44Da98b954EedeAC495271d0F);
-    address constant yDai = address(0x16de59092dAE5CcF4A1E6439D611fd0653f0Bd01);
+    address constant private uniswap = address(0x7a250d5630B4cF539739dF2C5dAcb4c659F2488D);
+    address constant private weth = address(0xC02aaA39b223FE8D0A0e5C4F27eAD9083C756Cc2); // used for crv <> weth <> dai route
+    address constant private yDai = address(0x16de59092dAE5CcF4A1E6439D611fd0653f0Bd01);
 
     constructor(address _controller, address _vault) public {
         require(_controller != address(0)); // dev: controller == zero address
