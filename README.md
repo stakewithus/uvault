@@ -41,7 +41,7 @@ export ETHERSCAN_TOKEN=4C8V4NVUK8KC5SBRR8NMPEV785JKTCI1NS
 # NOTE: Unfortunately the Infura key does not point to an archival node.
 #       That means you will have to restart ganache-cli every 128 blocks (~30 minutes)
 ganache-cli -f https://mainnet.infura.io/v3/ab8ed427a2544fdb869871b7e853243d -i 1
-brownie test --network --mainnet-fork
+brownie test --network mainnet-fork
 ```
 
 ### Scripts
