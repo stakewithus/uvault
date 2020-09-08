@@ -27,6 +27,13 @@ brownie pm install OpenZeppelin/openzeppelin-contracts@3.0.0
 cp .env.sample .env.test
 ```
 
+### Development
+
+```bash
+# access contracts on mainnet
+brownie console --network mainnet-fork
+```
+
 ### Test
 
 ```bash
