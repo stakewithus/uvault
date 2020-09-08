@@ -15,6 +15,7 @@ import "./interfaces/IVault.sol";
 // TODO: doc
 // TODO: reentrancy lock
 // TODO circuit breaker
+// TODO: keep percentage of underlying token as reserve to save gas on withdraw
 
 contract VaultV2 is IVault, ERC20 {
     using SafeERC20 for IERC20;
