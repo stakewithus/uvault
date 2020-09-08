@@ -1,5 +1,6 @@
 pragma solidity ^0.6.0;
 
+// https://github.com/curvefi/curve-contract/blob/master/contracts/pool-templates/StableSwapBase.vy
 interface ICurveFi {
   function get_virtual_price() external view returns (uint);
   function add_liquidity(
