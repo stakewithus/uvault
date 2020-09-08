@@ -32,9 +32,8 @@ contract StrategyDAItoYCRV {
     uint public performanceFeeMax = 10000;
 
     // total amount of underlying token in this contract
-    uint public underlyingTotal;
-    // DAI
-    address public underlyingToken = address(0x6B175474E89094C44Da98b954EedeAC495271d0F);
+    uint public daiTotal;
+    address public dai = address(0x6B175474E89094C44Da98b954EedeAC495271d0F);
 
     /*
     address(0xdF5e0e81Dff6FAF3A7e52BA697820c5e32D806A8), // yCRV underlying
@@ -52,7 +51,8 @@ contract StrategyDAItoYCRV {
     address constant public yCrv = address(0xdF5e0e81Dff6FAF3A7e52BA697820c5e32D806A8);
     address constant public pool = address(0xFA712EE4788C042e2B7BB55E6cb8ec569C4530c1);
 
-    address constant public mintr = address(0xd061D61a4d941c39E5453435B6345Dc261C2fcE0);
+    // Curve Minter
+    address constant public minter = address(0xd061D61a4d941c39E5453435B6345Dc261C2fcE0);
     address constant public crv = address(0xD533a949740bb3306d119CC777fa900bA034cd52);
     address constant public uni = address(0x7a250d5630B4cF539739dF2C5dAcb4c659F2488D);
     address constant public weth = address(0xC02aaA39b223FE8D0A0e5C4F27eAD9083C756Cc2); // used for crv <> weth <> dai route
@@ -64,7 +64,7 @@ contract StrategyDAItoYCRV {
     constructor(address _controller, address _vault) public {
         require(_controller != address(0)); // dev: controller == zero address
         require(_vault != address(0)); // dev: vault == zero address
-        // require(IVault(_vault).token() == underlyingToken); // dev: vault.token !== strategy.token
+        // require(IVault(_vault).token() == dai); // dev: vault.token !== strategy.token
 
         admin = msg.sender;
         controller = _controller;
@@ -110,15 +110,15 @@ contract StrategyDAItoYCRV {
     }
 
     function getExchangeRate() external view returns (uint, uint) {
-        return (_getBalance(), underlyingTotal);
+        return (_getBalance(), daiTotal);
     }
 
     function _deposit(address _from, uint _amount, uint _min) internal {
         require(_amount > 0); // amount == 0
 
-        underlyingTotal = underlyingTotal.add(_amount);
+        daiTotal = daiTotal.add(_amount);
 
-        IERC20(underlyingToken).safeTransferFrom(_from, address(this), _amount);
+        IERC20(dai).safeTransferFrom(_from, address(this), _amount);
 
         // DAI to yDAI
         uint256 daiBal = IERC20(dai).balanceOf(address(this));
@@ -156,8 +156,8 @@ contract StrategyDAItoYCRV {
     //     require(_amount > 0); // dev: amount == 0
 
     //     // NOTE: save underlying total before withdraw
-    //     uint underlyingTotalBefore = underlyingTotal;
-    //     underlyingTotal = underlyingTotal.sub(_amount);
+    //     uint underlyingTotalBefore = daiTotal;
+    //     daiTotal = underlyingTotal.sub(_amount);
 
     //     uint yCrvTotal = Guage(pool).balanceOf(address(this));
 
@@ -194,7 +194,7 @@ contract StrategyDAItoYCRV {
     // }
 
     // function harvest() external onlyAdmin {
-    //     Mintr(mintr).mint(pool);
+    //     Minter(minter).mint(pool);
 
     //     uint crvBal = IERC20(crv).balanceOf(address(this));
     //     if (crvBal > 0) {
