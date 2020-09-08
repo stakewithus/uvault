@@ -35,31 +35,21 @@ contract StrategyDAItoYCRV {
     uint public daiTotal;
     address public dai = address(0x6B175474E89094C44Da98b954EedeAC495271d0F);
 
-    /*
-    address(0xdF5e0e81Dff6FAF3A7e52BA697820c5e32D806A8), // yCRV underlying
-    address(0xFA712EE4788C042e2B7BB55E6cb8ec569C4530c1), // _gauge
-    address(0xd061D61a4d941c39E5453435B6345Dc261C2fcE0), // _mintr
-    address(0xD533a949740bb3306d119CC777fa900bA034cd52), // _crv
-    address(0x45F783CCE6B7FF23B2ab2D70e416cdb7D6055f51), // _curve
-    address(0xC02aaA39b223FE8D0A0e5C4F27eAD9083C756Cc2), // _weth
-    address(0x6B175474E89094C44Da98b954EedeAC495271d0F), // _dai
-    address(0x16de59092dAE5CcF4A1E6439D611fd0653f0Bd01), // _yDai
-    address(0x7a250d5630B4cF539739dF2C5dAcb4c659F2488D) // _uniswap
-    */
-
-    // yDAIyUSDCyUSDTyTUSD (yCRV)
-    address constant public yCrv = address(0xdF5e0e81Dff6FAF3A7e52BA697820c5e32D806A8);
-    address constant public pool = address(0xFA712EE4788C042e2B7BB55E6cb8ec569C4530c1);
-
+    // Curve
+    // yDAIyUSDCyUSDTyTUSD
+    address constant yCrv = address(0xdF5e0e81Dff6FAF3A7e52BA697820c5e32D806A8);
+    address constant gauge = address(0xFA712EE4788C042e2B7BB55E6cb8ec569C4530c1);
     // Curve Minter
-    address constant public minter = address(0xd061D61a4d941c39E5453435B6345Dc261C2fcE0);
-    address constant public crv = address(0xD533a949740bb3306d119CC777fa900bA034cd52);
-    address constant public uni = address(0x7a250d5630B4cF539739dF2C5dAcb4c659F2488D);
-    address constant public weth = address(0xC02aaA39b223FE8D0A0e5C4F27eAD9083C756Cc2); // used for crv <> weth <> dai route
+    address constant minter = address(0xd061D61a4d941c39E5453435B6345Dc261C2fcE0);
+    // CRV DAO token
+    address constant crv = address(0xD533a949740bb3306d119CC777fa900bA034cd52);
+    // Curve
+    address constant curve = address(0x45F783CCE6B7FF23B2ab2D70e416cdb7D6055f51);
 
-    address constant public dai = address(0x6B175474E89094C44Da98b954EedeAC495271d0F);
-    address constant public yDai = address(0x16de59092dAE5CcF4A1E6439D611fd0653f0Bd01);
-    address constant public curve = address(0x45F783CCE6B7FF23B2ab2D70e416cdb7D6055f51);
+    address constant uniswap = address(0x7a250d5630B4cF539739dF2C5dAcb4c659F2488D);
+    address constant weth = address(0xC02aaA39b223FE8D0A0e5C4F27eAD9083C756Cc2); // used for crv <> weth <> dai route
+    address constant dai = address(0x6B175474E89094C44Da98b954EedeAC495271d0F);
+    address constant yDai = address(0x16de59092dAE5CcF4A1E6439D611fd0653f0Bd01);
 
     constructor(address _controller, address _vault) public {
         require(_controller != address(0)); // dev: controller == zero address
@@ -102,7 +92,7 @@ contract StrategyDAItoYCRV {
     }
 
     function _getBalance() internal view returns (uint) {
-        return Gauge(pool).balanceOf(address(this));
+        return Gauge(gauge).balanceOf(address(this));
     }
 
     function getBalance() external view returns (uint) {
@@ -139,9 +129,9 @@ contract StrategyDAItoYCRV {
 
         uint256 yCrvBal = IERC20(yCrv).balanceOf(address(this));
         if (yCrvBal > 0) {
-            // IERC20(underlying).safeApprove(pool, 0);
-            IERC20(yCrv).safeApprove(pool, yCrvBal);
-            Gauge(pool).deposit(yCrvBal);
+            // IERC20(underlying).safeApprove(gauge, 0);
+            IERC20(yCrv).safeApprove(gauge, yCrvBal);
+            Gauge(gauge).deposit(yCrvBal);
         }
     }
 
@@ -159,12 +149,12 @@ contract StrategyDAItoYCRV {
     //     uint underlyingTotalBefore = daiTotal;
     //     daiTotal = underlyingTotal.sub(_amount);
 
-    //     uint yCrvTotal = Guage(pool).balanceOf(address(this));
+    //     uint yCrvTotal = Guage(gauge).balanceOf(address(this));
 
     //     // get yCrv amount from dai amount * yCrv / dai exchange rate
     //     uint yCrvAmount = _amount.mul(yCrvTotal).div(underlyingTotalBefore);
 
-    //     Guage(pool).withdraw(yCrvAmount);
+    //     Guage(gauge).withdraw(yCrvAmount);
 
     //     uint yCrvBal = IERC20(yCrv).balanceOf(address(this));
     //     if (yCrvBal < yCrvAmount) {
@@ -194,19 +184,19 @@ contract StrategyDAItoYCRV {
     // }
 
     // function harvest() external onlyAdmin {
-    //     Minter(minter).mint(pool);
+    //     Minter(minter).mint(gauge);
 
     //     uint crvBal = IERC20(crv).balanceOf(address(this));
     //     if (crvBal > 0) {
-    //         IERC20(crv).safeApprove(uni, 0);
-    //         IERC20(crv).safeApprove(uni, crvBal);
+    //         IERC20(crv).safeApprove(uniswap, 0);
+    //         IERC20(crv).safeApprove(uniswap, crvBal);
 
     //         address[] memory path = new address[](3);
     //         path[0] = crv;
     //         path[1] = weth;
     //         path[2] = dai;
 
-    //         Uni(uni).swapExactTokensForTokens(crvBal, uint(0), path, address(this), now.add(1800));
+    //         Uni(uniswap).swapExactTokensForTokens(crvBal, uint(0), path, address(this), now.add(1800));
     //     }
 
     //     uint daiBal = IERC20(dai).balanceOf(address(this));
