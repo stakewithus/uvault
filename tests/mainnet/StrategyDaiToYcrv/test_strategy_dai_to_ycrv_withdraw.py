@@ -6,9 +6,9 @@ ZERO_ADDRESS = "0x0000000000000000000000000000000000000000"
 
 # NOTE: need to restart ganache after every test due to following error
 #       revert: UniswapV2: LOCKED
-def test_withdraw(accounts, strategyDaiToCrv, dai, dai_holder, gauge, yCrv, yDai, Controller):
+def test_withdraw(accounts, strategyDaiToYcrv, dai, dai_holder, gauge, yCrv, yDai, Controller):
     admin = accounts[0]
-    controller = strategyDaiToCrv.controller()
+    controller = strategyDaiToYcrv.controller()
     # NOTE: cast to string to fix error
     #       TypeError: unhashable type: 'EthAddress'
     treasury = str(Controller.at(controller).treasury())
@@ -33,17 +33,17 @@ def test_withdraw(accounts, strategyDaiToCrv, dai, dai_holder, gauge, yCrv, yDai
     ) >= deposit_amount, "vault dai balance < deposit amount"
 
     # approve strategy to transfer from vault to strategy
-    dai.approve(strategyDaiToCrv, deposit_amount, {'from': vault})
+    dai.approve(strategyDaiToYcrv, deposit_amount, {'from': vault})
 
     # deposit into strategy
-    strategyDaiToCrv.deposit(
+    strategyDaiToYcrv.deposit(
         deposit_amount, deposit_min_return, {'from': vault}
     )
 
     def get_snapshot():
         snapshot = {
             "strategy": {
-                "totalUnderlying": strategyDaiToCrv.totalUnderlying()
+                "totalUnderlying": strategyDaiToYcrv.totalUnderlying()
             },
             "dai": {},
             "yDai": {},
@@ -53,24 +53,24 @@ def test_withdraw(accounts, strategyDaiToCrv, dai, dai_holder, gauge, yCrv, yDai
 
         snapshot["dai"][vault] = dai.balanceOf(vault)
         snapshot["dai"][treasury] = dai.balanceOf(treasury)
-        snapshot["dai"][strategyDaiToCrv] = dai.balanceOf(
-            strategyDaiToCrv
+        snapshot["dai"][strategyDaiToYcrv] = dai.balanceOf(
+            strategyDaiToYcrv
         )
-        snapshot["yDai"][strategyDaiToCrv] = yDai.balanceOf(
-            strategyDaiToCrv
+        snapshot["yDai"][strategyDaiToYcrv] = yDai.balanceOf(
+            strategyDaiToYcrv
         )
-        snapshot["yCrv"][strategyDaiToCrv] = yCrv.balanceOf(
-            strategyDaiToCrv
+        snapshot["yCrv"][strategyDaiToYcrv] = yCrv.balanceOf(
+            strategyDaiToYcrv
         )
-        snapshot["gauge"][strategyDaiToCrv] = gauge.balanceOf(
-            strategyDaiToCrv
+        snapshot["gauge"][strategyDaiToYcrv] = gauge.balanceOf(
+            strategyDaiToYcrv
         )
 
         return snapshot
 
     before = get_snapshot()
 
-    strategyDaiToCrv.withdraw(
+    strategyDaiToYcrv.withdraw(
         withdraw_amount, withdraw_min_return, {'from': vault}
     )
 
@@ -87,42 +87,42 @@ def test_withdraw(accounts, strategyDaiToCrv, dai, dai_holder, gauge, yCrv, yDai
     print(
         "gauge - strategy",
         "\n",
-        before["gauge"][strategyDaiToCrv],
+        before["gauge"][strategyDaiToYcrv],
         "\n",
-        after["gauge"][strategyDaiToCrv],
+        after["gauge"][strategyDaiToYcrv],
         "\n",
-        (after["gauge"][strategyDaiToCrv] - before["gauge"]
-         [strategyDaiToCrv]) / withdraw_amount
+        (after["gauge"][strategyDaiToYcrv] - before["gauge"]
+         [strategyDaiToYcrv]) / withdraw_amount
     )
     print(
         "yCrv - strategy",
         "\n",
-        before["yCrv"][strategyDaiToCrv],
+        before["yCrv"][strategyDaiToYcrv],
         "\n",
-        after["yCrv"][strategyDaiToCrv],
+        after["yCrv"][strategyDaiToYcrv],
         "\n",
-        (after["yCrv"][strategyDaiToCrv] - before["yCrv"]
-         [strategyDaiToCrv]) / withdraw_amount
+        (after["yCrv"][strategyDaiToYcrv] - before["yCrv"]
+         [strategyDaiToYcrv]) / withdraw_amount
     )
     print(
         "yDai - strategy",
         "\n",
-        before["yDai"][strategyDaiToCrv],
+        before["yDai"][strategyDaiToYcrv],
         "\n",
-        after["yDai"][strategyDaiToCrv],
+        after["yDai"][strategyDaiToYcrv],
         "\n",
-        (after["yDai"][strategyDaiToCrv] - before["yDai"]
-         [strategyDaiToCrv]) / withdraw_amount
+        (after["yDai"][strategyDaiToYcrv] - before["yDai"]
+         [strategyDaiToYcrv]) / withdraw_amount
     )
     print(
         "dai - strategy",
         "\n",
-        before["dai"][strategyDaiToCrv],
+        before["dai"][strategyDaiToYcrv],
         "\n",
-        after["dai"][strategyDaiToCrv],
+        after["dai"][strategyDaiToYcrv],
         "\n",
-        (after["dai"][strategyDaiToCrv] - before["dai"]
-         [strategyDaiToCrv]) / withdraw_amount
+        (after["dai"][strategyDaiToYcrv] - before["dai"]
+         [strategyDaiToYcrv]) / withdraw_amount
     )
     print(
         "dai - vault",
@@ -154,12 +154,12 @@ def test_withdraw(accounts, strategyDaiToCrv, dai, dai_holder, gauge, yCrv, yDai
     assert after["strategy"]["totalUnderlying"] == before["strategy"]["totalUnderlying"] - withdraw_amount
 
     # check withdraw of yCrv from gauge
-    exchange_rate = float(before["gauge"][strategyDaiToCrv]) / \
+    exchange_rate = float(before["gauge"][strategyDaiToYcrv]) / \
         before["strategy"]["totalUnderlying"]
     yCrv_amount = int(exchange_rate * withdraw_amount)
 
     delta = 1000  # acceptable rounding error
     assert abs(
-        (before["gauge"][strategyDaiToCrv] - after["gauge"][strategyDaiToCrv]) -
+        (before["gauge"][strategyDaiToYcrv] - after["gauge"][strategyDaiToYcrv]) -
         yCrv_amount
     ) <= delta

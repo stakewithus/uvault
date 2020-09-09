@@ -167,11 +167,11 @@ def strategyYVault(
 
 
 @pytest.fixture(scope="function")
-def strategyDaiToCrv(StrategyDaiToCrv, accounts, controller):
+def strategyDaiToYcrv(StrategyDaiToYcrv, accounts, controller):
     admin = accounts[0]
     vault = accounts[2]
 
-    yield StrategyDaiToCrv.deploy(controller, vault, {'from': admin})
+    yield StrategyDaiToYcrv.deploy(controller, vault, {'from': admin})
 
 # Mainnet
 

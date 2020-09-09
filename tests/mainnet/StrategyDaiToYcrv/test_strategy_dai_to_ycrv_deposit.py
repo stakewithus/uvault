@@ -4,7 +4,7 @@ from brownie import Contract
 ZERO_ADDRESS = "0x0000000000000000000000000000000000000000"
 
 
-def test_deposit(accounts, strategyDaiToCrv, dai, dai_holder, gauge):
+def test_deposit(accounts, strategyDaiToYcrv, dai, dai_holder, gauge):
     admin = accounts[0]
     controller = accounts[1]
     vault = accounts[2]
@@ -22,12 +22,12 @@ def test_deposit(accounts, strategyDaiToCrv, dai, dai_holder, gauge):
     assert dai.balanceOf(vault) == amount
 
     # approve strategy to transfer from vault to strategy
-    dai.approve(strategyDaiToCrv, amount, {'from': vault})
+    dai.approve(strategyDaiToYcrv, amount, {'from': vault})
 
     def get_snapshot():
         snapshot = {
             "strategy": {
-                "totalUnderlying": strategyDaiToCrv.totalUnderlying()
+                "totalUnderlying": strategyDaiToYcrv.totalUnderlying()
             },
             "dai": {
                 "balanceOf": {}
@@ -38,20 +38,20 @@ def test_deposit(accounts, strategyDaiToCrv, dai, dai_holder, gauge):
         }
 
         snapshot["dai"]["balanceOf"][vault] = dai.balanceOf(vault)
-        snapshot["gauge"]["balanceOf"][strategyDaiToCrv] = gauge.balanceOf(
-            strategyDaiToCrv
+        snapshot["gauge"]["balanceOf"][strategyDaiToYcrv] = gauge.balanceOf(
+            strategyDaiToYcrv
         )
 
         return snapshot
 
     before = get_snapshot()
 
-    strategyDaiToCrv.deposit(amount, min_return, {'from': vault})
+    strategyDaiToYcrv.deposit(amount, min_return, {'from': vault})
 
     after = get_snapshot()
 
     assert after["strategy"]["totalUnderlying"] == before["strategy"]["totalUnderlying"] + amount
     # test transfer of DAI from vault to yCRV into gauge
     assert after["dai"]["balanceOf"][vault] == before["dai"]["balanceOf"][vault] - amount
-    assert after["gauge"]["balanceOf"][strategyDaiToCrv] - \
-        before["gauge"]["balanceOf"][strategyDaiToCrv] >= min_return
+    assert after["gauge"]["balanceOf"][strategyDaiToYcrv] - \
+        before["gauge"]["balanceOf"][strategyDaiToYcrv] >= min_return
