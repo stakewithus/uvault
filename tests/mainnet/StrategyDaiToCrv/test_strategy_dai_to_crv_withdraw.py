@@ -20,7 +20,7 @@ def test_withdraw(accounts, strategyDaiToCrv, dai, dai_holder, gauge, yCrv, yDai
     deposit_min_return = deposit_amount * 0.97
 
     withdraw_amount = 3 * 10 ** 18
-    withdraw_min_return = withdraw_amount * 0
+    withdraw_min_return = withdraw_amount * 0.97
 
     # check dai balance
     dai_holder_bal = dai.balanceOf(dai_holder)
