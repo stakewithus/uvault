@@ -17,7 +17,7 @@ import "../interfaces/IVault.sol";
 
 // TODO interface IStrategy
 // TODO: claim all CRV to DAI and withdraw to vault
-contract StrategyDaiToCrv {
+contract StrategyDaiToYcrv {
     using SafeERC20 for IERC20;
     using SafeMath for uint256;
 
