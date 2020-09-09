@@ -112,6 +112,7 @@ contract StrategyDaiToYcrv {
 
     /*
     @notice Deposit `_amount` DAI, swap to `yCrv`, deposit `yCrv` into Curve `Gauge`
+    @param _from Address to deposit DAI from
     @param _amount Amount of DAI to deposit
     @param _min Minimum amount of `yCrv` that must be returned
     */
