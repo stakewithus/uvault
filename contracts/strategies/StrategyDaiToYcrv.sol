@@ -19,6 +19,7 @@ import "../interfaces/IStrategy.sol";
 // TODO: claim all CRV to DAI and withdraw to vault
 // TOOD: events?
 // TODO reentrancy lock
+// TODO: remove double call to safeApprove?
 contract StrategyDaiToYcrv {
     using SafeERC20 for IERC20;
     using SafeMath for uint256;
@@ -123,16 +124,14 @@ contract StrategyDaiToYcrv {
         // DAI to yDAI
         uint256 daiBal = IERC20(dai).balanceOf(address(this));
         if (daiBal > 0) {
-            // IERC20(dai).approve(yDai, 0);
-            IERC20(dai).approve(yDai, daiBal); // TODO: infinite approve?
+            IERC20(dai).safeApprove(yDai, daiBal);
             yERC20(yDai).deposit(daiBal);
         }
 
         // yDAI to yCRV
         uint256 yDaiBal = IERC20(yDai).balanceOf(address(this));
         if (yDaiBal > 0) {
-            // IERC20(yDai).approve(curve, 0);
-            IERC20(yDai).approve(curve, yDaiBal); // TODO: infinite approve?
+            IERC20(yDai).safeApprove(curve, yDaiBal);
             // mint yCRV
             ICurveFi(curve).add_liquidity([yDaiBal, 0, 0, 0], 0);
         }
@@ -140,7 +139,6 @@ contract StrategyDaiToYcrv {
         uint256 yCrvBal = IERC20(yCrv).balanceOf(address(this));
         require(yCrvBal >= _min); // dev: yCrv < min
         if (yCrvBal > 0) {
-            // IERC20(underlying).safeApprove(gauge, 0);
             IERC20(yCrv).safeApprove(gauge, yCrvBal);
             Gauge(gauge).deposit(yCrvBal);
         }
@@ -160,7 +158,6 @@ contract StrategyDaiToYcrv {
         require(_yCrvAmount > 0); // dev: yCrv amount == 0
 
         // use Uniswap to exchange yCrv for DAI
-        IERC20(yCrv).safeApprove(uniswap, 0);
         IERC20(yCrv).safeApprove(uniswap, _yCrvAmount);
 
         // route yCrv > WETH > DAI
@@ -230,7 +227,6 @@ contract StrategyDaiToYcrv {
         uint crvBal = IERC20(crv).balanceOf(address(this));
         if (crvBal > 0) {
             // use Uniswap to exchange CRV for DAI
-            IERC20(crv).safeApprove(uniswap, 0);
             IERC20(crv).safeApprove(uniswap, crvBal);
 
             // route CRV > WETH > DAI
@@ -275,17 +271,23 @@ contract StrategyDaiToYcrv {
     function exit() external onlyVault {
         _harvest();
 
-        totalUnderlying = 0;
+        // yCrv locked in Gauge
+        uint gaugeBal = Gauge(gauge).balanceOf(address(this));
+        if (gaugeBal > 0) {
+            Gauge(gauge).withdraw(gaugeBal);
+        }
 
-        uint yCrvBal = Gauge(gauge).balanceOf(address(this));
+        uint256 yCrvBal = IERC20(yCrv).balanceOf(address(this));
         if (yCrvBal > 0) {
-            Gauge(gauge).withdraw(yCrvBal);
             _yCrvToDai(yCrvBal);
         }
 
         // NOTE: DAI from harvest and withdrawing from Gauge
         uint daiBal = IERC20(dai).balanceOf(address(this));
         if (daiBal > 0) {
+            // TODO: what can go wrong if DAI is not transferred to vault?
+            totalUnderlying = 0;
+
             // transfer to vault
             // NOTE: msg.sender = vault
             IERC20(dai).safeTransfer(msg.sender, daiBal);
