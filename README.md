@@ -50,6 +50,7 @@ source .env.test
 # run mainnet fork with ganache
 # NOTE: Unfortunately the Infura key does not point to an archival node.
 #       That means you will have to restart ganache-cli every 128 blocks (~30 minutes)
+# NOTE: ganache may need to be restarted for each test in tests/mainnet
 ganache-cli \
 --fork https://mainnet.infura.io/v3/$WEB3_INFURA_PROJECT_ID \
 --unlock $DAI_HOLDER \
