@@ -14,7 +14,6 @@ import "./interfaces/Minter.sol";
 import "./interfaces/yERC20.sol";
 import "../interfaces/IController.sol";
 import "../interfaces/IStrategy.sol";
-import "../interfaces/IVault.sol";
 
 // TODO interface IStrategy
 // TODO: claim all CRV to DAI and withdraw to vault
@@ -57,7 +56,6 @@ contract StrategyDaiToYcrv {
     constructor(address _controller, address _vault) public {
         require(_controller != address(0)); // dev: controller == zero address
         require(_vault != address(0)); // dev: vault == zero address
-        // require(IVault(_vault).token() == dai); // dev: vault.token !== strategy.token
 
         admin = msg.sender;
         controller = _controller;
