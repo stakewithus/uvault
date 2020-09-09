@@ -20,6 +20,7 @@ import "../interfaces/IStrategy.sol";
 // TOOD: events?
 // TODO reentrancy lock
 // TODO: remove double call to safeApprove?
+// TODO: protect against attacker directly sending token to this strategy
 contract StrategyDaiToYcrv {
     using SafeERC20 for IERC20;
     using SafeMath for uint256;
