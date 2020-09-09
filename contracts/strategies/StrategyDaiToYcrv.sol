@@ -18,6 +18,7 @@ import "../interfaces/IStrategy.sol";
 // TODO interface IStrategy
 // TODO: claim all CRV to DAI and withdraw to vault
 // TOOD: events?
+// TODO reentrancy lock
 contract StrategyDaiToYcrv {
     using SafeERC20 for IERC20;
     using SafeMath for uint256;
@@ -151,6 +152,30 @@ contract StrategyDaiToYcrv {
         _deposit(msg.sender, _amount, _min);
     }
 
+    /*
+    @notice Swap yCRV to DAI
+    @param _yCrvAmount Amount of yCRV to swap to DAI
+    */
+    function _yCrvToDai(uint _yCrvAmount) internal {
+        require(_yCrvAmount > 0); // dev: yCrv amount == 0
+
+        // use Uniswap to exchange yCrv for DAI
+        IERC20(yCrv).safeApprove(uniswap, 0);
+        IERC20(yCrv).safeApprove(uniswap, _yCrvAmount);
+
+        // route yCrv > WETH > DAI
+        address[] memory path = new address[](3);
+        path[0] = yCrv;
+        path[1] = weth;
+        path[2] = dai;
+
+        // TODO: use 1inch?
+        Uniswap(uniswap).swapExactTokensForTokens(
+            _yCrvAmount, uint(0), path, address(this), now.add(1800)
+        );
+        // NOTE: Now this contract hash DAI
+    }
+
     // TODO: how to handle dust?
 
     /*
@@ -174,20 +199,7 @@ contract StrategyDaiToYcrv {
 
         uint yCrvBal = IERC20(yCrv).balanceOf(address(this));
         if (yCrvBal > 0) {
-            // use Uniswap to exchange yCrv for DAI
-            IERC20(yCrv).safeApprove(uniswap, 0);
-            IERC20(yCrv).safeApprove(uniswap, yCrvBal);
-
-            // route yCrv > WETH > DAI
-            address[] memory path = new address[](3);
-            path[0] = yCrv;
-            path[1] = weth;
-            path[2] = dai;
-
-            // TODO: use 1inch?
-            Uniswap(uniswap).swapExactTokensForTokens(
-                yCrvBal, uint(0), path, address(this), now.add(1800)
-            );
+            _yCrvToDai(yCrvBal);
         }
 
         // transfer DAI to treasury and vault
@@ -210,9 +222,9 @@ contract StrategyDaiToYcrv {
     }
 
     /*
-    @notice Claim CRV, swap for DAI, transfer performance fee to treasury, rdeposit remaning DAI
+    @notice Claim CRV and swap for DAI
     */
-    function harvest() external onlyAdmin {
+    function _harvest() internal {
         Minter(minter).mint(gauge);
 
         uint crvBal = IERC20(crv).balanceOf(address(this));
@@ -231,7 +243,15 @@ contract StrategyDaiToYcrv {
             Uniswap(uniswap).swapExactTokensForTokens(
                 crvBal, uint(0), path, address(this), now.add(1800)
             );
+            // NOTE: Now this contract has DAI
         }
+    }
+
+    /*
+    @notice Claim CRV, swap for DAI, transfer performance fee to treasury, rdeposit remaning DAI
+    */
+    function harvest() external onlyAdmin {
+        _harvest();
 
         uint daiBal = IERC20(dai).balanceOf(address(this));
         if (daiBal > 0) {
@@ -248,4 +268,50 @@ contract StrategyDaiToYcrv {
             _deposit(address(this), daiBal.sub(fee), 0);
         }
     }
+
+    /*
+    @notice Exit strategy by harvesting CRV to DAI and then withdrawing all DAI
+    */
+    function exit() external onlyVault {
+        _harvest();
+
+        totalUnderlying = 0;
+
+        uint yCrvBal = Gauge(gauge).balanceOf(address(this));
+        if (yCrvBal > 0) {
+            Gauge(gauge).withdraw(yCrvBal);
+            _yCrvToDai(yCrvBal);
+        }
+
+        // NOTE: DAI from harvest and withdrawing from Gauge
+        uint daiBal = IERC20(dai).balanceOf(address(this));
+        if (daiBal > 0) {
+            // transfer to vault
+            // NOTE: msg.sender = vault
+            IERC20(dai).safeTransfer(msg.sender, daiBal);
+        }
+    }
 }
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
