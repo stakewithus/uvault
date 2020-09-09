@@ -167,9 +167,8 @@ def strategyYVault(
 
 
 @pytest.fixture(scope="function")
-def strategyDaiToCrv(StrategyDaiToCrv, accounts):
+def strategyDaiToCrv(StrategyDaiToCrv, accounts, controller):
     admin = accounts[0]
-    controller = accounts[1]
     vault = accounts[2]
 
     yield StrategyDaiToCrv.deploy(controller, vault, {'from': admin})
@@ -190,3 +189,14 @@ def dai():
 @pytest.fixture
 def gauge():
     yield Contract.from_explorer("0xFA712EE4788C042e2B7BB55E6cb8ec569C4530c1")
+
+
+# yDAIyUSDCyUSDTyTUSD
+@pytest.fixture
+def yCrv():
+    yield Contract.from_explorer("0xdF5e0e81Dff6FAF3A7e52BA697820c5e32D806A8")
+
+
+@pytest.fixture
+def yDai():
+    yield Contract.from_explorer("0x16de59092dAE5CcF4A1E6439D611fd0653f0Bd01")

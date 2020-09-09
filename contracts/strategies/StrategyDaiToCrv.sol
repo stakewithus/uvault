@@ -7,9 +7,10 @@ import "@openzeppelin/contracts/token/ERC20/SafeERC20.sol";
 import "@openzeppelin/contracts/math/Math.sol";
 import "@openzeppelin/contracts/math/SafeMath.sol";
 
+import "./interfaces/Uniswap.sol";
 import "./interfaces/ICurveFi.sol";
 import "./interfaces/Gauge.sol";
-import "./interfaces/yVault.sol";
+import "./interfaces/yERC20.sol";
 import "../interfaces/IController.sol";
 import "../interfaces/IStrategy.sol";
 import "../interfaces/IVault.sol";
@@ -124,7 +125,7 @@ contract StrategyDaiToCrv {
         if (daiBal > 0) {
             // IERC20(dai).approve(yDai, 0);
             IERC20(dai).approve(yDai, daiBal); // TODO: infinite approve?
-            yVault(yDai).deposit(daiBal);
+            yERC20(yDai).deposit(daiBal);
         }
 
         // yDAI to yCRV
@@ -162,7 +163,7 @@ contract StrategyDaiToCrv {
 
         // yCrv in Gauge
         uint yCrvTotal = Gauge(gauge).balanceOf(address(this));
-        // calculate yCrv amount to withdraw from dai amount
+        // calculate yCrv amount to withdraw from DAI
         // yCrv / DAI exchange rate = yCrv total / DAI total
         uint yCrvAmount = _amount.mul(yCrvTotal).div(totalUnderlying);
 
@@ -172,32 +173,39 @@ contract StrategyDaiToCrv {
         Gauge(gauge).withdraw(yCrvAmount);
 
         uint yCrvBal = IERC20(yCrv).balanceOf(address(this));
-        if (yCrvBal < yCrvAmount) {
-            yCrvAmount = yCrvBal;
+        if (yCrvBal > 0) {
+            // use Uniswap to esxchange yCrv for DAI
+            IERC20(yCrv).safeApprove(uniswap, 0);
+            IERC20(yCrv).safeApprove(uniswap, yCrvBal);
+
+            // Route yCrv > WETH > DAI
+            address[] memory path = new address[](3);
+            path[0] = yCrv;
+            path[1] = weth;
+            path[2] = dai;
+
+            Uniswap(uniswap).swapExactTokensForTokens(
+                yCrvBal, uint(0), path, address(this), now.add(1800)
+            );
         }
 
-        // yCrv to yDai
-        uint minYDai = 0; // declare variable to fix compiler error (implicit conversion)
-        ICurveFi(curve).remove_liquidity(yCrvAmount, [minYDai, 0, 0, 0]);
-
-        // withdraw yDai for Dai
-        uint yDaiBal = yVault(yDai).balanceOf(address(this));
-        yVault(yDai).withdraw(yDaiBal);
-
+        // transfer DAI to treasury and vault
         uint daiBal = IERC20(dai).balanceOf(address(this));
-        require(daiBal >= _min); // dev: dai amount < min
-        // transfer fee to treasury
-        uint fee = daiBal.mul(withdrawFee).div(withdrawFeeMax);
-        if (fee > 0) {
-            address treasury = IController(controller).treasury();
-            require(treasury != address(0)); // dev: treasury == zero address
+        if (daiBal > 0) {
+            // check slippage
+            require(daiBal >= _min); // dev: dai amount < min
+            // transfer fee to treasury
+            uint fee = daiBal.mul(withdrawFee).div(withdrawFeeMax);
+            if (fee > 0) {
+                address treasury = IController(controller).treasury();
+                require(treasury != address(0)); // dev: treasury == zero address
 
-            IERC20(dai).safeTransfer(treasury, fee);
+                IERC20(dai).safeTransfer(treasury, fee);
+            }
+
+            // transfer rest to vault
+            IERC20(dai).safeTransfer(msg.sender, daiBal.sub(fee));
         }
-
-        // NOTE: msg.sender == vault
-        // transfer to vault
-        IERC20(dai).safeTransfer(msg.sender, daiBal.sub(fee));
     }
 
     // function harvest() external onlyAdmin {
@@ -213,7 +221,7 @@ contract StrategyDaiToCrv {
     //         path[1] = weth;
     //         path[2] = dai;
 
-    //         Uni(uniswap).swapExactTokensForTokens(crvBal, uint(0), path, address(this), now.add(1800));
+    //         Uniswap(uniswap).swapExactTokensForTokens(crvBal, uint(0), path, address(this), now.add(1800));
     //     }
 
     //     uint daiBal = IERC20(dai).balanceOf(address(this));
