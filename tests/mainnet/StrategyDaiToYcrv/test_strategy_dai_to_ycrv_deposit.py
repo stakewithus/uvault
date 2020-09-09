@@ -29,29 +29,54 @@ def test_deposit(accounts, strategyDaiToYcrv, dai, dai_holder, gauge):
             "strategy": {
                 "totalUnderlying": strategyDaiToYcrv.totalUnderlying()
             },
-            "dai": {
-                "balanceOf": {}
-            },
-            "gauge": {
-                "balanceOf": {}
-            }
+            "dai": {},
+            "gauge": {}
         }
 
-        snapshot["dai"]["balanceOf"][vault] = dai.balanceOf(vault)
-        snapshot["gauge"]["balanceOf"][strategyDaiToYcrv] = gauge.balanceOf(
+        snapshot["dai"][vault] = dai.balanceOf(vault)
+        snapshot["dai"][strategyDaiToYcrv] = dai.balanceOf(strategyDaiToYcrv)
+        snapshot["gauge"][strategyDaiToYcrv] = gauge.balanceOf(
             strategyDaiToYcrv
         )
 
         return snapshot
 
     before = get_snapshot()
-
     strategyDaiToYcrv.deposit(amount, min_return, {'from': vault})
-
     after = get_snapshot()
 
+    # debug
+    print(
+        "dai - vault",
+        "\n",
+        before["dai"][vault],
+        "\n",
+        after["dai"][vault],
+        "\n"
+    )
+    print(
+        "dai - strategy",
+        "\n",
+        before["dai"][strategyDaiToYcrv],
+        "\n",
+        after["dai"][strategyDaiToYcrv],
+        "\n"
+    )
+    exchanged_rate = float(amount) / (
+        after["gauge"][strategyDaiToYcrv] - before["gauge"][strategyDaiToYcrv]
+    )
+    print(
+        "gauge - strategy",
+        "\n",
+        before["gauge"][strategyDaiToYcrv],
+        "\n",
+        after["gauge"][strategyDaiToYcrv],
+        "\n",
+        f'DAI / yCrv exchanged rate: {exchanged_rate}'
+    )
+
     assert after["strategy"]["totalUnderlying"] == before["strategy"]["totalUnderlying"] + amount
-    # test transfer of DAI from vault to yCRV into gauge
-    assert after["dai"]["balanceOf"][vault] == before["dai"]["balanceOf"][vault] - amount
-    assert after["gauge"]["balanceOf"][strategyDaiToYcrv] - \
-        before["gauge"]["balanceOf"][strategyDaiToYcrv] >= min_return
+    # test transfer of DAI from vault into gauge
+    assert after["dai"][vault] == before["dai"][vault] - amount
+    assert after["gauge"][strategyDaiToYcrv] - \
+        before["gauge"][strategyDaiToYcrv] >= min_return
