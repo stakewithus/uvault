@@ -10,6 +10,7 @@ import "@openzeppelin/contracts/math/SafeMath.sol";
 import "./interfaces/Uniswap.sol";
 import "./interfaces/ICurveFi.sol";
 import "./interfaces/Gauge.sol";
+import "./interfaces/Minter.sol";
 import "./interfaces/yERC20.sol";
 import "../interfaces/IController.sol";
 import "../interfaces/IStrategy.sol";
@@ -174,16 +175,17 @@ contract StrategyDaiToYcrv {
 
         uint yCrvBal = IERC20(yCrv).balanceOf(address(this));
         if (yCrvBal > 0) {
-            // use Uniswap to esxchange yCrv for DAI
+            // use Uniswap to exchange yCrv for DAI
             IERC20(yCrv).safeApprove(uniswap, 0);
             IERC20(yCrv).safeApprove(uniswap, yCrvBal);
 
-            // Route yCrv > WETH > DAI
+            // route yCrv > WETH > DAI
             address[] memory path = new address[](3);
             path[0] = yCrv;
             path[1] = weth;
             path[2] = dai;
 
+            // TODO: use 1inch?
             Uniswap(uniswap).swapExactTokensForTokens(
                 yCrvBal, uint(0), path, address(this), now.add(1800)
             );
@@ -208,29 +210,43 @@ contract StrategyDaiToYcrv {
         }
     }
 
-    // function harvest() external onlyAdmin {
-    //     Minter(minter).mint(gauge);
+    /*
+    @notice Claim CRV, swap for DAI, transfer performance fee to treasury, rdeposit remaning DAI
+    */
+    function harvest() external onlyAdmin {
+        Minter(minter).mint(gauge);
 
-    //     uint crvBal = IERC20(crv).balanceOf(address(this));
-    //     if (crvBal > 0) {
-    //         IERC20(crv).safeApprove(uniswap, 0);
-    //         IERC20(crv).safeApprove(uniswap, crvBal);
+        uint crvBal = IERC20(crv).balanceOf(address(this));
+        if (crvBal > 0) {
+            // use Uniswap to exchange CRV for DAI
+            IERC20(crv).safeApprove(uniswap, 0);
+            IERC20(crv).safeApprove(uniswap, crvBal);
 
-    //         address[] memory path = new address[](3);
-    //         path[0] = crv;
-    //         path[1] = weth;
-    //         path[2] = dai;
+            // route CRV > WETH > DAI
+            address[] memory path = new address[](3);
+            path[0] = crv;
+            path[1] = weth;
+            path[2] = dai;
 
-    //         Uniswap(uniswap).swapExactTokensForTokens(crvBal, uint(0), path, address(this), now.add(1800));
-    //     }
+            // TODO: use 1inch?
+            Uniswap(uniswap).swapExactTokensForTokens(
+                crvBal, uint(0), path, address(this), now.add(1800)
+            );
+        }
 
-    //     uint daiBal = IERC20(dai).balanceOf(address(this));
-    //     if (daiBal > 0) {
-    //         // transfer fee to treasury
-    //         uint fee = daiBal.mul(performanceFee).div(performanceMax);
-    //         IERC20(dai).safeTransfer(IController(controller).treasury(), fee);
+        uint daiBal = IERC20(dai).balanceOf(address(this));
+        if (daiBal > 0) {
+            // transfer fee to treasury
+            uint fee = daiBal.mul(performanceFee).div(performanceFeeMax);
+            if (fee > 0) {
+                address treasury = IController(controller).treasury();
+                require(treasury != address(0)); // dev: treasury == zero address
 
-    //         _deposit(address(this), daiBal.sub(fee));
-    //     }
-    // }
+                IERC20(dai).safeTransfer(treasury, fee);
+            }
+
+            // NOTE: min yCrv to return is set to 0
+            _deposit(address(this), daiBal.sub(fee), 0);
+        }
+    }
 }
