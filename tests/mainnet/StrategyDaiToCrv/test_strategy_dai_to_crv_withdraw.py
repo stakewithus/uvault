@@ -19,7 +19,7 @@ def test_withdraw(accounts, strategyDaiToCrv, dai, dai_holder, gauge, yCrv, yDai
     # allow 3% splippage
     deposit_min_return = deposit_amount * 0.97
 
-    withdraw_amount = 3 * 10 ** 18
+    withdraw_amount = 10 * 10 ** 18
     withdraw_min_return = withdraw_amount * 0.97
 
     # check dai balance
