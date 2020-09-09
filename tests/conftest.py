@@ -198,5 +198,15 @@ def yCrv():
 
 
 @pytest.fixture
+def crv():
+    yield Contract.from_explorer("0xD533a949740bb3306d119CC777fa900bA034cd52")
+
+
+@pytest.fixture
+def minter():
+    yield Contract.from_explorer("0xd061D61a4d941c39E5453435B6345Dc261C2fcE0")
+
+
+@pytest.fixture
 def yDai():
     yield Contract.from_explorer("0x16de59092dAE5CcF4A1E6439D611fd0653f0Bd01")

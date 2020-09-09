@@ -35,7 +35,7 @@ contract StrategyDaiToYcrv {
     uint public performanceFee = 50;
     uint public performanceFeeMax = 10000;
 
-    // total amount of underlying token in this contract
+    // total amount of underlying token from vault
     uint public totalUnderlying;
     address constant private dai = address(0x6B175474E89094C44Da98b954EedeAC495271d0F);
 
@@ -118,8 +118,6 @@ contract StrategyDaiToYcrv {
     function _deposit(address _from, uint _amount, uint _min) internal {
         require(_amount > 0); // amount == 0
 
-        totalUnderlying = totalUnderlying.add(_amount);
-
         IERC20(dai).safeTransferFrom(_from, address(this), _amount);
 
         // DAI to yDAI
@@ -149,6 +147,7 @@ contract StrategyDaiToYcrv {
     }
 
     function deposit(uint _amount, uint _min) external onlyVault {
+        totalUnderlying = totalUnderlying.add(_amount);
         // NOTE: msg.sender == vault
         _deposit(msg.sender, _amount, _min);
     }
@@ -246,7 +245,7 @@ contract StrategyDaiToYcrv {
                 IERC20(dai).safeTransfer(treasury, fee);
             }
 
-            // NOTE: min yCrv to return is set to 0
+            // NOTE: min yCrv to get is set to 0
             _deposit(address(this), daiBal.sub(fee), 0);
         }
     }
