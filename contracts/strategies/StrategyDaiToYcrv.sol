@@ -22,13 +22,13 @@ import "../interfaces/IStrategy.sol";
 // TODO: remove double call to safeApprove?
 // TODO: protect against attacker directly sending token to this strategy
 // TODO inline safeTransfer to save gas?
-contract StrategyDaiToYcrv {
+contract StrategyDaiToYcrv is IStrategy {
     using SafeERC20 for IERC20;
     using SafeMath for uint256;
 
     address public admin;
     address public controller;
-    address public vault;
+    address override public vault;
 
     // TODO remove withdraw fee?
     uint public withdrawFee = 50;
@@ -94,11 +94,11 @@ contract StrategyDaiToYcrv {
         performanceFee = _fee;
     }
 
-    function underlyingToken() external view returns (address) {
+    function underlyingToken() override external view returns (address) {
         return dai;
     }
 
-    function yieldToken() external view returns (address) {
+    function yieldToken() override external view returns (address) {
         return yCrv;
     }
 
@@ -110,7 +110,7 @@ contract StrategyDaiToYcrv {
     @notice Returns balance of yield earning token
     @return Amount of yield earning token
     */
-    function yieldTokenBalance() external view returns (uint) {
+    function yieldTokenBalance() override external view returns (uint) {
         return _gaugeBalance();
     }
 
@@ -148,7 +148,7 @@ contract StrategyDaiToYcrv {
         }
     }
 
-    function deposit(uint _amount, uint _min) external onlyVault {
+    function deposit(uint _amount, uint _min) override external onlyVault {
         // NOTE: msg.sender == vault
         _deposit(msg.sender, _amount, _min);
     }
@@ -160,7 +160,7 @@ contract StrategyDaiToYcrv {
     @param _amount Amount of `yCrv` to withdraw
     @param _min Minimum amount of `yCrv` that must be returned
     */
-    function withdraw(uint _amount, uint _min) external onlyVault {
+    function withdraw(uint _amount, uint _min) override external onlyVault {
         require(_amount > 0); // dev: amount == 0
 
         Gauge(gauge).withdraw(_amount);
@@ -213,7 +213,7 @@ contract StrategyDaiToYcrv {
     /*
     @notice Claim CRV, swap for DAI, transfer performance fee to treasury, rdeposit remaning DAI
     */
-    function harvest() external onlyAdmin {
+    function harvest() override external onlyAdmin {
         _crvToDai();
 
         uint daiBal = IERC20(dai).balanceOf(address(this));
@@ -235,7 +235,7 @@ contract StrategyDaiToYcrv {
     /*
     @notice Exit strategy by harvesting CRV to DAI and then withdrawing all DAI
     */
-    function exit() external onlyVault {
+    function exit() override external onlyVault {
         _crvToDai();
 
         // yCrv locked in Gauge
