@@ -21,6 +21,7 @@ import "../interfaces/IStrategy.sol";
 // TODO reentrancy lock
 // TODO: remove double call to safeApprove?
 // TODO: protect against attacker directly sending token to this strategy
+// TODO inline safeTransfer to save gas?
 contract StrategyDaiToYcrv {
     using SafeERC20 for IERC20;
     using SafeMath for uint256;
@@ -37,8 +38,6 @@ contract StrategyDaiToYcrv {
     uint public performanceFee = 50;
     uint public performanceFeeMax = 10000;
 
-    // total amount of underlying token from vault
-    uint public totalUnderlying;
     address constant private dai = address(0x6B175474E89094C44Da98b954EedeAC495271d0F);
 
     // Curve
@@ -99,16 +98,20 @@ contract StrategyDaiToYcrv {
         return dai;
     }
 
-    function _getBalance() internal view returns (uint) {
+    function yieldToken() external view returns (address) {
+        return yCrv;
+    }
+
+    function _gaugeBalance() internal view returns (uint) {
         return Gauge(gauge).balanceOf(address(this));
     }
 
-    function getBalance() external view returns (uint) {
-        return _getBalance();
-    }
-
-    function getExchangeRate() external view returns (uint, uint) {
-        return (_getBalance(), totalUnderlying);
+    /*
+    @notice Returns balance of yield earning token
+    @return Amount of yield earning token
+    */
+    function yieldTokenBalance() external view returns (uint) {
+        return _gaugeBalance();
     }
 
     /*
@@ -146,83 +149,46 @@ contract StrategyDaiToYcrv {
     }
 
     function deposit(uint _amount, uint _min) external onlyVault {
-        totalUnderlying = totalUnderlying.add(_amount);
         // NOTE: msg.sender == vault
         _deposit(msg.sender, _amount, _min);
-    }
-
-    /*
-    @notice Swap yCRV to DAI
-    @param _yCrvAmount Amount of yCRV to swap to DAI
-    */
-    function _yCrvToDai(uint _yCrvAmount) internal {
-        require(_yCrvAmount > 0); // dev: yCrv amount == 0
-
-        // use Uniswap to exchange yCrv for DAI
-        IERC20(yCrv).safeApprove(uniswap, _yCrvAmount);
-
-        // route yCrv > WETH > DAI
-        address[] memory path = new address[](3);
-        path[0] = yCrv;
-        path[1] = weth;
-        path[2] = dai;
-
-        // TODO: use 1inch?
-        Uniswap(uniswap).swapExactTokensForTokens(
-            _yCrvAmount, uint(0), path, address(this), now.add(1800)
-        );
-        // NOTE: Now this contract hash DAI
     }
 
     // TODO: how to handle dust?
 
     /*
-    @notice Withdraw `_amount` DAI of `yCrv` from Curve `Gauge`
-    @param _amount Amount of DAI to withdraw
-    @param _min Minimum amount of DAI that must be returned
+    @notice Withdraw `_amount` of `yCrv` from Curve `Gauge`
+    @param _amount Amount of `yCrv` to withdraw
+    @param _min Minimum amount of `yCrv` that must be returned
     */
     function withdraw(uint _amount, uint _min) external onlyVault {
         require(_amount > 0); // dev: amount == 0
 
-        // yCrv in Gauge
-        uint yCrvTotal = Gauge(gauge).balanceOf(address(this));
-        // calculate yCrv amount to withdraw from DAI
-        // yCrv / DAI exchange rate = yCrv total / DAI total
-        uint yCrvAmount = _amount.mul(yCrvTotal).div(totalUnderlying);
+        Gauge(gauge).withdraw(_amount);
 
-        // update total after exchange amount is calculated above
-        totalUnderlying = totalUnderlying.sub(_amount);
-
-        Gauge(gauge).withdraw(yCrvAmount);
-
+        // transfer yCrv to treasury and vault
         uint yCrvBal = IERC20(yCrv).balanceOf(address(this));
+        // TODO remove withdrawal fee?
         if (yCrvBal > 0) {
-            _yCrvToDai(yCrvBal);
-        }
-
-        // transfer DAI to treasury and vault
-        uint daiBal = IERC20(dai).balanceOf(address(this));
-        if (daiBal > 0) {
             // check slippage
-            require(daiBal >= _min); // dev: dai amount < min
+            require(yCrvBal >= _min); // dev: yCrv amount < min
             // transfer fee to treasury
-            uint fee = daiBal.mul(withdrawFee).div(withdrawFeeMax);
+            uint fee = yCrvBal.mul(withdrawFee).div(withdrawFeeMax);
             if (fee > 0) {
                 address treasury = IController(controller).treasury();
                 require(treasury != address(0)); // dev: treasury == zero address
 
-                IERC20(dai).safeTransfer(treasury, fee);
+                IERC20(yCrv).safeTransfer(treasury, fee);
             }
 
             // transfer rest to vault
-            IERC20(dai).safeTransfer(msg.sender, daiBal.sub(fee));
+            IERC20(yCrv).safeTransfer(msg.sender, yCrvBal.sub(fee));
         }
     }
 
     /*
     @notice Claim CRV and swap for DAI
     */
-    function _harvest() internal {
+    function _crvToDai() internal {
         Minter(minter).mint(gauge);
 
         uint crvBal = IERC20(crv).balanceOf(address(this));
@@ -248,7 +214,7 @@ contract StrategyDaiToYcrv {
     @notice Claim CRV, swap for DAI, transfer performance fee to treasury, rdeposit remaning DAI
     */
     function harvest() external onlyAdmin {
-        _harvest();
+        _crvToDai();
 
         uint daiBal = IERC20(dai).balanceOf(address(this));
         if (daiBal > 0) {
@@ -270,25 +236,35 @@ contract StrategyDaiToYcrv {
     @notice Exit strategy by harvesting CRV to DAI and then withdrawing all DAI
     */
     function exit() external onlyVault {
-        _harvest();
+        _crvToDai();
 
         // yCrv locked in Gauge
-        uint gaugeBal = Gauge(gauge).balanceOf(address(this));
+        uint gaugeBal = _gaugeBalance();
         if (gaugeBal > 0) {
             Gauge(gauge).withdraw(gaugeBal);
         }
 
         uint256 yCrvBal = IERC20(yCrv).balanceOf(address(this));
         if (yCrvBal > 0) {
-            _yCrvToDai(yCrvBal);
+            // use Uniswap to exchange yCrv for DAI
+            IERC20(yCrv).safeApprove(uniswap, yCrvBal);
+
+            // route yCrv > WETH > DAI
+            address[] memory path = new address[](3);
+            path[0] = yCrv;
+            path[1] = weth;
+            path[2] = dai;
+
+            // TODO: use 1inch?
+            Uniswap(uniswap).swapExactTokensForTokens(
+                yCrvBal, uint(0), path, address(this), now.add(1800)
+            );
+            // NOTE: Now this contract hash DAI
         }
 
         // NOTE: DAI from harvest and withdrawing from Gauge
         uint daiBal = IERC20(dai).balanceOf(address(this));
         if (daiBal > 0) {
-            // TODO: what can go wrong if DAI is not transferred to vault?
-            totalUnderlying = 0;
-
             // transfer to vault
             // NOTE: msg.sender = vault
             IERC20(dai).safeTransfer(msg.sender, daiBal);
