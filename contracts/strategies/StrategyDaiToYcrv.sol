@@ -153,12 +153,35 @@ contract StrategyDaiToYcrv is IStrategy {
         _deposit(msg.sender, _amount, _min);
     }
 
+    /*
+    @notice Swap yCRV to DAI
+    @param _yCrvAmount Amount of yCRV to swap to DAI
+    */
+    function _yCrvToDai(uint _yCrvAmount) internal {
+        require(_yCrvAmount > 0); // dev: yCrv amount == 0
+
+        // use Uniswap to exchange yCrv for DAI
+        IERC20(yCrv).safeApprove(uniswap, _yCrvAmount);
+
+        // route yCrv > WETH > DAI
+        address[] memory path = new address[](3);
+        path[0] = yCrv;
+        path[1] = weth;
+        path[2] = dai;
+
+        // TODO: use 1inch?
+        Uniswap(uniswap).swapExactTokensForTokens(
+            _yCrvAmount, uint(0), path, address(this), now.add(1800)
+        );
+        // NOTE: Now this contract hash DAI
+    }
+
     // TODO: how to handle dust?
 
     /*
-    @notice Withdraw `_amount` of `yCrv` from Curve `Gauge`
+    @notice Withdraw `_amount` of `yCrv` from Curve `Gauge`, swap for `DAI`, send `DAI` back to vault
     @param _amount Amount of `yCrv` to withdraw
-    @param _min Minimum amount of `yCrv` that must be returned
+    @param _min Minimum amount of `DAI` that must be returned
     */
     function withdraw(uint _amount, uint _min) override external onlyVault {
         require(_amount > 0); // dev: amount == 0
@@ -167,21 +190,27 @@ contract StrategyDaiToYcrv is IStrategy {
 
         // transfer yCrv to treasury and vault
         uint yCrvBal = IERC20(yCrv).balanceOf(address(this));
-        // TODO remove withdrawal fee?
         if (yCrvBal > 0) {
+            _yCrvToDai(yCrvBal);
+        }
+
+        // transfer DAI to treasury and vault
+        uint daiBal = IERC20(dai).balanceOf(address(this));
+        // TODO remove withdrawal fee?
+        if (daiBal > 0) {
             // check slippage
-            require(yCrvBal >= _min); // dev: yCrv amount < min
+            require(daiBal >= _min); // dev: yCrv amount < min
             // transfer fee to treasury
-            uint fee = yCrvBal.mul(withdrawFee).div(withdrawFeeMax);
+            uint fee = daiBal.mul(withdrawFee).div(withdrawFeeMax);
             if (fee > 0) {
                 address treasury = IController(controller).treasury();
                 require(treasury != address(0)); // dev: treasury == zero address
 
-                IERC20(yCrv).safeTransfer(treasury, fee);
+                IERC20(dai).safeTransfer(treasury, fee);
             }
 
             // transfer rest to vault
-            IERC20(yCrv).safeTransfer(msg.sender, yCrvBal.sub(fee));
+            IERC20(dai).safeTransfer(msg.sender, daiBal.sub(fee));
         }
     }
 
@@ -211,7 +240,7 @@ contract StrategyDaiToYcrv is IStrategy {
     }
 
     /*
-    @notice Claim CRV, swap for DAI, transfer performance fee to treasury, rdeposit remaning DAI
+    @notice Claim CRV, swap for DAI, transfer performance fee to treasury, deposit remaning DAI
     */
     function harvest() override external onlyAdmin {
         _crvToDai();
@@ -246,28 +275,7 @@ contract StrategyDaiToYcrv is IStrategy {
 
         uint256 yCrvBal = IERC20(yCrv).balanceOf(address(this));
         if (yCrvBal > 0) {
-            // use Uniswap to exchange yCrv for DAI
-            IERC20(yCrv).safeApprove(uniswap, yCrvBal);
-
-            // route yCrv > WETH > DAI
-            address[] memory path = new address[](3);
-            path[0] = yCrv;
-            path[1] = weth;
-            path[2] = dai;
-
-            // TODO: use 1inch?
-            Uniswap(uniswap).swapExactTokensForTokens(
-                yCrvBal, uint(0), path, address(this), now.add(1800)
-            );
-            // NOTE: Now this contract hash DAI
-        }
-
-        // NOTE: DAI from harvest and withdrawing from Gauge
-        uint daiBal = IERC20(dai).balanceOf(address(this));
-        if (daiBal > 0) {
-            // transfer to vault
-            // NOTE: msg.sender = vault
-            IERC20(dai).safeTransfer(msg.sender, daiBal);
+            _yCrvToDai(yCrvBal);
         }
     }
 }
