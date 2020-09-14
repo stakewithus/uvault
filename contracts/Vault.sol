@@ -17,7 +17,7 @@ import "./interfaces/IVault.sol";
 // TODO  protect agains hack by directly sending token to this contract's address
 // TODO: safe withdraw any token in case strategy sends back wrong token
 
-contract VaultV2 is ERC20 {
+contract Vault is ERC20 {
     using SafeERC20 for IERC20;
     using SafeMath for uint;
 
@@ -33,6 +33,7 @@ contract VaultV2 is ERC20 {
         address _token, string memory _name, string memory _symbol
     ) ERC20(_name, _symbol) public  {
         require(_token != address(0)); // dev: token == zero address
+        // NOTE: token decimals must equal vault decimals
 
         admin = msg.sender;
         token = _token;
