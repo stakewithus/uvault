@@ -268,6 +268,11 @@ contract StrategyDaiToYcrv is IStrategy {
             // TODO use Curve to get dai from yCrv
             _yCrvToDai(yCrvBal);
         }
+
+        uint daiBal = IERC20(dai).balanceOf(address(this));
+        if (daiBal > 0) {
+            IERC20(dai).safeTransfer(vault, daiBal);
+        }
     }
 
     /*
@@ -276,11 +281,6 @@ contract StrategyDaiToYcrv is IStrategy {
     */
     function withdrawAll() override external onlyAdminOrVault {
         _withdrawAll();
-
-        uint daiBal = IERC20(dai).balanceOf(address(this));
-        if (daiBal > 0) {
-            IERC20(dai).safeTransfer(vault, daiBal);
-        }
     }
 
     /*
@@ -300,13 +300,13 @@ contract StrategyDaiToYcrv is IStrategy {
                 IERC20(dai).safeTransfer(treasury, fee);
             }
 
-            // NOTE: min yCrv to get is set to 0
-            _deposit(address(this), daiBal.sub(fee), 0);
+            _deposit(address(this), daiBal.sub(fee));
         }
     }
 
     /*
-    @notice Exit strategy by harvesting CRV to DAI and then withdrawing all DAI
+    @notice Exit strategy by harvesting CRV to DAI and then withdrawing all DAI to vault
+    @dev Must return all DAI to vault
     */
     function exit() override external onlyAdminOrVault {
         _crvToDai();
