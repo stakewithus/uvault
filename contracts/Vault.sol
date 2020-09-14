@@ -46,7 +46,7 @@ contract Vault is ERC20 {
     }
 
     modifier whenStrategyDefined() {
-        require(strategy != address(0)); // dev: Strategy must be defined
+        require(strategy != address(0)); // dev: strategy = zero address
         _;
     }
 
