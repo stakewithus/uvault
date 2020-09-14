@@ -31,7 +31,7 @@ def test_deposit(accounts, vault, erc20, sender, amount):
 
     # deposit
     before = get_snapshot()
-    tx = vault.deposit(sender, amount)
+    tx = vault.deposit(amount, {'from': sender})
     after = get_snapshot()
 
     # check ERC20 balances
@@ -45,4 +45,4 @@ def test_deposit(accounts, vault, erc20, sender, amount):
 
 def test_deposit(accounts, vault, erc20):
     with brownie.reverts("dev: amount = 0"):
-        vault.deposit(accounts[0], 0)
+        vault.deposit(0)

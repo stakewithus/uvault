@@ -16,7 +16,7 @@ def test_rebalance(accounts, vault, erc20, mockStrategy):
     erc20.mint(account, amount)
     erc20.approve(vault, amount, {'from': account})
 
-    vault.deposit(account, amount, {'from': account})
+    vault.deposit(amount, {'from': account})
 
     # setup strategy
     strategy._setVault_(vault)
@@ -26,7 +26,7 @@ def test_rebalance(accounts, vault, erc20, mockStrategy):
     def get_snapshot():
         snapshot = {
             "vault": {
-                "available": vault.available(),
+                "availableToInvest": vault.availableToInvest(),
             },
             "strategy": {
                 "balance": strategy.balance()
@@ -45,7 +45,7 @@ def test_rebalance(accounts, vault, erc20, mockStrategy):
 
     # check deposit was called
     assert strategy._getDepositAmount_() == \
-        before["vault"]["available"] + before["strategy"]["balance"]
+        before["vault"]["availableToInvest"] + before["strategy"]["balance"]
 
 
 def test_rebalance_not_admin(accounts, vault):

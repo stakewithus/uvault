@@ -15,7 +15,7 @@ def test_withdraw_from_vault(accounts, vault, erc20):
     erc20.mint(account, shares)
     erc20.approve(vault, shares, {'from': account})
 
-    vault.deposit(account, shares, {'from': account})
+    vault.deposit(shares, {'from': account})
 
     def get_snapshot():
         snapshot = {
@@ -70,7 +70,7 @@ def test_withdraw_zero_shares(accounts, vault, erc20):
     erc20.mint(sender, amount)
     erc20.approve(vault, amount, {'from': sender})
 
-    vault.deposit(sender, amount, {'from': sender})
+    vault.deposit(amount, {'from': sender})
 
     with brownie.reverts("dev: shares = 0"):
         vault.withdraw(0, {'from': sender})

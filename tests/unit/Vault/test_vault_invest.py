@@ -16,7 +16,7 @@ def test_invest(accounts, vault, erc20, mockStrategy):
     erc20.mint(account, amount)
     erc20.approve(vault, amount, {'from': account})
 
-    vault.deposit(account, amount, {'from': account})
+    vault.deposit(amount, {'from': account})
 
     # setup strategy
     strategy._setVault_(vault)
@@ -26,7 +26,7 @@ def test_invest(accounts, vault, erc20, mockStrategy):
     def get_snapshot():
         snapshot = {
             "vault": {
-                "available": vault.available(),
+                "availableToInvest": vault.availableToInvest(),
             }
         }
 
@@ -38,7 +38,8 @@ def test_invest(accounts, vault, erc20, mockStrategy):
     after = get_snapshot()
 
     # check deposit was called
-    assert strategy._getDepositAmount_() == before["vault"]["available"]
+    assert strategy._getDepositAmount_(
+    ) == before["vault"]["availableToInvest"]
 
 
 def test_invest_zero_available(accounts, vault, erc20, mockStrategy):
@@ -51,7 +52,7 @@ def test_invest_zero_available(accounts, vault, erc20, mockStrategy):
     strategy._setUnderlyingToken_(erc20)
     vault.setStrategy(strategy, {'from': admin})
 
-    assert vault.available() == 0
+    assert vault.availableToInvest() == 0
 
     # invest
     tx = vault.invest()
