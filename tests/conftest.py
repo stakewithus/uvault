@@ -112,9 +112,11 @@ def mockController(MockController, accounts):
 
 @pytest.fixture(scope="function")
 def mockStrategy(MockStrategy, accounts, erc20):
+    # mock controller address
+    controller = accounts[1]
     # mock vault address
-    vault = accounts[0]
-    yield MockStrategy.deploy(vault, erc20, {'from': accounts[0]})
+    vault = accounts[2]
+    yield MockStrategy.deploy(controller, vault, erc20, {'from': accounts[0]})
 
 # core
 

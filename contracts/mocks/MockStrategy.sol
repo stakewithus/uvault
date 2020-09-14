@@ -3,6 +3,8 @@ pragma solidity ^0.6.0;
 import "../interfaces/IStrategy.sol";
 
 contract MockStrategy is IStrategy {
+    address override public admin;
+    address override public controller;
     address override public vault;
     address override public underlyingToken;
 
@@ -11,7 +13,9 @@ contract MockStrategy is IStrategy {
     uint private _depositAmount_;
     uint private _withdrawAmount_;
 
-    constructor(address _vault, address _underlyingToken) public {
+    constructor(address _controller, address _vault, address _underlyingToken) public {
+        admin = msg.sender;
+        controller = _controller;
         vault = _vault;
         underlyingToken = _underlyingToken;
     }

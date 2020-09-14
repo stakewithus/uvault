@@ -41,10 +41,15 @@ def test_set_strategy(accounts, vault, erc20, mockStrategy):
 
 def test_set_strategy_update(accounts, vault, erc20, MockStrategy):
     admin = accounts[0]
-    # setup
-    oldStrategy = MockStrategy.deploy(vault, erc20, {'from': admin})
-    newStrategy = MockStrategy.deploy(vault, erc20, {'from': admin})
+    controller = accounts[1]  # mock controller address
 
+    # setup
+    oldStrategy = MockStrategy.deploy(
+        controller, vault, erc20, {'from': admin}
+    )
+    newStrategy = MockStrategy.deploy(
+        controller, vault, erc20, {'from': admin}
+    )
     vault.setStrategy(oldStrategy, {'from': admin})
 
     def get_snapshot():
