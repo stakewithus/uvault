@@ -16,6 +16,7 @@ import "./interfaces/IVault.sol";
 // TODO inline safeTransfer to save gas?
 // TODO  protect agains hack by directly sending token to this contract's address
 // TODO: safe withdraw any token in case strategy sends back wrong token
+// TODO: batch deposit and batch withdraw (via sig or approve(msg.sender, this contract, shares))
 
 contract Vault is ERC20 {
     using SafeERC20 for IERC20;
