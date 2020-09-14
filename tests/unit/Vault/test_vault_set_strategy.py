@@ -85,7 +85,7 @@ def test_set_strategy_not_admin(accounts, vault):
 
 
 def test_set_strategy_strategy_zero_address(accounts, vault):
-    with brownie.reverts("dev: strategy == zero address"):
+    with brownie.reverts("dev: strategy = zero address"):
         vault.setStrategy(ZERO_ADDRESS, {'from': accounts[0]})
 
 

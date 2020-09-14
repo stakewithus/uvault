@@ -32,7 +32,7 @@ contract Vault is ERC20 {
     constructor(
         address _token, string memory _name, string memory _symbol
     ) ERC20(_name, _symbol) public  {
-        require(_token != address(0)); // dev: token == zero address
+        require(_token != address(0)); // dev: token = zero address
         // NOTE: token decimals must equal vault decimals
 
         admin = msg.sender;
@@ -50,12 +50,12 @@ contract Vault is ERC20 {
     }
 
     function setAdmin(address _admin) external onlyAdmin {
-        require(_admin != address(0)); // dev: admin == zero address
+        require(_admin != address(0)); // dev: admin = zero address
         admin = _admin;
     }
 
     function setMin(uint _min) external onlyAdmin {
-        require(_min <= max); // dev:min > max
+        require(_min <= max); // dev: min > max
         min = _min;
     }
 
@@ -79,10 +79,10 @@ contract Vault is ERC20 {
     }
 
     function setStrategy(address _strategy) public onlyAdmin {
-        require(_strategy != address(0)); // dev: strategy == zero address
+        require(_strategy != address(0)); // dev: strategy = zero address
         require(IStrategy(_strategy).underlyingToken() == token); // dev: strategy.token != vault.token
         require(IStrategy(_strategy).vault() == address(this)); // dev: strategy.vault != vault
-        require(_strategy != strategy); // dev: new strategy == current strategy
+        require(_strategy != strategy); // dev: new strategy = current strategy
 
         // withdraw from current strategy
         if (strategy != address(0)) {
@@ -125,7 +125,7 @@ contract Vault is ERC20 {
     @param _amount Amount of token to transfer from `msg.sender`
     */
     function deposit(address _from, uint _amount) external {
-        require(_amount > 0); // dev: amount == 0
+        require(_amount > 0); // dev: amount = 0
         // NOTE: no need to check if _from is zero address
 
         _mint(_from, _amount);
@@ -139,8 +139,8 @@ contract Vault is ERC20 {
     function withdraw(uint _shares) external {
         // NOTE: cache totalSupply before burning
         uint totalSupply = totalSupply();
-        require(totalSupply > 0); // dev: total supply == 0
-        require(_shares > 0); // dev: amount == 0
+        require(totalSupply > 0); // dev: total supply = 0
+        require(_shares > 0); // dev: amount = 0
 
         _burn(msg.sender, _shares);
 
