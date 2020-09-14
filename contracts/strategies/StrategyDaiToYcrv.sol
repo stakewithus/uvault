@@ -265,16 +265,22 @@ contract StrategyDaiToYcrv is IStrategy {
 
         uint256 yCrvBal = IERC20(yCrv).balanceOf(address(this));
         if (yCrvBal > 0) {
+            // TODO use Curve to get dai from yCrv
             _yCrvToDai(yCrvBal);
         }
     }
 
     /*
     @notice Withdraw all DAI to vault
+    @dev Must allow admin to withdraw to vault
     */
     function withdrawAll() override external onlyAdminOrVault {
         _withdrawAll();
-        // TODO withdraw DAI to vault
+
+        uint daiBal = IERC20(dai).balanceOf(address(this));
+        if (daiBal > 0) {
+            IERC20(dai).safeTransfer(vault, daiBal);
+        }
     }
 
     /*
