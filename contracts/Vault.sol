@@ -18,13 +18,13 @@ import "./interfaces/IVault.sol";
 // TODO: safe withdraw any token in case strategy sends back wrong token
 // TODO: batch deposit and batch withdraw (via sig or approve(msg.sender, this contract, shares))
 
-contract Vault is ERC20 {
+contract Vault is ERC20, IVault {
     using SafeERC20 for IERC20;
     using SafeMath for uint;
 
-    address public admin;
-    address public token;
-    address public strategy;
+    address override public admin;
+    address override public token;
+    address override public strategy;
 
     // percentange of token available to be invested into strategy
     uint public min = 9500;
@@ -68,11 +68,11 @@ contract Vault is ERC20 {
     @notice Returns balance of tokens in vault
     @return Amount of token in vault
     */
-    function balanceInVault() external view returns (uint) {
+    function balanceInVault() override external view returns (uint) {
         return _balanceInVault();
     }
 
-    function _available() internal view returns (uint) {
+    function _availableToInvest() internal view returns (uint) {
         return _balanceInVault().mul(min).div(max);
     }
 
@@ -80,8 +80,8 @@ contract Vault is ERC20 {
     @notice Returns amount of token available to be invested into strategy
     @return Amount of token available to be invested into strategy
     */
-    function available() external view returns (uint) {
-        return _available();
+    function availableToInvest() override external view returns (uint) {
+        return _availableToInvest();
     }
 
     function _totalLockedValue() internal view returns (uint) {
@@ -95,7 +95,7 @@ contract Vault is ERC20 {
     @notice Returns the total amount of tokens in vault + strategy
     @return Total amount of tokens in vault + strategy
     */
-    function totalLockedValue() external view returns (uint) {
+    function totalLockedValue() override external view returns (uint) {
         return _totalLockedValue();
     }
 
@@ -105,7 +105,7 @@ contract Vault is ERC20 {
     @dev Only admin is allowed to call
     @dev Must withdraw all tokens from current strategy
     */
-    function setStrategy(address _strategy) public onlyAdmin {
+    function setStrategy(address _strategy) override external onlyAdmin {
         require(_strategy != address(0)); // dev: strategy = zero address
         require(IStrategy(_strategy).underlyingToken() == token); // dev: strategy.token != vault.token
         require(IStrategy(_strategy).vault() == address(this)); // dev: strategy.vault != vault
@@ -122,7 +122,7 @@ contract Vault is ERC20 {
     }
 
     function _invest() internal whenStrategyDefined {
-        uint amount = _available();
+        uint amount = _availableToInvest();
 
         if (amount > 0) {
             // NOTE: infinite approval is set when this strategy was set
@@ -134,36 +134,34 @@ contract Vault is ERC20 {
     @notice Invest token from vault into strategy.
             Some token are kept in vault for cheap withdraw.
     */
-    function invest() external onlyAdmin {
+    function invest() override external onlyAdmin {
         _invest();
     }
 
     /*
     @notice Withdraw from strategy, fills up reserve and re-invests the rest of tokens
     */
-    function rebalance() external onlyAdmin whenStrategyDefined {
+    function rebalance() override external onlyAdmin whenStrategyDefined {
         IStrategy(strategy).withdrawAll();
         _invest();
     }
 
     /*
     @notice Deposit token into vault
-    @param _from Address to transfer tokens from
     @param _amount Amount of token to transfer from `msg.sender`
     */
-    function deposit(address _from, uint _amount) external {
+    function deposit(uint _amount) override external {
         require(_amount > 0); // dev: amount = 0
-        // NOTE: no need to check if _from is zero address
 
-        _mint(_from, _amount);
-        IERC20(token).safeTransferFrom(_from, address(this), _amount);
+        _mint(msg.sender, _amount);
+        IERC20(token).safeTransferFrom(msg.sender, address(this), _amount);
     }
 
     /*
     @notice Withdraw shares for token
     @param _shares Amount of shares to burn
     */
-    function withdraw(uint _shares) external {
+    function withdraw(uint _shares) override external {
         // NOTE: cache totalSupply before burning
         uint totalSupply = totalSupply();
         require(totalSupply > 0); // dev: total supply = 0
