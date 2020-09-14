@@ -5,7 +5,6 @@ interface IStrategy {
     function vault() external view returns(address);
     function underlyingToken() external view returns(address);
     function balance() external view returns(uint);
-    function harvest() external;
     /*
     @notice Deposit `amount` underlying token for yield token
     @param amount Amount of underlying token to deposit
@@ -20,4 +19,5 @@ interface IStrategy {
     @notice Withdraw all underlying token from strategy
     */
     function withdrawAll() external;
+    function harvest() external;
 }

@@ -112,7 +112,9 @@ def mockController(MockController, accounts):
 
 @pytest.fixture(scope="function")
 def mockStrategy(MockStrategy, accounts, erc20):
-    yield MockStrategy.deploy(erc20, {'from': accounts[0]})
+    # mock vault address
+    vault = accounts[0]
+    yield MockStrategy.deploy(vault, erc20, {'from': accounts[0]})
 
 # core
 
@@ -134,6 +136,8 @@ def vault(Vault, accounts, erc20):
 
 
 # strategy
+
+
 @pytest.fixture(scope="function")
 def mockYCRV(ERC20, accounts):
     yield ERC20.deploy(
