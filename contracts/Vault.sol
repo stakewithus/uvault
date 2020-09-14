@@ -59,25 +59,51 @@ contract Vault is ERC20 {
         min = _min;
     }
 
+    function _balanceInVault() internal view returns (uint) {
+        return IERC20(token).balanceOf(address(this));
+    }
+
+    /*
+    @notice Returns balance of tokens in vault
+    @return Amount of token in vault
+    */
+    function balanceInVault() external view returns (uint) {
+        return _balanceInVault();
+    }
+
+    function _available() internal view returns (uint) {
+        return _balanceInVault().mul(min).div(max);
+    }
+
     /*
     @notice Returns amount of token available to be invested into strategy
     @return Amount of token available to be invested into strategy
     */
-    function _available() internal returns (uint) {
-        return ERC20(token).balanceOf(address(this)).mul(min).div(max);
+    function available() external view returns (uint) {
+        return _available();
+    }
+
+    function _totalLockedValue() internal view returns (uint) {
+        if (address(strategy) == address(0)) {
+            return _balanceInVault();
+        }
+        return _balanceInVault().add(IStrategy(strategy).balance());
     }
 
     /*
     @notice Returns the total amount of tokens in vault + strategy
     @return Total amount of tokens in vault + strategy
     */
-    function _balance() internal returns (uint) {
-        if (address(strategy) == address(0)) {
-            return IERC20(token).balanceOf(address(this));
-        }
-        return IERC20(token).balanceOf(address(this)).add(IStrategy(strategy).balance());
+    function totalLockedValue() external view returns (uint) {
+        return _totalLockedValue();
     }
 
+    /*
+    @notice Set strategy
+    @param _strategy Address of strategy
+    @dev Only admin is allowed to call
+    @dev Must withdraw all tokens from current strategy
+    */
     function setStrategy(address _strategy) public onlyAdmin {
         require(_strategy != address(0)); // dev: strategy = zero address
         require(IStrategy(_strategy).underlyingToken() == token); // dev: strategy.token != vault.token
@@ -140,7 +166,7 @@ contract Vault is ERC20 {
         // NOTE: cache totalSupply before burning
         uint totalSupply = totalSupply();
         require(totalSupply > 0); // dev: total supply = 0
-        require(_shares > 0); // dev: amount = 0
+        require(_shares > 0); // dev: shares = 0
 
         _burn(msg.sender, _shares);
 
@@ -152,13 +178,13 @@ contract Vault is ERC20 {
 
         s / T = y / Y
         */
-        uint amountToWithdraw = _shares.mul(_balance()).div(totalSupply);
+        uint amountToWithdraw = _shares.mul(_totalLockedValue()).div(totalSupply);
 
-        uint bal = IERC20(token).balanceOf(address(this));
+        uint bal = _balanceInVault();
         if (amountToWithdraw > bal) {
             // NOTE: can skip check for underflow here since amountToWithdraw > bal
             IStrategy(strategy).withdraw(amountToWithdraw - bal);
-            uint balAfter = ERC20(token).balanceOf(address(this));
+            uint balAfter = _balanceInVault();
 
             if (balAfter < amountToWithdraw) {
                 amountToWithdraw = balAfter;
