@@ -3,9 +3,9 @@ pragma solidity ^0.6.0;
 
 import "./interfaces/IController.sol";
 
-contract ControllerV2 is IController {
-    address public admin;
-    address public override treasury;
+contract Controller is IController {
+    address override public admin;
+    address override public treasury;
 
     constructor(address _treasury) public {
         require(_treasury != address(0)); // dev: treasury == zero address
