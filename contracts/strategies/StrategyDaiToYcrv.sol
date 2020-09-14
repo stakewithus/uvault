@@ -12,6 +12,7 @@ import "./interfaces/ICurveFi.sol";
 import "./interfaces/Gauge.sol";
 import "./interfaces/Minter.sol";
 import "./interfaces/yERC20.sol";
+import "./interfaces/Zap.sol";
 import "../interfaces/IController.sol";
 import "../interfaces/IStrategy.sol";
 
@@ -47,6 +48,8 @@ contract StrategyDaiToYcrv is IStrategy {
     address constant private gauge = address(0xFA712EE4788C042e2B7BB55E6cb8ec569C4530c1);
     // Curve Minter
     address constant private minter = address(0xd061D61a4d941c39E5453435B6345Dc261C2fcE0);
+    // Curve Zap
+    address constant private zap = address(0xbBC81d23Ea2c3ec7e56D39296F0cbB648873a5d3);
     // CRV DAO token
     address constant private crv = address(0xD533a949740bb3306d119CC777fa900bA034cd52);
     // Curve
@@ -75,6 +78,11 @@ contract StrategyDaiToYcrv is IStrategy {
         _;
     }
 
+    modifier onlyAdminOrVault() {
+        require(msg.sender == admin || msg.sender == vault); // dev: !admin and !vault
+        _;
+    }
+
     function setAdmin(address _admin) external onlyAdmin {
         require(_admin != address(0)); // dev: admin = zero address
         admin = _admin;
@@ -99,16 +107,26 @@ contract StrategyDaiToYcrv is IStrategy {
         return dai;
     }
 
+    function _getUnderlyingPrice( uint _yCrvAmount)
+        internal view returns (uint)
+    {
+        // DAI = index 0
+        return Zap(zap).calc_withdraw_one_coin(_yCrvAmount, int128(0));
+    }
+
     function _gaugeBalance() internal view returns (uint) {
         return Gauge(gauge).balanceOf(address(this));
     }
 
-    /*
-    @notice Returns balance of token
-    @return Amount of token
-    */
     function balance() override external view returns (uint) {
-        return _gaugeBalance();
+        uint yCrvBal = IERC20(yCrv).balanceOf(address(this));
+        // balance of yCrv locked in Gauge
+        uint gaugeBal = Gauge(gauge).balanceOf(address(this));
+
+        uint daiBal = IERC20(dai).balanceOf(address(this));
+        uint daiInYCrv = _getUnderlyingPrice(yCrvBal.add(gaugeBal));
+
+        return daiBal.add(daiInYCrv);
     }
 
     /*
@@ -252,10 +270,11 @@ contract StrategyDaiToYcrv is IStrategy {
     }
 
     /*
-    @notice Withdraw all by harvesting CRV to DAI and then withdrawing all DAI
+    @notice Withdraw all DAI to vault
     */
-    function withdrawAll() override external onlyVault {
+    function withdrawAll() override external onlyAdminOrVault {
         _withdrawAll();
+        // TODO withdraw DAI to vault
     }
 
     /*
@@ -283,7 +302,7 @@ contract StrategyDaiToYcrv is IStrategy {
     /*
     @notice Exit strategy by harvesting CRV to DAI and then withdrawing all DAI
     */
-    function exit() override external onlyVault {
+    function exit() override external onlyAdminOrVault {
         _crvToDai();
         _withdrawAll();
     }
