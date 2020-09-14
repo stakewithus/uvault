@@ -37,6 +37,8 @@ def test_set_strategy(accounts, vault, erc20, mockStrategy):
 
     assert after["vault"]["strategy"] == strategy
     assert after["erc20"]["allowance"][strategy] == MAX_UINT
+    # check exit was not called
+    assert not strategy._wasExitCalled_()
 
 
 def test_set_strategy_update(accounts, vault, erc20, MockStrategy):
@@ -79,8 +81,8 @@ def test_set_strategy_update(accounts, vault, erc20, MockStrategy):
     assert after["vault"]["strategy"] == newStrategy
     assert after["erc20"]["allowance"][newStrategy] == MAX_UINT
     assert after["erc20"]["allowance"][oldStrategy] == 0
-    # check withdrawAll was called
-    assert oldStrategy._getWithdrawAmount_() == MAX_UINT
+    # check exit was called
+    assert oldStrategy._wasExitCalled_()
 
 
 def test_set_strategy_not_admin(accounts, vault):

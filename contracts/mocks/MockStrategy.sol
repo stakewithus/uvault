@@ -12,6 +12,7 @@ contract MockStrategy is IStrategy {
     uint private _balance_;
     uint private _depositAmount_;
     uint private _withdrawAmount_;
+    bool private _exitWasCalled_;
 
     constructor(address _controller, address _vault, address _underlyingToken) public {
         admin = msg.sender;
@@ -38,6 +39,10 @@ contract MockStrategy is IStrategy {
 
     function harvest() override external {}
 
+    function exit() override external {
+        _exitWasCalled_ = true;
+    }
+
     // test helpers
     function _setVault_(address _vault) external {
         vault = _vault;
@@ -57,5 +62,9 @@ contract MockStrategy is IStrategy {
 
     function _getWithdrawAmount_() external view returns (uint) {
         return _withdrawAmount_;
+    }
+
+    function _wasExitCalled_() external view returns (bool) {
+        return _exitWasCalled_;
     }
 }

@@ -22,4 +22,10 @@ interface IStrategy {
     */
     function withdrawAll() external;
     function harvest() external;
+    /*
+    @notice Exit from strategy
+    @dev Must claim and convert all assets into underlying token
+    @dev Must transfer all tokens back to vault
+    */
+    function exit() external;
 }
