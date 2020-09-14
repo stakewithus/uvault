@@ -2,11 +2,14 @@
 pragma solidity ^0.6.0;
 
 interface IStrategy {
-    function admin() external view returns(address);
-    function controller() external view returns(address);
-    function vault() external view returns(address);
-    function underlyingToken() external view returns(address);
-    function balance() external view returns(uint);
+    function admin() external view returns (address);
+    function controller() external view returns (address);
+    function vault() external view returns (address);
+    function underlyingToken() external view returns (address);
+    /*
+    @notice Returns balance of underlying token
+    */
+    function balance() external view returns (uint);
     /*
     @notice Deposit `amount` underlying token for yield token
     @param amount Amount of underlying token to deposit
