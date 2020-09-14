@@ -57,6 +57,7 @@ contract StrategyDaiToYcrv is IStrategy {
 
     address constant private uniswap = address(0x7a250d5630B4cF539739dF2C5dAcb4c659F2488D);
     address constant private weth = address(0xC02aaA39b223FE8D0A0e5C4F27eAD9083C756Cc2); // used for crv <> weth <> dai route
+    // DAI yVault
     address constant private yDai = address(0x16de59092dAE5CcF4A1E6439D611fd0653f0Bd01);
 
     constructor(address _controller, address _vault) public {
@@ -130,16 +131,9 @@ contract StrategyDaiToYcrv is IStrategy {
     }
 
     /*
-    @notice Deposit `_amount` DAI, swap to `yCrv`, deposit `yCrv` into Curve `Gauge`
-    @param _from Address to deposit DAI from
-    @param _amount Amount of DAI to deposit
-    @param _min Minimum amount of `yCrv` that must be returned
+    @notice Deposits DAI for yCRV
     */
-    function _deposit(address _from, uint _amount, uint _min) internal {
-        require(_amount > 0); // amount == 0
-
-        IERC20(dai).safeTransferFrom(_from, address(this), _amount);
-
+    function _daiToYcrv() internal {
         // DAI to yDAI
         uint256 daiBal = IERC20(dai).balanceOf(address(this));
         if (daiBal > 0) {
@@ -152,11 +146,12 @@ contract StrategyDaiToYcrv is IStrategy {
         if (yDaiBal > 0) {
             IERC20(yDai).safeApprove(curve, yDaiBal);
             // mint yCRV
+            // min slippage is set to 0
             ICurveFi(curve).add_liquidity([yDaiBal, 0, 0, 0], 0);
         }
 
+        // stake yCRV into Gauge
         uint256 yCrvBal = IERC20(yCrv).balanceOf(address(this));
-        require(yCrvBal >= _min); // dev: yCrv < min
         if (yCrvBal > 0) {
             IERC20(yCrv).safeApprove(gauge, yCrvBal);
             Gauge(gauge).deposit(yCrvBal);
@@ -164,11 +159,14 @@ contract StrategyDaiToYcrv is IStrategy {
     }
 
     function deposit(uint _amount) override external onlyVault {
-        uint _min = 0;
+        require(_amount > 0); // amount == 0
+
         // NOTE: msg.sender == vault
-        _deposit(msg.sender, _amount, _min);
+        IERC20(dai).safeTransferFrom(msg.sender, address(this), _amount);
+        _daiToYcrv();
     }
 
+    // TODO: how to handle dust?
     /*
     @notice Swap yCRV to DAI
     @param _yCrvAmount Amount of yCRV to swap to DAI
@@ -191,8 +189,6 @@ contract StrategyDaiToYcrv is IStrategy {
         );
         // NOTE: Now this contract hash DAI
     }
-
-    // TODO: how to handle dust?
 
     /*
     @notice Withdraw `_amount` of `yCrv` from Curve `Gauge`, swap for `DAI`, send `DAI` back to vault
@@ -300,7 +296,8 @@ contract StrategyDaiToYcrv is IStrategy {
                 IERC20(dai).safeTransfer(treasury, fee);
             }
 
-            _deposit(address(this), daiBal.sub(fee));
+            // deposit remaining DAI for yCRV
+            _daiToYCrv();
         }
     }
 
