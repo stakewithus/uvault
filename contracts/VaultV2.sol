@@ -11,23 +11,23 @@ import "@openzeppelin/contracts/token/ERC20/ERC20.sol";
 import "./interfaces/IStrategy.sol";
 import "./interfaces/IVault.sol";
 
-// TODO: test
-// TODO: doc
 // TODO: reentrancy lock
 // TODO circuit breaker
-// TODO: keep percentage of underlying token as reserve to save gas on withdraw
 // TODO inline safeTransfer to save gas?
 // TODO  protect agains hack by directly sending token to this contract's address
-// TODO: implement reserve to make withdraw cheap
 // TODO: safe withdraw any token in case strategy sends back wrong token
 
-contract VaultV2 is IVault, ERC20 {
+contract VaultV2 is ERC20 {
     using SafeERC20 for IERC20;
     using SafeMath for uint;
 
     address public admin;
-    address override public token;
-    address override public strategy;
+    address public token;
+    address public strategy;
+
+    // percentange of token available to be invested into strategy
+    uint public min = 9500;
+    uint public constant max = 10000;
 
     constructor(
         address _token, string memory _name, string memory _symbol
@@ -53,7 +53,31 @@ contract VaultV2 is IVault, ERC20 {
         admin = _admin;
     }
 
-    function setStrategy(address _strategy) override public onlyAdmin {
+    function setMin(uint _min) external onlyAdmin {
+        require(_min <= max); // dev:min > max
+        min = _min;
+    }
+
+    /*
+    @notice Returns amount of token available to be invested into strategy
+    @return Amount of token available to be invested into strategy
+    */
+    function _available() internal returns (uint) {
+        return ERC20(token).balanceOf(address(this)).mul(min).div(max);
+    }
+
+    /*
+    @notice Returns the total amount of tokens in vault + strategy
+    @return Total amount of tokens in vault + strategy
+    */
+    function _balance() internal returns (uint) {
+        if (address(strategy) == address(0)) {
+            return IERC20(token).balanceOf(address(this));
+        }
+        return IERC20(token).balanceOf(address(this)).add(IStrategy(strategy).balance());
+    }
+
+    function setStrategy(address _strategy) public onlyAdmin {
         require(_strategy != address(0)); // dev: strategy == zero address
         require(IStrategy(_strategy).underlyingToken() == token); // dev: strategy.token != vault.token
         require(IStrategy(_strategy).vault() == address(this)); // dev: strategy.vault != vault
@@ -62,76 +86,84 @@ contract VaultV2 is IVault, ERC20 {
         // withdraw from current strategy
         if (strategy != address(0)) {
             IERC20(token).safeApprove(strategy, 0);
-            IStrategy(strategy).exit();
+            IStrategy(strategy).withdrawAll();
         }
 
         strategy = _strategy;
         IERC20(token).safeApprove(strategy, uint256(-1));
     }
 
-    /*
-    @notice Invest token in vault into strategy
-    @param _amount Amount of token to invest
-    @param _min Min amount of yield earning tokens to return. Prevents slippage
-    */
-    function invest(uint _amount, uint _min)
-        override external onlyAdmin whenStrategyDefined
-    {
-        require(_amount > 0); // dev: amount = 0
-        // NOTE: infinite approval is set when this strategy was set
-        IStrategy(strategy).deposit(_amount, _min);
+    function _invest() internal whenStrategyDefined {
+        uint amount = _available();
+
+        if (amount > 0) {
+            // NOTE: infinite approval is set when this strategy was set
+            IStrategy(strategy).deposit(amount);
+        }
     }
 
-    function deposit(uint _amount) override external {
+    /*
+    @notice Invest token from vault into strategy.
+            Some token are kept in vault for cheap withdraw.
+    */
+    function invest() external onlyAdmin {
+        _invest();
+    }
+
+    /*
+    @notice Withdraw from strategy, fills up reserve and re-invests the rest of tokens
+    */
+    function rebalance() external onlyAdmin whenStrategyDefined {
+        IStrategy(strategy).withdrawAll();
+        _invest();
+    }
+
+    /*
+    @notice Deposit token into vault
+    @param _from Address to transfer tokens from
+    @param _amount Amount of token to transfer from `msg.sender`
+    */
+    function deposit(address _from, uint _amount) external {
         require(_amount > 0); // dev: amount == 0
+        // NOTE: no need to check if _from is zero address
 
-        _mint(msg.sender, _amount);
-        IERC20(token).safeTransferFrom(msg.sender, address(this), _amount);
+        _mint(_from, _amount);
+        IERC20(token).safeTransferFrom(_from, address(this), _amount);
     }
 
     /*
-    @notice Withdraw shares for yield token
+    @notice Withdraw shares for token
     @param _shares Amount of shares to burn
-    @param _min Minimum number of yield token to return
     */
-    function withdraw(uint _shares, uint _min)
-        override external whenStrategyDefined
-    {
+    function withdraw(uint _shares) external {
+        // NOTE: cache totalSupply before burning
         uint totalSupply = totalSupply();
         require(totalSupply > 0); // dev: total supply == 0
         require(_shares > 0); // dev: amount == 0
 
+        _burn(msg.sender, _shares);
+
         /*
-        s = sahres
+        s = shares
         T = total supply of shares
-        y = amount of yield token to return
-        Y = total amount of yield token
+        y = amount of token to withdraw
+        Y = total amount of token in vault + strategy
 
         s / T = y / Y
-
-        NOTE: value of y per s is low when there are many token in vault
-              not yet invested in strategy
         */
-        // TODO: How to handle Y = 0 when strategy is exited
-        uint amount = _shares.mul(
-            IStrategy(strategy).yieldTokenBalance()
-        ).div(totalSupply);
+        uint amountToWithdraw = _shares.mul(_balance()).div(totalSupply);
 
-        address yieldToken = IStrategy(strategy).yieldToken();
-        uint bal = IERC20(yieldToken).balanceOf(address(this));
-        if (bal < amount) {
-            // NOTE: can skip check for underflow here since bal < amount
-            IStrategy(strategy).withdraw(amount - bal, _min);
-            uint balAfter = ERC20(yieldToken).balanceOf(address(this));
+        uint bal = IERC20(token).balanceOf(address(this));
+        if (amountToWithdraw > bal) {
+            // NOTE: can skip check for underflow here since amountToWithdraw > bal
+            IStrategy(strategy).withdraw(amountToWithdraw - bal);
+            uint balAfter = ERC20(token).balanceOf(address(this));
 
-            if (balAfter < amount) {
-                amount = balAfter;
+            if (balAfter < amountToWithdraw) {
+                amountToWithdraw = balAfter;
             }
         }
 
-        require(amount >= _min); // dev: amount < min return
-
-        _burn(msg.sender, amount);
-        IERC20(yieldToken).safeTransfer(msg.sender, amount);
+        IERC20(token).safeTransfer(msg.sender, amountToWithdraw);
     }
 }
