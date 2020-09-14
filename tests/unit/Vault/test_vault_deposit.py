@@ -1,4 +1,3 @@
-
 import brownie
 from brownie.test import given, strategy
 
