@@ -176,11 +176,6 @@ def strategyDaiToYcrv(StrategyDaiToYcrv, accounts, controller):
 # Mainnet
 
 
-@pytest.fixture(scope="function")
-def yCrvPriceConverter(YcrvPriceConverter, accounts):
-    yield YcrvPriceConverter.deploy({'from': accounts[0]})
-
-
 @pytest.fixture
 def dai_holder(accounts):
     yield accounts.at(DAI_HOLDER, force=True)
