@@ -27,8 +27,8 @@ interface IStrategy {
     function harvest() external;
     /*
     @notice Exit from strategy
-    @dev Must claim and convert all assets into underlying token
-    @dev Must transfer all tokens back to vault
+    @dev Must transfer all underlying tokens back to vault
+    @dev Should transfer dust out of this contract
     */
     function exit() external;
 }
