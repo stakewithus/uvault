@@ -11,8 +11,8 @@ import "./interfaces/Uniswap.sol";
 import "./interfaces/ICurveFi.sol";
 import "./interfaces/Gauge.sol";
 import "./interfaces/Minter.sol";
+import "./interfaces/DepositY.sol";
 import "./interfaces/yERC20.sol";
-import "./interfaces/Zap.sol";
 import "../interfaces/IController.sol";
 import "../interfaces/IStrategy.sol";
 
@@ -48,8 +48,8 @@ contract StrategyDaiToYcrv is IStrategy {
     address constant private gauge = address(0xFA712EE4788C042e2B7BB55E6cb8ec569C4530c1);
     // Curve Minter
     address constant private minter = address(0xd061D61a4d941c39E5453435B6345Dc261C2fcE0);
-    // Curve Zap
-    address constant private zap = address(0xbBC81d23Ea2c3ec7e56D39296F0cbB648873a5d3);
+    // Curve DepositY
+    address constant private depositY = address(0xbBC81d23Ea2c3ec7e56D39296F0cbB648873a5d3);
     // CRV DAO token
     address constant private crv = address(0xD533a949740bb3306d119CC777fa900bA034cd52);
     // Curve
@@ -108,26 +108,22 @@ contract StrategyDaiToYcrv is IStrategy {
         return dai;
     }
 
-    function _getUnderlyingPrice( uint _yCrvAmount)
+    function _getYcrvToDai( uint _yCrvAmount)
         internal view returns (uint)
     {
         // DAI = index 0
-        return Zap(zap).calc_withdraw_one_coin(_yCrvAmount, int128(0));
+        return DepositY(depositY).calc_withdraw_one_coin(_yCrvAmount, int128(0));
     }
 
-    function _gaugeBalance() internal view returns (uint) {
-        return Gauge(gauge).balanceOf(address(this));
+    function _balance() internal view returns (uint) {
+        return _getYcrvToDai(Gauge(gauge).balanceOf(address(this)));
     }
 
+    /*
+    @notice Returns amount of DAI locked in this contract
+    */
     function balance() override external view returns (uint) {
-        uint yCrvBal = IERC20(yCrv).balanceOf(address(this));
-        // balance of yCrv locked in Gauge
-        uint gaugeBal = Gauge(gauge).balanceOf(address(this));
-
-        uint daiBal = IERC20(dai).balanceOf(address(this));
-        uint daiInYCrv = _getUnderlyingPrice(yCrvBal.add(gaugeBal));
-
-        return daiBal.add(daiInYCrv);
+        return _balance();
     }
 
     /*
@@ -166,53 +162,78 @@ contract StrategyDaiToYcrv is IStrategy {
         _daiToYcrv();
     }
 
-    // TODO: how to handle dust?
     /*
-    @notice Swap yCRV to DAI
-    @param _yCrvAmount Amount of yCRV to swap to DAI
+    @notice Get value of yDAI from DAI
+    @return value of yDAI
     */
-    function _yCrvToDai(uint _yCrvAmount) internal {
-        require(_yCrvAmount > 0); // dev: yCrv amount == 0
-
-        // use Uniswap to exchange yCrv for DAI
-        IERC20(yCrv).safeApprove(uniswap, _yCrvAmount);
-
-        // route yCrv > WETH > DAI
-        address[] memory path = new address[](3);
-        path[0] = yCrv;
-        path[1] = weth;
-        path[2] = dai;
-
-        // TODO: use 1inch?
-        Uniswap(uniswap).swapExactTokensForTokens(
-            _yCrvAmount, uint(0), path, address(this), now.add(1800)
+    function _getDaiToYdai(uint _daiAmount) internal view returns (uint) {
+        return _daiAmount
+        .mul(10 ** 18)
+        .div(
+            yERC20(yDai).getPricePerFullShare() // returns yDAI / DAI
         );
-        // NOTE: Now this contract hash DAI
     }
 
     /*
-    @notice Withdraw `_amount` of `yCrv` from Curve `Gauge`, swap for `DAI`, send `DAI` back to vault
-    @param _amount Amount of `yCrv` to withdraw
-    @param _min Minimum amount of `DAI` that must be returned
+    @notice Get value of yDAI from yCrv
+    @return value of yDAI
     */
-    function withdraw(uint _amount) override external onlyVault {
-        uint _min = 0;
-        require(_amount > 0); // dev: amount == 0
+    function _getYcrvToYdai(uint _yCrvAmount) internal view returns (uint) {
+        return _getDaiToYdai(_getYcrvToDai(_yCrvAmount));
+    }
 
-        Gauge(gauge).withdraw(_amount);
+    // TODO: how to handle dust?
+    /*
+    @notice Withdraw yCrv and convert it to DAI
+    @param _yCrvAmount Amount of yCRV to swap to DAI
+    */
+    function _yCrvToDai(uint _yCrvAmount) internal {
+        // withdraw yCrv from  Gauge
+        Gauge(gauge).withdraw(_yCrvAmount);
 
-        // transfer yCrv to treasury and vault
-        uint yCrvBal = IERC20(yCrv).balanceOf(address(this));
-        if (yCrvBal > 0) {
-            _yCrvToDai(yCrvBal);
+        // get yCrv to yDAI
+        uint yDaiAmount = _getYcrvToYdai(_yCrvAmount);
+
+        // withdraw yDAI from Curve
+        // TODO: pass min as input?
+        ICurveFi(curve).remove_liquidity_imbalance(
+            [yDaiAmount, 0, 0, 0], _yCrvAmount
+        );
+
+        // withdraw DAI from yVault
+        uint yDaiBal = IERC20(yDai).balanceOf(address(this));
+        if (yDaiBal > 0) {
+            yERC20(yDai).withdraw(yDaiBal);
         }
+        // Now we have DAI
+    }
+
+    /*
+    @notice Withdraw `_daiAmount` of `DAI`
+    @param _daiAmount Amount of `DAI` to withdraw
+    */
+    function withdraw(uint _daiAmount) override external onlyVault {
+        require(_daiAmount > 0); // dev: amount == 0
+
+        // get yCrv amount to withdraw from DAI
+        /*
+        d = amount of DAI to withdraw
+        D = total DAI in redeemable from total yCrv in Gauge
+        y = amount of yCrv to withdraw
+        Y = total amount of yCrv in Gauge
+
+        d / D = y / Y
+        y = d / D * Y
+        */
+        uint gaugeBal = IERC20(gauge).balanceOf(address(this));
+        uint yCrvAmount = _daiAmount.mul(_balance()).div(gaugeBal);
+
+        _yCrvToDai(yCrvAmount);
 
         // transfer DAI to treasury and vault
         uint daiBal = IERC20(dai).balanceOf(address(this));
         // TODO remove withdrawal fee?
         if (daiBal > 0) {
-            // check slippage
-            require(daiBal >= _min); // dev: yCrv amount < min
             // transfer fee to treasury
             uint fee = daiBal.mul(withdrawFee).div(withdrawFeeMax);
             if (fee > 0) {
@@ -225,6 +246,28 @@ contract StrategyDaiToYcrv is IStrategy {
             // transfer rest to vault
             IERC20(dai).safeTransfer(msg.sender, daiBal.sub(fee));
         }
+    }
+
+    function _withdrawAll() internal {
+        // gauge balance is same unit as yCrv
+        uint gaugeBal = IERC20(gauge).balanceOf(address(this));
+        if (gaugeBal > 0) {
+            _yCrvToDai(gaugeBal);
+        }
+
+        uint daiBal = IERC20(dai).balanceOf(address(this));
+        if (daiBal > 0) {
+            IERC20(dai).safeTransfer(vault, daiBal);
+        }
+    }
+
+    /*
+    @notice Withdraw all DAI to vault
+    @dev Must allow admin to withdraw to vault
+    @dev This function does not claim CRV
+    */
+    function withdrawAll() override external onlyAdminOrVault {
+        _withdrawAll();
     }
 
     /*
@@ -252,33 +295,6 @@ contract StrategyDaiToYcrv is IStrategy {
         }
     }
 
-    function _withdrawAll() internal {
-        // yCrv locked in Gauge
-        uint gaugeBal = _gaugeBalance();
-        if (gaugeBal > 0) {
-            Gauge(gauge).withdraw(gaugeBal);
-        }
-
-        uint256 yCrvBal = IERC20(yCrv).balanceOf(address(this));
-        if (yCrvBal > 0) {
-            // TODO use Curve to get dai from yCrv
-            _yCrvToDai(yCrvBal);
-        }
-
-        uint daiBal = IERC20(dai).balanceOf(address(this));
-        if (daiBal > 0) {
-            IERC20(dai).safeTransfer(vault, daiBal);
-        }
-    }
-
-    /*
-    @notice Withdraw all DAI to vault
-    @dev Must allow admin to withdraw to vault
-    */
-    function withdrawAll() override external onlyAdminOrVault {
-        _withdrawAll();
-    }
-
     /*
     @notice Claim CRV, swap for DAI, transfer performance fee to treasury, deposit remaning DAI
     */
@@ -297,7 +313,7 @@ contract StrategyDaiToYcrv is IStrategy {
             }
 
             // deposit remaining DAI for yCRV
-            _daiToYCrv();
+            _daiToYcrv();
         }
     }
 
