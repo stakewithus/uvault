@@ -38,7 +38,7 @@ def test_withdraw(
     def get_snapshot():
         snapshot = {
             "strategy": {
-                "balance": strategy.balance()
+                "underlyingBalance": strategy.underlyingBalance()
             },
             "dai": {},
             "yDai": {},
@@ -57,7 +57,7 @@ def test_withdraw(
 
     # withdraw amount may be < deposit amount
     # so here we get the maximum redeemable amount
-    withdraw_amount = strategy.balance()
+    withdraw_amount = strategy.underlyingBalance()
 
     before = get_snapshot()
     strategy.withdraw(withdraw_amount,  {'from': vault})
@@ -75,9 +75,9 @@ def test_withdraw(
     print(
         "strategy (DAI calculated from yCrv in Gauge)",
         "\n",
-        before["strategy"]["balance"],
+        before["strategy"]["underlyingBalance"],
         "\n",
-        after["strategy"]["balance"],
+        after["strategy"]["underlyingBalance"],
         "\n"
     )
     print(

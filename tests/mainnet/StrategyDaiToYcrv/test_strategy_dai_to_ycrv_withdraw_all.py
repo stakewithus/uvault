@@ -31,7 +31,7 @@ def test_withdraw_all(
     def get_snapshot():
         snapshot = {
             "strategy": {
-                "balance": strategy.balance()
+                "underlyingBalance": strategy.underlyingBalance()
             },
             "dai": {},
             "gauge": {},
@@ -71,9 +71,9 @@ def test_withdraw_all(
     print(
         "strategy (DAI calculated from yCrv in Gauge)",
         "\n",
-        before["strategy"]["balance"],
+        before["strategy"]["underlyingBalance"],
         "\n",
-        after["strategy"]["balance"],
+        after["strategy"]["underlyingBalance"],
         "\n",
     )
     print(

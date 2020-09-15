@@ -27,7 +27,7 @@ def test_deposit(accounts, strategyDaiToYcrv, dai, dai_holder, gauge):
     def get_snapshot():
         snapshot = {
             "strategy": {
-                "balance": strategy.balance()
+                "underlyingBalance": strategy.underlyingBalance()
             },
             "dai": {},
             "gauge": {}
@@ -63,9 +63,9 @@ def test_deposit(accounts, strategyDaiToYcrv, dai, dai_holder, gauge):
     print(
         "strategy (DAI calculated from yCrv in Gauge)",
         "\n",
-        before["strategy"]["balance"],
+        before["strategy"]["underlyingBalance"],
         "\n",
-        after["strategy"]["balance"],
+        after["strategy"]["underlyingBalance"],
         "\n",
     )
     print(
@@ -88,7 +88,8 @@ def test_deposit(accounts, strategyDaiToYcrv, dai, dai_holder, gauge):
     min_ycrv = amount * 0.97
 
     ycrv_diff = after["gauge"][strategy] - before["gauge"][strategy]
-    dai_diff = after["strategy"]["balance"] - before["strategy"]["balance"]
+    dai_diff = after["strategy"]["underlyingBalance"] - \
+        before["strategy"]["underlyingBalance"]
 
     assert after["dai"][vault] == before["dai"][vault] - amount
     assert dai_diff >= min_redeemable_dai
