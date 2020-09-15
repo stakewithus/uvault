@@ -107,6 +107,6 @@ def test_withdraw_all(
     assert after["dai"][vault] >= min_redeemed_dai
     # check strategy is empty
     assert after["dai"][strategy] == 0
-    assert after["gauge"][strategy] == 0
-    assert after["yCrv"][strategy] <= 1 * 10 ** 18  # less than 1 DAI
+    assert after["gauge"][strategy] <= 10 * 10 ** 18  # dust yCrv < 1 DAI
+    assert after["yCrv"][strategy] == 0
     assert after["yDai"][strategy] == 0
