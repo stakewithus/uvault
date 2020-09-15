@@ -21,7 +21,7 @@ contract MockStrategy is IStrategy {
         underlyingToken = _underlyingToken;
     }
 
-    function balance() override external view returns (uint) {
+    function underlyingBalance() override external view returns (uint) {
         return _balance_;
     }
 

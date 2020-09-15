@@ -9,7 +9,7 @@ interface IStrategy {
     /*
     @notice Returns balance of underlying token
     */
-    function balance() external view returns (uint);
+    function underlyingBalance() external view returns (uint);
     /*
     @notice Deposit `amount` underlying token for yield token
     @param amount Amount of underlying token to deposit

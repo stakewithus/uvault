@@ -88,7 +88,7 @@ contract Vault is ERC20, IVault {
         if (address(strategy) == address(0)) {
             return _balanceInVault();
         }
-        return _balanceInVault().add(IStrategy(strategy).balance());
+        return _balanceInVault().add(IStrategy(strategy).underlyingBalance());
     }
 
     /*
