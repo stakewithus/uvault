@@ -184,7 +184,6 @@ contract StrategyDaiToYcrv is IStrategy {
         return _getDaiToYdai(_getYcrvToDai(_yCrvAmount));
     }
 
-    // TODO: how to handle dust?
     /*
     @notice Withdraw yCrv and convert it to DAI
     @param _yCrvAmount Amount of yCRV to swap to DAI
@@ -202,9 +201,6 @@ contract StrategyDaiToYcrv is IStrategy {
         ICurveFi(curve).remove_liquidity_imbalance(
             [yDaiAmount, 0, 0, 0], _yCrvAmount
         );
-        // removing liquidity creates yCrv dust
-        // this dust can be checked by
-        // IERC20(yCrv).balanceOf(address(this))
 
         // withdraw DAI from yVault
         uint yDaiBal = IERC20(yDai).balanceOf(address(this));
@@ -215,16 +211,30 @@ contract StrategyDaiToYcrv is IStrategy {
     }
 
     /*
+    @notice Deposit yCrv dust created from `_yCrvToDai` into Gauge
+    */
+    function _depositYcrvDust() internal {
+        // deposit dust into Gauge
+        uint yCrvBal = IERC20(yCrv).balanceOf(address(this));
+        if (yCrvBal > 0) {
+            IERC20(yCrv).safeApprove(gauge, yCrvBal);
+            Gauge(gauge).deposit(yCrvBal);
+        }
+    }
+
+    /*
     @notice Withdraw `_daiAmount` of `DAI`
     @param _daiAmount Amount of `DAI` to withdraw
     */
     function withdraw(uint _daiAmount) override external onlyVault {
         require(_daiAmount > 0); // dev: amount == 0
+        uint totalDai = _balance();
+        require(_daiAmount <= totalDai); // dev: dai > total redeemable dai
 
         // get yCrv amount to withdraw from DAI
         /*
         d = amount of DAI to withdraw
-        D = total DAI in redeemable from total yCrv in Gauge
+        D = total DAI redeemable from yCrv in Gauge
         y = amount of yCrv to withdraw
         Y = total amount of yCrv in Gauge
 
@@ -232,9 +242,11 @@ contract StrategyDaiToYcrv is IStrategy {
         y = d / D * Y
         */
         uint gaugeBal = Gauge(gauge).balanceOf(address(this));
-        uint yCrvAmount = _daiAmount.mul(_balance()).div(gaugeBal);
+        uint yCrvAmount = _daiAmount.mul(gaugeBal).div(totalDai);
 
         _yCrvToDai(yCrvAmount);
+        _depositYcrvDust();
+
 
         // transfer DAI to treasury and vault
         uint daiBal = IERC20(dai).balanceOf(address(this));
@@ -274,6 +286,7 @@ contract StrategyDaiToYcrv is IStrategy {
     */
     function withdrawAll() override external onlyAdminOrVault {
         _withdrawAll();
+        _depositYcrvDust();
     }
 
     /*
