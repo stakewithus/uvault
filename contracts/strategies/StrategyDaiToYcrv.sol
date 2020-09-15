@@ -324,11 +324,25 @@ contract StrategyDaiToYcrv is IStrategy {
     }
 
     /*
+    @notice Transfer dust to treasury
+    */
+    function _clean() internal {
+        uint yCrvBal = IERC20(yCrv).balanceOf(address(this));
+        if (yCrvBal > 0) {
+            address treasury = IController(controller).treasury();
+            require(treasury != address(0)); // dev: treasury == zero address
+
+            IERC20(yCrv).safeTransfer(treasury, yCrvBal);
+        }
+    }
+
+    /*
     @notice Exit strategy by harvesting CRV to DAI and then withdrawing all DAI to vault
     @dev Must return all DAI to vault
     */
     function exit() override external onlyAdminOrVault {
         _crvToDai();
         _withdrawAll();
+        _clean();
     }
 }
