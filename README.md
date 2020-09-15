@@ -57,7 +57,7 @@ ganache-cli \
 --networkId 1
 
 # test on mainnet and print all logs
-brownie test --network mainnet-fork -- -s
+brownie test --network mainnet-fork -s
 ```
 
 ### Scripts
