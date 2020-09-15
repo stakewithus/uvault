@@ -11,16 +11,16 @@ def test_exit(
     minter, crv,
     Controller
 ):
+    strategy = strategyDaiToYcrv
+
     admin = accounts[0]
-    controller = strategyDaiToYcrv.controller()
+    controller = strategy.controller()
     # NOTE: cast to string to fix error
     #       TypeError: unhashable type: 'EthAddress'
     treasury = str(Controller.at(controller).treasury())
     vault = accounts[2]
 
     deposit_amount = 10 * 10 ** 18
-    # allow 3% splippage
-    deposit_min_return = deposit_amount * 0.97
 
     # check dai balance
     dai_holder_bal = dai.balanceOf(dai_holder)
@@ -33,17 +33,15 @@ def test_exit(
     ) >= deposit_amount, "vault dai balance < deposit amount"
 
     # approve strategy to transfer from vault to strategy
-    dai.approve(strategyDaiToYcrv, deposit_amount, {'from': vault})
+    dai.approve(strategy, deposit_amount, {'from': vault})
 
     # deposit into strategy
-    strategyDaiToYcrv.deposit(
-        deposit_amount, deposit_min_return, {'from': vault}
-    )
+    strategy.deposit(deposit_amount, {'from': vault})
 
     def get_snapshot():
         snapshot = {
             "strategy": {
-                "totalUnderlying": strategyDaiToYcrv.totalUnderlying()
+                "underlyingBalance": strategy.underlyingBalance()
             },
             "dai": {},
             "yDai": {},
@@ -54,55 +52,61 @@ def test_exit(
 
         snapshot["dai"][vault] = dai.balanceOf(vault)
         snapshot["dai"][treasury] = dai.balanceOf(treasury)
-        snapshot["dai"][strategyDaiToYcrv] = dai.balanceOf(
-            strategyDaiToYcrv
-        )
-        snapshot["yDai"][strategyDaiToYcrv] = yDai.balanceOf(
-            strategyDaiToYcrv
-        )
-        snapshot["yCrv"][strategyDaiToYcrv] = yCrv.balanceOf(
-            strategyDaiToYcrv
-        )
-        snapshot["gauge"][strategyDaiToYcrv] = gauge.balanceOf(
-            strategyDaiToYcrv
-        )
-        snapshot["crv"][strategyDaiToYcrv] = crv.balanceOf(
-            strategyDaiToYcrv
-        )
+        snapshot["dai"][strategy] = dai.balanceOf(strategy)
+        snapshot["yDai"][strategy] = yDai.balanceOf(strategy)
+        snapshot["yCrv"][strategy] = yCrv.balanceOf(strategy)
+        snapshot["gauge"][strategy] = gauge.balanceOf(strategy)
+        snapshot["crv"][strategy] = crv.balanceOf(strategy)
 
         return snapshot
 
     before = get_snapshot()
-    strategyDaiToYcrv.exit({'from': vault})
+    strategy.exit({'from': vault})
     after = get_snapshot()
 
     # debug
     print(
-        "crv - strategy",
+        "strategy (CRV)",
         "\n",
-        before["crv"][strategyDaiToYcrv],
+        before["crv"][strategy],
         "\n",
-        after["crv"][strategyDaiToYcrv],
+        after["crv"][strategy],
         "\n",
     )
     print(
-        "gauge - strategy",
+        "gauge (yCrv)",
         "\n",
-        before["gauge"][strategyDaiToYcrv],
+        before["gauge"][strategy],
         "\n",
-        after["gauge"][strategyDaiToYcrv],
+        after["gauge"][strategy],
         "\n"
     )
     print(
-        "dai- strategy",
+        "strategy (yCrv)",
         "\n",
-        before["dai"][strategyDaiToYcrv],
+        before["yCrv"][strategy],
         "\n",
-        after["dai"][strategyDaiToYcrv],
+        after["yCrv"][strategy],
+        "\n"
+    )
+    print(
+        "strategy (yDai)",
+        "\n",
+        before["yDai"][strategy],
+        "\n",
+        after["yDai"][strategy],
         "\n",
     )
     print(
-        "dai - vault",
+        "strategy (DAI)",
+        "\n",
+        before["dai"][strategy],
+        "\n",
+        after["dai"][strategy],
+        "\n",
+    )
+    print(
+        "vault (DAI)",
         "\n",
         before["dai"][vault],
         "\n",
@@ -111,12 +115,13 @@ def test_exit(
     )
 
     # check strategy state
-    assert after["strategy"]["totalUnderlying"] == 0
+    assert after["strategy"]["underlyingBalance"] <= 1  # dust
 
-    # check strategy balances
-    assert after["crv"][strategyDaiToYcrv] == 0
-    assert after["yCrv"][strategyDaiToYcrv] == 0
-    assert after["dai"][strategyDaiToYcrv] == 0
+    # # check strategy balances
+    assert after["crv"][strategy] == 0
+    assert after["yCrv"][strategy] == 0
+    assert after["yDai"][strategy] == 0
+    assert after["dai"][strategy] == 0
 
     # check vault balance
     assert after["dai"][vault] >= before["dai"][vault]

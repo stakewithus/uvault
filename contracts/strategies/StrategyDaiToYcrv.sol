@@ -355,7 +355,7 @@ contract StrategyDaiToYcrv is IStrategy {
     */
     function exit() override external onlyAdminOrVault {
         _crvToDai();
-        // _withdrawAll();
-        // _clean();
+        _withdrawAll();
+        _clean();
     }
 }
