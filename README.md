@@ -56,7 +56,8 @@ ganache-cli \
 --unlock $DAI_HOLDER \
 --networkId 1
 
-brownie test -s --network mainnet-fork
+# test on mainnet and print all logs
+brownie test --network mainnet-fork -- -s
 ```
 
 ### Scripts
