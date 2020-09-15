@@ -108,9 +108,11 @@ contract StrategyDaiToYcrv is IStrategy {
         return dai;
     }
 
-    function _getYcrvToDai( uint _yCrvAmount)
-        internal view returns (uint)
-    {
+    /*
+    @notice Get amout of DAI from yCrv
+    @param _yCrvAmount Amount of yCrv to convert to DAI
+    */
+    function _getYcrvToDai( uint _yCrvAmount) internal view returns (uint) {
         // DAI = index 0
         return DepositY(depositY).calc_withdraw_one_coin(_yCrvAmount, int128(0));
     }
