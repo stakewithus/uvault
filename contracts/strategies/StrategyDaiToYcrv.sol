@@ -7,12 +7,12 @@ import "@openzeppelin/contracts/token/ERC20/SafeERC20.sol";
 import "@openzeppelin/contracts/math/Math.sol";
 import "@openzeppelin/contracts/math/SafeMath.sol";
 
-import "./interfaces/Uniswap.sol";
-import "./interfaces/ICurveFi.sol";
-import "./interfaces/Gauge.sol";
-import "./interfaces/Minter.sol";
-import "./interfaces/DepositY.sol";
-import "./interfaces/yERC20.sol";
+import "../../interfaces/uniswap/Uniswap.sol";
+import "../../interfaces/curve/ICurveFi.sol";
+import "../../interfaces/curve/Gauge.sol";
+import "../../interfaces/curve/Minter.sol";
+import "../../interfaces/curve/DepositY.sol";
+import "../../interfaces/yearn/yERC20.sol";
 import "../interfaces/IController.sol";
 import "../interfaces/IStrategy.sol";
 
