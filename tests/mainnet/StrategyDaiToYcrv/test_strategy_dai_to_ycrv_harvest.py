@@ -11,16 +11,16 @@ def test_harvest(
     minter, crv,
     Controller
 ):
+    strategy = strategyDaiToYcrv
+
     admin = accounts[0]
-    controller = strategyDaiToYcrv.controller()
+    controller = strategy.controller()
     # NOTE: cast to string to fix error
     #       TypeError: unhashable type: 'EthAddress'
     treasury = str(Controller.at(controller).treasury())
     vault = accounts[2]
 
     deposit_amount = 10 * 10 ** 18
-    # allow 3% splippage
-    deposit_min_return = deposit_amount * 0.97
 
     # check dai balance
     dai_holder_bal = dai.balanceOf(dai_holder)
@@ -33,17 +33,15 @@ def test_harvest(
     ) >= deposit_amount, "vault dai balance < deposit amount"
 
     # approve strategy to transfer from vault to strategy
-    dai.approve(strategyDaiToYcrv, deposit_amount, {'from': vault})
+    dai.approve(strategy, deposit_amount, {'from': vault})
 
     # deposit into strategy
-    strategyDaiToYcrv.deposit(
-        deposit_amount, deposit_min_return, {'from': vault}
-    )
+    strategy.deposit(deposit_amount, {'from': vault})
 
     def get_snapshot():
         snapshot = {
             "strategy": {
-                "totalUnderlying": strategyDaiToYcrv.totalUnderlying()
+                "underlyingBalance": strategy.underlyingBalance()
             },
             "dai": {},
             "yDai": {},
@@ -54,71 +52,60 @@ def test_harvest(
 
         snapshot["dai"][vault] = dai.balanceOf(vault)
         snapshot["dai"][treasury] = dai.balanceOf(treasury)
-        snapshot["dai"][strategyDaiToYcrv] = dai.balanceOf(
-            strategyDaiToYcrv
-        )
-        snapshot["yDai"][strategyDaiToYcrv] = yDai.balanceOf(
-            strategyDaiToYcrv
-        )
-        snapshot["yCrv"][strategyDaiToYcrv] = yCrv.balanceOf(
-            strategyDaiToYcrv
-        )
-        snapshot["gauge"][strategyDaiToYcrv] = gauge.balanceOf(
-            strategyDaiToYcrv
-        )
-        snapshot["crv"][strategyDaiToYcrv] = crv.balanceOf(
-            strategyDaiToYcrv
-        )
+        snapshot["dai"][strategy] = dai.balanceOf(strategy)
+        snapshot["yDai"][strategy] = yDai.balanceOf(strategy)
+        snapshot["yCrv"][strategy] = yCrv.balanceOf(strategy)
+        snapshot["gauge"][strategy] = gauge.balanceOf(strategy)
+        snapshot["crv"][strategy] = crv.balanceOf(strategy)
 
         return snapshot
 
     before = get_snapshot()
-    strategyDaiToYcrv.harvest({'from': admin})
+    strategy.harvest({'from': admin})
     after = get_snapshot()
 
     print(
-        "crv - strategy",
+        "strategy (CRV)",
         "\n",
-        before["crv"][strategyDaiToYcrv],
+        before["crv"][strategy],
         "\n",
-        after["crv"][strategyDaiToYcrv],
-        "\n",
-    )
-    print(
-        "dai- strategy",
-        "\n",
-        before["dai"][strategyDaiToYcrv],
-        "\n",
-        after["dai"][strategyDaiToYcrv],
+        after["crv"][strategy],
         "\n",
     )
     print(
-        "dai - treasury",
+        "strategy (DAI)",
+        "\n",
+        before["dai"][strategy],
+        "\n",
+        after["dai"][strategy],
+        "\n",
+    )
+    print(
+        "treasury (DAI)",
         "\n",
         before["dai"][treasury],
         "\n",
         after["dai"][treasury],
         "\n",
     )
-
+    print(
+        "gauge (yCrv)",
+        "\n",
+        before["gauge"][strategy],
+        "\n",
+        after["gauge"][strategy],
+        "\n",
+    )
     # growth of yCrv amount
     growth = float(
-        after["gauge"][strategyDaiToYcrv] - before["gauge"][strategyDaiToYcrv]
-    ) / before["gauge"][strategyDaiToYcrv]
-    print(
-        "gauge - strategy",
-        "\n",
-        before["gauge"][strategyDaiToYcrv],
-        "\n",
-        after["gauge"][strategyDaiToYcrv],
-        "\n",
-        f' growth: {growth}'
-        "\n"
-    )
+        after["gauge"][strategy] - before["gauge"][strategy]
+    ) / before["gauge"][strategy]
+
+    print(f'yCrv growth: {growth}')
 
     # check dai performance fee to treasury
     assert after["dai"][treasury] >= before["dai"][treasury]
 
     # check crv and yCrv in strategy
-    assert after["crv"][strategyDaiToYcrv] >= before["crv"][strategyDaiToYcrv]
-    assert after["gauge"][strategyDaiToYcrv] >= before["gauge"][strategyDaiToYcrv]
+    assert after["crv"][strategy] >= before["crv"][strategy]
+    assert after["gauge"][strategy] >= before["gauge"][strategy]
