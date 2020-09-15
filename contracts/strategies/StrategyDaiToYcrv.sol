@@ -188,6 +188,7 @@ contract StrategyDaiToYcrv is IStrategy {
     /*
     @notice Withdraw yCrv and convert it to DAI
     @param _yCrvAmount Amount of yCRV to swap to DAI
+    @dev Creates yCrv dust that are too small to convert to yDai
     */
     function _yCrvToDai(uint _yCrvAmount) internal {
         // withdraw yCrv from  Gauge
@@ -201,6 +202,9 @@ contract StrategyDaiToYcrv is IStrategy {
         ICurveFi(curve).remove_liquidity_imbalance(
             [yDaiAmount, 0, 0, 0], _yCrvAmount
         );
+        // removing liquidity creates yCrv dust
+        // this dust can be checked by
+        // IERC20(yCrv).balanceOf(address(this))
 
         // withdraw DAI from yVault
         uint yDaiBal = IERC20(yDai).balanceOf(address(this));
@@ -227,7 +231,7 @@ contract StrategyDaiToYcrv is IStrategy {
         d / D = y / Y
         y = d / D * Y
         */
-        uint gaugeBal = IERC20(gauge).balanceOf(address(this));
+        uint gaugeBal = Gauge(gauge).balanceOf(address(this));
         uint yCrvAmount = _daiAmount.mul(_balance()).div(gaugeBal);
 
         _yCrvToDai(yCrvAmount);
@@ -252,7 +256,7 @@ contract StrategyDaiToYcrv is IStrategy {
 
     function _withdrawAll() internal {
         // gauge balance is same unit as yCrv
-        uint gaugeBal = IERC20(gauge).balanceOf(address(this));
+        uint gaugeBal = Gauge(gauge).balanceOf(address(this));
         if (gaugeBal > 0) {
             _yCrvToDai(gaugeBal);
         }
