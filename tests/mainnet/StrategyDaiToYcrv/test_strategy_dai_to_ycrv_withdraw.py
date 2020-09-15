@@ -4,11 +4,13 @@ from brownie import Contract
 ZERO_ADDRESS = "0x0000000000000000000000000000000000000000"
 
 
-# NOTE: need to restart ganache after every test due to following error
-#       revert: UniswapV2: LOCKED
-def test_withdraw(accounts, strategyDaiToYcrv, dai, dai_holder, gauge, yCrv, yDai, Controller):
+def test_withdraw(
+    accounts, strategyDaiToYcrv, dai, dai_holder, gauge, yCrv, yDai, Controller
+):
+    strategy = strategyDaiToYcrv
+
     admin = accounts[0]
-    controller = strategyDaiToYcrv.controller()
+    controller = strategy.controller()
     # NOTE: cast to string to fix error
     #       TypeError: unhashable type: 'EthAddress'
     treasury = str(Controller.at(controller).treasury())
@@ -16,11 +18,6 @@ def test_withdraw(accounts, strategyDaiToYcrv, dai, dai_holder, gauge, yCrv, yDa
     vault = accounts[2]
 
     deposit_amount = 10 * 10 ** 18
-    # allow 3% splippage
-    deposit_min_return = deposit_amount * 0.97
-
-    withdraw_amount = 10 * 10 ** 18
-    withdraw_min_return = withdraw_amount * 0.97
 
     # check dai balance
     dai_holder_bal = dai.balanceOf(dai_holder)
@@ -33,17 +30,15 @@ def test_withdraw(accounts, strategyDaiToYcrv, dai, dai_holder, gauge, yCrv, yDa
     ) >= deposit_amount, "vault dai balance < deposit amount"
 
     # approve strategy to transfer from vault to strategy
-    dai.approve(strategyDaiToYcrv, deposit_amount, {'from': vault})
+    dai.approve(strategy, deposit_amount, {'from': vault})
 
     # deposit into strategy
-    strategyDaiToYcrv.deposit(
-        deposit_amount, deposit_min_return, {'from': vault}
-    )
+    strategy.deposit(deposit_amount,  {'from': vault})
 
     def get_snapshot():
         snapshot = {
             "strategy": {
-                "totalUnderlying": strategyDaiToYcrv.totalUnderlying()
+                "balance": strategy.balance()
             },
             "dai": {},
             "yDai": {},
@@ -53,113 +48,88 @@ def test_withdraw(accounts, strategyDaiToYcrv, dai, dai_holder, gauge, yCrv, yDa
 
         snapshot["dai"][vault] = dai.balanceOf(vault)
         snapshot["dai"][treasury] = dai.balanceOf(treasury)
-        snapshot["dai"][strategyDaiToYcrv] = dai.balanceOf(
-            strategyDaiToYcrv
-        )
-        snapshot["yDai"][strategyDaiToYcrv] = yDai.balanceOf(
-            strategyDaiToYcrv
-        )
-        snapshot["yCrv"][strategyDaiToYcrv] = yCrv.balanceOf(
-            strategyDaiToYcrv
-        )
-        snapshot["gauge"][strategyDaiToYcrv] = gauge.balanceOf(
-            strategyDaiToYcrv
-        )
+        snapshot["dai"][strategy] = dai.balanceOf(strategy)
+        snapshot["yDai"][strategy] = yDai.balanceOf(strategy)
+        snapshot["yCrv"][strategy] = yCrv.balanceOf(strategy)
+        snapshot["gauge"][strategy] = gauge.balanceOf(strategy)
 
         return snapshot
 
+    # withdraw amount may be < deposit amount
+    # so here we get the maximum redeemable amount
+    withdraw_amount = strategy.balance()
+
     before = get_snapshot()
-
-    strategyDaiToYcrv.withdraw(
-        withdraw_amount, withdraw_min_return, {'from': vault}
-    )
-
+    strategy.withdraw(withdraw_amount,  {'from': vault})
     after = get_snapshot()
 
     # debug
     print(
-        "total underlying"
+        "gauge (yCrv)",
         "\n",
-        before["strategy"]["totalUnderlying"],
+        before["gauge"][strategy],
         "\n",
-        after["strategy"]["totalUnderlying"],
-        "\n")
-    print(
-        "gauge - strategy",
+        after["gauge"][strategy],
         "\n",
-        before["gauge"][strategyDaiToYcrv],
-        "\n",
-        after["gauge"][strategyDaiToYcrv],
-        "\n",
-        (after["gauge"][strategyDaiToYcrv] - before["gauge"]
-         [strategyDaiToYcrv]) / withdraw_amount
     )
     print(
-        "yCrv - strategy",
+        "strategy (DAI calculated from yCrv in Gauge)",
         "\n",
-        before["yCrv"][strategyDaiToYcrv],
+        before["strategy"]["balance"],
         "\n",
-        after["yCrv"][strategyDaiToYcrv],
-        "\n",
-        (after["yCrv"][strategyDaiToYcrv] - before["yCrv"]
-         [strategyDaiToYcrv]) / withdraw_amount
+        after["strategy"]["balance"],
+        "\n"
     )
     print(
-        "yDai - strategy",
+        "strategy (yCrv)",
         "\n",
-        before["yDai"][strategyDaiToYcrv],
+        before["yCrv"][strategy],
         "\n",
-        after["yDai"][strategyDaiToYcrv],
+        after["yCrv"][strategy],
         "\n",
-        (after["yDai"][strategyDaiToYcrv] - before["yDai"]
-         [strategyDaiToYcrv]) / withdraw_amount
     )
     print(
-        "dai - strategy",
+        "strategy (yDai)",
         "\n",
-        before["dai"][strategyDaiToYcrv],
+        before["yDai"][strategy],
         "\n",
-        after["dai"][strategyDaiToYcrv],
+        after["yDai"][strategy],
         "\n",
-        (after["dai"][strategyDaiToYcrv] - before["dai"]
-         [strategyDaiToYcrv]) / withdraw_amount
     )
     print(
-        "dai - vault",
+        "strategy (DAI)",
+        "\n",
+        before["dai"][strategy],
+        "\n",
+        after["dai"][strategy],
+        "\n"
+    )
+    print(
+        "vault (DAI)",
         "\n",
         before["dai"][vault],
         "\n",
         after["dai"][vault],
-        "\n",
-        (after["dai"][vault] - before["dai"][vault]) / withdraw_amount
+        "\n"
     )
     print(
-        "dai - treasury",
+        "treasury (DAI)",
         "\n",
         before["dai"][treasury],
         "\n",
         after["dai"][treasury],
         "\n",
-        (after["dai"][treasury] - before["dai"][treasury]) / withdraw_amount
     )
+
+    # minimum amount of DAI to withdraw
+    min_dai = deposit_amount * 0.99
 
     # check balance of DAI transferred to treasury and vault
     fee = after["dai"][treasury] - before["dai"][treasury]
     returned_amount = after["dai"][vault] - before["dai"][vault]
 
     assert fee >= 0
-    assert returned_amount + fee >= withdraw_min_return
+    assert returned_amount >= min_dai
 
-    # check strategy underlying amount
-    assert after["strategy"]["totalUnderlying"] == before["strategy"]["totalUnderlying"] - withdraw_amount
-
-    # check withdraw of yCrv from gauge
-    exchange_rate = float(before["gauge"][strategyDaiToYcrv]) / \
-        before["strategy"]["totalUnderlying"]
-    yCrv_amount = int(exchange_rate * withdraw_amount)
-
-    delta = 1000  # acceptable rounding error
-    assert abs(
-        (before["gauge"][strategyDaiToYcrv] - after["gauge"][strategyDaiToYcrv]) -
-        yCrv_amount
-    ) <= delta
+    # check yCrv dust is redeposited into Gauge
+    assert after["yCrv"][strategy] == 0
