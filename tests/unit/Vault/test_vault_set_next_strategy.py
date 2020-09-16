@@ -28,6 +28,7 @@ def test_set_next_strategy(accounts, Vault, erc20, mockStrategy):
     tx = vault.setNextStrategy(nextStrategy, {'from': admin})
     after = get_snapshot()
 
+    assert tx.events["SetNextStrategy"].values() == [nextStrategy]
     assert after["vault"]["nextStrategy"] == nextStrategy
     assert after["vault"]["timeLock"] == tx.timestamp + minWaitTime
 

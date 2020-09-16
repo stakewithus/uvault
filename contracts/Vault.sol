@@ -22,6 +22,9 @@ contract Vault is ERC20, IVault {
     using SafeERC20 for IERC20;
     using SafeMath for uint;
 
+    event SetNextStrategy(address nextStrategy);
+    event SwitchStrategy(address newStrategy);
+
     address override public admin;
     address override public token;
     address override public strategy;
@@ -121,6 +124,8 @@ contract Vault is ERC20, IVault {
 
         nextStrategy = _strategy;
         timeLock = block.timestamp.add(minWaitTime);
+
+        emit SetNextStrategy(_strategy);
     }
 
     /*
@@ -139,6 +144,8 @@ contract Vault is ERC20, IVault {
 
         strategy = nextStrategy;
         IERC20(token).safeApprove(strategy, uint256(-1));
+
+        emit SwitchStrategy(strategy);
     }
 
     /*

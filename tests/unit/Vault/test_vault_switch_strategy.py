@@ -38,6 +38,7 @@ def test_switch_strategy_new(accounts, vault, erc20, mockStrategy):
     tx = vault.switchStrategy({'from': admin})
     after = get_snapshot()
 
+    assert tx.events["SwitchStrategy"].values() == [strategy]
     assert after["vault"]["strategy"] == strategy
     assert after["erc20"]["allowance"][strategy] == MAX_UINT
     # check exit was not called
