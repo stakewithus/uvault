@@ -124,6 +124,24 @@ contract Vault is ERC20, IVault {
     }
 
     /*
+    @notice Switch strategy
+    @dev Only admin is allowed to call
+    @dev Must withdraw all tokens from current strategy
+    */
+    function switchStrategy() external onlyAdmin {
+        require(block.timestamp >= timeLock); // dev: timestamp < time lock
+
+        // withdraw from current strategy
+        if (strategy != address(0)) {
+            IERC20(token).safeApprove(strategy, 0);
+            IStrategy(strategy).exit();
+        }
+
+        strategy = nextStrategy;
+        IERC20(token).safeApprove(strategy, uint256(-1));
+    }
+
+    /*
     @notice Set strategy
     @param _strategy Address of strategy
     @dev Only admin is allowed to call
