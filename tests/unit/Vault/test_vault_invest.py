@@ -21,7 +21,8 @@ def test_invest(accounts, vault, erc20, mockStrategy):
     # setup strategy
     strategy._setVault_(vault)
     strategy._setUnderlyingToken_(erc20)
-    vault.setStrategy(strategy, {'from': admin})
+    vault.setNextStrategy(strategy, {'from': admin})
+    vault.switchStrategy({'from': admin})
 
     def get_snapshot():
         snapshot = {
@@ -50,7 +51,8 @@ def test_invest_zero_available(accounts, vault, erc20, mockStrategy):
     # setup
     strategy._setVault_(vault)
     strategy._setUnderlyingToken_(erc20)
-    vault.setStrategy(strategy, {'from': admin})
+    vault.setNextStrategy(strategy, {'from': admin})
+    vault.switchStrategy({'from': admin})
 
     assert vault.availableToInvest() == 0
 

@@ -21,7 +21,8 @@ def test_rebalance(accounts, vault, erc20, mockStrategy):
     # setup strategy
     strategy._setVault_(vault)
     strategy._setUnderlyingToken_(erc20)
-    vault.setStrategy(strategy, {'from': admin})
+    vault.setNextStrategy(strategy, {'from': admin})
+    vault.switchStrategy({'from': admin})
 
     def get_snapshot():
         snapshot = {

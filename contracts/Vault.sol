@@ -149,29 +149,6 @@ contract Vault is ERC20, IVault {
 
         emit SwitchStrategy(strategy);
     }
-
-    /*
-    @notice Set strategy
-    @param _strategy Address of strategy
-    @dev Only admin is allowed to call
-    @dev Must withdraw all tokens from current strategy
-    */
-    function setStrategy(address _strategy) override external onlyAdmin {
-        require(_strategy != address(0)); // dev: strategy = zero address
-        require(IStrategy(_strategy).underlyingToken() == token); // dev: strategy.token != vault.token
-        require(IStrategy(_strategy).vault() == address(this)); // dev: strategy.vault != vault
-        require(_strategy != strategy); // dev: new strategy = current strategy
-
-        // withdraw from current strategy
-        if (strategy != address(0)) {
-            IERC20(token).safeApprove(strategy, 0);
-            IStrategy(strategy).exit();
-        }
-
-        strategy = _strategy;
-        IERC20(token).safeApprove(strategy, uint256(-1));
-    }
-
     function _invest() internal whenStrategyDefined {
         uint amount = _availableToInvest();
 

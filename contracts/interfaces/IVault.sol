@@ -17,7 +17,6 @@ interface IVault {
     @notice Returns the total amount of token in vault + strategy
     */
     function totalLockedValue() external view returns (uint);
-    function setStrategy(address _strategy) external;
     /*
     @notice Transfers token in vault to strategy
     */
