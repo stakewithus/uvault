@@ -49,6 +49,15 @@ contract StrategyUsdcToCcrv is IStrategy {
     address constant private uniswap = address(0x7a250d5630B4cF539739dF2C5dAcb4c659F2488D);
     address constant private weth = address(0xC02aaA39b223FE8D0A0e5C4F27eAD9083C756Cc2); // used for crv <> weth <> dai route
 
+    constructor(address _controller, address _vault) public {
+        require(_controller != address(0)); // dev: controller = zero address
+        require(_vault != address(0)); // dev: vault = zero address
+
+        admin = msg.sender;
+        controller = _controller;
+        vault = _vault;
+    }
+
     function underlyingToken() override external view returns (address) {
         return usdc;
     }
