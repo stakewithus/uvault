@@ -173,6 +173,14 @@ def strategyDaiToYcrv(StrategyDaiToYcrv, accounts, controller):
 
     yield StrategyDaiToYcrv.deploy(controller, vault, {'from': admin})
 
+
+@pytest.fixture(scope="function")
+def strategyUsdcToCcrv(StrategyUsdcToCcrv, accounts, controller):
+    admin = accounts[0]
+    vault = accounts[2]
+
+    yield StrategyUsdcToCcrv.deploy(controller, vault, {'from': admin})
+
 # Mainnet
 
 
@@ -184,6 +192,11 @@ def dai_holder(accounts):
 @pytest.fixture
 def dai():
     yield Contract.from_explorer("0x6B175474E89094C44Da98b954EedeAC495271d0F")
+
+
+@pytest.fixture
+def usdc():
+    yield Contract.from_explorer("0xA0b86991c6218b36c1d19D4a2e9Eb0cE3606eB48")
 
 
 @pytest.fixture
