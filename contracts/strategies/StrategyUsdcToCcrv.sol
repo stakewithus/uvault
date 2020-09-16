@@ -13,7 +13,7 @@ import "../../interfaces/curve/Minter.sol";
 import "../interfaces/IController.sol";
 import "../interfaces/IStrategy.sol";
 
-contract StrategyUsdcToYcrv is IStrategy {
+contract StrategyUsdcToCcrv is IStrategy {
     using SafeERC20 for IERC20;
     using SafeMath for uint;
 
