@@ -1,3 +1,5 @@
+# @version 0.2.4
+
 # @dev Implementation of ERC-20 token standard
 # @dev Use for testing
 # @author Takayuki Jimba (@yudetamago)
