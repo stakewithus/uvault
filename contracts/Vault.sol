@@ -33,7 +33,7 @@ contract Vault is ERC20, IVault {
     // address of next strategy to be used
     address public nextStrategy;
     // timestamp of when the next strategy can be used
-    uint public timelock;
+    uint public timeLock;
     // Minimum time that must pass before new strategy can be used
     uint public minWaitTime;
 
@@ -106,6 +106,21 @@ contract Vault is ERC20, IVault {
     */
     function totalLockedValue() override external view returns (uint) {
         return _totalLockedValue();
+    }
+
+    /*
+    @notice Set next strategy
+    @param _nextStrategy Address of next strategy
+    */
+    function setNextStrategy(address _strategy) external onlyAdmin {
+        require(_strategy != address(0)); // dev: strategy = zero address
+        require(IStrategy(_strategy).underlyingToken() == token); // dev: strategy.token != vault.token
+        require(IStrategy(_strategy).vault() == address(this)); // dev: strategy.vault != vault
+        require(_strategy != nextStrategy); // dev: same next strategy
+        require(_strategy != strategy); // dev: next strategy = current strategy
+
+        nextStrategy = _strategy;
+        timeLock = block.timestamp.add(minWaitTime);
     }
 
     /*
