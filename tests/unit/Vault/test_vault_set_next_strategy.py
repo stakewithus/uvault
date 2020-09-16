@@ -4,7 +4,7 @@ import pytest
 ZERO_ADDRESS = "0x0000000000000000000000000000000000000000"
 
 
-def test_set_next_strategy(accounts, Vault, erc20, mockStrategy):
+def test_current_strategy_is_not_set(accounts, Vault, erc20, mockStrategy):
     admin = accounts[0]
     minWaitTime = 100
 
@@ -19,6 +19,7 @@ def test_set_next_strategy(accounts, Vault, erc20, mockStrategy):
     def get_snapshot():
         return {
             "vault": {
+                "strategy": vault.strategy(),
                 "nextStrategy": vault.nextStrategy(),
                 "timeLock": vault.timeLock(),
             }
@@ -29,8 +30,16 @@ def test_set_next_strategy(accounts, Vault, erc20, mockStrategy):
     after = get_snapshot()
 
     assert tx.events["SetNextStrategy"].values() == [nextStrategy]
+    assert before["vault"]["strategy"] == ZERO_ADDRESS
     assert after["vault"]["nextStrategy"] == nextStrategy
-    assert after["vault"]["timeLock"] == tx.timestamp + minWaitTime
+    assert after["vault"]["timeLock"] == 0
+
+
+@pytest.mark.skip
+def test_current_strategy_is_set(accounts, Vault, erc20, mockStrategy):
+    # Cannot test without having a strategy set first.
+    # test for integration
+    pass
 
 
 def test_not_admin(accounts, vault, erc20):
@@ -79,10 +88,3 @@ def test_same_next_strategy(accounts, vault, mockStrategy):
 
     with brownie.reverts("dev: same next strategy"):
         vault.setNextStrategy(strategy, {'from': admin})
-
-
-@pytest.mark.skip
-def test_currenty_strategy():
-    # Cannot test without having a strategy set first.
-    # test for integration
-    pass

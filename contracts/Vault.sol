@@ -123,7 +123,10 @@ contract Vault is ERC20, IVault {
         require(_strategy != strategy); // dev: next strategy = current strategy
 
         nextStrategy = _strategy;
-        timeLock = block.timestamp.add(minWaitTime);
+        // set time lock if current strategy is set
+        if (strategy != address(0)) {
+            timeLock = block.timestamp.add(minWaitTime);
+        }
 
         emit SetNextStrategy(_strategy);
     }
@@ -149,6 +152,7 @@ contract Vault is ERC20, IVault {
 
         emit SwitchStrategy(strategy);
     }
+
     function _invest() internal whenStrategyDefined {
         uint amount = _availableToInvest();
 
