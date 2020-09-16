@@ -13,6 +13,7 @@ import "../../interfaces/curve/Gauge.sol";
 import "../../interfaces/curve/Minter.sol";
 import "../../interfaces/curve/DepositY.sol";
 import "../../interfaces/yearn/yERC20.sol";
+import "../../interfaces/1inch/IOneSplit.sol";
 import "../interfaces/IController.sol";
 import "../interfaces/IStrategy.sol";
 
@@ -55,8 +56,11 @@ contract StrategyDaiToYcrv is IStrategy {
     // Curve
     address constant private curve = address(0x45F783CCE6B7FF23B2ab2D70e416cdb7D6055f51);
 
+    // DEX related addresses
+    address constant private oneSplit = address(0x50FDA034C0Ce7a8f7EFDAebDA7Aa7cA21CC1267e);
     address constant private uniswap = address(0x7a250d5630B4cF539739dF2C5dAcb4c659F2488D);
     address constant private weth = address(0xC02aaA39b223FE8D0A0e5C4F27eAD9083C756Cc2); // used for crv <> weth <> dai route
+
     // DAI yVault
     address constant private yDai = address(0x16de59092dAE5CcF4A1E6439D611fd0653f0Bd01);
 
@@ -290,9 +294,9 @@ contract StrategyDaiToYcrv is IStrategy {
     }
 
     /*
-    @notice Claim CRV and swap for DAI
+    @notice Use Uniswap to exchange CRV for DAI
     */
-    function _crvToDai() internal {
+    function _uniswap_CrvToDai() internal {
         Minter(minter).mint(gauge);
 
         uint crvBal = IERC20(crv).balanceOf(address(this));
@@ -312,6 +316,39 @@ contract StrategyDaiToYcrv is IStrategy {
             );
             // NOTE: Now this contract has DAI
         }
+    }
+
+    /*
+    @notice Use 1inch to exchange CRV for DAI
+    @dev This function does not work, fails at IOneSplit(oneSplit).swap()
+    */
+    // function _oneInch_CrvToDai() internal {
+    //     Minter(minter).mint(gauge);
+
+    //     uint crvBal = IERC20(crv).balanceOf(address(this));
+    //     if (crvBal > 0) {
+    //         IERC20(crv).safeApprove(oneSplit, 0);
+    //         IERC20(crv).safeApprove(oneSplit, crvBal);
+
+    //         uint returnAmount;
+    //         uint[] memory distribution;
+
+    //         (returnAmount, distribution) = IOneSplit(oneSplit).getExpectedReturn(
+    //             crv, dai, crvBal, 10, 0
+    //         );
+
+    //         IOneSplit(oneSplit).swap(crv, dai, crvBal, returnAmount, distribution, 0);
+    //         // NOTE: Now this contract has DAI
+    //     }
+    // }
+
+    /*
+    @notice Claim CRV and swap for DAI
+    @dev Experiment with uniswap and 1inch
+    */
+    function _crvToDai() internal {
+        _uniswap_CrvToDai();
+        // _oneInch_CrvToDai();
     }
 
     /*
