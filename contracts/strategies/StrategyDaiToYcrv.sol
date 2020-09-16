@@ -248,6 +248,15 @@ contract StrategyDaiToYcrv is IStrategy {
         uint gaugeBal = Gauge(gauge).balanceOf(address(this));
         uint yCrvAmount = _daiAmount.mul(gaugeBal).div(totalDai);
 
+        // TODO:: use this to calculate price of DAI in yCrv?
+        // https://github.com/iearn-finance/yearn-protocol/blob/develop/contracts/strategies/StrategyDAICurve.sol#L151
+        /*
+            // calculate amount of ycrv to withdraw for amount of _want_
+            uint256 _ycrv = _amount.mul(1e18).div(ICurveFi(curve).get_virtual_price());
+            // calculate amount of yycrv to withdraw for amount of _ycrv_
+            uint256 _yycrv = _ycrv.mul(1e18).div(yERC20(yycrv).getPricePerFullShare());
+        */
+
         _yCrvToDai(yCrvAmount);
         _depositYcrvDust();
 
