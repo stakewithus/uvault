@@ -100,6 +100,27 @@ def test_not_admin(accounts, vault):
         vault.switchStrategy({'from': accounts[1]})
 
 
+def test_next_strategy_zero_address(accounts, vault):
+    admin = accounts[0]
+
+    with brownie.reverts("dev: next strategy = zero address"):
+        vault.switchStrategy({'from': admin})
+
+
+def test_same_strategy(accounts, vault, mockStrategy):
+    admin = accounts[0]
+
+    strategy = mockStrategy
+    strategy._setVault_(vault)
+    strategy._setUnderlyingToken_(vault.token())
+
+    vault.setNextStrategy(strategy, {'from': admin})
+    vault.switchStrategy({'from': admin})
+
+    with brownie.reverts("dev: next strategy = current strategy"):
+        vault.switchStrategy({'from': admin})
+
+
 def test_time_lock(accounts, Vault, erc20, mockStrategy):
     admin = accounts[0]
     minWaitTime = 100

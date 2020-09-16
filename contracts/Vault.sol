@@ -134,6 +134,8 @@ contract Vault is ERC20, IVault {
     @dev Must withdraw all tokens from current strategy
     */
     function switchStrategy() external onlyAdmin {
+        require(nextStrategy != address(0)); // dev: next strategy = zero address
+        require(nextStrategy != strategy); // dev: next strategy = current strategy
         require(block.timestamp >= timeLock); // dev: timestamp < time lock
 
         // withdraw from current strategy
