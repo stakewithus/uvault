@@ -5,6 +5,10 @@ interface IVault {
     function admin() external view returns (address);
     function token() external view returns (address);
     function strategy() external view returns (address);
+    function nextStrategy() external view returns (address);
+    function timeLock() external view returns (uint);
+    function setNextStrategy(address strategy) external;
+    function switchStrategy() external;
     /*
     @notice Returns the amount of token in the vault
     */

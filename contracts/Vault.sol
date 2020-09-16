@@ -34,9 +34,9 @@ contract Vault is ERC20, IVault {
     uint public constant max = 10000;
 
     // address of next strategy to be used
-    address public nextStrategy;
+    address override public nextStrategy;
     // timestamp of when the next strategy can be used
-    uint public timeLock;
+    uint override public timeLock;
     // Minimum time that must pass before new strategy can be used
     uint public minWaitTime;
 
@@ -115,7 +115,7 @@ contract Vault is ERC20, IVault {
     @notice Set next strategy
     @param _nextStrategy Address of next strategy
     */
-    function setNextStrategy(address _strategy) external onlyAdmin {
+    function setNextStrategy(address _strategy) override external onlyAdmin {
         require(_strategy != address(0)); // dev: strategy = zero address
         require(IStrategy(_strategy).underlyingToken() == token); // dev: strategy.token != vault.token
         require(IStrategy(_strategy).vault() == address(this)); // dev: strategy.vault != vault
@@ -133,7 +133,7 @@ contract Vault is ERC20, IVault {
     @dev Only admin is allowed to call
     @dev Must withdraw all tokens from current strategy
     */
-    function switchStrategy() external onlyAdmin {
+    function switchStrategy() override external onlyAdmin {
         require(nextStrategy != address(0)); // dev: next strategy = zero address
         require(nextStrategy != strategy); // dev: next strategy = current strategy
         require(block.timestamp >= timeLock); // dev: timestamp < time lock
