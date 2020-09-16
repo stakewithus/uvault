@@ -134,7 +134,7 @@ def controller(Controller, accounts):
 
 @pytest.fixture(scope="function")
 def vault(Vault, accounts, erc20):
-    yield Vault.deploy(erc20, "vault", "vault", {'from': accounts[0]})
+    yield Vault.deploy(erc20, "vault", "vault", 0, {'from': accounts[0]})
 
 
 # strategy

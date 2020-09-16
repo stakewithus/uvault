@@ -30,14 +30,23 @@ contract Vault is ERC20, IVault {
     uint public min = 9500;
     uint public constant max = 10000;
 
+    // address of next strategy to be used
+    address public nextStrategy;
+    // timestamp of when the next strategy can be used
+    uint public timelock;
+    // Minimum time that must pass before new strategy can be used
+    uint public minWaitTime;
+
     constructor(
-        address _token, string memory _name, string memory _symbol
+        address _token, string memory _name, string memory _symbol,
+        uint _minWaitTime
     ) ERC20(_name, _symbol) public  {
         require(_token != address(0)); // dev: token = zero address
         // NOTE: token decimals must equal vault decimals
 
         admin = msg.sender;
         token = _token;
+        minWaitTime = _minWaitTime;
     }
 
     modifier onlyAdmin() {
