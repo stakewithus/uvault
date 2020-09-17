@@ -11,6 +11,7 @@ import "../../interfaces/curve/ICurveFi.sol";
 import "../../interfaces/curve/Gauge.sol";
 import "../../interfaces/curve/Minter.sol";
 import "../../interfaces/curve/DepositCompound.sol";
+import "../../interfaces/yearn/yERC20.sol";
 import "../interfaces/IController.sol";
 import "../interfaces/IStrategy.sol";
 
@@ -49,6 +50,9 @@ contract StrategyUsdcToCcrv is IStrategy {
     // DEX related addresses
     address constant private uniswap = address(0x7a250d5630B4cF539739dF2C5dAcb4c659F2488D);
     address constant private weth = address(0xC02aaA39b223FE8D0A0e5C4F27eAD9083C756Cc2); // used for crv <> weth <> dai route
+
+    // USDC yVault
+    address constant private yUsdc = address(0xd6aD7a6750A7593E092a9B218d66C0A814a3436e);
 
     constructor(address _controller, address _vault) public {
         require(_controller != address(0)); // dev: controller = zero address
@@ -99,8 +103,8 @@ contract StrategyUsdcToCcrv is IStrategy {
     }
 
     /*
-    @notice Get amout of USDC from yCrv
-    @param _yCrvAmount Amount of yCrv to convert to USDC
+    @notice Get amout of USDC from cCrv
+    @param _yCrvAmount Amount of cCrv to convert to USDC
     */
     function _getYcrvToUsdc( uint _yCrvAmount) internal view returns (uint) {
         // USDC = index 1
@@ -120,7 +124,40 @@ contract StrategyUsdcToCcrv is IStrategy {
         return _underlyingBalance();
     }
 
-    function deposit(uint amount) override external {
+    /*
+    @notice Deposits USDC for cCrv
+    */
+    function _usdcToYcrv() internal {
+        // USDC to yUsdc
+        uint256 usdcBal = IERC20(usdc).balanceOf(address(this));
+        if (usdcBal > 0) {
+            IERC20(usdc).safeApprove(yUsdc, usdcBal);
+            yERC20(yUsdc).deposit(usdcBal);
+        }
+
+        // yUsdc to cCrv
+        uint256 yUsdcBal = IERC20(yUsdc).balanceOf(address(this));
+        if (yUsdcBal > 0) {
+            IERC20(yUsdc).safeApprove(curve, yUsdcBal);
+            // mint cCrv
+            // min slippage is set to 0
+            ICurveFi(curve).add_liquidity([0, yUsdcBal, 0, 0], 0);
+        }
+
+        // stake cCrv into Gauge
+        uint256 cCrv = IERC20(cCrv).balanceOf(address(this));
+        if (cCrv > 0) {
+            IERC20(cCrv).safeApprove(gauge, cCrv);
+            Gauge(gauge).deposit(cCrv);
+        }
+    }
+
+    function deposit(uint _amount) override external onlyVault {
+        require(_amount > 0); // amount == 0
+
+        // NOTE: msg.sender == vault
+        IERC20(usdc).safeTransferFrom(msg.sender, address(this), _amount);
+        _usdcToYcrv();
     }
 
     function withdraw(uint amount) override external {
@@ -133,6 +170,5 @@ contract StrategyUsdcToCcrv is IStrategy {
 
     }
     function exit() override external {
-
     }
 }

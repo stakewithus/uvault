@@ -4,7 +4,7 @@ from brownie import Contract
 ZERO_ADDRESS = "0x0000000000000000000000000000000000000000"
 
 
-def test_deposit(accounts, strategyDaiToYcrv, dai, dai_holder, gauge):
+def test_deposit(accounts, strategyDaiToYcrv, dai, stable_coin_holder, gauge):
     strategy = strategyDaiToYcrv
 
     admin = accounts[0]
@@ -14,11 +14,11 @@ def test_deposit(accounts, strategyDaiToYcrv, dai, dai_holder, gauge):
     amount = 10 * 10 ** 18
 
     # check dai balance
-    dai_holder_bal = dai.balanceOf(dai_holder)
-    assert dai_holder_bal > amount
+    stable_coin_holder_bal = dai.balanceOf(stable_coin_holder)
+    assert stable_coin_holder_bal >= amount
 
     # transfer DAI to vault
-    dai.transfer(vault, amount, {'from': dai_holder})
+    dai.transfer(vault, amount, {'from': stable_coin_holder})
     assert dai.balanceOf(vault) == amount
 
     # approve strategy to transfer from vault to strategy
@@ -85,7 +85,7 @@ def test_deposit(accounts, strategyDaiToYcrv, dai, dai_holder, gauge):
     # minimum amount of redeemable dai
     min_redeemable_dai = amount * 0.99
     # minimum amount of ycrv minted
-    min_ycrv = amount * 0.97
+    min_ycrv = amount * 0.95
 
     ycrv_diff = after["gauge"][strategy] - before["gauge"][strategy]
     dai_diff = after["strategy"]["underlyingBalance"] - \

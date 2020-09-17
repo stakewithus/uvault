@@ -5,7 +5,7 @@ ZERO_ADDRESS = "0x0000000000000000000000000000000000000000"
 
 
 def test_withdraw_all(
-    accounts, strategyDaiToYcrv, dai, dai_holder, gauge, yCrv, yDai
+    accounts, strategyDaiToYcrv, dai, stable_coin_holder, gauge, yCrv, yDai
 ):
     strategy = strategyDaiToYcrv
 
@@ -16,11 +16,11 @@ def test_withdraw_all(
     amount = 10 * 10 ** 18
 
     # check dai balance
-    dai_holder_bal = dai.balanceOf(dai_holder)
-    assert dai_holder_bal > amount
+    stable_coin_holder_bal = dai.balanceOf(stable_coin_holder)
+    assert stable_coin_holder_bal >= amount
 
     # transfer DAI to vault
-    dai.transfer(vault, amount, {'from': dai_holder})
+    dai.transfer(vault, amount, {'from': stable_coin_holder})
     assert dai.balanceOf(vault) == amount
 
     # approve strategy to transfer from vault to strategy

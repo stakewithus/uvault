@@ -7,7 +7,7 @@ ZERO_ADDRESS = "0x0000000000000000000000000000000000000000"
 # NOTE: need to restart ganache after every test due to following error
 #       revert: UniswapV2: LOCKED
 def test_exit(
-    accounts, strategyDaiToYcrv, dai, dai_holder, gauge, yCrv, yDai,
+    accounts, strategyDaiToYcrv, dai, stable_coin_holder, gauge, yCrv, yDai,
     minter, crv,
     Controller
 ):
@@ -23,11 +23,11 @@ def test_exit(
     deposit_amount = 10 * 10 ** 18
 
     # check dai balance
-    dai_holder_bal = dai.balanceOf(dai_holder)
-    assert dai_holder_bal > deposit_amount, "dai balance < deposit amount"
+    stable_coin_holder_bal = dai.balanceOf(stable_coin_holder)
+    assert stable_coin_holder_bal >= deposit_amount, "dai balance < deposit amount"
 
     # transfer DAI to vault
-    dai.transfer(vault, deposit_amount, {'from': dai_holder})
+    dai.transfer(vault, deposit_amount, {'from': stable_coin_holder})
     assert dai.balanceOf(
         vault
     ) >= deposit_amount, "vault dai balance < deposit amount"

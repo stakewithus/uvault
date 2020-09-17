@@ -53,7 +53,7 @@ source .env.test
 # NOTE: ganache may need to be restarted for each test in tests/mainnet
 ganache-cli \
 --fork https://mainnet.infura.io/v3/$WEB3_INFURA_PROJECT_ID \
---unlock $DAI_HOLDER \
+--unlock $STABLE_COIN_HOLDER \
 --networkId 1
 
 # test on mainnet and print all logs
