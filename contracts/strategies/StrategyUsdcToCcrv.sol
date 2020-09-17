@@ -10,6 +10,7 @@ import "../../interfaces/uniswap/Uniswap.sol";
 import "../../interfaces/curve/ICurveFi.sol";
 import "../../interfaces/curve/Gauge.sol";
 import "../../interfaces/curve/Minter.sol";
+import "../../interfaces/curve/DepositCompound.sol";
 import "../interfaces/IController.sol";
 import "../interfaces/IStrategy.sol";
 
@@ -58,13 +59,67 @@ contract StrategyUsdcToCcrv is IStrategy {
         vault = _vault;
     }
 
+    modifier onlyAdmin() {
+        require(msg.sender == admin); // dev: !admin
+        _;
+    }
+
+    modifier onlyVault() {
+        require(msg.sender == vault); // dev: !vault
+        _;
+    }
+
+    modifier onlyAdminOrVault() {
+        require(msg.sender == admin || msg.sender == vault); // dev: !admin and !vault
+        _;
+    }
+
+    function setAdmin(address _admin) external onlyAdmin {
+        require(_admin != address(0)); // dev: admin = zero address
+        admin = _admin;
+    }
+
+    function setController(address _controller) external onlyAdmin {
+        require(_controller != address(0)); // dev: controller = zero address
+        controller = _controller;
+    }
+
+    function setWithdrawFee(uint _fee) external onlyAdmin {
+        require(_fee <= withdrawFeeMax); // dev: withdraw fee > max
+        withdrawFee = _fee;
+    }
+
+    function setPerformanceFee(uint _fee) external onlyAdmin {
+        require(_fee <= performanceFee); // dev: performance fee > max
+        performanceFee = _fee;
+    }
+
     function underlyingToken() override external view returns (address) {
         return usdc;
     }
 
-    function underlyingBalance() override external view returns (uint) {
-        return 0;
+    /*
+    @notice Get amout of USDC from yCrv
+    @param _yCrvAmount Amount of yCrv to convert to USDC
+    */
+    function _getYcrvToUsdc( uint _yCrvAmount) internal view returns (uint) {
+        // USDC = index 1
+        return DepositCompound(
+            depositC
+        ).calc_withdraw_one_coin(_yCrvAmount, int128(1));
     }
+
+    function _underlyingBalance() internal view returns (uint) {
+        return _getYcrvToUsdc(Gauge(gauge).balanceOf(address(this)));
+    }
+
+    /*
+    @notice Returns amount of USDC locked in this contract
+    */
+    function underlyingBalance() override external view returns (uint) {
+        return _underlyingBalance();
+    }
+
     function deposit(uint amount) override external {
     }
 
