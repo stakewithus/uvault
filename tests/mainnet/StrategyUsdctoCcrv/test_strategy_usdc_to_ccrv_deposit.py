@@ -8,11 +8,10 @@ ZERO_ADDRESS = "0x0000000000000000000000000000000000000000"
 DEPOSIT_AMOUNT = 10 * 10 ** 6
 
 # test
-# TODO: fix test
-#       Cannot test, DepositCompound.add_liquidity fails
+
+# NOTE: If test is failing, try restarting ganache
 
 
-@pytest.mark.skip
 def test_deposit(accounts, strategyUsdcToCcrv, usdc, stable_coin_holder, cCrv, cGauge):
     strategy = strategyUsdcToCcrv
 
@@ -94,13 +93,13 @@ def test_deposit(accounts, strategyUsdcToCcrv, usdc, stable_coin_holder, cCrv, c
     # exchange rate of cCrv / USDC
     rate = float(
         after["cGauge"][strategy] - before["cGauge"][strategy]
-    ) / (DEPOSIT_AMOUNT)
+    ) / (DEPOSIT_AMOUNT * 10 ** 12)
     print(f'cCrv / USDC {rate}')
 
     # minimum amount of redeemable usdc
     min_redeemable_usdc = DEPOSIT_AMOUNT * 0.99
     # minimum amount of cCrv minted
-    min_ccrv = DEPOSIT_AMOUNT * 0.97
+    min_ccrv = DEPOSIT_AMOUNT * 0.95
 
     ccrv_diff = after["cGauge"][strategy] - before["cGauge"][strategy]
     usdc_diff = after["strategy"]["underlyingBalance"] - \
