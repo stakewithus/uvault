@@ -49,7 +49,7 @@ contract StrategyUsdcToCcrv is IStrategy {
 
     // DEX related addresses
     address constant private uniswap = address(0x7a250d5630B4cF539739dF2C5dAcb4c659F2488D);
-    address constant private weth = address(0xC02aaA39b223FE8D0A0e5C4F27eAD9083C756Cc2); // used for crv <> weth <> dai route
+    address constant private weth = address(0xC02aaA39b223FE8D0A0e5C4F27eAD9083C756Cc2); // used for crv <> weth <> usdc route
 
     // USDC yVault
     address constant private yUsdc = address(0xd6aD7a6750A7593E092a9B218d66C0A814a3436e);
@@ -104,17 +104,17 @@ contract StrategyUsdcToCcrv is IStrategy {
 
     /*
     @notice Get amout of USDC from cCrv
-    @param _yCrvAmount Amount of cCrv to convert to USDC
+    @param _cCrvAmount Amount of cCrv to convert to USDC
     */
-    function _getYcrvToUsdc( uint _yCrvAmount) internal view returns (uint) {
+    function _getCcrvToUsdc( uint _cCrvAmount) internal view returns (uint) {
         // USDC = index 1
         return DepositCompound(
             depositC
-        ).calc_withdraw_one_coin(_yCrvAmount, int128(1));
+        ).calc_withdraw_one_coin(_cCrvAmount, int128(1));
     }
 
     function _underlyingBalance() internal view returns (uint) {
-        return _getYcrvToUsdc(Gauge(gauge).balanceOf(address(this)));
+        return _getCcrvToUsdc(Gauge(gauge).balanceOf(address(this)));
     }
 
     /*
@@ -132,18 +132,16 @@ contract StrategyUsdcToCcrv is IStrategy {
         uint256 usdcBal = IERC20(usdc).balanceOf(address(this));
         if (usdcBal > 0) {
             IERC20(usdc).safeApprove(depositC, usdcBal);
-
-            usdcBal = 1000;
             // mint cCrv
             // min slippage is set to 0
             DepositCompound(depositC).add_liquidity([0, usdcBal], 0);
         }
 
         // stake cCrv into Gauge
-        uint256 cCrv = IERC20(cCrv).balanceOf(address(this));
-        if (cCrv > 0) {
-            IERC20(cCrv).safeApprove(gauge, cCrv);
-            Gauge(gauge).deposit(cCrv);
+        uint256 cCrvBal = IERC20(cCrv).balanceOf(address(this));
+        if (cCrvBal > 0) {
+            IERC20(cCrv).safeApprove(gauge, cCrvBal);
+            Gauge(gauge).deposit(cCrvBal);
         }
     }
 
@@ -155,7 +153,75 @@ contract StrategyUsdcToCcrv is IStrategy {
         _usdcToCcrv();
     }
 
-    function withdraw(uint amount) override external {
+    /*
+    @notice Withdraw cCrv and convert it to usdc
+    @param _cCrvAmount Amount of cCrv to swap to usdc
+    @dev Creates cCrv dust that are too small to convert to usdc
+    */
+    function _cCrvToUsdc(uint _cCrvAmount) internal {
+        // withdraw cCrv from  Gauge
+        Gauge(gauge).withdraw(_cCrvAmount);
+
+        // get cCrv to usdc
+        uint usdcAmount = _getCcrvToUsdc(_cCrvAmount);
+
+        // withdraw usdc from Curve
+        // TODO: pass min as input?
+        DepositCompound(depositC).remove_liquidity_imbalance(
+            [0, usdcAmount], _cCrvAmount
+        );
+        // Now we have usdc
+    }
+
+    /*
+    @notice Deposit cCrv dust
+    */
+    function _depositCcrvDust() internal {
+        // deposit dust into Gauge
+        uint cCrvBal = IERC20(cCrv).balanceOf(address(this));
+        if (cCrvBal > 0) {
+            IERC20(cCrv).safeApprove(gauge, cCrvBal);
+            Gauge(gauge).deposit(cCrvBal);
+        }
+    }
+
+    function withdraw(uint _usdcAmount) override external {
+        require(_usdcAmount > 0); // dev: amount == 0
+        uint totalUsdc = _underlyingBalance();
+        require(_usdcAmount <= totalUsdc); // dev: usdc > total redeemable usdc
+
+        // get cCrv amount to withdraw from USDC
+        /*
+        d = amount of USDC to withdraw
+        D = total USDC redeemable from cCrv in Gauge
+        y = amount of cCrv to withdraw
+        Y = usdc amount of cCrv in Gauge
+
+        d / D = y / Y
+        y = d / D * Y
+        */
+        uint gaugeBal = Gauge(gauge).balanceOf(address(this));
+        uint cCrvAmount = _usdcAmount.mul(gaugeBal).div(totalUsdc);
+
+        _cCrvToUsdc(cCrvAmount);
+        _depositCcrvDust();
+
+        // transfer USDC to treasury and vault
+        uint usdcBal = IERC20(usdc).balanceOf(address(this));
+        // TODO remove withdrawal fee?
+        if (usdcBal > 0) {
+            // transfer fee to treasury
+            uint fee = usdcBal.mul(withdrawFee).div(withdrawFeeMax);
+            if (fee > 0) {
+                address treasury = IController(controller).treasury();
+                require(treasury != address(0)); // dev: treasury == zero address
+
+                IERC20(usdc).safeTransfer(treasury, fee);
+            }
+
+            // transfer rest to vault
+            IERC20(usdc).safeTransfer(msg.sender, usdcBal.sub(fee));
+        }
     }
 
     function withdrawAll() override external {
