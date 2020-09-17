@@ -5,7 +5,7 @@ ZERO_ADDRESS = "0x0000000000000000000000000000000000000000"
 
 
 def test_withdraw(
-    accounts, strategyDaiToYcrv, dai, stable_coin_holder, gauge, yCrv, yDai, Controller
+    accounts, strategyDaiToYcrv, dai, stable_coin_holder, yGauge, yCrv, yDai, Controller
 ):
     strategy = strategyDaiToYcrv
 
@@ -43,7 +43,7 @@ def test_withdraw(
             "dai": {},
             "yDai": {},
             "yCrv": {},
-            "gauge": {}
+            "yGauge": {}
         }
 
         snapshot["dai"][vault] = dai.balanceOf(vault)
@@ -51,7 +51,7 @@ def test_withdraw(
         snapshot["dai"][strategy] = dai.balanceOf(strategy)
         snapshot["yDai"][strategy] = yDai.balanceOf(strategy)
         snapshot["yCrv"][strategy] = yCrv.balanceOf(strategy)
-        snapshot["gauge"][strategy] = gauge.balanceOf(strategy)
+        snapshot["yGauge"][strategy] = yGauge.balanceOf(strategy)
 
         return snapshot
 
@@ -65,15 +65,15 @@ def test_withdraw(
 
     # debug
     print(
-        "gauge (yCrv)",
+        "yGauge (yCrv)",
         "\n",
-        before["gauge"][strategy],
+        before["yGauge"][strategy],
         "\n",
-        after["gauge"][strategy],
+        after["yGauge"][strategy],
         "\n",
     )
     print(
-        "strategy (DAI calculated from yCrv in Gauge)",
+        "strategy (DAI calculated from yCrv in yGauge)",
         "\n",
         before["strategy"]["underlyingBalance"],
         "\n",
@@ -131,5 +131,5 @@ def test_withdraw(
     assert fee >= 0
     assert returned_amount >= min_dai
 
-    # check yCrv dust is redeposited into Gauge
+    # check yCrv dust is redeposited into yGauge
     assert after["yCrv"][strategy] == 0

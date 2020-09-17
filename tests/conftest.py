@@ -200,7 +200,7 @@ def usdc():
 
 
 @pytest.fixture
-def gauge():
+def yGauge():
     yield Contract.from_explorer("0xFA712EE4788C042e2B7BB55E6cb8ec569C4530c1")
 
 

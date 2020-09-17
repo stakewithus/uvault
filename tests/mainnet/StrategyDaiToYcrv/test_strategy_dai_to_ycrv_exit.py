@@ -7,7 +7,7 @@ ZERO_ADDRESS = "0x0000000000000000000000000000000000000000"
 # NOTE: need to restart ganache after every test due to following error
 #       revert: UniswapV2: LOCKED
 def test_exit(
-    accounts, strategyDaiToYcrv, dai, stable_coin_holder, gauge, yCrv, yDai,
+    accounts, strategyDaiToYcrv, dai, stable_coin_holder, yGauge, yCrv, yDai,
     minter, crv,
     Controller
 ):
@@ -46,7 +46,7 @@ def test_exit(
             "dai": {},
             "yDai": {},
             "yCrv": {},
-            "gauge": {},
+            "yGauge": {},
             "crv": {}
         }
 
@@ -55,7 +55,7 @@ def test_exit(
         snapshot["dai"][strategy] = dai.balanceOf(strategy)
         snapshot["yDai"][strategy] = yDai.balanceOf(strategy)
         snapshot["yCrv"][strategy] = yCrv.balanceOf(strategy)
-        snapshot["gauge"][strategy] = gauge.balanceOf(strategy)
+        snapshot["yGauge"][strategy] = yGauge.balanceOf(strategy)
         snapshot["crv"][strategy] = crv.balanceOf(strategy)
 
         return snapshot
@@ -74,11 +74,11 @@ def test_exit(
         "\n",
     )
     print(
-        "gauge (yCrv)",
+        "yGauge (yCrv)",
         "\n",
-        before["gauge"][strategy],
+        before["yGauge"][strategy],
         "\n",
-        after["gauge"][strategy],
+        after["yGauge"][strategy],
         "\n"
     )
     print(

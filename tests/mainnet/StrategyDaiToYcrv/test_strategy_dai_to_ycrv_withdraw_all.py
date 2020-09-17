@@ -5,7 +5,7 @@ ZERO_ADDRESS = "0x0000000000000000000000000000000000000000"
 
 
 def test_withdraw_all(
-    accounts, strategyDaiToYcrv, dai, stable_coin_holder, gauge, yCrv, yDai
+    accounts, strategyDaiToYcrv, dai, stable_coin_holder, yGauge, yCrv, yDai
 ):
     strategy = strategyDaiToYcrv
 
@@ -34,14 +34,14 @@ def test_withdraw_all(
                 "underlyingBalance": strategy.underlyingBalance()
             },
             "dai": {},
-            "gauge": {},
+            "yGauge": {},
             "yCrv": {},
             "yDai": {}
         }
 
         snapshot["dai"][vault] = dai.balanceOf(vault)
         snapshot["dai"][strategy] = dai.balanceOf(strategy)
-        snapshot["gauge"][strategy] = gauge.balanceOf(strategy)
+        snapshot["yGauge"][strategy] = yGauge.balanceOf(strategy)
         snapshot["yCrv"][strategy] = yCrv.balanceOf(strategy)
         snapshot["yDai"][strategy] = yDai.balanceOf(strategy)
 
@@ -69,7 +69,7 @@ def test_withdraw_all(
         "\n"
     )
     print(
-        "strategy (DAI calculated from yCrv in Gauge)",
+        "strategy (DAI calculated from yCrv in yGauge)",
         "\n",
         before["strategy"]["underlyingBalance"],
         "\n",
@@ -93,11 +93,11 @@ def test_withdraw_all(
         "\n"
     )
     print(
-        "gauge (yCrv)",
+        "yGauge (yCrv)",
         "\n",
-        before["gauge"][strategy],
+        before["yGauge"][strategy],
         "\n",
-        after["gauge"][strategy],
+        after["yGauge"][strategy],
         "\n",
     )
 
@@ -107,6 +107,6 @@ def test_withdraw_all(
     assert after["dai"][vault] >= min_redeemed_dai
     # check strategy is empty
     assert after["dai"][strategy] == 0
-    assert after["gauge"][strategy] <= 10 * 10 ** 18  # dust yCrv < 1 DAI
+    assert after["yGauge"][strategy] <= 10 * 10 ** 18  # dust yCrv < 1 DAI
     assert after["yCrv"][strategy] == 0
     assert after["yDai"][strategy] == 0

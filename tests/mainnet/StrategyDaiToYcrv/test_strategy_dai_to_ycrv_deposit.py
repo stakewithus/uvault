@@ -4,7 +4,7 @@ from brownie import Contract
 ZERO_ADDRESS = "0x0000000000000000000000000000000000000000"
 
 
-def test_deposit(accounts, strategyDaiToYcrv, dai, stable_coin_holder, gauge):
+def test_deposit(accounts, strategyDaiToYcrv, dai, stable_coin_holder, yGauge):
     strategy = strategyDaiToYcrv
 
     admin = accounts[0]
@@ -30,12 +30,12 @@ def test_deposit(accounts, strategyDaiToYcrv, dai, stable_coin_holder, gauge):
                 "underlyingBalance": strategy.underlyingBalance()
             },
             "dai": {},
-            "gauge": {}
+            "yGauge": {}
         }
 
         snapshot["dai"][vault] = dai.balanceOf(vault)
         snapshot["dai"][strategy] = dai.balanceOf(strategy)
-        snapshot["gauge"][strategy] = gauge.balanceOf(strategy)
+        snapshot["yGauge"][strategy] = yGauge.balanceOf(strategy)
 
         return snapshot
 
@@ -61,7 +61,7 @@ def test_deposit(accounts, strategyDaiToYcrv, dai, stable_coin_holder, gauge):
         "\n"
     )
     print(
-        "strategy (DAI calculated from yCrv in Gauge)",
+        "strategy (DAI calculated from yCrv in yGauge)",
         "\n",
         before["strategy"]["underlyingBalance"],
         "\n",
@@ -69,16 +69,16 @@ def test_deposit(accounts, strategyDaiToYcrv, dai, stable_coin_holder, gauge):
         "\n",
     )
     print(
-        "gauge (yCrv)",
+        "yGauge (yCrv)",
         "\n",
-        before["gauge"][strategy],
+        before["yGauge"][strategy],
         "\n",
-        after["gauge"][strategy],
+        after["yGauge"][strategy],
         "\n",
     )
     # exchange rate of yCrv / DAI
     rate = float(
-        after["gauge"][strategy] - before["gauge"][strategy]
+        after["yGauge"][strategy] - before["yGauge"][strategy]
     ) / (amount)
     print(f'yCrv / DAI {rate}')
 
@@ -87,7 +87,7 @@ def test_deposit(accounts, strategyDaiToYcrv, dai, stable_coin_holder, gauge):
     # minimum amount of ycrv minted
     min_ycrv = amount * 0.95
 
-    ycrv_diff = after["gauge"][strategy] - before["gauge"][strategy]
+    ycrv_diff = after["yGauge"][strategy] - before["yGauge"][strategy]
     dai_diff = after["strategy"]["underlyingBalance"] - \
         before["strategy"]["underlyingBalance"]
 
