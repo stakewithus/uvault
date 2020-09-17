@@ -11,7 +11,7 @@ from eth_account.messages import encode_defunct
 env_path = Path('.') / '.env.test'
 load_dotenv(dotenv_path=env_path)
 
-DAI_HOLDER = os.getenv("DAI_HOLDER")
+STABLE_COIN_HOLDER = os.getenv("STABLE_COIN_HOLDER")
 
 
 class AccountHelper:
@@ -185,8 +185,8 @@ def strategyUsdcToCcrv(StrategyUsdcToCcrv, accounts, controller):
 
 
 @pytest.fixture
-def dai_holder(accounts):
-    yield accounts.at(DAI_HOLDER, force=True)
+def stable_coin_holder(accounts):
+    yield accounts.at(STABLE_COIN_HOLDER, force=True)
 
 
 @pytest.fixture
