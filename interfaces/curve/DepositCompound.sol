@@ -6,4 +6,5 @@ pragma solidity ^0.6.0;
 
 interface DepositCompound {
   function calc_withdraw_one_coin(uint _token_amount, int128 i) external view returns (uint);
+  function add_liquidity(uint256[2] calldata amounts, uint256 min_mint_amount) external;
 }

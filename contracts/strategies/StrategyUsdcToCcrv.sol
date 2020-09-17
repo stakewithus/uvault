@@ -127,21 +127,16 @@ contract StrategyUsdcToCcrv is IStrategy {
     /*
     @notice Deposits USDC for cCrv
     */
-    function _usdcToYcrv() internal {
-        // USDC to yUsdc
+    function _usdcToCcrv() internal {
+        // USDC to cUsdc
         uint256 usdcBal = IERC20(usdc).balanceOf(address(this));
         if (usdcBal > 0) {
-            IERC20(usdc).safeApprove(yUsdc, usdcBal);
-            yERC20(yUsdc).deposit(usdcBal);
-        }
+            IERC20(usdc).safeApprove(depositC, usdcBal);
 
-        // yUsdc to cCrv
-        uint256 yUsdcBal = IERC20(yUsdc).balanceOf(address(this));
-        if (yUsdcBal > 0) {
-            IERC20(yUsdc).safeApprove(curve, yUsdcBal);
+            usdcBal = 1000;
             // mint cCrv
             // min slippage is set to 0
-            ICurveFi(curve).add_liquidity([0, yUsdcBal, 0, 0], 0);
+            DepositCompound(depositC).add_liquidity([0, usdcBal], 0);
         }
 
         // stake cCrv into Gauge
@@ -157,7 +152,7 @@ contract StrategyUsdcToCcrv is IStrategy {
 
         // NOTE: msg.sender == vault
         IERC20(usdc).safeTransferFrom(msg.sender, address(this), _amount);
-        _usdcToYcrv();
+        _usdcToCcrv();
     }
 
     function withdraw(uint amount) override external {
