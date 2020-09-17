@@ -1,23 +1,47 @@
 import brownie
 import pytest
+import time
 
 ZERO_ADDRESS = "0x0000000000000000000000000000000000000000"
 MAX_UINT = 2 ** 256 - 1
 
 
-def test_switch_strategy_new(accounts, vault, erc20, mockStrategy):
-    admin = accounts[0]
+# fixtures
+@pytest.fixture(scope="function")
+def admin(accounts):
+    return accounts[0]
 
-    strategy = mockStrategy
+
+MIN_WAIT_TIME = 1
+
+
+@pytest.fixture(scope="function")
+def vault(Vault, admin, erc20):
+    yield Vault.deploy(erc20, "vault", "vault", MIN_WAIT_TIME, {'from': admin})
+
+
+@pytest.fixture(scope="function")
+def strategy(mockStrategy):
+    # rename mockStrategy to strategy
+    return mockStrategy
+
+
+@pytest.fixture(scope="function", autouse=True)
+def setup(admin, vault, strategy):
     strategy._setVault_(vault)
     strategy._setUnderlyingToken_(vault.token())
 
-    assert vault.strategy() == ZERO_ADDRESS
-    assert vault.nextStrategy() == ZERO_ADDRESS
-    assert vault.timeLock() == 0
-
     vault.setNextStrategy(strategy, {'from': admin})
 
+    assert vault.strategy() == ZERO_ADDRESS
+    assert vault.nextStrategy() == strategy
+    assert vault.timeLock() == 0
+    assert vault.minWaitTime() == MIN_WAIT_TIME
+
+# test
+
+
+def test_set_new_strategy(admin, vault, erc20, strategy):
     def get_snapshot():
         snapshot = {
             "erc20": {
@@ -39,30 +63,27 @@ def test_switch_strategy_new(accounts, vault, erc20, mockStrategy):
     after = get_snapshot()
 
     assert tx.events["SwitchStrategy"].values() == [strategy]
+
     assert after["vault"]["strategy"] == strategy
     assert after["erc20"]["allowance"][strategy] == MAX_UINT
     # check exit was not called
     assert not strategy._wasExitCalled_()
 
 
-def test_switch_strategy_update(accounts, vault, erc20, MockStrategy):
-    admin = accounts[0]
+def test_switch_strategy(accounts, admin, vault, erc20, strategy, MockStrategy):
     controller = accounts[1]  # mock controller address
 
-    # check time lock is zero so that we can switch strategy without waiting
-    assert vault.timeLock() == 0
-
     # setup
-    oldStrategy = MockStrategy.deploy(
-        controller, vault, erc20, {'from': admin}
-    )
+    vault.switchStrategy({'from': admin})
+    oldStrategy = strategy
+
     newStrategy = MockStrategy.deploy(
-        controller, vault, erc20, {'from': admin}
+        controller, vault, vault.token(), {'from': admin}
     )
 
-    vault.setNextStrategy(oldStrategy, {'from': admin})
-    vault.switchStrategy({'from': admin})
     vault.setNextStrategy(newStrategy, {'from': admin})
+    # wait for time lock to pass
+    time.sleep(MIN_WAIT_TIME)
 
     def get_snapshot():
         snapshot = {
@@ -100,40 +121,34 @@ def test_not_admin(accounts, vault):
         vault.switchStrategy({'from': accounts[1]})
 
 
-def test_next_strategy_zero_address(accounts, vault):
-    admin = accounts[0]
+def test_next_strategy_zero_address(Vault, erc20, admin):
+    vault = Vault.deploy(
+        erc20, "vault", "vault", MIN_WAIT_TIME, {'from': admin}
+    )
 
     with brownie.reverts("dev: next strategy = zero address"):
         vault.switchStrategy({'from': admin})
 
 
-def test_same_strategy(accounts, vault, mockStrategy):
-    admin = accounts[0]
-
-    strategy = mockStrategy
-    strategy._setVault_(vault)
-    strategy._setUnderlyingToken_(vault.token())
-
-    vault.setNextStrategy(strategy, {'from': admin})
+def test_same_strategy(vault, admin):
     vault.switchStrategy({'from': admin})
 
     with brownie.reverts("dev: next strategy = current strategy"):
         vault.switchStrategy({'from': admin})
 
 
-def test_time_lock(accounts, Vault, erc20, mockStrategy):
-    admin = accounts[0]
-    minWaitTime = 100
+def test_time_lock(accounts, vault, admin, erc20, strategy, MockStrategy):
+    controller = accounts[1]  # mock controller address
 
-    vault = Vault.deploy(
-        erc20, "vault", "vault", minWaitTime, {'from': accounts[0]}
+    # setup
+    vault.switchStrategy({'from': admin})
+    newStrategy = MockStrategy.deploy(
+        controller, vault, vault.token(), {'from': admin}
     )
 
-    strategy = mockStrategy
-    strategy._setVault_(vault)
-    strategy._setUnderlyingToken_(vault.token())
+    tx = vault.setNextStrategy(newStrategy, {'from': admin})
 
-    vault.setNextStrategy(strategy, {'from': admin})
+    assert vault.timeLock() >= tx.timestamp + MIN_WAIT_TIME
 
     with brownie.reverts("dev: timestamp < time lock"):
         vault.switchStrategy({'from': admin})
