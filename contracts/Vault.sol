@@ -115,20 +115,20 @@ contract Vault is ERC20, IVault {
     @notice Set next strategy
     @param _nextStrategy Address of next strategy
     */
-    function setNextStrategy(address _strategy) override external onlyAdmin {
-        require(_strategy != address(0)); // dev: strategy = zero address
-        require(IStrategy(_strategy).underlyingToken() == token); // dev: strategy.token != vault.token
-        require(IStrategy(_strategy).vault() == address(this)); // dev: strategy.vault != vault
-        require(_strategy != nextStrategy); // dev: same next strategy
-        require(_strategy != strategy); // dev: next strategy = current strategy
+    function setNextStrategy(address _nextStrategy) override external onlyAdmin {
+        require(_nextStrategy != address(0)); // dev: strategy = zero address
+        require(IStrategy(_nextStrategy).underlyingToken() == token); // dev: strategy.token != vault.token
+        require(IStrategy(_nextStrategy).vault() == address(this)); // dev: strategy.vault != vault
+        require(_nextStrategy != nextStrategy); // dev: same next strategy
+        require(_nextStrategy != strategy); // dev: next strategy = current strategy
 
-        nextStrategy = _strategy;
+        nextStrategy = _nextStrategy;
         // set time lock if current strategy is set
         if (strategy != address(0)) {
             timeLock = block.timestamp.add(minWaitTime);
         }
 
-        emit SetNextStrategy(_strategy);
+        emit SetNextStrategy(_nextStrategy);
     }
 
     /*
