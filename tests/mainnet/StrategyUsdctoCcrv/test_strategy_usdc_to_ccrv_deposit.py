@@ -4,29 +4,26 @@ from brownie import Contract
 ZERO_ADDRESS = "0x0000000000000000000000000000000000000000"
 
 
-# USDC precision = 10 ** 6
-DEPOSIT_AMOUNT = 10 * 10 ** 6
-
-# test
-
 # NOTE: If test is failing, try restarting ganache
 
-
-def test_deposit(accounts, strategyUsdcToCcrv, usdc, stable_coin_holder, cCrv, cGauge):
+def test_deposit(accounts, strategyUsdcToCcrv, usdc, stable_coin_holder, cUsd, cGauge):
     strategy = strategyUsdcToCcrv
 
     admin = accounts[0]
     vault = accounts[2]
 
+    # USDC precision = 10 ** 6
+    deposit_amount = 10 * 10 ** 6
+
     # check balance
-    assert usdc.balanceOf(stable_coin_holder) >= DEPOSIT_AMOUNT
+    assert usdc.balanceOf(stable_coin_holder) >= deposit_amount
 
     # transfer USDC to vault
-    usdc.transfer(vault, DEPOSIT_AMOUNT, {'from': stable_coin_holder})
-    assert usdc.balanceOf(vault) == DEPOSIT_AMOUNT
+    usdc.transfer(vault, deposit_amount, {'from': stable_coin_holder})
+    assert usdc.balanceOf(vault) == deposit_amount
 
     # approve strategy to transfer from vault to strategy
-    usdc.approve(strategy, DEPOSIT_AMOUNT, {'from': vault})
+    usdc.approve(strategy, deposit_amount, {'from': vault})
 
     def get_snapshot():
         snapshot = {
@@ -34,19 +31,19 @@ def test_deposit(accounts, strategyUsdcToCcrv, usdc, stable_coin_holder, cCrv, c
                 "underlyingBalance": strategy.underlyingBalance()
             },
             "usdc": {},
-            "cCrv": {},
+            "cUsd": {},
             "cGauge": {}
         }
 
         snapshot["usdc"][vault] = usdc.balanceOf(vault)
         snapshot["usdc"][strategy] = usdc.balanceOf(strategy)
-        snapshot["cCrv"][strategy] = cCrv.balanceOf(strategy)
+        snapshot["cUsd"][strategy] = cUsd.balanceOf(strategy)
         snapshot["cGauge"][strategy] = cGauge.balanceOf(strategy)
 
         return snapshot
 
     before = get_snapshot()
-    tx = strategy.deposit(DEPOSIT_AMOUNT, {'from': vault})
+    tx = strategy.deposit(deposit_amount, {'from': vault})
     after = get_snapshot()
 
     # debug
@@ -67,7 +64,7 @@ def test_deposit(accounts, strategyUsdcToCcrv, usdc, stable_coin_holder, cCrv, c
         "\n"
     )
     print(
-        "strategy (USDC calculated from cCrv in cGauge)",
+        "strategy (USDC calculated from cUsd in cGauge)",
         "\n",
         before["strategy"]["underlyingBalance"],
         "\n",
@@ -75,36 +72,36 @@ def test_deposit(accounts, strategyUsdcToCcrv, usdc, stable_coin_holder, cCrv, c
         "\n",
     )
     print(
-        "strategy (cCrv)",
+        "strategy (cUsd)",
         "\n",
-        before["cCrv"][strategy],
+        before["cUsd"][strategy],
         "\n",
-        after["cCrv"][strategy],
+        after["cUsd"][strategy],
         "\n",
     )
     print(
-        "cGauge (cCrv)",
+        "cGauge (cUsd)",
         "\n",
         before["cGauge"][strategy],
         "\n",
         after["cGauge"][strategy],
         "\n",
     )
-    # exchange rate of cCrv / USDC
+    # exchange rate of cUsd / USDC
     rate = float(
         after["cGauge"][strategy] - before["cGauge"][strategy]
-    ) / (DEPOSIT_AMOUNT * 10 ** 12)
-    print(f'cCrv / USDC {rate}')
+    ) / (deposit_amount * 10 ** 12)
+    print(f'cUsd / USDC {rate}')
 
     # minimum amount of redeemable usdc
-    min_redeemable_usdc = DEPOSIT_AMOUNT * 0.99
-    # minimum amount of cCrv minted
-    min_ccrv = DEPOSIT_AMOUNT * 0.95
+    min_redeemable_usdc = deposit_amount * 0.99
+    # minimum amount of cUsd minted
+    min_ccrv = deposit_amount * 0.95
 
     ccrv_diff = after["cGauge"][strategy] - before["cGauge"][strategy]
     usdc_diff = after["strategy"]["underlyingBalance"] - \
         before["strategy"]["underlyingBalance"]
 
-    assert after["usdc"][vault] == before["usdc"][vault] - DEPOSIT_AMOUNT
+    assert after["usdc"][vault] == before["usdc"][vault] - deposit_amount
     assert usdc_diff >= min_redeemable_usdc
     assert ccrv_diff >= min_ccrv

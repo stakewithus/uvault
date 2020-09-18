@@ -216,7 +216,7 @@ def yCrv():
 
 
 @pytest.fixture
-def cCrv():
+def cUsd():
     # cDAIcUSDC
     yield Contract.from_explorer("0x845838DF265Dcd2c412A1Dc9e959c7d08537f8a2")
 
