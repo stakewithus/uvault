@@ -3,4 +3,4 @@ hypothesis:
 compiler:
   solc:
     remappings:
-      - "@openzeppelin=OpenZeppelin/openzeppelin-contracts@3.0.0"
+      - "@openzeppelin=OpenZeppelin/openzeppelin-contracts@2.5.1"

@@ -21,7 +21,7 @@ source venv/bin/activate
 pip install -r requirements.txt
 
 # install Brownie PM
-brownie pm install OpenZeppelin/openzeppelin-contracts@3.0.0
+brownie pm install OpenZeppelin/openzeppelin-contracts@2.5.1
 
 # copy .env.sample and edit
 cp .env.sample .env.test
