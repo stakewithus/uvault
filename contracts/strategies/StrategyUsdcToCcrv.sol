@@ -11,6 +11,7 @@ import "../../interfaces/curve/ICurveFi.sol";
 import "../../interfaces/curve/Gauge.sol";
 import "../../interfaces/curve/Minter.sol";
 import "../../interfaces/curve/DepositCompound.sol";
+import "../../interfaces/curve/StableSwapCompound.sol";
 import "../../interfaces/yearn/yERC20.sol";
 import "../interfaces/IController.sol";
 import "../interfaces/IStrategy.sol";
@@ -32,6 +33,7 @@ contract StrategyUsdcToCcrv is IStrategy {
     uint public performanceFeeMax = 10000;
 
     address constant private usdc = address(0xA0b86991c6218b36c1d19D4a2e9Eb0cE3606eB48);
+    address constant private dai = address(0x6B175474E89094C44Da98b954EedeAC495271d0F);
 
     // Curve
     // cDAI/cUSDC
@@ -50,9 +52,6 @@ contract StrategyUsdcToCcrv is IStrategy {
     // DEX related addresses
     address constant private uniswap = address(0x7a250d5630B4cF539739dF2C5dAcb4c659F2488D);
     address constant private weth = address(0xC02aaA39b223FE8D0A0e5C4F27eAD9083C756Cc2); // used for crv <> weth <> usdc route
-
-    // USDC yVault
-    address constant private yUsdc = address(0xd6aD7a6750A7593E092a9B218d66C0A814a3436e);
 
     constructor(address _controller, address _vault) public {
         require(_controller != address(0)); // dev: controller = zero address
@@ -199,12 +198,52 @@ contract StrategyUsdcToCcrv is IStrategy {
         }
     }
 
-    function withdrawAll() override external {
+    function _withdrawAll() internal {
+        // gauge balance is same unit as cCrv
+        uint gaugeBal = Gauge(gauge).balanceOf(address(this));
+        if (gaugeBal > 0) {
+            // withdraw cCrv from  Gauge
+            Gauge(gauge).withdraw(gaugeBal);
 
+            // withdraw dai and usdc
+            uint cCrvBal = IERC20(cCrv).balanceOf(address(this));
+            DepositCompound(depositC).remove_liquidity(cCrvBal, [uint(0), 0]);
+
+            // exchange dai for usdc
+            uint daiBal = IERC20(dai).balanceOf(address(this));
+            if (daiBal > 0) {
+                IERC20(dai).safeApprove(curve, daiBal);
+                StableSwapCompound(curve).exchange(0, 1, daiBal, 0);
+            }
+            // Now we have usdc
+        }
+
+        uint usdcBal = IERC20(usdc).balanceOf(address(this));
+        if (usdcBal > 0) {
+            IERC20(usdc).safeTransfer(vault, usdcBal);
+        }
     }
+
+    /*
+    @notice Withdraw all usdc to vault
+    @dev Must allow admin to withdraw to vault
+    @dev This function does not claim CRV
+    */
+    function withdrawAll() override external onlyAdminOrVault {
+        _withdrawAll();
+    }
+
     function harvest() override external {
 
     }
+
     function exit() override external {
     }
+
+    // TODO
+    // emergency / debug
+    // withdraw usdc to admin
+    // withdraw cCrv from gauge to strategy
+    // remove liquidity from DepositCompound
+    // withdraw dust cCrv from strategy to admin
 }
