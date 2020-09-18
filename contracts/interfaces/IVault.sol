@@ -1,5 +1,4 @@
-// TODO: lock solidity version
-pragma solidity ^0.6.0;
+pragma solidity ^0.5.16;
 
 interface IVault {
     function admin() external view returns (address);
@@ -7,7 +6,7 @@ interface IVault {
     function strategy() external view returns (address);
     function nextStrategy() external view returns (address);
     function timeLock() external view returns (uint);
-    function setNextStrategy(address strategy) external;
+    function setNextStrategy(address _strategy) external;
     function switchStrategy() external;
     /*
     @notice Returns the amount of token in the vault
@@ -30,6 +29,6 @@ interface IVault {
             into strategy
     */
     function rebalance() external;
-    function deposit(uint amount) external;
-    function withdraw(uint amount) external;
+    function deposit(uint _amount) external;
+    function withdraw(uint _amount) external;
 }

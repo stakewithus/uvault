@@ -1,11 +1,10 @@
-// TODO: lock solidity version
-pragma solidity ^0.6.0;
+pragma solidity ^0.5.16;
 
 import "./interfaces/IController.sol";
 
 contract Controller is IController {
-    address override public admin;
-    address override public treasury;
+    address public admin;
+    address public treasury;
 
     constructor(address _treasury) public {
         require(_treasury != address(0)); // dev: treasury = zero address

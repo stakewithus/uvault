@@ -1,11 +1,9 @@
-// TODO: lock version
-pragma solidity ^0.6.0;
+pragma solidity ^0.5.16;
 
-// TODO create ERC20 lite to save gas
-import "@openzeppelin/contracts/token/ERC20/IERC20.sol";
-import "@openzeppelin/contracts/token/ERC20/SafeERC20.sol";
-import "@openzeppelin/contracts/math/Math.sol";
-import "@openzeppelin/contracts/math/SafeMath.sol";
+import "@openzeppelinV2/contracts/token/ERC20/IERC20.sol";
+import "@openzeppelinV2/contracts/token/ERC20/SafeERC20.sol";
+import "@openzeppelinV2/contracts/math/Math.sol";
+import "@openzeppelinV2/contracts/math/SafeMath.sol";
 
 import "../../interfaces/uniswap/Uniswap.sol";
 import "../../interfaces/curve/ICurveFi.sol";
@@ -29,9 +27,9 @@ contract StrategyDaiToYcrv is IStrategy {
     using SafeERC20 for IERC20;
     using SafeMath for uint256;
 
-    address override public admin;
-    address override public controller;
-    address override public vault;
+    address public admin;
+    address public controller;
+    address public vault;
 
     // TODO remove withdraw fee?
     uint public withdrawFee = 50;
@@ -108,7 +106,7 @@ contract StrategyDaiToYcrv is IStrategy {
         performanceFee = _fee;
     }
 
-    function underlyingToken() override external view returns (address) {
+    function underlyingToken() external view returns (address) {
         return dai;
     }
 
@@ -128,7 +126,7 @@ contract StrategyDaiToYcrv is IStrategy {
     /*
     @notice Returns amount of DAI locked in this contract
     */
-    function underlyingBalance() override external view returns (uint) {
+    function underlyingBalance() external view returns (uint) {
         return _underlyingBalance();
     }
 
@@ -160,7 +158,7 @@ contract StrategyDaiToYcrv is IStrategy {
         }
     }
 
-    function deposit(uint _amount) override external onlyVault {
+    function deposit(uint _amount) external onlyVault {
         require(_amount > 0); // amount == 0
 
         // NOTE: msg.sender == vault
@@ -230,7 +228,7 @@ contract StrategyDaiToYcrv is IStrategy {
     @notice Withdraw `_daiAmount` of `DAI`
     @param _daiAmount Amount of `DAI` to withdraw
     */
-    function withdraw(uint _daiAmount) override external onlyVault {
+    function withdraw(uint _daiAmount) external onlyVault {
         require(_daiAmount > 0); // dev: amount == 0
         uint totalDai = _underlyingBalance();
         require(_daiAmount <= totalDai); // dev: dai > total redeemable dai
@@ -297,9 +295,8 @@ contract StrategyDaiToYcrv is IStrategy {
     @dev Must allow admin to withdraw to vault
     @dev This function does not claim CRV
     */
-    function withdrawAll() override external onlyAdminOrVault {
+    function withdrawAll() external onlyAdminOrVault {
         _withdrawAll();
-        _depositYcrvDust();
     }
 
     /*
@@ -363,7 +360,7 @@ contract StrategyDaiToYcrv is IStrategy {
     /*
     @notice Claim CRV, swap for DAI, transfer performance fee to treasury, deposit remaning DAI
     */
-    function harvest() override external onlyAdmin {
+    function harvest() external onlyAdmin {
         _crvToDai();
 
         uint daiBal = IERC20(dai).balanceOf(address(this));
@@ -399,7 +396,7 @@ contract StrategyDaiToYcrv is IStrategy {
     @notice Exit strategy by harvesting CRV to DAI and then withdrawing all DAI to vault
     @dev Must return all DAI to vault
     */
-    function exit() override external onlyAdminOrVault {
+    function exit() external onlyAdminOrVault {
         _crvToDai();
         _withdrawAll();
         _clean();

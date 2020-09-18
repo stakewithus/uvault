@@ -1,8 +1,7 @@
-// TODO: lock solidity version
-pragma solidity ^0.6.0;
+pragma solidity ^0.5.16;
 
-import "@openzeppelin/contracts/token/ERC20/SafeERC20.sol";
-import "@openzeppelin/contracts/token/ERC20/IERC20.sol";
+import "@openzeppelinV2/contracts/token/ERC20/SafeERC20.sol";
+import "@openzeppelinV2/contracts/token/ERC20/IERC20.sol";
 
 interface GasToken {
     function mint(uint amount) external;

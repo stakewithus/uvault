@@ -1,12 +1,12 @@
-pragma solidity ^0.6.0;
+pragma solidity ^0.5.16;
 
 import "../interfaces/IStrategy.sol";
 
 contract MockStrategy is IStrategy {
-    address override public admin;
-    address override public controller;
-    address override public vault;
-    address override public underlyingToken;
+    address public admin;
+    address public controller;
+    address public vault;
+    address public underlyingToken;
 
     // test helper
     uint private _balance_;
@@ -21,25 +21,25 @@ contract MockStrategy is IStrategy {
         underlyingToken = _underlyingToken;
     }
 
-    function underlyingBalance() override external view returns (uint) {
+    function underlyingBalance() external view returns (uint) {
         return _balance_;
     }
 
-    function deposit(uint _amount) override external {
+    function deposit(uint _amount) external {
         _depositAmount_ = _amount;
     }
 
-    function withdraw(uint _amount) override external {
+    function withdraw(uint _amount) external {
         _withdrawAmount_ = _amount;
     }
 
-    function withdrawAll() override external {
+    function withdrawAll() external {
         _withdrawAmount_ = uint(-1);
     }
 
-    function harvest() override external {}
+    function harvest() external {}
 
-    function exit() override external {
+    function exit() external {
         _exitWasCalled_ = true;
     }
 

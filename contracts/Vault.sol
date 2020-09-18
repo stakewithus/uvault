@@ -1,12 +1,11 @@
-// TODO: lock solidity version
-pragma solidity ^0.6.0;
+pragma solidity ^0.5.16;
 
-import "@openzeppelin/contracts/math/SafeMath.sol";
+import "@openzeppelinV2/contracts/math/SafeMath.sol";
 // TODO SafeERC20 lite
-import "@openzeppelin/contracts/token/ERC20/SafeERC20.sol";
-import "@openzeppelin/contracts/token/ERC20/IERC20.sol";
-// TODO use more gas efficient ERC20
-import "@openzeppelin/contracts/token/ERC20/ERC20.sol";
+import "@openzeppelinV2/contracts/token/ERC20/SafeERC20.sol";
+import "@openzeppelinV2/contracts/token/ERC20/IERC20.sol";
+import "@openzeppelinV2/contracts/token/ERC20/ERC20.sol";
+import "@openzeppelinV2/contracts/token/ERC20/ERC20Detailed.sol";
 
 import "./interfaces/IStrategy.sol";
 import "./interfaces/IVault.sol";
@@ -18,32 +17,34 @@ import "./interfaces/IVault.sol";
 // TODO: safe withdraw any token in case strategy sends back wrong token
 // TODO: batch deposit and batch withdraw (via sig or approve(msg.sender, this contract, shares))
 
-contract Vault is ERC20, IVault {
+contract Vault is ERC20, ERC20Detailed, IVault {
     using SafeERC20 for IERC20;
     using SafeMath for uint;
 
     event SetNextStrategy(address nextStrategy);
     event SwitchStrategy(address newStrategy);
 
-    address override public admin;
-    address override public token;
-    address override public strategy;
+    address public admin;
+    address public token;
+    address public strategy;
 
     // percentange of token available to be invested into strategy
     uint public min = 9500;
     uint public constant max = 10000;
 
     // address of next strategy to be used
-    address override public nextStrategy;
+    address public nextStrategy;
     // timestamp of when the next strategy can be used
-    uint override public timeLock;
+    uint public timeLock;
     // Minimum time that must pass before new strategy can be used
     uint public minWaitTime;
 
     constructor(
         address _token, string memory _name, string memory _symbol,
         uint _minWaitTime
-    ) ERC20(_name, _symbol) public  {
+    ) ERC20Detailed(
+        _name, _symbol, ERC20Detailed(_token).decimals()
+    ) public  {
         require(_token != address(0)); // dev: token = zero address
         // NOTE: token decimals must equal vault decimals
 
@@ -80,7 +81,7 @@ contract Vault is ERC20, IVault {
     @notice Returns balance of tokens in vault
     @return Amount of token in vault
     */
-    function balanceInVault() override external view returns (uint) {
+    function balanceInVault() external view returns (uint) {
         return _balanceInVault();
     }
 
@@ -92,7 +93,7 @@ contract Vault is ERC20, IVault {
     @notice Returns amount of token available to be invested into strategy
     @return Amount of token available to be invested into strategy
     */
-    function availableToInvest() override external view returns (uint) {
+    function availableToInvest() external view returns (uint) {
         return _availableToInvest();
     }
 
@@ -107,7 +108,7 @@ contract Vault is ERC20, IVault {
     @notice Returns the total amount of tokens in vault + strategy
     @return Total amount of tokens in vault + strategy
     */
-    function totalLockedValue() override external view returns (uint) {
+    function totalLockedValue() external view returns (uint) {
         return _totalLockedValue();
     }
 
@@ -115,7 +116,7 @@ contract Vault is ERC20, IVault {
     @notice Set next strategy
     @param _nextStrategy Address of next strategy
     */
-    function setNextStrategy(address _nextStrategy) override external onlyAdmin {
+    function setNextStrategy(address _nextStrategy) external onlyAdmin {
         require(_nextStrategy != address(0)); // dev: strategy = zero address
         require(IStrategy(_nextStrategy).underlyingToken() == token); // dev: strategy.token != vault.token
         require(IStrategy(_nextStrategy).vault() == address(this)); // dev: strategy.vault != vault
@@ -136,7 +137,7 @@ contract Vault is ERC20, IVault {
     @dev Only admin is allowed to call
     @dev Must withdraw all tokens from current strategy
     */
-    function switchStrategy() override external onlyAdmin {
+    function switchStrategy() external onlyAdmin {
         require(nextStrategy != address(0)); // dev: next strategy = zero address
         require(nextStrategy != strategy); // dev: next strategy = current strategy
         require(block.timestamp >= timeLock); // dev: timestamp < time lock
@@ -166,14 +167,14 @@ contract Vault is ERC20, IVault {
     @notice Invest token from vault into strategy.
             Some token are kept in vault for cheap withdraw.
     */
-    function invest() override external onlyAdmin {
+    function invest() external onlyAdmin {
         _invest();
     }
 
     /*
     @notice Withdraw from strategy, fills up reserve and re-invests the rest of tokens
     */
-    function rebalance() override external onlyAdmin whenStrategyDefined {
+    function rebalance() external onlyAdmin whenStrategyDefined {
         IStrategy(strategy).withdrawAll();
         _invest();
     }
@@ -182,7 +183,7 @@ contract Vault is ERC20, IVault {
     @notice Deposit token into vault
     @param _amount Amount of token to transfer from `msg.sender`
     */
-    function deposit(uint _amount) override external {
+    function deposit(uint _amount) external {
         require(_amount > 0); // dev: amount = 0
 
         _mint(msg.sender, _amount);
@@ -193,7 +194,7 @@ contract Vault is ERC20, IVault {
     @notice Withdraw shares for token
     @param _shares Amount of shares to burn
     */
-    function withdraw(uint _shares) override external {
+    function withdraw(uint _shares) external {
         // NOTE: cache totalSupply before burning
         uint totalSupply = totalSupply();
         require(totalSupply > 0); // dev: total supply = 0

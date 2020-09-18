@@ -1,5 +1,4 @@
-// TODO: lock solidity version
-pragma solidity ^0.6.0;
+pragma solidity ^0.5.16;
 
 interface IStrategy {
     function admin() external view returns (address);
@@ -14,12 +13,12 @@ interface IStrategy {
     @notice Deposit `amount` underlying token for yield token
     @param amount Amount of underlying token to deposit
     */
-    function deposit(uint amount) external;
+    function deposit(uint _amount) external;
     /*
     @notice Withdraw `amount` yield token to withdraw
     @param amount Amount of yield token to withdraw
     */
-    function withdraw(uint amount) external;
+    function withdraw(uint _amount) external;
     /*
     @notice Withdraw all underlying token from strategy
     */

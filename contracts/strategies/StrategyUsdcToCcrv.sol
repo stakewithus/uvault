@@ -1,8 +1,7 @@
-// TODO: lock version
-pragma solidity ^0.6.0;
+pragma solidity ^0.5.16;
 
-import "@openzeppelin/contracts/token/ERC20/IERC20.sol";
-import "@openzeppelin/contracts/math/SafeMath.sol";
+import "@openzeppelinV2/contracts/token/ERC20/IERC20.sol";
+import "@openzeppelinV2/contracts/math/SafeMath.sol";
 
 import "../../interfaces/uniswap/Uniswap.sol";
 import "../../interfaces/curve/Gauge.sol";
@@ -15,9 +14,9 @@ import "../interfaces/IStrategy.sol";
 contract StrategyUsdcToCcrv is IStrategy {
     using SafeMath for uint;
 
-    address override public admin;
-    address override public controller;
-    address override public vault;
+    address public admin;
+    address public controller;
+    address public vault;
 
     uint public withdrawFee = 50;
     uint public withdrawFeeMax = 10000;
@@ -93,23 +92,23 @@ contract StrategyUsdcToCcrv is IStrategy {
         performanceFee = _fee;
     }
 
-    function underlyingToken() override external view returns (address) {
+    function underlyingToken() external view returns (address) {
         return underlying;
     }
 
     function _underlyingBalance() internal view returns (uint) {
         uint gaugeBal = Gauge(gauge).balanceOf(address(this));
 
-        // USDC = index 1
-        return DepositCompound(
-            depositC
-        ).calc_withdraw_one_coin(gaugeBal, int128(1));
+        // DAI  = 0
+        // USDC = 1
+        return DepositCompound(depositC)
+            .calc_withdraw_one_coin(gaugeBal, int128(1));
     }
 
     /*
     @notice Returns amount of underlying stable coin locked in this contract
     */
-    function underlyingBalance() override external view returns (uint) {
+    function underlyingBalance() external view returns (uint) {
         return _underlyingBalance();
     }
 
@@ -122,7 +121,6 @@ contract StrategyUsdcToCcrv is IStrategy {
         if (underlyingBal > 0) {
             IERC20(underlying).approve(depositC, underlyingBal);
             // mint cUsd
-            // min slippage is set to 0
             DepositCompound(depositC).add_liquidity([0, underlyingBal], 0);
         }
 
@@ -138,10 +136,9 @@ contract StrategyUsdcToCcrv is IStrategy {
     @notice Deposit underlying token into this strategy
     @param _underlyingAmount Amount of underlying token to deposit
     */
-    function deposit(uint _underlyingAmount) override external onlyVault {
-        require(_underlyingAmount > 0); // amount = 0
+    function deposit(uint _underlyingAmount) external onlyVault {
+        require(_underlyingAmount > 0); // dev: underlying amount = 0
 
-        // NOTE: msg.sender == vault
         IERC20(underlying).transferFrom(msg.sender, address(this), _underlyingAmount);
         _depositUnderlying();
     }
@@ -154,16 +151,6 @@ contract StrategyUsdcToCcrv is IStrategy {
         uint cCrvBal = IERC20(cUsd).balanceOf(address(this));
         DepositCompound(depositC).remove_liquidity(cCrvBal, [uint(0), 0]);
 
-        // NOTE: if underlying is dai use this code
-        // // exchange usdc for dai
-        // uint usdcBal = IERC20(usdc).balanceOf(address(this));
-        // if (usdcBal > 0) {
-        //     IERC20(usdc).approve(swapC, usdcBal);
-        //     StableSwapCompound(swapC).exchange(1, 0, usddcBal, 0);
-        // }
-        // // Now we have dai
-
-        // NOTE: if underlying is usdc use this code
         // exchange dai for usdc
         uint daiBal = IERC20(dai).balanceOf(address(this));
         if (daiBal > 0) {
@@ -177,8 +164,8 @@ contract StrategyUsdcToCcrv is IStrategy {
     @notice Withdraw undelying token to vault and treasury
     @param _underlyingAmount Amount of underlying token to withdraw
     */
-    function withdraw(uint _underlyingAmount) override external onlyVault {
-        require(_underlyingAmount > 0); // dev: underlying amount == 0
+    function withdraw(uint _underlyingAmount) external onlyVault {
+        require(_underlyingAmount > 0); // dev: underlying amount = 0
         uint totalUnderlying = _underlyingBalance();
         require(_underlyingAmount <= totalUnderlying); // dev: underlying > total underlying
 
@@ -199,7 +186,7 @@ contract StrategyUsdcToCcrv is IStrategy {
             _withdrawUnderlying(cCrvAmount);
         }
 
-        // transfer underlyign token to treasury and vault
+        // transfer underlying token to treasury and vault
         uint underlyingBal = IERC20(underlying).balanceOf(address(this));
         if (underlyingBal > 0) {
             // transfer fee to treasury
@@ -234,7 +221,7 @@ contract StrategyUsdcToCcrv is IStrategy {
     @dev Must allow admin to withdraw to vault
     @dev This function does not claim CRV
     */
-    function withdrawAll() override external onlyAdminOrVault {
+    function withdrawAll() external onlyAdminOrVault {
         _withdrawAll();
     }
 
@@ -266,7 +253,7 @@ contract StrategyUsdcToCcrv is IStrategy {
     @notice Claim CRV, swap for underlying, transfer performance fee to treasury,
             deposit remaning underlying
     */
-    function harvest() override external onlyAdmin {
+    function harvest() external onlyAdmin {
         _crvToUnderlying();
 
         uint usdcBal = IERC20(usdc).balanceOf(address(this));
@@ -292,7 +279,7 @@ contract StrategyUsdcToCcrv is IStrategy {
         uint cCrvBal = IERC20(cUsd).balanceOf(address(this));
         if (cCrvBal > 0) {
             address treasury = IController(controller).treasury();
-            require(treasury != address(0)); // dev: treasury == zero address
+            require(treasury != address(0)); // dev: treasury = zero address
 
             IERC20(cUsd).transfer(treasury, cCrvBal);
         }
@@ -303,7 +290,7 @@ contract StrategyUsdcToCcrv is IStrategy {
             withdrawing all underlying to vault
     @dev Must return all underlying token to vault
     */
-    function exit() override external onlyAdminOrVault {
+    function exit() external onlyAdminOrVault {
         _crvToUnderlying();
         _withdrawAll();
         _clean();
