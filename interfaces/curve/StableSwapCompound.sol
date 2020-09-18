@@ -1,4 +1,4 @@
-pragma solidity ^0.6.0;
+pragma solidity ^0.5.16;
 
 // https://github.com/curvefi/curve-contract/blob/master/contracts/pools/compound/StableSwapCompound.vy
 interface StableSwapCompound {

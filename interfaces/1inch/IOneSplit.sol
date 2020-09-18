@@ -1,4 +1,4 @@
-pragma solidity ^0.6.0;
+pragma solidity ^0.5.16;
 
 // Github
 // https://github.com/CryptoManiacsZone/1inchProtocol/blob/master/contracts/OneSplitAudit.sol
@@ -39,7 +39,7 @@ interface IOneSplit {
         address destToken,
         uint256 amount,
         uint256 minReturn,
-        uint256[] memory distribution,
+        uint256[] calldata distribution,
         uint256 flags
     )
         external

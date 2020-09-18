@@ -1,4 +1,4 @@
-pragma solidity ^0.6.0;
+pragma solidity ^0.5.16;
 
 // https://etherscan.io/address/0x16de59092dae5ccf4a1e6439d611fd0653f0bd01#code
 
