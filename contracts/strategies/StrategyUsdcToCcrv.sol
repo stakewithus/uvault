@@ -131,7 +131,7 @@ contract StrategyUsdcToCcrv is IStrategy {
         // USDC to cUsdc
         uint256 usdcBal = IERC20(usdc).balanceOf(address(this));
         if (usdcBal > 0) {
-            IERC20(usdc).safeApprove(depositC, usdcBal);
+            IERC20(usdc).approve(depositC, usdcBal);
             // mint cCrv
             // min slippage is set to 0
             DepositCompound(depositC).add_liquidity([0, usdcBal], 0);
@@ -140,7 +140,7 @@ contract StrategyUsdcToCcrv is IStrategy {
         // stake cCrv into Gauge
         uint256 cCrvBal = IERC20(cCrv).balanceOf(address(this));
         if (cCrvBal > 0) {
-            IERC20(cCrv).safeApprove(gauge, cCrvBal);
+            IERC20(cCrv).approve(gauge, cCrvBal);
             Gauge(gauge).deposit(cCrvBal);
         }
     }
@@ -153,38 +153,6 @@ contract StrategyUsdcToCcrv is IStrategy {
         _usdcToCcrv();
     }
 
-    /*
-    @notice Withdraw cCrv and convert it to usdc
-    @param _cCrvAmount Amount of cCrv to swap to usdc
-    @dev Creates cCrv dust that are too small to convert to usdc
-    */
-    function _cCrvToUsdc(uint _cCrvAmount) internal {
-        // withdraw cCrv from  Gauge
-        Gauge(gauge).withdraw(_cCrvAmount);
-
-        // get cCrv to usdc
-        uint usdcAmount = _getCcrvToUsdc(_cCrvAmount);
-
-        // withdraw usdc from Curve
-        // TODO: pass min as input?
-        DepositCompound(depositC).remove_liquidity_imbalance(
-            [0, usdcAmount], _cCrvAmount
-        );
-        // Now we have usdc
-    }
-
-    /*
-    @notice Deposit cCrv dust
-    */
-    function _depositCcrvDust() internal {
-        // deposit dust into Gauge
-        uint cCrvBal = IERC20(cCrv).balanceOf(address(this));
-        if (cCrvBal > 0) {
-            IERC20(cCrv).safeApprove(gauge, cCrvBal);
-            Gauge(gauge).deposit(cCrvBal);
-        }
-    }
-
     function withdraw(uint _usdcAmount) override external {
         require(_usdcAmount > 0); // dev: amount == 0
         uint totalUsdc = _underlyingBalance();
@@ -195,7 +163,7 @@ contract StrategyUsdcToCcrv is IStrategy {
         d = amount of USDC to withdraw
         D = total USDC redeemable from cCrv in Gauge
         y = amount of cCrv to withdraw
-        Y = usdc amount of cCrv in Gauge
+        Y = total amount of cCrv in Gauge
 
         d / D = y / Y
         y = d / D * Y
@@ -203,8 +171,15 @@ contract StrategyUsdcToCcrv is IStrategy {
         uint gaugeBal = Gauge(gauge).balanceOf(address(this));
         uint cCrvAmount = _usdcAmount.mul(gaugeBal).div(totalUsdc);
 
-        _cCrvToUsdc(cCrvAmount);
-        _depositCcrvDust();
+        // cCrv to usdc
+        Gauge(gauge).withdraw(cCrvAmount);
+
+        // withdraw usdc from Curve
+        // TODO use remove_liquidity and exchange?
+        DepositCompound(depositC).remove_liquidity_imbalance(
+            [0, _usdcAmount], cCrvAmount
+        );
+        // now we have usdc
 
         // transfer USDC to treasury and vault
         uint usdcBal = IERC20(usdc).balanceOf(address(this));
