@@ -233,13 +233,75 @@ contract StrategyUsdcToCcrv is IStrategy {
         _withdrawAll();
     }
 
-    function harvest() override external {
+    /*
+    @notice Claim CRV and swap for usdc
+    */
+    function _crvToUsdc() internal {
+        Minter(minter).mint(gauge);
 
+        uint crvBal = IERC20(crv).balanceOf(address(this));
+        if (crvBal > 0) {
+            // use Uniswap to exchange CRV for usdc
+            IERC20(crv).approve(uniswap, crvBal);
+
+            // route CRV > WETH > usdc
+            address[] memory path = new address[](3);
+            path[0] = crv;
+            path[1] = weth;
+            path[2] = usdc;
+
+            Uniswap(uniswap).swapExactTokensForTokens(
+                crvBal, uint(0), path, address(this), now.add(1800)
+            );
+            // NOTE: Now this contract has usdc
+        }
     }
 
-    function exit() override external {
+    /*
+    @notice Claim CRV, swap for usdc, transfer performance fee to treasury,
+            deposit remaning usdc
+    */
+    function harvest() override external onlyAdmin {
+        _crvToUsdc();
+
+        uint usdcBal = IERC20(usdc).balanceOf(address(this));
+        if (usdcBal > 0) {
+            // transfer fee to treasury
+            uint fee = usdcBal.mul(performanceFee).div(performanceFeeMax);
+            if (fee > 0) {
+                address treasury = IController(controller).treasury();
+                require(treasury != address(0)); // dev: treasury == zero address
+
+                IERC20(usdc).safeTransfer(treasury, fee);
+            }
+
+            // deposit remaining usdc for cCrv
+            _usdcToCcrv();
+        }
     }
 
+    /*
+    @notice Transfer dust to treasury
+    */
+    function _clean() internal {
+        uint cCrvBal = IERC20(cCrv).balanceOf(address(this));
+        if (cCrvBal > 0) {
+            address treasury = IController(controller).treasury();
+            require(treasury != address(0)); // dev: treasury == zero address
+
+            IERC20(cCrv).safeTransfer(treasury, cCrvBal);
+        }
+    }
+
+    /*
+    @notice Exit strategy by harvesting CRV to DAI and then withdrawing all DAI to vault
+    @dev Must return all DAI to vault
+    */
+    function exit() override external onlyAdminOrVault {
+        _crvToUsdc();
+        _withdrawAll();
+        _clean();
+    }
     // TODO
     // emergency / debug
     // withdraw usdc to admin
