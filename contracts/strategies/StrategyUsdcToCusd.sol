@@ -7,7 +7,6 @@ import "../interfaces/uniswap/Uniswap.sol";
 import "../interfaces/curve/Gauge.sol";
 import "../interfaces/curve/Minter.sol";
 import "../interfaces/curve/DepositCompound.sol";
-import "../interfaces/curve/StableSwapCompound.sol";
 import "../IController.sol";
 import "../IStrategy.sol";
 
@@ -35,8 +34,6 @@ contract StrategyUsdcToCusd is IStrategy {
     address constant private cUsd = address(0x845838DF265Dcd2c412A1Dc9e959c7d08537f8a2);
     // DepositCompound
     address constant private depositC = address(0xeB21209ae4C2c9FF2a86ACA31E123764A3B6Bc06);
-    // StableSwapCompound
-    address constant private swapC = address(0xA2B47E3D5c44877cca798226B7B8118F9BFb7A56);
     // cUsd Gauge
     address constant private gauge = address(0x7ca5b0a2910B33e9759DC7dDB0413949071D7575);
     // Minter
@@ -149,14 +146,10 @@ contract StrategyUsdcToCusd is IStrategy {
 
         // withdraw dai and usdc
         uint cUsdBal = IERC20(cUsd).balanceOf(address(this));
-        DepositCompound(depositC).remove_liquidity(cUsdBal, [uint(0), 0]);
+        IERC20(cUsd).approve(depositC, cUsdBal);
+        // NOTE: creates cUsd dust so we donate it
+        DepositCompound(depositC).remove_liquidity_one_coin(cUsdBal, int128(1), 0, true);
 
-        // exchange dai for usdc
-        uint daiBal = IERC20(dai).balanceOf(address(this));
-        if (daiBal > 0) {
-            IERC20(dai).approve(swapC, daiBal);
-            StableSwapCompound(swapC).exchange(0, 1, daiBal, 0);
-        }
         // Now we have usdc
     }
 
