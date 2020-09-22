@@ -6,7 +6,13 @@ const {
   CUSD_ADDRESS,
   CGAUGE_ADDRESS,
 } = require("../../config");
-const { eq, sub, frac, USDC_TO_CUSD_DECIMALS } = require("../../util");
+const {
+  sendEther,
+  eq,
+  sub,
+  frac,
+  USDC_TO_CUSD_DECIMALS,
+} = require("../../util");
 
 const IERC20 = artifacts.require("IERC20");
 const Gauge = artifacts.require("Gauge");
@@ -19,11 +25,7 @@ contract("StrategyUsdcToCusd", (accounts) => {
   const treasury = accounts[2];
 
   before(async () => {
-    await web3.eth.sendTransaction({
-      to: USDC_WHALE,
-      from: accounts[0],
-      value: web3.utils.toWei("1", "ether"),
-    });
+    await sendEther(web3, accounts[0], USDC_WHALE, 1);
   });
 
   let usdc;
