@@ -11,7 +11,7 @@ import "../../interfaces/curve/StableSwapCompound.sol";
 import "../interfaces/IController.sol";
 import "../interfaces/IStrategy.sol";
 
-contract StrategyUsdcToCcrv is IStrategy {
+contract StrategyUsdcToCusd is IStrategy {
     using SafeMath for uint;
 
     address public admin;
@@ -125,10 +125,10 @@ contract StrategyUsdcToCcrv is IStrategy {
         }
 
         // stake cUsd into Gauge
-        uint256 cCrvBal = IERC20(cUsd).balanceOf(address(this));
-        if (cCrvBal > 0) {
-            IERC20(cUsd).approve(gauge, cCrvBal);
-            Gauge(gauge).deposit(cCrvBal);
+        uint256 cUsdBal = IERC20(cUsd).balanceOf(address(this));
+        if (cUsdBal > 0) {
+            IERC20(cUsd).approve(gauge, cUsdBal);
+            Gauge(gauge).deposit(cUsdBal);
         }
     }
 
@@ -148,8 +148,8 @@ contract StrategyUsdcToCcrv is IStrategy {
         Gauge(gauge).withdraw(_cUsdAmount);
 
         // withdraw dai and usdc
-        uint cCrvBal = IERC20(cUsd).balanceOf(address(this));
-        DepositCompound(depositC).remove_liquidity(cCrvBal, [uint(0), 0]);
+        uint cUsdBal = IERC20(cUsd).balanceOf(address(this));
+        DepositCompound(depositC).remove_liquidity(cUsdBal, [uint(0), 0]);
 
         // exchange dai for usdc
         uint daiBal = IERC20(dai).balanceOf(address(this));
@@ -180,10 +180,10 @@ contract StrategyUsdcToCcrv is IStrategy {
         c = u / U * C
         */
         uint gaugeBal = Gauge(gauge).balanceOf(address(this));
-        uint cCrvAmount = _underlyingAmount.mul(gaugeBal).div(totalUnderlying);
+        uint cUsdAmount = _underlyingAmount.mul(gaugeBal).div(totalUnderlying);
 
-        if (cCrvAmount > 0) {
-            _withdrawUnderlying(cCrvAmount);
+        if (cUsdAmount > 0) {
+            _withdrawUnderlying(cUsdAmount);
         }
 
         // transfer underlying token to treasury and vault
@@ -276,12 +276,12 @@ contract StrategyUsdcToCcrv is IStrategy {
     @notice Transfer dust to treasury
     */
     function _clean() internal {
-        uint cCrvBal = IERC20(cUsd).balanceOf(address(this));
-        if (cCrvBal > 0) {
+        uint cUsdBal = IERC20(cUsd).balanceOf(address(this));
+        if (cUsdBal > 0) {
             address treasury = IController(controller).treasury();
             require(treasury != address(0)); // dev: treasury = zero address
 
-            IERC20(cUsd).transfer(treasury, cCrvBal);
+            IERC20(cUsd).transfer(treasury, cUsdBal);
         }
     }
 
