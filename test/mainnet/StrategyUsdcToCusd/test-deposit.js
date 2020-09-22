@@ -13,6 +13,7 @@ const {
   frac,
   USDC_TO_CUSD_DECIMALS,
 } = require("../../util");
+const { getSnapshot } = require("./lib");
 
 const IERC20 = artifacts.require("IERC20");
 const Gauge = artifacts.require("Gauge");
@@ -49,29 +50,18 @@ contract("StrategyUsdcToCusd", (accounts) => {
     // approve strategy to spend USDC from vault
     await usdc.approve(strategy.address, amount, { from: vault });
 
-    const getSnapshot = async () => {
-      const snapshot = {
-        strategy: {
-          underlyingBalance: await strategy.underlyingBalance(),
-        },
-        usdc: {
-          [vault]: await usdc.balanceOf(vault),
-          [strategy.address]: await usdc.balanceOf(strategy.address),
-        },
-        cUsd: {
-          [strategy.address]: await cUsd.balanceOf(strategy.address),
-        },
-        cGauge: {
-          [strategy.address]: await cGauge.balanceOf(strategy.address),
-        },
-      };
+    const snapshot = getSnapshot({
+      usdc,
+      cUsd,
+      cGauge,
+      strategy,
+      vault,
+      treasury,
+    });
 
-      return snapshot;
-    };
-
-    const before = await getSnapshot();
+    const before = await snapshot();
     await strategy.deposit(amount, { from: vault });
-    const after = await getSnapshot();
+    const after = await snapshot();
 
     // minimum amount of USDC that can be withdrawn
     const minUsdc = frac(amount, new BN(99), new BN(100));
@@ -82,20 +72,14 @@ contract("StrategyUsdcToCusd", (accounts) => {
       new BN(100)
     );
 
-    const cUsdDiff = sub(
-      after.cGauge[strategy.address],
-      before.cGauge[strategy.address]
-    );
+    const cUsdDiff = sub(after.cGauge.strategy, before.cGauge.strategy);
     const usdcDiff = sub(
       after.strategy.underlyingBalance,
       before.strategy.underlyingBalance
     );
 
     // USDC transferred from vault to strategy
-    assert(
-      eq(after.usdc[vault], sub(before.usdc[vault], amount)),
-      "usdc vault"
-    );
+    assert(eq(after.usdc.vault, sub(before.usdc.vault, amount)), "usdc vault");
 
     assert(usdcDiff.gte(minUsdc), "min usdc");
     assert(cUsdDiff.gte(minCusd), "min cUsd");
