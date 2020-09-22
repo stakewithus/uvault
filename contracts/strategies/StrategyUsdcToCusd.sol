@@ -266,19 +266,6 @@ contract StrategyUsdcToCusd is IStrategy {
     }
 
     /*
-    @notice Transfer dust to treasury
-    */
-    function _clean() internal {
-        uint cUsdBal = IERC20(cUsd).balanceOf(address(this));
-        if (cUsdBal > 0) {
-            address treasury = IController(controller).treasury();
-            require(treasury != address(0)); // dev: treasury = zero address
-
-            IERC20(cUsd).transfer(treasury, cUsdBal);
-        }
-    }
-
-    /*
     @notice Exit strategy by harvesting CRV to underlying token and then
             withdrawing all underlying to vault
     @dev Must return all underlying token to vault
@@ -286,8 +273,7 @@ contract StrategyUsdcToCusd is IStrategy {
     function exit() external onlyAdminOrVault {
         _crvToUnderlying();
         _withdrawAll();
-        _clean();
-    }
+   }
 
     // TODO
     // emergency / debug

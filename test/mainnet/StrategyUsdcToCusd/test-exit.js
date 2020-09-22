@@ -50,7 +50,7 @@ contract("StrategyUsdcToCusd", (accounts) => {
     await strategy.deposit(depositAmount, { from: vault });
   });
 
-  it("should harvest", async () => {
+  it("should exit", async () => {
     const snapshot = getSnapshot({
       usdc,
       cUsd,
@@ -62,18 +62,17 @@ contract("StrategyUsdcToCusd", (accounts) => {
     });
 
     const before = await snapshot();
-    await strategy.harvest({ from: admin });
+    await strategy.exit({ from: vault });
     const after = await snapshot();
 
-    assert(after.usdc.treasury.gte(before.usdc.treasury), "usdc treasury");
     assert(
-      after.strategy.underlyingBalance.gte(before.strategy.underlyingBalance),
+      eq(after.strategy.underlyingBalance, new BN(0)),
       "strategy underlying balance"
     );
-    assert(
-      after.cGauge.strategy.gte(before.cGauge.strategy),
-      "cGauge strategy"
-    );
-    assert(after.crv.strategy.gte(before.crv.strategy), "crv strategy");
+    assert(eq(after.cGauge.strategy, new BN(0)), "cGauge strategy");
+    assert(eq(after.cUsd.strategy, new BN(0)), "cUsd strategy");
+    assert(eq(after.usdc.strategy, new BN(0)), "usdc strategy");
+    assert(eq(after.crv.strategy, new BN(0)), "crv strategy");
+    assert(after.usdc.vault.gte(before.usdc.vault), "usdc vault");
   });
 });
