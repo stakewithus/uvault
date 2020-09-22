@@ -8,3 +8,4 @@ venv
 report.*
 .env.*
 !.env.sample
+node_modules

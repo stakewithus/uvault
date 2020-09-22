@@ -1,0 +1,29 @@
+{
+  "name": "uvault",
+  "version": "1.0.0",
+  "description": "",
+  "main": "truffle-config.js",
+  "directories": {
+    "test": "test"
+  },
+  "scripts": {
+    "test": "echo \"Error: no test specified\" && exit 1"
+  },
+  "dependencies": {
+    "@openzeppelin/contracts": "^2.5.0",
+    "bignumber.js": "^9.0.0",
+    "ganache-cli": "^6.10.1",
+    "truffle": "5.1.31"
+  },
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/stakewithus/uvault.git"
+  },
+  "keywords": [],
+  "author": "",
+  "license": "ISC",
+  "bugs": {
+    "url": "https://github.com/stakewithus/uvault/issues"
+  },
+  "homepage": "https://github.com/stakewithus/uvault#readme"
+}
