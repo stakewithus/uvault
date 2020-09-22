@@ -5,6 +5,7 @@ const {
   USDC_WHALE,
   CUSD_ADDRESS,
   CGAUGE_ADDRESS,
+  CRV_ADDRESS,
 } = require("../../config");
 const {
   sendEther,
@@ -33,12 +34,14 @@ contract("StrategyUsdcToCusd", (accounts) => {
   let usdc;
   let cUsd;
   let cGauge;
+  let crv;
   let controller;
   let strategy;
   beforeEach(async () => {
     usdc = await IERC20.at(USDC_ADDRESS);
     cUsd = await IERC20.at(CUSD_ADDRESS);
     cGauge = await Gauge.at(CGAUGE_ADDRESS);
+    crv = await IERC20.at(CRV_ADDRESS);
     controller = await Controller.new(treasury);
     strategy = await StrategyUsdcToCusd.new(controller.address, vault);
 
@@ -55,6 +58,7 @@ contract("StrategyUsdcToCusd", (accounts) => {
       usdc,
       cUsd,
       cGauge,
+      crv,
       strategy,
       treasury,
       vault,
@@ -74,7 +78,6 @@ contract("StrategyUsdcToCusd", (accounts) => {
     // check balance of usdc transferred to treasury and vault
     const usdcDiff = sub(after.usdc.vault, before.usdc.vault);
 
-    console.log(usdcDiff.toString(), minUsdc.toString());
     assert(usdcDiff.gte(minUsdc), "usdc diff");
 
     // check strategy does not have any USDC

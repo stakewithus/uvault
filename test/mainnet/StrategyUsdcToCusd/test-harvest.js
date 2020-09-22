@@ -7,13 +7,7 @@ const {
   CGAUGE_ADDRESS,
   CRV_ADDRESS,
 } = require("../../config");
-const {
-  sendEther,
-  eq,
-  sub,
-  frac,
-  USDC_TO_CUSD_DECIMALS,
-} = require("../../util");
+const { sendEther, eq, sub, frac } = require("../../util");
 const { getSnapshot } = require("./lib");
 
 const IERC20 = artifacts.require("IERC20");

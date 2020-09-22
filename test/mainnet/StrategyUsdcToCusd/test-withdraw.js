@@ -5,14 +5,9 @@ const {
   USDC_WHALE,
   CUSD_ADDRESS,
   CGAUGE_ADDRESS,
+  CRV_ADDRESS,
 } = require("../../config");
-const {
-  sendEther,
-  eq,
-  sub,
-  frac,
-  USDC_TO_CUSD_DECIMALS,
-} = require("../../util");
+const { sendEther, eq, sub, frac } = require("../../util");
 const { getSnapshot } = require("./lib");
 
 const IERC20 = artifacts.require("IERC20");
@@ -33,12 +28,14 @@ contract("StrategyUsdcToCusd", (accounts) => {
   let usdc;
   let cUsd;
   let cGauge;
+  let crv;
   let controller;
   let strategy;
   beforeEach(async () => {
     usdc = await IERC20.at(USDC_ADDRESS);
     cUsd = await IERC20.at(CUSD_ADDRESS);
     cGauge = await Gauge.at(CGAUGE_ADDRESS);
+    crv = await IERC20.at(CRV_ADDRESS);
     controller = await Controller.new(treasury);
     strategy = await StrategyUsdcToCusd.new(controller.address, vault);
 
@@ -54,6 +51,7 @@ contract("StrategyUsdcToCusd", (accounts) => {
     const snapshot = getSnapshot({
       usdc,
       cUsd,
+      crv,
       cGauge,
       strategy,
       treasury,
