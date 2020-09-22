@@ -1,4 +1,4 @@
-function getSnapshot({ strategy, usdc, cUsd, cGauge, vault, treasury }) {
+function getSnapshot({ strategy, usdc, cUsd, cGauge, crv, vault, treasury }) {
   return async () => {
     const snapshot = {
       strategy: {
@@ -14,6 +14,9 @@ function getSnapshot({ strategy, usdc, cUsd, cGauge, vault, treasury }) {
       },
       cGauge: {
         strategy: await cGauge.balanceOf(strategy.address),
+      },
+      crv: {
+        strategy: await crv.balanceOf(strategy.address),
       },
     };
 
