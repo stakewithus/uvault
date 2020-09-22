@@ -20,7 +20,6 @@ const Controller = artifacts.require("Controller");
 const StrategyUsdcToCusd = artifacts.require("StrategyUsdcToCusd");
 
 contract("StrategyUsdcToCusd", (accounts) => {
-  const admin = accounts[0];
   const vault = accounts[1];
   const treasury = accounts[2];
 
