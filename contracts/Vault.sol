@@ -48,7 +48,7 @@ contract Vault is ERC20, ERC20Detailed, IVault {
     ) ERC20Detailed(
         _name, _symbol, ERC20Detailed(_token).decimals()
     ) public  {
-        require(_token != address(0), "token = zero address");
+        // NOTE: ERC20Detailed(_token).decimals() will fail if token = address(0)
 
         admin = msg.sender;
         token = _token;

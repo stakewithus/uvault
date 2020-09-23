@@ -1,6 +1,8 @@
 // https://github.com/indutny/bn.js/
 const BN = require("bn.js");
 
+const ZERO_ADDRESS = "0x0000000000000000000000000000000000000000";
+
 // NOTE: x, y BN.js instance
 function eq(x, y) {
   return x.eq(y);
@@ -32,6 +34,7 @@ function sendEther(web3, from, to, amount) {
 }
 
 module.exports = {
+  ZERO_ADDRESS,
   eq,
   add,
   sub,
