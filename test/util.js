@@ -3,6 +3,8 @@ const BN = require("bn.js");
 
 const ZERO_ADDRESS = "0x0000000000000000000000000000000000000000";
 
+const MAX_UINT = new BN(2).pow(new BN(256)).sub(new BN(1));
+
 // NOTE: x, y BN.js instance
 function eq(x, y) {
   return x.eq(y);
@@ -35,6 +37,7 @@ function sendEther(web3, from, to, amount) {
 
 module.exports = {
   ZERO_ADDRESS,
+  MAX_UINT,
   eq,
   add,
   sub,
