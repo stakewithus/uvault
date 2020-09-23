@@ -30,5 +30,10 @@ interface IVault {
     */
     function rebalance() external;
     function deposit(uint _amount) external;
-    function withdraw(uint _amount) external;
+    /*
+    @notice Withdraw underlying token
+    @param _shares Amount of shares to burn
+    @param _min Minimum amount of underlying token expected to return
+    */
+    function withdraw(uint _shares, uint _min) external;
 }
