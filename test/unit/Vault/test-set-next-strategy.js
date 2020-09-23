@@ -14,8 +14,7 @@ contract("Vault", (accounts) => {
     erc20 = await ERC20Token.new();
   });
 
-  // set to 0 so we can immediately set strategy for other tests
-  const MIN_WAIT_TIME = 0;
+  const MIN_WAIT_TIME = 100;
 
   let vault;
   beforeEach(async () => {
@@ -40,7 +39,7 @@ contract("Vault", (accounts) => {
 
       assert.equal(tx.logs[0].event, "SetNextStrategy", "event");
       assert.equal(
-        tx.logs[0].args.nextStrategy,
+        tx.logs[0].args.strategy,
         strategy.address,
         "event arg next strategy"
       );

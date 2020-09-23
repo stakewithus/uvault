@@ -21,8 +21,8 @@ contract Vault is ERC20, ERC20Detailed, IVault {
     using SafeERC20 for IERC20;
     using SafeMath for uint;
 
-    event SetNextStrategy(address nextStrategy);
-    event SwitchStrategy(address newStrategy);
+    event SetNextStrategy(address strategy);
+    event SwitchStrategy(address strategy);
 
     address public admin;
     address public token;

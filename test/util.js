@@ -40,6 +40,10 @@ async function getBlockTimestamp(web3, tx) {
   return block.timestamp;
 }
 
+async function timeout(secs) {
+  return new Promise((resolve) => setTimeout(resolve, secs * 1000));
+}
+
 module.exports = {
   ZERO_ADDRESS,
   MAX_UINT,
@@ -50,4 +54,5 @@ module.exports = {
   USDC_TO_CUSD_DECIMALS,
   sendEther,
   getBlockTimestamp,
+  timeout,
 };
