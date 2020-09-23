@@ -274,11 +274,4 @@ contract StrategyUsdcToCusd is IStrategy {
         _crvToUnderlying();
         _withdrawAll();
    }
-
-    // TODO
-    // emergency / debug
-    // withdraw usdc to admin
-    // withdraw cUsd from gauge to strategy
-    // remove liquidity from DepositCompound
-    // withdraw dust cUsd from strategy to admin
 }
