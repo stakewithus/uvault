@@ -46,8 +46,8 @@ contract StrategyUsdcToCusd is IStrategy {
     address constant private weth = address(0xC02aaA39b223FE8D0A0e5C4F27eAD9083C756Cc2); // used for crv <> weth <> usdc route
 
     constructor(address _controller, address _vault) public {
-        require(_controller != address(0)); // dev: controller = zero address
-        require(_vault != address(0)); // dev: vault = zero address
+        require(_controller != address(0), "controller = zero address");
+        require(_vault != address(0), "vault = zero address");
 
         admin = msg.sender;
         controller = _controller;
@@ -55,37 +55,37 @@ contract StrategyUsdcToCusd is IStrategy {
     }
 
     modifier onlyAdmin() {
-        require(msg.sender == admin); // dev: !admin
+        require(msg.sender == admin, "!admin");
         _;
     }
 
     modifier onlyVault() {
-        require(msg.sender == vault); // dev: !vault
+        require(msg.sender == vault, "!vault");
         _;
     }
 
     modifier onlyAdminOrVault() {
-        require(msg.sender == admin || msg.sender == vault); // dev: !admin and !vault
+        require(msg.sender == admin || msg.sender == vault, "!admin and !vault");
         _;
     }
 
     function setAdmin(address _admin) external onlyAdmin {
-        require(_admin != address(0)); // dev: admin = zero address
+        require(_admin != address(0), "admin = zero address");
         admin = _admin;
     }
 
     function setController(address _controller) external onlyAdmin {
-        require(_controller != address(0)); // dev: controller = zero address
+        require(_controller != address(0), "controller = zero address");
         controller = _controller;
     }
 
     function setWithdrawFee(uint _fee) external onlyAdmin {
-        require(_fee <= withdrawFeeMax); // dev: withdraw fee > max
+        require(_fee <= withdrawFeeMax, "withdraw fee > max");
         withdrawFee = _fee;
     }
 
     function setPerformanceFee(uint _fee) external onlyAdmin {
-        require(_fee <= performanceFee); // dev: performance fee > max
+        require(_fee <= performanceFee, "performance fee > max");
         performanceFee = _fee;
     }
 
@@ -134,7 +134,7 @@ contract StrategyUsdcToCusd is IStrategy {
     @param _underlyingAmount Amount of underlying token to deposit
     */
     function deposit(uint _underlyingAmount) external onlyVault {
-        require(_underlyingAmount > 0); // dev: underlying amount = 0
+        require(_underlyingAmount > 0, "underlying = 0");
 
         IERC20(underlying).transferFrom(msg.sender, address(this), _underlyingAmount);
         _depositUnderlying();
@@ -158,9 +158,9 @@ contract StrategyUsdcToCusd is IStrategy {
     @param _underlyingAmount Amount of underlying token to withdraw
     */
     function withdraw(uint _underlyingAmount) external onlyVault {
-        require(_underlyingAmount > 0); // dev: underlying amount = 0
+        require(_underlyingAmount > 0, "underlying = 0");
         uint totalUnderlying = _underlyingBalance();
-        require(_underlyingAmount <= totalUnderlying); // dev: underlying > total underlying
+        require(_underlyingAmount <= totalUnderlying, "underlying > total");
 
         // calculate cUsd amount to withdraw from underlying
         /*
@@ -186,7 +186,7 @@ contract StrategyUsdcToCusd is IStrategy {
             uint fee = underlyingBal.mul(withdrawFee).div(withdrawFeeMax);
             if (fee > 0) {
                 address treasury = IController(controller).treasury();
-                require(treasury != address(0)); // dev: treasury == zero address
+                require(treasury != address(0), "treasury = zero address");
 
                 IERC20(underlying).transfer(treasury, fee);
             }
@@ -254,7 +254,7 @@ contract StrategyUsdcToCusd is IStrategy {
             uint fee = usdcBal.mul(performanceFee).div(performanceFeeMax);
             if (fee > 0) {
                 address treasury = IController(controller).treasury();
-                require(treasury != address(0)); // dev: treasury == zero address
+                require(treasury != address(0), "treasury = zero address");
 
                 IERC20(usdc).transfer(treasury, fee);
             }

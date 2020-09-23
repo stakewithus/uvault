@@ -39,14 +39,16 @@ contract Vault is ERC20, ERC20Detailed, IVault {
     // Minimum time that must pass before new strategy can be used
     uint public minWaitTime;
 
+    /*
+    @dev vault decimals must be equal to token decimals
+    */
     constructor(
         address _token, string memory _name, string memory _symbol,
         uint _minWaitTime
     ) ERC20Detailed(
         _name, _symbol, ERC20Detailed(_token).decimals()
     ) public  {
-        require(_token != address(0)); // dev: token = zero address
-        // NOTE: token decimals must equal vault decimals
+        require(_token != address(0), "token = zero address");
 
         admin = msg.sender;
         token = _token;
@@ -54,22 +56,22 @@ contract Vault is ERC20, ERC20Detailed, IVault {
     }
 
     modifier onlyAdmin() {
-        require(msg.sender == admin); // dev: !admin
+        require(msg.sender == admin, "!admin");
         _;
     }
 
     modifier whenStrategyDefined() {
-        require(strategy != address(0)); // dev: strategy = zero address
+        require(strategy != address(0), "strategy = zero address");
         _;
     }
 
     function setAdmin(address _admin) external onlyAdmin {
-        require(_admin != address(0)); // dev: admin = zero address
+        require(_admin != address(0), "admin = zero address");
         admin = _admin;
     }
 
     function setMin(uint _min) external onlyAdmin {
-        require(_min <= max); // dev: min > max
+        require(_min <= max, "min > max");
         min = _min;
     }
 
@@ -117,11 +119,17 @@ contract Vault is ERC20, ERC20Detailed, IVault {
     @param _nextStrategy Address of next strategy
     */
     function setNextStrategy(address _nextStrategy) external onlyAdmin {
-        require(_nextStrategy != address(0)); // dev: strategy = zero address
-        require(IStrategy(_nextStrategy).underlyingToken() == token); // dev: strategy.token != vault.token
-        require(IStrategy(_nextStrategy).vault() == address(this)); // dev: strategy.vault != vault
-        require(_nextStrategy != nextStrategy); // dev: same next strategy
-        require(_nextStrategy != strategy); // dev: next strategy = current strategy
+        require(_nextStrategy != address(0), "strategy = zero address");
+        require(
+            IStrategy(_nextStrategy).underlyingToken() == token,
+            "strategy.token != vault.token"
+        );
+        require(
+            IStrategy(_nextStrategy).vault() == address(this),
+           "strategy.vault != vault"
+        );
+        require(_nextStrategy != nextStrategy, "same next strategy");
+        require(_nextStrategy != strategy, "next strategy = current strategy");
 
         nextStrategy = _nextStrategy;
         // set time lock if current strategy is set
@@ -138,9 +146,9 @@ contract Vault is ERC20, ERC20Detailed, IVault {
     @dev Must withdraw all tokens from current strategy
     */
     function switchStrategy() external onlyAdmin {
-        require(nextStrategy != address(0)); // dev: next strategy = zero address
-        require(nextStrategy != strategy); // dev: next strategy = current strategy
-        require(block.timestamp >= timeLock); // dev: timestamp < time lock
+        require(nextStrategy != address(0), "next strategy = zero address");
+        require(nextStrategy != strategy, "next strategy = current strategy");
+        require(block.timestamp >= timeLock, "timestamp < time lock");
 
         // withdraw from current strategy
         if (strategy != address(0)) {
@@ -184,7 +192,7 @@ contract Vault is ERC20, ERC20Detailed, IVault {
     @param _amount Amount of token to transfer from `msg.sender`
     */
     function deposit(uint _amount) external {
-        require(_amount > 0); // dev: amount = 0
+        require(_amount > 0, "amount = 0");
 
         _mint(msg.sender, _amount);
         IERC20(token).safeTransferFrom(msg.sender, address(this), _amount);
@@ -207,8 +215,8 @@ contract Vault is ERC20, ERC20Detailed, IVault {
     function withdraw(uint _shares, uint _min) external {
         // NOTE: cache totalSupply before burning
         uint totalSupply = totalSupply();
-        require(totalSupply > 0); // dev: total supply = 0
-        require(_shares > 0); // dev: shares = 0
+        require(totalSupply > 0, "total supply = 0");
+        require(_shares > 0, "shares = 0");
 
         _burn(msg.sender, _shares);
 
