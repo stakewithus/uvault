@@ -1,6 +1,14 @@
 const BN = require("bn.js");
 const { expect } = require("./setup");
-const { ZERO_ADDRESS, eq, add, sub, frac, MAX_UINT } = require("../util");
+const {
+  ZERO_ADDRESS,
+  eq,
+  add,
+  sub,
+  frac,
+  MAX_UINT,
+  getBlockTimestamp,
+} = require("../util");
 const { assert } = require("chai");
 
 const ERC20Token = artifacts.require("ERC20Token");
@@ -91,10 +99,10 @@ contract("Vault", (accounts) => {
   });
 
   describe("setNextStrategy", () => {
+    const controller = accounts[1];
+
     let strategy;
     beforeEach(async () => {
-      const controller = accounts[1];
-
       strategy = await MockStrategy.new(
         controller,
         vault.address,
@@ -116,9 +124,33 @@ contract("Vault", (accounts) => {
       assert(eq(await vault.timeLock(), new BN(0)), "time lock");
     });
 
-    it.skip("should set next strategy when current strategy is set", async () => {
-      // Cannot test without having a strategy set first.
-      // test for integration
+    it("should set next strategy when current strategy is set", async () => {
+      await vault.setNextStrategy(strategy.address, { from: admin });
+      await vault.switchStrategy({ from: admin });
+
+      assert.equal(await vault.strategy(), strategy.address, "strategy");
+
+      const newStrategy = await MockStrategy.new(
+        controller,
+        vault.address,
+        erc20.address,
+        { from: admin }
+      );
+      const tx = await vault.setNextStrategy(newStrategy.address, {
+        from: admin,
+      });
+
+      const timestamp = await getBlockTimestamp(web3, tx);
+
+      assert.equal(
+        await vault.nextStrategy(),
+        newStrategy.address,
+        "next strategy"
+      );
+      assert(
+        eq(await vault.timeLock(), new BN(timestamp + MIN_WAIT_TIME)),
+        "time lock"
+      );
     });
 
     it("should reject if not admin", async () => {
@@ -283,9 +315,41 @@ contract("Vault", (accounts) => {
       ).to.be.rejectedWith("withdraw amount < min");
     });
 
-    it.skip("should withdraw from strategy", async () => {
-      // integration test
-      // cannot test without calling invest() and transferring tokens to strategy
+    it("should withdraw from strategy", async () => {
+      const snapshot = async () => {
+        return {
+          vault: {
+            balanceInVault: await vault.balanceInVault(),
+          },
+        };
+      };
+
+      const controller = accounts[1];
+
+      const strategy = await MockStrategy.new(
+        controller,
+        vault.address,
+        erc20.address,
+        { from: admin }
+      );
+
+      // set balance in strategy, this would increate vault.totalLockedValue()
+      const balInStrategy = new BN(10).pow(new BN(18));
+      await strategy._setBalance_(balInStrategy);
+
+      const amountToWithdraw = await vault.calcWithdraw(amount);
+
+      const before = await snapshot();
+      await vault.withdraw(amount, 0, { from: sender });
+      const after = await snapshot();
+
+      assert(
+        eq(
+          await strategy._getWithdrawAmount_(),
+          sub(amountToWithdraw, before.vault.balanceInVault)
+        ),
+        "strategy withdraw"
+      );
     });
 
     it("should reject if balance = 0", async () => {

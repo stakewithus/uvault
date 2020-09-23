@@ -230,13 +230,19 @@ contract Vault is ERC20, ERC20Detailed, IVault {
         y = s / T * Y
         */
         uint amountToWithdraw = _shares.mul(_totalLockedValue()).div(totalSupply);
-        require(amountToWithdraw >= _min, "withdraw amount < min");
 
         uint bal = _balanceInVault();
         if (amountToWithdraw > bal) {
             // NOTE: can skip check for underflow here since amountToWithdraw > bal
             IStrategy(strategy).withdraw(amountToWithdraw - bal);
+
+            uint balAfter = _balanceInVault();
+            if (balAfter < amountToWithdraw) {
+                amountToWithdraw = balAfter;
+            }
         }
+
+        require(amountToWithdraw >= _min, "withdraw amount < min");
 
         IERC20(token).safeTransfer(msg.sender, amountToWithdraw);
     }

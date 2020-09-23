@@ -35,6 +35,11 @@ function sendEther(web3, from, to, amount) {
   });
 }
 
+async function getBlockTimestamp(web3, tx) {
+  const block = await web3.eth.getBlock(tx.receipt.blockHash);
+  return block.timestamp;
+}
+
 module.exports = {
   ZERO_ADDRESS,
   MAX_UINT,
@@ -44,4 +49,5 @@ module.exports = {
   frac,
   USDC_TO_CUSD_DECIMALS,
   sendEther,
+  getBlockTimestamp,
 };
