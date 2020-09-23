@@ -30,6 +30,14 @@ interface IVault {
     */
     function rebalance() external;
     function deposit(uint _amount) external;
+
+    /*
+    @notice Calculate amount of underlying token that can be withdrawn
+    @param _shares Amount of shares
+    @return Amount of underlying token that can be withdrawn
+    */
+    function calcWithdraw(uint _shares) external view returns (uint);
+
     /*
     @notice Withdraw underlying token
     @param _shares Amount of shares to burn

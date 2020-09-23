@@ -191,6 +191,15 @@ contract Vault is ERC20, ERC20Detailed, IVault {
     }
 
     /*
+    @notice Calculate amount of underlying token that can be withdrawn
+    @param _shares Amount of shares
+    @return Amount of underlying token that can be withdrawn
+    */
+    function calcWithdraw(uint _shares) external view returns (uint) {
+        return _shares.mul(_totalLockedValue()).div(totalSupply());
+    }
+
+    /*
     @notice Withdraw underlying token
     @param _shares Amount of shares to burn
     @param _min Minimum amount of underlying token expected to return
