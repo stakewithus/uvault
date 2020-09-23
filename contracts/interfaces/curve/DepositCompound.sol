@@ -1,4 +1,4 @@
-pragma solidity ^0.5.16;
+pragma solidity 0.5.17;
 
 // https://github.com/curvefi/curve-contract/blob/master/contracts/pools/compound/DepositCompound.vy
 // Contract address
