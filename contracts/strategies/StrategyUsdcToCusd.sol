@@ -211,7 +211,6 @@ contract StrategyUsdcToCusd is IStrategy {
 
     /*
     @notice Withdraw all underlying to vault
-    @dev Must allow admin to withdraw to vault
     @dev This function does not claim CRV
     */
     function withdrawAll() external onlyAdminOrVault {
