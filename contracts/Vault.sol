@@ -209,6 +209,7 @@ contract Vault is ERC20, ERC20Detailed, IVault {
         Y = total amount of token in vault + strategy
 
         s / T = y / Y
+        y = s / T * Y
         */
         uint amountToWithdraw = _shares.mul(_totalLockedValue()).div(totalSupply);
 
