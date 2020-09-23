@@ -1,6 +1,6 @@
 const BN = require("bn.js");
 const { expect } = require("./setup");
-const { ZERO_ADDRESS, eq } = require("../util");
+const { ZERO_ADDRESS, eq, add, sub } = require("../util");
 const { assert } = require("chai");
 
 const ERC20Token = artifacts.require("ERC20Token");
@@ -89,73 +89,133 @@ contract("Vault", (accounts) => {
   //     });
   //   });
 
-  describe("setNextStrategy", () => {
-    let strategy;
+  //   describe("setNextStrategy", () => {
+  //     let strategy;
+  //     beforeEach(async () => {
+  //       const controller = accounts[1];
+
+  //       strategy = await MockStrategy.new(
+  //         controller,
+  //         vault.address,
+  //         erc20.address,
+  //         { from: admin }
+  //       );
+  //     });
+
+  //     it("should set next strategy when current strategy is not set", async () => {
+  //       const tx = await vault.setNextStrategy(strategy.address, { from: admin });
+
+  //       assert.equal(tx.logs[0].event, "SetNextStrategy", "event");
+  //       assert.equal(
+  //         tx.logs[0].args.nextStrategy,
+  //         strategy.address,
+  //         "event arg next strategy"
+  //       );
+  //       assert.equal(await vault.nextStrategy(), strategy.address);
+  //       assert(eq(await vault.timeLock(), new BN(0)), "time lock");
+  //     });
+
+  //     it.skip("should set next strategy when current strategy is set", async () => {
+  //       // Cannot test without having a strategy set first.
+  //       // test for integration
+  //     });
+
+  //     it("should reject if not admin", async () => {
+  //       await expect(
+  //         vault.setNextStrategy(strategy.address, { from: accounts[1] })
+  //       ).to.be.rejectedWith("!admin");
+  //     });
+
+  //     it("should reject zero address", async () => {
+  //       await expect(
+  //         vault.setNextStrategy(ZERO_ADDRESS, { from: accounts[1] })
+  //       ).to.be.rejectedWith("!admin");
+  //     });
+
+  //     it("should reject strategy.token != vault.token", async () => {
+  //       // use non zero address to mock underlying token address
+  //       await strategy._setUnderlyingToken_(accounts[0]);
+
+  //       await expect(
+  //         vault.setNextStrategy(strategy.address, { from: admin })
+  //       ).to.be.rejectedWith("strategy.token != vault.token");
+  //     });
+
+  //     it("should reject strategy.vault != vault", async () => {
+  //       // use non zero address to mock vault address
+  //       await strategy._setVault_(accounts[0]);
+
+  //       await expect(
+  //         vault.setNextStrategy(strategy.address, { from: admin })
+  //       ).to.be.rejectedWith("strategy.vault != vault");
+  //     });
+
+  //     it("should reject same strategy", async () => {
+  //       await vault.setNextStrategy(strategy.address, { from: admin });
+
+  //       await expect(
+  //         vault.setNextStrategy(strategy.address, { from: admin })
+  //       ).to.be.rejectedWith("same next strategy");
+  //     });
+  //   });
+
+  describe("deposit", () => {
+    const sender = accounts[1];
+    const amount = new BN(10).pow(new BN(18));
+
     beforeEach(async () => {
-      const controller = accounts[1];
+      await erc20.mint(sender, amount);
+      await erc20.approve(vault.address, amount, { from: sender });
+    });
 
-      strategy = await MockStrategy.new(
-        controller,
-        vault.address,
-        erc20.address,
-        { from: admin }
+    it("should deposit", async () => {
+      const snapshot = async () => {
+        return {
+          erc20: {
+            sender: await erc20.balanceOf(sender),
+            vault: await erc20.balanceOf(vault.address),
+          },
+          vault: {
+            balanceOf: {
+              sender: await vault.balanceOf(sender),
+            },
+            totalSupply: await vault.totalSupply(),
+          },
+        };
+      };
+
+      const before = await snapshot();
+      await vault.deposit(amount, { from: sender });
+      const after = await snapshot();
+
+      // check erc20 balance
+      assert(
+        eq(after.erc20.sender, sub(before.erc20.sender, amount)),
+        "erc20 sender"
+      );
+      assert(
+        eq(after.erc20.vault, add(before.erc20.vault, amount)),
+        "erc20 vault"
+      );
+
+      // check vault balance
+      assert(
+        eq(
+          after.vault.balanceOf.sender,
+          add(before.vault.balanceOf.sender, amount)
+        ),
+        "vault sender"
+      );
+      assert(
+        eq(after.vault.totalSupply, add(before.vault.totalSupply, amount)),
+        "total supply"
       );
     });
 
-    it("should set next strategy when current strategy is not set", async () => {
-      const tx = await vault.setNextStrategy(strategy.address, { from: admin });
-
-      assert.equal(tx.logs[0].event, "SetNextStrategy", "event");
-      assert.equal(
-        tx.logs[0].args.nextStrategy,
-        strategy.address,
-        "event arg next strategy"
+    it("should reject if amount = 0", async () => {
+      await expect(vault.deposit(0, { from: sender })).to.be.rejectedWith(
+        "amount = 0"
       );
-      assert.equal(await vault.nextStrategy(), strategy.address);
-      assert(eq(await vault.timeLock(), new BN(0)), "time lock");
-    });
-
-    it.skip("should set next strategy when current strategy is set", async () => {
-      // Cannot test without having a strategy set first.
-      // test for integration
-    });
-
-    it("should reject if not admin", async () => {
-      await expect(
-        vault.setNextStrategy(strategy.address, { from: accounts[1] })
-      ).to.be.rejectedWith("!admin");
-    });
-
-    it("should reject zero address", async () => {
-      await expect(
-        vault.setNextStrategy(ZERO_ADDRESS, { from: accounts[1] })
-      ).to.be.rejectedWith("!admin");
-    });
-
-    it("should reject strategy.token != vault.token", async () => {
-      // use non zero address to mock underlying token address
-      await strategy._setUnderlyingToken_(accounts[0]);
-
-      await expect(
-        vault.setNextStrategy(strategy.address, { from: admin })
-      ).to.be.rejectedWith("strategy.token != vault.token");
-    });
-
-    it("should reject strategy.vault != vault", async () => {
-      // use non zero address to mock vault address
-      await strategy._setVault_(accounts[0]);
-
-      await expect(
-        vault.setNextStrategy(strategy.address, { from: admin })
-      ).to.be.rejectedWith("strategy.vault != vault");
-    });
-
-    it("should reject same strategy", async () => {
-      await vault.setNextStrategy(strategy.address, { from: admin });
-
-      await expect(
-        vault.setNextStrategy(strategy.address, { from: admin })
-      ).to.be.rejectedWith("same next strategy");
     });
   });
 });
