@@ -1,5 +1,6 @@
 const ERC20Token = artifacts.require("ERC20Token");
 const Vault = artifacts.require("Vault");
+const MockStrategy = artifacts.require("MockStrategy");
 
 module.exports = (accounts, minWaitTime = 0) => {
   const admin = accounts[0];
@@ -12,6 +13,7 @@ module.exports = (accounts, minWaitTime = 0) => {
     vault: null,
     admin,
     controller,
+    strategy: null,
   };
 
   before(async () => {
@@ -25,6 +27,13 @@ module.exports = (accounts, minWaitTime = 0) => {
       "vault",
       "vault",
       minWaitTime
+    );
+
+    refs.strategy = await MockStrategy.new(
+      controller,
+      refs.vault.address,
+      refs.erc20.address,
+      { from: admin }
     );
   });
 

@@ -14,29 +14,21 @@ contract("Vault", (accounts) => {
 
   let vault;
   let erc20;
+  let strategy;
   beforeEach(() => {
     vault = refs.vault;
     erc20 = refs.erc20;
+    strategy = refs.strategy;
   });
 
   describe("invest", () => {
     const sender = accounts[1];
     const amount = new BN(10).pow(new BN(18));
 
-    let strategy;
     beforeEach(async () => {
       await erc20.mint(sender, amount);
       await erc20.approve(vault.address, amount, { from: sender });
       await vault.deposit(amount, { from: sender });
-
-      const controller = accounts[1];
-
-      strategy = await MockStrategy.new(
-        controller,
-        vault.address,
-        erc20.address,
-        { from: admin }
-      );
 
       await vault.setNextStrategy(strategy.address, { from: admin });
       await vault.switchStrategy({ from: admin });

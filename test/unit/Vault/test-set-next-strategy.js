@@ -9,28 +9,18 @@ contract("Vault", (accounts) => {
   const MIN_WAIT_TIME = 100;
 
   const refs = setup(accounts, MIN_WAIT_TIME);
-  const { admin } = refs;
+  const { admin, controller } = refs;
 
   let vault;
   let erc20;
+  let strategy;
   beforeEach(() => {
     vault = refs.vault;
     erc20 = refs.erc20;
+    strategy = refs.strategy;
   });
 
   describe("setNextStrategy", () => {
-    const controller = accounts[1];
-
-    let strategy;
-    beforeEach(async () => {
-      strategy = await MockStrategy.new(
-        controller,
-        vault.address,
-        erc20.address,
-        { from: admin }
-      );
-    });
-
     it("should set next strategy when current strategy is not set", async () => {
       const tx = await vault.setNextStrategy(strategy.address, { from: admin });
 
