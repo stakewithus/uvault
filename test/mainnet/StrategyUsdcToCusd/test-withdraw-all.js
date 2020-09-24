@@ -1,12 +1,6 @@
 const BN = require("bn.js");
 
-const {
-  USDC_ADDRESS,
-  USDC_WHALE,
-  CUSD_ADDRESS,
-  CGAUGE_ADDRESS,
-  CRV_ADDRESS,
-} = require("../../config");
+const { USDC, USDC_WHALE, CUSD, CGAUGE, CRV } = require("../../config");
 const {
   sendEther,
   eq,
@@ -38,10 +32,10 @@ contract("StrategyUsdcToCusd", (accounts) => {
   let controller;
   let strategy;
   beforeEach(async () => {
-    usdc = await IERC20.at(USDC_ADDRESS);
-    cUsd = await IERC20.at(CUSD_ADDRESS);
-    cGauge = await Gauge.at(CGAUGE_ADDRESS);
-    crv = await IERC20.at(CRV_ADDRESS);
+    usdc = await IERC20.at(USDC);
+    cUsd = await IERC20.at(CUSD);
+    cGauge = await Gauge.at(CGAUGE);
+    crv = await IERC20.at(CRV);
     controller = await Controller.new(treasury);
     strategy = await StrategyUsdcToCusd.new(controller.address, vault);
 
