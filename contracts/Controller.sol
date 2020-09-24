@@ -32,4 +32,12 @@ contract Controller is IController {
     function harvest(address _strategy) external onlyAdmin {
         IStrategy(_strategy).harvest();
     }
+
+    function withdrawAll(address _strategy) external onlyAdmin {
+        IStrategy(_strategy).withdrawAll();
+    }
+
+    function exit(address _strategy) external onlyAdmin {
+        IStrategy(_strategy).exit();
+    }
 }
