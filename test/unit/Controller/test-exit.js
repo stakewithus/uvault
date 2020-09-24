@@ -3,7 +3,7 @@ const setup = require("./setup");
 
 contract("Controller", (accounts) => {
   const refs = setup(accounts);
-  const { admin } = refs;
+  const { admin, gasRelayer } = refs;
 
   let controller;
   let strategy;
@@ -13,16 +13,22 @@ contract("Controller", (accounts) => {
   });
 
   describe("exit", () => {
-    it("should exit", async () => {
+    it("should exit admin", async () => {
       await controller.exit(strategy.address, { from: admin });
 
       assert(await strategy._exitWasCalled_(), "exit");
     });
 
-    it("should reject if caller not admin", async () => {
+    it("should exit gas relayer", async () => {
+      await controller.exit(strategy.address, { from: gasRelayer });
+
+      assert(await strategy._exitWasCalled_(), "exit");
+    });
+
+    it("should reject if caller not authorized", async () => {
       await expect(
         controller.exit(strategy.address, { from: accounts[1] })
-      ).to.be.rejectedWith("!admin");
+      ).to.be.rejectedWith("!authorized");
     });
 
     it("should reject invalid strategy address", async () => {

@@ -4,7 +4,7 @@ const setup = require("./setup");
 
 contract("Controller", (accounts) => {
   const refs = setup(accounts);
-  const { admin } = refs;
+  const { admin, gasRelayer } = refs;
 
   let controller;
   let strategy;
@@ -14,16 +14,22 @@ contract("Controller", (accounts) => {
   });
 
   describe("withdrawAll", () => {
-    it("should withdrawAll", async () => {
+    it("should withdrawAll admin", async () => {
       await controller.withdrawAll(strategy.address, { from: admin });
 
       assert(eq(await strategy._withdrawAmount_(), MAX_UINT), "withdraw");
     });
 
-    it("should reject if caller not admin", async () => {
+    it("should withdrawAll gas relayer", async () => {
+      await controller.withdrawAll(strategy.address, { from: gasRelayer });
+
+      assert(eq(await strategy._withdrawAmount_(), MAX_UINT), "withdraw");
+    });
+
+    it("should reject if caller not authorized", async () => {
       await expect(
         controller.withdrawAll(strategy.address, { from: accounts[1] })
-      ).to.be.rejectedWith("!admin");
+      ).to.be.rejectedWith("!authorized");
     });
 
     it("should reject invalid strategy address", async () => {

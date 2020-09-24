@@ -3,7 +3,7 @@ const setup = require("./setup");
 
 contract("Controller", (accounts) => {
   const refs = setup(accounts);
-  const { admin } = refs;
+  const { admin, gasRelayer } = refs;
 
   let controller;
   let vault;
@@ -13,16 +13,22 @@ contract("Controller", (accounts) => {
   });
 
   describe("switchStrategy", () => {
-    it("should switch strategy", async () => {
+    it("should switch strategy admin", async () => {
       await controller.switchStrategy(vault.address, { from: admin });
 
       assert(await vault._switchStrategyWasCalled_(), "switch strategy");
     });
 
-    it("should reject if caller not admin", async () => {
+    it("should switch strategy gas relayer", async () => {
+      await controller.switchStrategy(vault.address, { from: gasRelayer });
+
+      assert(await vault._switchStrategyWasCalled_(), "switch strategy");
+    });
+
+    it("should reject if caller not authorized", async () => {
       await expect(
         controller.switchStrategy(vault.address, { from: accounts[1] })
-      ).to.be.rejectedWith("!admin");
+      ).to.be.rejectedWith("!authorized");
     });
 
     it("should reject invalid vault address", async () => {

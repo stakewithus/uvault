@@ -3,7 +3,7 @@ const setup = require("./setup");
 
 contract("Controller", (accounts) => {
   const refs = setup(accounts);
-  const { admin } = refs;
+  const { admin, gasRelayer } = refs;
 
   let controller;
   let vault;
@@ -13,16 +13,22 @@ contract("Controller", (accounts) => {
   });
 
   describe("invest", () => {
-    it("should invest", async () => {
+    it("should invest admin", async () => {
       await controller.invest(vault.address, { from: admin });
 
       assert(await vault._investWasCalled_(), "invest");
     });
 
-    it("should reject if caller not admin", async () => {
+    it("should invest gas relayer", async () => {
+      await controller.invest(vault.address, { from: gasRelayer });
+
+      assert(await vault._investWasCalled_(), "invest");
+    });
+
+    it("should reject if caller not authorized", async () => {
       await expect(
         controller.invest(vault.address, { from: accounts[1] })
-      ).to.be.rejectedWith("!admin");
+      ).to.be.rejectedWith("!authorized");
     });
 
     it("should reject invalid vault address", async () => {

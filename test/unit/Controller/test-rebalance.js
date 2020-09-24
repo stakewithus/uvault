@@ -3,7 +3,7 @@ const setup = require("./setup");
 
 contract("Controller", (accounts) => {
   const refs = setup(accounts);
-  const { admin } = refs;
+  const { admin, gasRelayer } = refs;
 
   let controller;
   let vault;
@@ -13,16 +13,22 @@ contract("Controller", (accounts) => {
   });
 
   describe("rebalance", () => {
-    it("should rebalance", async () => {
+    it("should rebalance admin", async () => {
       await controller.rebalance(vault.address, { from: admin });
 
       assert(await vault._rebalanceWasCalled_(), "rebalance");
     });
 
-    it("should reject if caller not admin", async () => {
+    it("should rebalance gas relayer", async () => {
+      await controller.rebalance(vault.address, { from: gasRelayer });
+
+      assert(await vault._rebalanceWasCalled_(), "rebalance");
+    });
+
+    it("should reject if caller not authorized", async () => {
       await expect(
         controller.rebalance(vault.address, { from: accounts[1] })
-      ).to.be.rejectedWith("!admin");
+      ).to.be.rejectedWith("!authorized");
     });
 
     it("should reject invalid vault address", async () => {

@@ -23,6 +23,11 @@ contract Controller is IController {
         _;
     }
 
+    modifier onlyAuthorized() {
+        require(msg.sender == admin || msg.sender == gasRelayer, "!authorized");
+        _;
+    }
+
     function setAdmin(address _admin) external onlyAdmin {
         require(_admin != address(0), "admin = zero address");
         admin = _admin;
@@ -38,27 +43,27 @@ contract Controller is IController {
         gasRelayer = _gasRelayer;
     }
 
-    function invest(address _vault) external onlyAdmin {
+    function invest(address _vault) external onlyAuthorized {
         IVault(_vault).invest();
     }
 
-    function switchStrategy(address _vault) external onlyAdmin {
+    function switchStrategy(address _vault) external onlyAuthorized {
         IVault(_vault).switchStrategy();
     }
 
-    function rebalance(address _vault) external onlyAdmin {
+    function rebalance(address _vault) external onlyAuthorized {
         IVault(_vault).rebalance();
     }
 
-    function harvest(address _strategy) external onlyAdmin {
+    function harvest(address _strategy) external onlyAuthorized {
         IStrategy(_strategy).harvest();
     }
 
-    function withdrawAll(address _strategy) external onlyAdmin {
+    function withdrawAll(address _strategy) external onlyAuthorized {
         IStrategy(_strategy).withdrawAll();
     }
 
-    function exit(address _strategy) external onlyAdmin {
+    function exit(address _strategy) external onlyAuthorized {
         IStrategy(_strategy).exit();
     }
 }

@@ -3,7 +3,7 @@ const setup = require("./setup");
 
 contract("Controller", (accounts) => {
   const refs = setup(accounts);
-  const { admin } = refs;
+  const { admin, gasRelayer } = refs;
 
   let controller;
   let strategy;
@@ -13,16 +13,22 @@ contract("Controller", (accounts) => {
   });
 
   describe("harvest", () => {
-    it("should harvest", async () => {
+    it("should harvest admin", async () => {
       await controller.harvest(strategy.address, { from: admin });
 
       assert(await strategy._harvestWasCalled_(), "harvest");
     });
 
-    it("should reject if caller not admin", async () => {
+    it("should harvest gas relayer", async () => {
+      await controller.harvest(strategy.address, { from: gasRelayer });
+
+      assert(await strategy._harvestWasCalled_(), "harvest");
+    });
+
+    it("should reject if caller not authorized", async () => {
       await expect(
         controller.harvest(strategy.address, { from: accounts[1] })
-      ).to.be.rejectedWith("!admin");
+      ).to.be.rejectedWith("!authorized");
     });
 
     it("should reject invalid strategy address", async () => {
