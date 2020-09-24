@@ -3,7 +3,6 @@ const { expect } = require("../setup");
 const { ZERO_ADDRESS, eq, add, MAX_UINT } = require("../../util");
 const setup = require("./setup");
 
-const MockStrategy = artifacts.require("MockStrategy");
 const Vault = artifacts.require("Vault");
 
 contract("Vault", (accounts) => {
