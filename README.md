@@ -15,5 +15,8 @@ ganache-cli \
 --unlock $USDC_WHALE \
 --networkId 999
 
-truffle test --network mainnet_fork
+npm run test:mainnet
+
+# test specific file
+truffle test --network mainnet_fork test/mainnet/path/to/test.js
 ```
