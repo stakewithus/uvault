@@ -44,4 +44,14 @@ interface IVault {
     @param _min Minimum amount of underlying token expected to return
     */
     function withdraw(uint _shares, uint _min) external;
+
+    /*
+    @notice Withdraw all underlying token from currenty strategy
+    */
+    function withdrawAllFromStrategy() external;
+
+    /*
+    @notice Exit from current strategy
+    */
+    function exitStrategy() external;
 }

@@ -25,6 +25,7 @@ contract Vault is ERC20, ERC20Detailed, IVault {
     event SwitchStrategy(address strategy);
 
     address public admin;
+    address public controller;
     address public token;
     address public strategy;
 
@@ -43,20 +44,28 @@ contract Vault is ERC20, ERC20Detailed, IVault {
     @dev vault decimals must be equal to token decimals
     */
     constructor(
+        address _controller,
         address _token, string memory _name, string memory _symbol,
         uint _minWaitTime
     ) ERC20Detailed(
         _name, _symbol, ERC20Detailed(_token).decimals()
     ) public  {
         // NOTE: ERC20Detailed(_token).decimals() will fail if token = address(0)
+        require(_controller != address(0), "controller = zero address");
 
         admin = msg.sender;
+        controller = _controller;
         token = _token;
         minWaitTime = _minWaitTime;
     }
 
     modifier onlyAdmin() {
         require(msg.sender == admin, "!admin");
+        _;
+    }
+
+    modifier onlyController() {
+        require(msg.sender == controller, "!controller");
         _;
     }
 
@@ -245,5 +254,21 @@ contract Vault is ERC20, ERC20Detailed, IVault {
         require(amountToWithdraw >= _min, "withdraw amount < min");
 
         IERC20(token).safeTransfer(msg.sender, amountToWithdraw);
+    }
+
+    /*
+    @notice Withdraw all underlying token from currenty strategy
+    */
+    function withdrawAllFromStrategy()
+        external onlyController whenStrategyDefined
+    {
+        IStrategy(strategy).withdrawAll();
+    }
+
+    /*
+    @notice Exit from current strategy
+    */
+    function exitStrategy() external onlyController whenStrategyDefined {
+        IStrategy(strategy).exit();
     }
 }

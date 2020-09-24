@@ -6,6 +6,9 @@ const ERC20Token = artifacts.require("ERC20Token");
 const Vault = artifacts.require("Vault");
 
 contract("Vault", (accounts) => {
+  // mock controller address
+  const controller = accounts[1];
+
   let erc20;
   before(async () => {
     erc20 = await ERC20Token.new();
@@ -16,7 +19,13 @@ contract("Vault", (accounts) => {
 
   let vault;
   beforeEach(async () => {
-    vault = await Vault.new(erc20.address, "vault", "vault", MIN_WAIT_TIME);
+    vault = await Vault.new(
+      controller,
+      erc20.address,
+      "vault",
+      "vault",
+      MIN_WAIT_TIME
+    );
   });
 
   describe("deposit", () => {

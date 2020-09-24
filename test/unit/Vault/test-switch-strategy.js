@@ -15,6 +15,8 @@ const Vault = artifacts.require("Vault");
 
 contract("Vault", (accounts) => {
   const admin = accounts[0];
+  // mock controller address
+  const controller = accounts[1];
 
   let erc20;
   before(async () => {
@@ -25,7 +27,13 @@ contract("Vault", (accounts) => {
 
   let vault;
   beforeEach(async () => {
-    vault = await Vault.new(erc20.address, "vault", "vault", MIN_WAIT_TIME);
+    vault = await Vault.new(
+      controller,
+      erc20.address,
+      "vault",
+      "vault",
+      MIN_WAIT_TIME
+    );
   });
 
   describe("switchStrategy", () => {
@@ -116,6 +124,7 @@ contract("Vault", (accounts) => {
 
     it("should reject if strategy is zero address", async () => {
       const vault = await Vault.new(
+        controller,
         erc20.address,
         "vault",
         "vault",
