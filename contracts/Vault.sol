@@ -255,20 +255,4 @@ contract Vault is ERC20, ERC20Detailed, IVault {
 
         IERC20(token).safeTransfer(msg.sender, amountToWithdraw);
     }
-
-    /*
-    @notice Withdraw all underlying token from currenty strategy
-    */
-    function withdrawAllFromStrategy()
-        external onlyController whenStrategyDefined
-    {
-        IStrategy(strategy).withdrawAll();
-    }
-
-    /*
-    @notice Exit from current strategy
-    */
-    function exitStrategy() external onlyController whenStrategyDefined {
-        IStrategy(strategy).exit();
-    }
 }

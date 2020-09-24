@@ -2,6 +2,7 @@ pragma solidity 0.5.17;
 
 interface IVault {
     function admin() external view returns (address);
+    function controller() external view returns (address);
     function token() external view returns (address);
     function strategy() external view returns (address);
     function nextStrategy() external view returns (address);
@@ -44,14 +45,4 @@ interface IVault {
     @param _min Minimum amount of underlying token expected to return
     */
     function withdraw(uint _shares, uint _min) external;
-
-    /*
-    @notice Withdraw all underlying token from currenty strategy
-    */
-    function withdrawAllFromStrategy() external;
-
-    /*
-    @notice Exit from current strategy
-    */
-    function exitStrategy() external;
 }
