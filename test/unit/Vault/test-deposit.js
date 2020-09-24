@@ -1,5 +1,5 @@
 const BN = require("bn.js");
-const { expect } = require("../setup");
+const { expect } = require("../../setup");
 const { eq, add, sub } = require("../../util");
 const setup = require("./setup");
 

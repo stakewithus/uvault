@@ -1,5 +1,5 @@
 const BN = require("bn.js");
-const { expect } = require("../setup");
+const { expect } = require("../../setup");
 const { ZERO_ADDRESS, eq, getBlockTimestamp } = require("../../util");
 const setup = require("./setup");
 

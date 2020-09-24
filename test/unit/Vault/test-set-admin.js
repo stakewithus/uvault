@@ -1,4 +1,4 @@
-const { expect } = require("../setup");
+const { expect } = require("../../setup");
 const { ZERO_ADDRESS } = require("../../util");
 const setup = require("./setup");
 

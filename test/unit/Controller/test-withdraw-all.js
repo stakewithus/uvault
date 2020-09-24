@@ -1,4 +1,4 @@
-const { expect } = require("../setup");
+const { expect } = require("../../setup");
 const { eq, MAX_UINT } = require("../../util");
 const setup = require("./setup");
 

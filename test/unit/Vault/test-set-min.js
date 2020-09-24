@@ -1,4 +1,4 @@
-const { expect } = require("../setup");
+const { expect } = require("../../setup");
 const setup = require("./setup");
 
 contract("Vault", (accounts) => {
