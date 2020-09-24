@@ -13,6 +13,7 @@ ganache-cli \
 --unlock $STABLE_COIN_HOLDER \
 --unlock $DAI_WHALE \
 --unlock $USDC_WHALE \
+--unlock $CHI_WHALE \
 --networkId 999
 
 npm run test:mainnet
