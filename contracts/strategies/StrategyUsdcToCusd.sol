@@ -69,6 +69,14 @@ contract StrategyUsdcToCusd is IStrategy {
         _;
     }
 
+    modifier onlyVaultOrController() {
+        require(
+            msg.sender == vault || msg.sender == controller ,
+            "!vault and !controller"
+        );
+        _;
+    }
+
     function setAdmin(address _admin) external onlyAdmin {
         require(_admin != address(0), "admin = zero address");
         admin = _admin;
@@ -213,7 +221,7 @@ contract StrategyUsdcToCusd is IStrategy {
     @notice Withdraw all underlying to vault
     @dev This function does not claim CRV
     */
-    function withdrawAll() external onlyVault {
+    function withdrawAll() external onlyVaultOrController {
         _withdrawAll();
     }
 
@@ -269,7 +277,7 @@ contract StrategyUsdcToCusd is IStrategy {
             withdrawing all underlying to vault
     @dev Must return all underlying token to vault
     */
-    function exit() external onlyVault {
+    function exit() external onlyVaultOrController {
         _crvToUnderlying();
         _withdrawAll();
    }
