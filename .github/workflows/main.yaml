@@ -23,5 +23,8 @@ jobs:
       - name: Install Ganache
         run: npm install -g ganache-cli@6.8.2
 
+      - name: Npm install
+        run: npm install
+
       - name: Run unit test
         run: npm run test:unit
