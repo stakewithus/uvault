@@ -1,6 +1,7 @@
 pragma solidity 0.5.17;
 
 import "./IController.sol";
+import "./IStrategy.sol";
 
 contract Controller is IController {
     address public admin;
@@ -26,5 +27,9 @@ contract Controller is IController {
     function setTreasury(address _treasury) external onlyAdmin {
         require(_treasury != address(0), "treasury = zero address");
         treasury = _treasury;
+    }
+
+    function harvest(address _strategy) external onlyAdmin {
+        IStrategy(_strategy).harvest();
     }
 }
