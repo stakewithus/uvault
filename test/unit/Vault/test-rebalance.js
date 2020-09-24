@@ -49,11 +49,11 @@ contract("Vault", (accounts) => {
       await vault.rebalance({ from: controller });
       const after = await snapshot();
 
-      assert(eq(await strategy._getWithdrawAmount_(), MAX_UINT), "withdraw");
+      assert(eq(await strategy._withdrawAmount_(), MAX_UINT), "withdraw");
 
       assert(
         eq(
-          await strategy._getDepositAmount_(),
+          await strategy._depositAmount_(),
           add(before.vault.availableToInvest, before.strategy.underlyingBalance)
         ),
         "deposit"

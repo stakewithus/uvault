@@ -45,7 +45,7 @@ contract("Vault", (accounts) => {
       assert(
         eq(await erc20.allowance(vault.address, strategy.address), MAX_UINT)
       );
-      assert.isFalse(await strategy._wasExitCalled_(), "exit");
+      assert.isFalse(await strategy._exitWasCalled_(), "exit");
     });
 
     it("should switch strategy", async () => {

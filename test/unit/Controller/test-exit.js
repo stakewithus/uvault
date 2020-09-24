@@ -16,7 +16,7 @@ contract("Controller", (accounts) => {
     it("should exit", async () => {
       await controller.exit(strategy.address, { from: admin });
 
-      assert(await strategy._wasExitCalled_(), "exit");
+      assert(await strategy._exitWasCalled_(), "exit");
     });
 
     it("should reject if caller not admin", async () => {

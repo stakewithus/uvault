@@ -17,7 +17,7 @@ contract("Controller", (accounts) => {
     it("should withdrawAll", async () => {
       await controller.withdrawAll(strategy.address, { from: admin });
 
-      assert(eq(await strategy._getWithdrawAmount_(), MAX_UINT), "withdraw");
+      assert(eq(await strategy._withdrawAmount_(), MAX_UINT), "withdraw");
     });
 
     it("should reject if caller not admin", async () => {

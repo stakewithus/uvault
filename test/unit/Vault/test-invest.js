@@ -47,7 +47,7 @@ contract("Vault", (accounts) => {
       const after = await snapshot();
 
       assert(
-        eq(await strategy._getDepositAmount_(), before.vault.availableToInvest),
+        eq(await strategy._depositAmount_(), before.vault.availableToInvest),
         "deposit"
       );
     });
@@ -59,7 +59,7 @@ contract("Vault", (accounts) => {
 
       await vault.invest({ from: controller });
 
-      assert(eq(await strategy._getDepositAmount_(), new BN(0)), "deposit");
+      assert(eq(await strategy._depositAmount_(), new BN(0)), "deposit");
     });
 
     it("should reject if not controller", async () => {

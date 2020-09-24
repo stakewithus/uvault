@@ -9,11 +9,11 @@ contract MockStrategy is IStrategy {
     address public underlyingToken;
 
     // test helper
-    uint private _balance_;
-    uint private _depositAmount_;
-    uint private _withdrawAmount_;
-    bool private _exitWasCalled_;
-    bool private _harvestWasCalled_;
+    uint public _balance_;
+    uint public _depositAmount_;
+    uint public _withdrawAmount_;
+    bool public _exitWasCalled_;
+    bool public _harvestWasCalled_;
 
     constructor(address _controller, address _vault, address _underlyingToken) public {
         admin = msg.sender;
@@ -57,21 +57,5 @@ contract MockStrategy is IStrategy {
 
     function _setBalance_(uint _balance) external {
         _balance_ = _balance;
-    }
-
-    function _getDepositAmount_() external view returns (uint) {
-        return _depositAmount_;
-    }
-
-    function _getWithdrawAmount_() external view returns (uint) {
-        return _withdrawAmount_;
-    }
-
-    function _wasExitCalled_() external view returns (bool) {
-        return _exitWasCalled_;
-    }
-
-    function _wasHarvestCalled_() external view returns (bool) {
-        return _harvestWasCalled_;
     }
 }

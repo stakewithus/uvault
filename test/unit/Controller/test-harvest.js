@@ -16,7 +16,7 @@ contract("Controller", (accounts) => {
     it("should harvest", async () => {
       await controller.harvest(strategy.address, { from: admin });
 
-      assert(await strategy._wasHarvestCalled_(), "harvest");
+      assert(await strategy._harvestWasCalled_(), "harvest");
     });
 
     it("should reject if caller not admin", async () => {

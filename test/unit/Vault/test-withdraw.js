@@ -111,7 +111,7 @@ contract("Vault", (accounts) => {
 
       assert(
         eq(
-          await strategy._getWithdrawAmount_(),
+          await strategy._withdrawAmount_(),
           sub(amountToWithdraw, before.vault.balanceInVault)
         ),
         "strategy withdraw"
