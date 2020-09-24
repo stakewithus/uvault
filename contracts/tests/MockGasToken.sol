@@ -7,6 +7,8 @@ contract MockGasToken is GasToken {
     uint public _mintAmount_;
     uint public _freeAmount_;
     uint public _freeUpToAmount_;
+    address public _transferTo_;
+    uint public _transferAmount_;
 
     function mint(uint _amount) external {
         _mintAmount_ = _amount;
@@ -18,5 +20,12 @@ contract MockGasToken is GasToken {
     function freeUpTo(uint _amount) external returns (uint) {
         _freeUpToAmount_ = _amount;
         return 0;
+    }
+
+    function transfer(address _to, uint _amount) external returns (bool) {
+        _transferTo_ = _to;
+        _transferAmount_ = _amount;
+
+        return true;
     }
 }

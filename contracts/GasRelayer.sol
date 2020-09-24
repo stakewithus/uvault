@@ -1,6 +1,5 @@
 pragma solidity 0.5.17;
 
-import "@openzeppelin/contracts/token/ERC20/IERC20.sol";
 import "./interfaces/GasToken.sol";
 
 contract GasRelayer {
@@ -29,19 +28,19 @@ contract GasRelayer {
         gasToken = _gasToken;
     }
 
-    function mintGasToken(uint _value) external {
-        GasToken(gasToken).mint(_value);
+    function mintGasToken(uint _amount) external {
+        GasToken(gasToken).mint(_amount);
     }
 
-    function transferGasToken(address _to, uint _value) external onlyAdmin {
-        IERC20(gasToken).transfer(_to, _value);
+    function transferGasToken(address _to, uint _amount) external onlyAdmin {
+        GasToken(gasToken).transfer(_to, _amount);
     }
 
-    function relayTx(uint _value, address _to, bytes calldata _data)
+    function relayTx(uint _amount, address _to, bytes calldata _data)
         external onlyAdmin
     {
-        if (_value > 0) {
-            GasToken(gasToken).freeUpTo(_value);
+        if (_amount > 0) {
+            GasToken(gasToken).freeUpTo(_amount);
         }
 
         (bool success,) = _to.call(_data);
