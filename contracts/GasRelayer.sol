@@ -2,12 +2,8 @@ pragma solidity 0.5.17;
 
 import "@openzeppelin/contracts/token/ERC20/SafeERC20.sol";
 import "@openzeppelin/contracts/token/ERC20/IERC20.sol";
+import "./interfaces/GasToken.sol";
 
-interface GasToken {
-    function mint(uint amount) external;
-    function free(uint amount) external returns (bool);
-    function freeUpTo(uint amount) external returns (uint);
-}
 
 contract GasRelayer {
     using SafeERC20 for IERC20;
