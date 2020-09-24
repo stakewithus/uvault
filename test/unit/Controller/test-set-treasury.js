@@ -1,15 +1,16 @@
 const { expect } = require("../setup");
 const { ZERO_ADDRESS } = require("../../util");
-
-const Controller = artifacts.require("Controller");
+const setup = require("./setup");
 
 contract("Controller", (accounts) => {
-  const admin = accounts[0];
-  const treasury = accounts[1];
+  const refs = setup(accounts);
+  const { admin } = refs;
 
   let controller;
-  beforeEach(async () => {
-    controller = await Controller.new(treasury, { from: admin });
+  let strategy;
+  beforeEach(() => {
+    controller = refs.controller;
+    strategy = refs.strategy;
   });
 
   describe("setTreasury", () => {

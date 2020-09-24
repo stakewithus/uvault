@@ -1,25 +1,16 @@
 const { expect } = require("../setup");
 const { eq, MAX_UINT } = require("../../util");
-
-const Controller = artifacts.require("Controller");
-const MockStrategy = artifacts.require("MockStrategy");
+const setup = require("./setup");
 
 contract("Controller", (accounts) => {
-  const admin = accounts[0];
-  const treasury = accounts[1];
-  // mock contract addresses
-  const vault = accounts[2];
-  const underlyingToken = accounts[3];
+  const refs = setup(accounts);
+  const { admin } = refs;
 
   let controller;
   let strategy;
-  beforeEach(async () => {
-    controller = await Controller.new(treasury, { from: admin });
-    strategy = await MockStrategy.new(
-      controller.address,
-      vault,
-      underlyingToken
-    );
+  beforeEach(() => {
+    controller = refs.controller;
+    strategy = refs.strategy;
   });
 
   describe("withdrawAll", () => {
