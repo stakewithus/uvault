@@ -62,7 +62,8 @@ contract("StrategyUsdcToCusd", (accounts) => {
     });
 
     const before = await snapshot();
-    await strategy.harvest({ from: admin });
+    // only controller can call harvest
+    await controller.harvest(strategy.address, { from: admin });
     const after = await snapshot();
 
     assert(after.usdc.treasury.gte(before.usdc.treasury), "usdc treasury");

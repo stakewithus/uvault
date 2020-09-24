@@ -59,6 +59,11 @@ contract StrategyUsdcToCusd is IStrategy {
         _;
     }
 
+    modifier onlyController() {
+        require(msg.sender == controller, "!controller");
+        _;
+    }
+
     modifier onlyVault() {
         require(msg.sender == vault, "!vault");
         _;
@@ -245,7 +250,7 @@ contract StrategyUsdcToCusd is IStrategy {
     @notice Claim CRV, swap for underlying, transfer performance fee to treasury,
             deposit remaning underlying
     */
-    function harvest() external onlyAdmin {
+    function harvest() external onlyController {
         _crvToUnderlying();
 
         uint usdcBal = IERC20(usdc).balanceOf(address(this));
