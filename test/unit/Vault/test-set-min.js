@@ -1,30 +1,17 @@
 const { expect } = require("../setup");
-
-const ERC20Token = artifacts.require("ERC20Token");
-const Vault = artifacts.require("Vault");
+const setup = require("./setup");
 
 contract("Vault", (accounts) => {
-  const admin = accounts[0];
-  // mock controller address
-  const controller = accounts[1];
-
-  let erc20;
-  before(async () => {
-    erc20 = await ERC20Token.new();
-  });
-
-  // set to 0 so we can immediately set strategy for other tests
   const MIN_WAIT_TIME = 0;
 
+  const refs = setup(accounts, MIN_WAIT_TIME);
+  const { admin } = refs;
+
   let vault;
-  beforeEach(async () => {
-    vault = await Vault.new(
-      controller,
-      erc20.address,
-      "vault",
-      "vault",
-      MIN_WAIT_TIME
-    );
+  let erc20;
+  beforeEach(() => {
+    vault = refs.vault;
+    erc20 = refs.erc20;
   });
 
   describe("setMin", () => {

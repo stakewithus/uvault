@@ -1,32 +1,21 @@
 const BN = require("bn.js");
 const { expect } = require("../setup");
 const { ZERO_ADDRESS, eq, getBlockTimestamp } = require("../../util");
+const setup = require("./setup");
 
-const ERC20Token = artifacts.require("ERC20Token");
 const MockStrategy = artifacts.require("MockStrategy");
-const Vault = artifacts.require("Vault");
 
 contract("Vault", (accounts) => {
-  const admin = accounts[0];
-  // mock controller address
-  const controller = accounts[1];
-
-  let erc20;
-  before(async () => {
-    erc20 = await ERC20Token.new();
-  });
-
   const MIN_WAIT_TIME = 100;
 
+  const refs = setup(accounts, MIN_WAIT_TIME);
+  const { admin } = refs;
+
   let vault;
-  beforeEach(async () => {
-    vault = await Vault.new(
-      controller,
-      erc20.address,
-      "vault",
-      "vault",
-      MIN_WAIT_TIME
-    );
+  let erc20;
+  beforeEach(() => {
+    vault = refs.vault;
+    erc20 = refs.erc20;
   });
 
   describe("setNextStrategy", () => {
