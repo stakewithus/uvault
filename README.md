@@ -2,7 +2,12 @@
 
 ```shell
 cp .env.sample .env.test
+# unit test
+ganache-cli
 
+truffle test test/unit/**/test-*.js
+
+# test mainnet fork
 source .env.test
 
 ganache-cli \
