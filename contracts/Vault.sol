@@ -154,7 +154,7 @@ contract Vault is ERC20, ERC20Detailed, IVault {
     @dev Only admin is allowed to call
     @dev Must withdraw all tokens from current strategy
     */
-    function switchStrategy() external onlyAdmin {
+    function switchStrategy() external onlyController {
         require(nextStrategy != address(0), "next strategy = zero address");
         require(nextStrategy != strategy, "next strategy = current strategy");
         require(block.timestamp >= timeLock, "timestamp < time lock");
@@ -171,7 +171,7 @@ contract Vault is ERC20, ERC20Detailed, IVault {
         emit SwitchStrategy(strategy);
     }
 
-    function _invest() internal whenStrategyDefined {
+    function _invest() internal {
         uint amount = _availableToInvest();
 
         if (amount > 0) {
@@ -184,14 +184,14 @@ contract Vault is ERC20, ERC20Detailed, IVault {
     @notice Invest token from vault into strategy.
             Some token are kept in vault for cheap withdraw.
     */
-    function invest() external onlyAdmin {
+    function invest() external onlyController whenStrategyDefined {
         _invest();
     }
 
     /*
     @notice Withdraw from strategy, fills up reserve and re-invests the rest of tokens
     */
-    function rebalance() external onlyAdmin whenStrategyDefined {
+    function rebalance() external onlyController whenStrategyDefined {
         IStrategy(strategy).withdrawAll();
         _invest();
     }

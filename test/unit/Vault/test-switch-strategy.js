@@ -33,7 +33,7 @@ contract("Vault", (accounts) => {
     });
 
     it("should set new strategy", async () => {
-      const tx = await vault.switchStrategy({ from: admin });
+      const tx = await vault.switchStrategy({ from: controller });
 
       assert.equal(tx.logs[1].event, "SwitchStrategy", "event");
       assert.equal(
@@ -77,12 +77,12 @@ contract("Vault", (accounts) => {
         };
       };
 
-      await vault.switchStrategy({ from: admin });
+      await vault.switchStrategy({ from: controller });
       await vault.setNextStrategy(newStrategy.address, { from: admin });
       await timeout(MIN_WAIT_TIME);
 
       const before = await snapshot();
-      await vault.switchStrategy({ from: admin });
+      await vault.switchStrategy({ from: controller });
       const after = await snapshot();
 
       assert.equal(before.vault.strategy, oldStrategy.address, "old strategy");
@@ -97,10 +97,10 @@ contract("Vault", (accounts) => {
       );
     });
 
-    it("should reject if not admin", async () => {
+    it("should reject if not controller", async () => {
       await expect(
-        vault.switchStrategy({ from: accounts[1] })
-      ).to.be.rejectedWith("!admin");
+        vault.switchStrategy({ from: accounts[0] })
+      ).to.be.rejectedWith("!controller");
     });
 
     it("should reject if strategy is zero address", async () => {
@@ -112,21 +112,21 @@ contract("Vault", (accounts) => {
         MIN_WAIT_TIME
       );
 
-      await expect(vault.switchStrategy({ from: admin })).to.be.rejectedWith(
-        "next strategy = zero address"
-      );
+      await expect(
+        vault.switchStrategy({ from: controller })
+      ).to.be.rejectedWith("next strategy = zero address");
     });
 
     it("should reject if same strategy", async () => {
-      vault.switchStrategy({ from: admin });
+      vault.switchStrategy({ from: controller });
 
-      await expect(vault.switchStrategy({ from: admin })).to.be.rejectedWith(
-        "next strategy = current strategy"
-      );
+      await expect(
+        vault.switchStrategy({ from: controller })
+      ).to.be.rejectedWith("next strategy = current strategy");
     });
 
     it("should reject timestamp < time lock", async () => {
-      await vault.switchStrategy({ from: admin });
+      await vault.switchStrategy({ from: controller });
 
       const newStrategy = await MockStrategy.new(
         controller,
@@ -146,9 +146,9 @@ contract("Vault", (accounts) => {
         "time lock"
       );
 
-      await expect(vault.switchStrategy({ from: admin })).to.be.rejectedWith(
-        "timestamp < time lock"
-      );
+      await expect(
+        vault.switchStrategy({ from: controller })
+      ).to.be.rejectedWith("timestamp < time lock");
     });
   });
 });

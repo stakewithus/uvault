@@ -30,7 +30,7 @@ contract("Vault", (accounts) => {
       await vault.deposit(amount, { from: sender });
 
       await vault.setNextStrategy(strategy.address, { from: admin });
-      await vault.switchStrategy({ from: admin });
+      await vault.switchStrategy({ from: controller });
     });
 
     it("should rebalance", async () => {
@@ -46,7 +46,7 @@ contract("Vault", (accounts) => {
       };
 
       const before = await snapshot();
-      await vault.rebalance({ from: admin });
+      await vault.rebalance({ from: controller });
       const after = await snapshot();
 
       assert(eq(await strategy._getWithdrawAmount_(), MAX_UINT), "withdraw");
@@ -60,9 +60,9 @@ contract("Vault", (accounts) => {
       );
     });
 
-    it("should reject if not admin", async () => {
-      await expect(vault.rebalance({ from: accounts[1] })).to.be.rejectedWith(
-        "!admin"
+    it("should reject if not controller", async () => {
+      await expect(vault.rebalance({ from: accounts[0] })).to.be.rejectedWith(
+        "!controller"
       );
     });
 
@@ -76,7 +76,7 @@ contract("Vault", (accounts) => {
       );
       assert.equal(await vault.strategy(), ZERO_ADDRESS, "strategy");
 
-      await expect(vault.rebalance({ from: admin })).to.be.rejectedWith(
+      await expect(vault.rebalance({ from: controller })).to.be.rejectedWith(
         "strategy = zero address"
       );
     });

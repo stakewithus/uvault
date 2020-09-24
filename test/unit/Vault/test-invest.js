@@ -30,7 +30,7 @@ contract("Vault", (accounts) => {
       await vault.deposit(amount, { from: sender });
 
       await vault.setNextStrategy(strategy.address, { from: admin });
-      await vault.switchStrategy({ from: admin });
+      await vault.switchStrategy({ from: controller });
     });
 
     it("should invest", async () => {
@@ -43,7 +43,7 @@ contract("Vault", (accounts) => {
       };
 
       const before = await snapshot();
-      await vault.invest({ from: admin });
+      await vault.invest({ from: controller });
       const after = await snapshot();
 
       assert(
@@ -57,14 +57,14 @@ contract("Vault", (accounts) => {
 
       assert(eq(await vault.availableToInvest(), new BN(0)), "available");
 
-      await vault.invest({ from: admin });
+      await vault.invest({ from: controller });
 
       assert(eq(await strategy._getDepositAmount_(), new BN(0)), "deposit");
     });
 
-    it("should reject if not admin", async () => {
-      await expect(vault.invest({ from: accounts[1] })).to.be.rejectedWith(
-        "!admin"
+    it("should reject if not controller", async () => {
+      await expect(vault.invest({ from: accounts[0] })).to.be.rejectedWith(
+        "!controller"
       );
     });
 
@@ -78,7 +78,7 @@ contract("Vault", (accounts) => {
       );
       assert.equal(await vault.strategy(), ZERO_ADDRESS, "strategy");
 
-      await expect(vault.invest({ from: admin })).to.be.rejectedWith(
+      await expect(vault.invest({ from: controller })).to.be.rejectedWith(
         "strategy = zero address"
       );
     });
