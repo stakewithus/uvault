@@ -13,7 +13,7 @@ const MockStrategy = artifacts.require("MockStrategy");
 const Vault = artifacts.require("Vault");
 
 contract("Vault", (accounts) => {
-  const MIN_WAIT_TIME = 1;
+  const MIN_WAIT_TIME = 2;
 
   const refs = setup(accounts, MIN_WAIT_TIME);
   const { admin, controller } = refs;
