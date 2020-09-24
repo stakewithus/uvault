@@ -1,29 +1,14 @@
 const BN = require("bn.js");
-
-const { USDC, USDC_WHALE, CUSD, CGAUGE, CRV } = require("../../config");
-const {
-  sendEther,
-  eq,
-  sub,
-  frac,
-  USDC_TO_CUSD_DECIMALS,
-} = require("../../util");
+const { USDC_WHALE } = require("../../config");
+const { eq, sub, frac } = require("../../util");
 const { getSnapshot } = require("./lib");
-
-const IERC20 = artifacts.require("IERC20");
-const Gauge = artifacts.require("Gauge");
-const Controller = artifacts.require("Controller");
-const StrategyUsdcToCusd = artifacts.require("StrategyUsdcToCusd");
+const setup = require("./setup");
 
 contract("StrategyUsdcToCusd", (accounts) => {
-  const vault = accounts[1];
-  const treasury = accounts[2];
+  const depositAmount = new BN(100).mul(new BN(10).pow(new BN(6)));
 
-  before(async () => {
-    await sendEther(web3, accounts[0], USDC_WHALE, 1);
-  });
-
-  const depositAmount = new BN(10).pow(new BN(6));
+  const refs = setup(accounts);
+  const { vault, treasury } = refs;
 
   let usdc;
   let cUsd;
@@ -32,12 +17,12 @@ contract("StrategyUsdcToCusd", (accounts) => {
   let controller;
   let strategy;
   beforeEach(async () => {
-    usdc = await IERC20.at(USDC);
-    cUsd = await IERC20.at(CUSD);
-    cGauge = await Gauge.at(CGAUGE);
-    crv = await IERC20.at(CRV);
-    controller = await Controller.new(treasury);
-    strategy = await StrategyUsdcToCusd.new(controller.address, vault);
+    usdc = refs.usdc;
+    cUsd = refs.cUsd;
+    cGauge = refs.cGauge;
+    crv = refs.crv;
+    controller = refs.controller;
+    strategy = refs.strategy;
 
     // deposit USDC into vault
     await usdc.transfer(vault, depositAmount, { from: USDC_WHALE });
