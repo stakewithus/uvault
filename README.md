@@ -18,6 +18,10 @@ ganache-cli \
 
 npm run test:mainnet
 
+# NOTE
+# restart ganache when you see this error
+# Error: Returned error: Returned error: project ID does not have access to archive state
+
 # test specific file
 truffle test --network mainnet_fork test/mainnet/path/to/test.js
 ```
