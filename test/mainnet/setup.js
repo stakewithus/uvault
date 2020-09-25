@@ -7,7 +7,7 @@ const GasToken = artifacts.require("GasToken");
 const GasRelayer = artifacts.require("GasRelayer");
 const Controller = artifacts.require("Controller");
 const Vault = artifacts.require("Vault");
-const StrategyMainnetTest = artifacts.require("StrategyMainnetTest");
+const StrategyTest = artifacts.require("StrategyTest");
 
 module.exports = (accounts) => {
   const admin = accounts[0];
@@ -56,7 +56,7 @@ module.exports = (accounts) => {
         from: admin,
       }
     );
-    const strategy = await StrategyMainnetTest.new(
+    const strategy = await StrategyTest.new(
       controller.address,
       vault.address,
       UNDERLYING,

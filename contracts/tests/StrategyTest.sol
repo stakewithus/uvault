@@ -6,7 +6,7 @@ import "@openzeppelin/contracts/math/SafeMath.sol";
 import "../IController.sol";
 import "../IStrategy.sol";
 
-contract StrategyMainnetTest is IStrategy {
+contract StrategyTest is IStrategy {
     using SafeMath for uint;
 
     address public admin;
