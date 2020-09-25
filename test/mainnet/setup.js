@@ -1,5 +1,5 @@
 const BN = require("bn.js");
-const { USDC, USDC_WHALE, CHI } = require("../config");
+const { USDC, USDC_WHALE, USDC_DECIMALS, CHI } = require("../config");
 const { sendEther } = require("../util");
 
 const IERC20 = artifacts.require("IERC20");
@@ -15,7 +15,7 @@ module.exports = (accounts) => {
 
   const whale = USDC_WHALE;
   const UNDERLYING = USDC;
-  const UNDERLYING_DECIMALS = 6;
+  const UNDERLYING_DECIMALS = USDC_DECIMALS;
   const MIN_WAIT_TIME = 0;
 
   // references to return
@@ -29,6 +29,7 @@ module.exports = (accounts) => {
     strategy: null,
     underlying: null,
     whale,
+    UNDERLYING_DECIMALS,
     MIN_WAIT_TIME,
   };
 
