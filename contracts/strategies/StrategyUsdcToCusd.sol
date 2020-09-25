@@ -144,7 +144,7 @@ contract StrategyUsdcToCusd is IStrategy {
     function deposit(uint _underlyingAmount) external onlyVault {
         require(_underlyingAmount > 0, "underlying = 0");
 
-        IERC20(underlying).transferFrom(msg.sender, address(this), _underlyingAmount);
+        IERC20(underlying).transferFrom(vault, address(this), _underlyingAmount);
         _depositUnderlying();
     }
 
@@ -200,7 +200,7 @@ contract StrategyUsdcToCusd is IStrategy {
             }
 
             // transfer rest to vault
-            IERC20(underlying).transfer(msg.sender, underlyingBal.sub(fee));
+            IERC20(underlying).transfer(vault, underlyingBal.sub(fee));
         }
     }
 
