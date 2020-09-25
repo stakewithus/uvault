@@ -20,21 +20,20 @@ contract StrategyMainnetTest is IStrategy {
     uint public performanceFee = 50;
     uint public performanceFeeMax = 10000;
 
-    address constant private usdc = address(0xA0b86991c6218b36c1d19D4a2e9Eb0cE3606eB48);
-    address constant private dai = address(0x6B175474E89094C44Da98b954EedeAC495271d0F);
-
-    address constant private underlying = usdc;
+    address public underlying;
 
     // test helper
     bool public _harvestWasCalled_;
 
-    constructor(address _controller, address _vault) public {
+    constructor(address _controller, address _vault, address _underlying) public {
         require(_controller != address(0), "controller = zero address");
         require(_vault != address(0), "vault = zero address");
+        require(_underlying != address(0), "underlying = zero address");
 
         admin = msg.sender;
         controller = _controller;
         vault = _vault;
+        underlying = _underlying;
     }
 
     modifier onlyAdmin() {
