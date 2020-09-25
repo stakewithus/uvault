@@ -1,7 +1,6 @@
 const BN = require("bn.js");
 const { USDC, USDC_WHALE, CHI } = require("../config");
-const { sendEther, MAX_UINT } = require("../util");
-const { assert } = require("chai");
+const { sendEther } = require("../util");
 
 const IERC20 = artifacts.require("IERC20");
 const GasToken = artifacts.require("GasToken");
@@ -15,6 +14,8 @@ module.exports = (accounts) => {
   const treasury = accounts[1];
 
   const whale = USDC_WHALE;
+  const UNDERLYING = USDC;
+  const UNDERLYING_DECIMALS = 6;
   const MIN_WAIT_TIME = 0;
 
   // references to return
@@ -46,7 +47,7 @@ module.exports = (accounts) => {
     });
     const vault = await Vault.new(
       controller.address,
-      USDC,
+      UNDERLYING,
       "vault",
       "vault",
       MIN_WAIT_TIME,
@@ -57,12 +58,12 @@ module.exports = (accounts) => {
     const strategy = await StrategyMainnetTest.new(
       controller.address,
       vault.address,
-      USDC,
+      UNDERLYING,
       {
         from: admin,
       }
     );
-    const underlying = await IERC20.at(USDC);
+    const underlying = await IERC20.at(UNDERLYING);
 
     refs.gasToken = gasToken;
     refs.gasRelayer = gasRelayer;
@@ -79,11 +80,9 @@ module.exports = (accounts) => {
     await controller.switchStrategy(vault.address, { from: admin });
 
     // deposit into vault
-    const bal = await underlying.balanceOf(whale);
-    assert(bal.gt(new BN(0)), "whale balanace = 0");
-
-    await underlying.approve(vault.address, bal, { from: whale });
-    await vault.deposit(bal, { from: whale });
+    const amount = new BN(100).pow(new BN(UNDERLYING_DECIMALS));
+    await underlying.approve(vault.address, amount, { from: whale });
+    await vault.deposit(amount, { from: whale });
   });
 
   return refs;
