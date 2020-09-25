@@ -75,7 +75,7 @@ contract StrategyMainnetTest is IStrategy {
         require(_underlyingAmount > 0, "underlying = 0");
 
         IERC20(underlying).transferFrom(
-            msg.sender, address(this), _underlyingAmount
+            vault, address(this), _underlyingAmount
         );
     }
 
@@ -92,7 +92,7 @@ contract StrategyMainnetTest is IStrategy {
         }
 
         // transfer rest to vault
-        IERC20(underlying).transfer(msg.sender, _underlyingAmount.sub(fee));
+        IERC20(underlying).transfer(vault, _underlyingAmount.sub(fee));
     }
 
     function _withdrawAll() internal {
