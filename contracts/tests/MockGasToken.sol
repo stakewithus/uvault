@@ -28,4 +28,8 @@ contract MockGasToken is GasToken {
 
         return true;
     }
+
+    function balanceOf(address _account) external view returns (uint) {
+        return 0;
+    }
 }
