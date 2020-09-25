@@ -50,6 +50,7 @@ contract("integration", (accounts) => {
     // check gas token was used
     assert(eq(after.gasToken.gasRelayer, new BN(0)), "gas token");
     // check underlying was transferred from vault to strategy
+    assert(before.underlying.vault.gt(new BN(0)), "vault before");
     assert(
       eq(
         after.underlying.vault,
