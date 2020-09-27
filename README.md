@@ -45,4 +45,5 @@ A_(i+1) = Ai + dAi
 - withdraw
 + harvest
 +/- assets locked in other Defi to yield fees and interest
++/- price of LP tokens
 ```
