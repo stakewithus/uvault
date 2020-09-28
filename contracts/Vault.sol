@@ -134,8 +134,6 @@ contract Vault is ERC20, ERC20Detailed, IVault {
     */
     function setNextStrategy(address _nextStrategy) external onlyAdmin {
         require(_nextStrategy != address(0), "strategy = zero address");
-        require(IStrategy(_nextStrategy).underlyingToken() == token, "strategy.token != vault.token");
-        require(IStrategy(_nextStrategy).vault() == address(this), "strategy.vault != vault");
         require(_nextStrategy != nextStrategy, "same next strategy");
         require(_nextStrategy != strategy, "next strategy = current strategy");
 
