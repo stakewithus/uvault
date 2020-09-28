@@ -30,6 +30,7 @@ truffle test --network mainnet_fork test/mainnet/path/to/test.js
 
 ```shell
 npm run ethlint
+npm run lint
 ```
 
 ### APY
