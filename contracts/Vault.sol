@@ -113,7 +113,7 @@ contract Vault is ERC20, ERC20Detailed, IVault {
         return _availableToInvest();
     }
 
-    function _totalLockedValue() internal view returns (uint) {
+    function _totalValueLocked() internal view returns (uint) {
         if (address(strategy) == address(0)) {
             return _balanceInVault();
         }
@@ -124,8 +124,8 @@ contract Vault is ERC20, ERC20Detailed, IVault {
     @notice Returns the total amount of tokens in vault + strategy
     @return Total amount of tokens in vault + strategy
     */
-    function totalLockedValue() external view returns (uint) {
-        return _totalLockedValue();
+    function totalValueLocked() external view returns (uint) {
+        return _totalValueLocked();
     }
 
     /*
@@ -213,7 +213,7 @@ contract Vault is ERC20, ERC20Detailed, IVault {
     @return Amount of underlying token that can be withdrawn
     */
     function calcWithdraw(uint _shares) external view returns (uint) {
-        return _shares.mul(_totalLockedValue()).div(totalSupply());
+        return _shares.mul(_totalValueLocked()).div(totalSupply());
     }
 
     /*
@@ -238,7 +238,7 @@ contract Vault is ERC20, ERC20Detailed, IVault {
         s / T = u / U
         u = s / T * U
         */
-        uint amountToWithdraw = _shares.mul(_totalLockedValue()).div(totalShares);
+        uint amountToWithdraw = _shares.mul(_totalValueLocked()).div(totalShares);
 
         uint bal = _balanceInVault();
         if (amountToWithdraw > bal) {
