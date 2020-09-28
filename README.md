@@ -26,6 +26,12 @@ npm run test:mainnet
 truffle test --network mainnet_fork test/mainnet/path/to/test.js
 ```
 
+### Lint
+
+```shell
+npm run ethlint
+```
+
 ### APY
 
 ```
