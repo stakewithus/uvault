@@ -45,6 +45,9 @@ contract Vault is ERC20, ERC20Detailed, IVault {
     // Minimum time that must pass before new strategy can be used
     uint public minWaitTime;
 
+    // mapping of approved strategies
+    mapping(address => bool) public strategies;
+
     /*
     @dev vault decimals must be equal to token decimals
     */
@@ -146,15 +149,10 @@ contract Vault is ERC20, ERC20Detailed, IVault {
         emit SetNextStrategy(_nextStrategy);
     }
 
-    /*
-    @notice Switch strategy
-    @dev Only admin is allowed to call
-    @dev Must withdraw all tokens from current strategy
-    */
-    function switchStrategy() external onlyController {
-        require(nextStrategy != address(0), "next strategy = zero address");
-        require(nextStrategy != strategy, "next strategy = current strategy");
-        require(block.timestamp >= timeLock, "timestamp < time lock");
+    function _switchStrategy(address _strategy) internal {
+        require(_strategy != strategy, "new strategy = current strategy");
+        require(IStrategy(_strategy).underlyingToken() == token, "strategy.token != vault.token");
+        require(IStrategy(_strategy).vault() == address(this), "strategy.vault != vault");
 
         // withdraw from current strategy
         if (strategy != address(0)) {
@@ -162,11 +160,27 @@ contract Vault is ERC20, ERC20Detailed, IVault {
             IStrategy(strategy).exit();
         }
 
-        strategy = nextStrategy;
+        strategy = _strategy;
+        if (!strategies[_strategy]) {
+            strategies[_strategy] = true;
+        }
+
         IERC20(token).safeApprove(strategy, 0);
         IERC20(token).safeApprove(strategy, uint(-1));
 
         emit SwitchStrategy(strategy);
+    }
+
+    /*
+    @notice Switch strategy
+    @dev Only admin is allowed to call
+    @dev Must withdraw all tokens from current strategy
+    */
+    function switchStrategy() external onlyController {
+        require(nextStrategy != address(0), "next strategy = zero address");
+        require(block.timestamp >= timeLock, "timestamp < time lock");
+
+        _switchStrategy(nextStrategy);
     }
 
     function _invest() internal {

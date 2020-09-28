@@ -35,7 +35,8 @@ contract("Vault", (accounts) => {
         strategy.address,
         "event arg switch strategy"
       );
-      assert.equal(await vault.strategy(), strategy.address);
+      assert.equal(await vault.strategy(), strategy.address, "strategy");
+      assert.isTrue(await strategy.strategies(strategy.address), "approved strategy");
       assert(eq(await erc20.allowance(vault.address, strategy.address), MAX_UINT));
       assert.isFalse(await strategy._exitWasCalled_(), "exit");
     });
@@ -100,14 +101,6 @@ contract("Vault", (accounts) => {
       );
     });
 
-    it("should reject if same strategy", async () => {
-      vault.switchStrategy({from: controller});
-
-      await expect(vault.switchStrategy({from: controller})).to.be.rejectedWith(
-        "next strategy = current strategy"
-      );
-    });
-
     it("should reject timestamp < time lock", async () => {
       await vault.switchStrategy({from: controller});
 
@@ -128,6 +121,32 @@ contract("Vault", (accounts) => {
 
       await expect(vault.switchStrategy({from: controller})).to.be.rejectedWith(
         "timestamp < time lock"
+      );
+    });
+
+    it("should reject if same strategy", async () => {
+      vault.switchStrategy({from: controller});
+
+      await expect(vault.switchStrategy({from: controller})).to.be.rejectedWith(
+        "new strategy = current strategy"
+      );
+    });
+
+    it("should reject strategy.token != vault.token", async () => {
+      // use non zero address to mock underlying token address
+      await strategy._setUnderlyingToken_(accounts[0]);
+
+      await expect(vault.switchStrategy({from: controller})).to.be.rejectedWith(
+        "strategy.token != vault.token"
+      );
+    });
+
+    it("should reject strategy.vault != vault", async () => {
+      // use non zero address to mock vault address
+      await strategy._setVault_(accounts[0]);
+
+      await expect(vault.switchStrategy({from: controller})).to.be.rejectedWith(
+        "strategy.vault != vault"
       );
     });
   });
