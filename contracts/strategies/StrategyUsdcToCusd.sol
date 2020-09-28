@@ -11,6 +11,11 @@ import "../interfaces/curve/DepositCompound.sol";
 import "../IController.sol";
 import "../IStrategy.sol";
 
+/* potential hacks?
+- front running?
+- slippage when withdrawing all from strategy
+*/
+
 contract StrategyUsdcToCusd is IStrategy {
     using SafeERC20 for IERC20;
     using SafeMath for uint;

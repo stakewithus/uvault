@@ -9,11 +9,18 @@ import "@openzeppelin/contracts/token/ERC20/ERC20Detailed.sol";
 import "./IStrategy.sol";
 import "./IVault.sol";
 
-// TODO: circuit breaker
-// TODO: protect against hack by directly sending token to this contract's address
-// TODO: protect against flash loan attack? deposit, flash loan to increase Defi pool, withdraw
-// TODO: safe withdraw any token in case strategy sends back wrong token
-// TODO: batch deposit and batch withdraw (via sig or approve(msg.sender, this contract, shares))
+// TODO: batch deposit and batch withdraw
+
+/* potential hacks?
+- directly send underlying token to this vault
+- flash loan
+    - vault deposit
+    - use loan and make underlying token more valuable
+    - vault withdraw
+    - return loan
+- front running?
+- slippage when withdrawing all from strategy
+*/
 
 contract Vault is ERC20, ERC20Detailed, IVault {
     using SafeERC20 for IERC20;
