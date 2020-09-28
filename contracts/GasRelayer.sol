@@ -36,14 +36,16 @@ contract GasRelayer {
         GasToken(gasToken).transfer(_to, _amount);
     }
 
-    function relayTx(uint _amount, address _to, bytes calldata _data)
-        external onlyAdmin
-    {
+    function relayTx(
+        uint _amount,
+        address _to,
+        bytes calldata _data
+    ) external onlyAdmin {
         if (_amount > 0) {
             GasToken(gasToken).freeUpTo(_amount);
         }
 
-        (bool success,) = _to.call(_data);
+        (bool success, ) = _to.call(_data);
         require(success, "relay failed");
     }
 }

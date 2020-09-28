@@ -46,11 +46,11 @@ contract Vault is ERC20, ERC20Detailed, IVault {
     */
     constructor(
         address _controller,
-        address _token, string memory _name, string memory _symbol,
+        address _token,
+        string memory _name,
+        string memory _symbol,
         uint _minWaitTime
-    ) ERC20Detailed(
-        _name, _symbol, ERC20Detailed(_token).decimals()
-    ) public  {
+    ) public ERC20Detailed(_name, _symbol, ERC20Detailed(_token).decimals()) {
         // NOTE: ERC20Detailed(_token).decimals() will fail if token = address(0)
         require(_controller != address(0), "controller = zero address");
 
@@ -130,14 +130,8 @@ contract Vault is ERC20, ERC20Detailed, IVault {
     */
     function setNextStrategy(address _nextStrategy) external onlyAdmin {
         require(_nextStrategy != address(0), "strategy = zero address");
-        require(
-            IStrategy(_nextStrategy).underlyingToken() == token,
-            "strategy.token != vault.token"
-        );
-        require(
-            IStrategy(_nextStrategy).vault() == address(this),
-            "strategy.vault != vault"
-        );
+        require(IStrategy(_nextStrategy).underlyingToken() == token, "strategy.token != vault.token");
+        require(IStrategy(_nextStrategy).vault() == address(this), "strategy.vault != vault");
         require(_nextStrategy != nextStrategy, "same next strategy");
         require(_nextStrategy != strategy, "next strategy = current strategy");
 
@@ -167,7 +161,7 @@ contract Vault is ERC20, ERC20Detailed, IVault {
         }
 
         strategy = nextStrategy;
-        IERC20(token).safeApprove(strategy, uint256(-1));
+        IERC20(token).safeApprove(strategy, uint(-1));
 
         emit SwitchStrategy(strategy);
     }
