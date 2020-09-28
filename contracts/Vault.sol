@@ -9,7 +9,6 @@ import "@openzeppelin/contracts/token/ERC20/ERC20Detailed.sol";
 import "./IStrategy.sol";
 import "./IVault.sol";
 
-// TODO: reentrancy lock
 // TODO: circuit breaker
 // TODO: protect against hack by directly sending token to this contract's address
 // TODO: protect against flash loan attack? deposit, flash loan to increase Defi pool, withdraw
@@ -218,7 +217,7 @@ contract Vault is ERC20, ERC20Detailed, IVault {
     function withdraw(uint _shares, uint _min) external {
         // NOTE: cache totalSupply before burning
         uint totalShares = totalSupply();
-        require(totalShares > 0, "total supply = 0");
+        require(totalShares > 0, "total shares = 0");
         require(_shares > 0, "shares = 0");
 
         _burn(msg.sender, _shares);
@@ -226,17 +225,17 @@ contract Vault is ERC20, ERC20Detailed, IVault {
         /*
         s = shares
         T = total supply of shares
-        y = amount of token to withdraw
-        Y = total amount of token in vault + strategy
+        u = amount of underlying token to withdraw
+        U = total amount of underlying token in vault + strategy
 
-        s / T = y / Y
-        y = s / T * Y
+        s / T = u / U
+        u = s / T * U
         */
         uint amountToWithdraw = _shares.mul(_totalLockedValue()).div(totalShares);
 
         uint bal = _balanceInVault();
         if (amountToWithdraw > bal) {
-            // NOTE: can skip check for underflow here since amountToWithdraw > bal
+            // safe to skip check for underflow since amountToWithdraw > bal
             IStrategy(strategy).withdraw(amountToWithdraw - bal);
 
             uint balAfter = _balanceInVault();
