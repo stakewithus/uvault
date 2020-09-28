@@ -1,7 +1,6 @@
 pragma solidity 0.5.17;
 
 import "@openzeppelin/contracts/math/SafeMath.sol";
-// TODO SafeERC20 lite
 import "@openzeppelin/contracts/token/ERC20/SafeERC20.sol";
 import "@openzeppelin/contracts/token/ERC20/IERC20.sol";
 import "@openzeppelin/contracts/token/ERC20/ERC20.sol";
@@ -12,7 +11,6 @@ import "./IVault.sol";
 
 // TODO: reentrancy lock
 // TODO: circuit breaker
-// TODO: inline safeTransfer to save gas?
 // TODO: protect against hack by directly sending token to this contract's address
 // TODO: protect against flash loan attack? deposit, flash loan to increase Defi pool, withdraw
 // TODO: safe withdraw any token in case strategy sends back wrong token
@@ -156,12 +154,12 @@ contract Vault is ERC20, ERC20Detailed, IVault {
 
         // withdraw from current strategy
         if (strategy != address(0)) {
-            IERC20(token).safeApprove(strategy, 0);
+            IERC20(token).approve(strategy, 0);
             IStrategy(strategy).exit();
         }
 
         strategy = nextStrategy;
-        IERC20(token).safeApprove(strategy, uint(-1));
+        IERC20(token).approve(strategy, uint(-1));
 
         emit SwitchStrategy(strategy);
     }
