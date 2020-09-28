@@ -33,6 +33,31 @@ npm run ethlint
 npm run lint
 ```
 
+### Slither
+
+```shell
+docker run -it -v $PWD:/code trailofbits/eth-security-toolbox
+
+solc-select 0.5.17
+cd /code
+# slither analysis
+slither .
+
+# quick review
+slither . --print human-summary
+
+slither . --print inheritance-graph
+xdot contracts.dot
+
+slither . --print contract-summary
+
+# in-depth review
+slither . --print call-graph
+slither . --print cfg
+slither . --print function-summary
+slither . --print vars-and-auth
+```
+
 ### APY
 
 ```
