@@ -9,6 +9,7 @@
     "scripts": {
         "ethlint": "solium -d contracts --fix",
         "lint": "prettier --write contracts/*.sol contracts/**/*.sol",
+        "lint:check": "prettier --check contracts/*.sol contracts/**/*.sol",
         "test": "echo \"Error: no test specified\" && exit 1",
         "test:mainnet": "truffle test --network mainnet_fork",
         "test:unit": "truffle test test/unit/**/test-*.js"
