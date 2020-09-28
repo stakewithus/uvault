@@ -1,12 +1,14 @@
 pragma solidity 0.5.17;
 
 import "@openzeppelin/contracts/token/ERC20/IERC20.sol";
+import "@openzeppelin/contracts/token/ERC20/SafeERC20.sol";
 import "@openzeppelin/contracts/math/SafeMath.sol";
 
 import "../IController.sol";
 import "../IStrategy.sol";
 
 contract StrategyTest is IStrategy {
+    using SafeERC20 for IERC20;
     using SafeMath for uint;
 
     address public admin;
@@ -75,7 +77,7 @@ contract StrategyTest is IStrategy {
     function deposit(uint _underlyingAmount) external onlyVault {
         require(_underlyingAmount > 0, "underlying = 0");
 
-        IERC20(underlying).transferFrom(vault, address(this), _underlyingAmount);
+        IERC20(underlying).safeTransferFrom(vault, address(this), _underlyingAmount);
     }
 
     function withdraw(uint _underlyingAmount) external onlyVault {
@@ -87,17 +89,17 @@ contract StrategyTest is IStrategy {
             address treasury = IController(controller).treasury();
             require(treasury != address(0), "treasury = zero address");
 
-            IERC20(underlying).transfer(treasury, fee);
+            IERC20(underlying).safeTransfer(treasury, fee);
         }
 
         // transfer rest to vault
-        IERC20(underlying).transfer(vault, _underlyingAmount.sub(fee));
+        IERC20(underlying).safeTransfer(vault, _underlyingAmount.sub(fee));
     }
 
     function _withdrawAll() internal {
         uint underlyingBal = IERC20(underlying).balanceOf(address(this));
         if (underlyingBal > 0) {
-            IERC20(underlying).transfer(vault, underlyingBal);
+            IERC20(underlying).safeTransfer(vault, underlyingBal);
         }
     }
 

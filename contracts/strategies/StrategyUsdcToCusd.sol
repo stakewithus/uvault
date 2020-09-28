@@ -1,6 +1,7 @@
 pragma solidity 0.5.17;
 
 import "@openzeppelin/contracts/token/ERC20/IERC20.sol";
+import "@openzeppelin/contracts/token/ERC20/SafeERC20.sol";
 import "@openzeppelin/contracts/math/SafeMath.sol";
 
 import "../interfaces/uniswap/Uniswap.sol";
@@ -11,6 +12,7 @@ import "../IController.sol";
 import "../IStrategy.sol";
 
 contract StrategyUsdcToCusd is IStrategy {
+    using SafeERC20 for IERC20;
     using SafeMath for uint;
 
     address public admin;
@@ -140,7 +142,7 @@ contract StrategyUsdcToCusd is IStrategy {
     function deposit(uint _underlyingAmount) external onlyVault {
         require(_underlyingAmount > 0, "underlying = 0");
 
-        IERC20(underlying).transferFrom(vault, address(this), _underlyingAmount);
+        IERC20(underlying).safeTransferFrom(vault, address(this), _underlyingAmount);
         _depositUnderlying();
     }
 
@@ -192,11 +194,11 @@ contract StrategyUsdcToCusd is IStrategy {
                 address treasury = IController(controller).treasury();
                 require(treasury != address(0), "treasury = zero address");
 
-                IERC20(underlying).transfer(treasury, fee);
+                IERC20(underlying).safeTransfer(treasury, fee);
             }
 
             // transfer rest to vault
-            IERC20(underlying).transfer(vault, underlyingBal.sub(fee));
+            IERC20(underlying).safeTransfer(vault, underlyingBal.sub(fee));
         }
     }
 
@@ -209,7 +211,7 @@ contract StrategyUsdcToCusd is IStrategy {
 
         uint underlyingBal = IERC20(underlying).balanceOf(address(this));
         if (underlyingBal > 0) {
-            IERC20(underlying).transfer(vault, underlyingBal);
+            IERC20(underlying).safeTransfer(vault, underlyingBal);
         }
     }
 
@@ -258,7 +260,7 @@ contract StrategyUsdcToCusd is IStrategy {
                 address treasury = IController(controller).treasury();
                 require(treasury != address(0), "treasury = zero address");
 
-                IERC20(usdc).transfer(treasury, fee);
+                IERC20(usdc).safeTransfer(treasury, fee);
             }
 
             // deposit remaining underlying for cUsd
