@@ -136,7 +136,7 @@ contract Vault is ERC20, ERC20Detailed, IVault {
         );
         require(
             IStrategy(_nextStrategy).vault() == address(this),
-           "strategy.vault != vault"
+            "strategy.vault != vault"
         );
         require(_nextStrategy != nextStrategy, "same next strategy");
         require(_nextStrategy != strategy, "next strategy = current strategy");

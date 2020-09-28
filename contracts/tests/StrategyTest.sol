@@ -53,7 +53,7 @@ contract StrategyTest is IStrategy {
 
     modifier onlyVaultOrController() {
         require(
-            msg.sender == vault || msg.sender == controller ,
+            msg.sender == vault || msg.sender == controller,
             "!vault and !controller"
         );
         _;
@@ -109,8 +109,7 @@ contract StrategyTest is IStrategy {
     function harvest() external onlyController {
         _harvestWasCalled_ = true;
     }
-
     function exit() external onlyVaultOrController {
         _withdrawAll();
-   }
+    }
 }

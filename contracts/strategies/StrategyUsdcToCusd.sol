@@ -71,7 +71,7 @@ contract StrategyUsdcToCusd is IStrategy {
 
     modifier onlyVaultOrController() {
         require(
-            msg.sender == vault || msg.sender == controller ,
+            msg.sender == vault || msg.sender == controller,
             "!vault and !controller"
         );
         _;
@@ -280,5 +280,5 @@ contract StrategyUsdcToCusd is IStrategy {
     function exit() external onlyVaultOrController {
         _crvToUnderlying();
         _withdrawAll();
-   }
+    }
 }
