@@ -30,7 +30,7 @@ contract Vault is ERC20, ERC20Detailed, IVault {
 
     // percentange of token available to be invested into strategy
     uint public min = 9500;
-    uint public constant max = 10000;
+    uint public constant MAX = 10000;
 
     // address of next strategy to be used
     address public nextStrategy;
@@ -79,7 +79,7 @@ contract Vault is ERC20, ERC20Detailed, IVault {
     }
 
     function setMin(uint _min) external onlyAdmin {
-        require(_min <= max, "min > max");
+        require(_min <= MAX, "min > max");
         min = _min;
     }
 
@@ -96,7 +96,7 @@ contract Vault is ERC20, ERC20Detailed, IVault {
     }
 
     function _availableToInvest() internal view returns (uint) {
-        return _balanceInVault().mul(min).div(max);
+        return _balanceInVault().mul(min).div(MAX);
     }
 
     /*
@@ -217,8 +217,8 @@ contract Vault is ERC20, ERC20Detailed, IVault {
     */
     function withdraw(uint _shares, uint _min) external {
         // NOTE: cache totalSupply before burning
-        uint totalSupply = totalSupply();
-        require(totalSupply > 0, "total supply = 0");
+        uint totalShares = totalSupply();
+        require(totalShares > 0, "total supply = 0");
         require(_shares > 0, "shares = 0");
 
         _burn(msg.sender, _shares);
@@ -232,7 +232,7 @@ contract Vault is ERC20, ERC20Detailed, IVault {
         s / T = y / Y
         y = s / T * Y
         */
-        uint amountToWithdraw = _shares.mul(_totalLockedValue()).div(totalSupply);
+        uint amountToWithdraw = _shares.mul(_totalLockedValue()).div(totalShares);
 
         uint bal = _balanceInVault();
         if (amountToWithdraw > bal) {

@@ -16,11 +16,11 @@ contract StrategyTest is IStrategy {
     address public vault;
 
     uint public withdrawFee = 50;
-    uint public withdrawFeeMax = 10000;
+    uint public constant WITHDRAW_FEE_MAX = 10000;
 
     // performance fee sent to treasury when harvest() generates profit
     uint public performanceFee = 50;
-    uint public performanceFeeMax = 10000;
+    uint public constant PERFORMANCE_FEE_MAX = 10000;
 
     address public underlying;
 
@@ -84,7 +84,7 @@ contract StrategyTest is IStrategy {
         require(_underlyingAmount > 0, "underlying = 0");
 
         // transfer fee to treasury
-        uint fee = _underlyingAmount.mul(withdrawFee).div(withdrawFeeMax);
+        uint fee = _underlyingAmount.mul(withdrawFee).div(WITHDRAW_FEE_MAX);
         if (fee > 0) {
             address treasury = IController(controller).treasury();
             require(treasury != address(0), "treasury = zero address");
