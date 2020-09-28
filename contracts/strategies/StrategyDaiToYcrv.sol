@@ -25,7 +25,7 @@ import "../IStrategy.sol";
 
 contract StrategyDaiToYcrv is IStrategy {
     using SafeERC20 for IERC20;
-    using SafeMath for uint256;
+    using SafeMath for uint;
 
     address public admin;
     address public controller;
@@ -39,28 +39,28 @@ contract StrategyDaiToYcrv is IStrategy {
     uint public performanceFee = 50;
     uint public performanceFeeMax = 10000;
 
-    address constant private dai = address(0x6B175474E89094C44Da98b954EedeAC495271d0F);
+    address private constant dai = address(0x6B175474E89094C44Da98b954EedeAC495271d0F);
 
     // Curve
     // yDAIyUSDCyUSDTyTUSD
-    address constant private yCrv = address(0xdF5e0e81Dff6FAF3A7e52BA697820c5e32D806A8);
-    address constant private gauge = address(0xFA712EE4788C042e2B7BB55E6cb8ec569C4530c1);
+    address private constant yCrv = address(0xdF5e0e81Dff6FAF3A7e52BA697820c5e32D806A8);
+    address private constant gauge = address(0xFA712EE4788C042e2B7BB55E6cb8ec569C4530c1);
     // Curve Minter
-    address constant private minter = address(0xd061D61a4d941c39E5453435B6345Dc261C2fcE0);
+    address private constant minter = address(0xd061D61a4d941c39E5453435B6345Dc261C2fcE0);
     // Curve DepositY
-    address constant private depositY = address(0xbBC81d23Ea2c3ec7e56D39296F0cbB648873a5d3);
+    address private constant depositY = address(0xbBC81d23Ea2c3ec7e56D39296F0cbB648873a5d3);
     // CRV DAO token
-    address constant private crv = address(0xD533a949740bb3306d119CC777fa900bA034cd52);
+    address private constant crv = address(0xD533a949740bb3306d119CC777fa900bA034cd52);
     // Curve
-    address constant private curve = address(0x45F783CCE6B7FF23B2ab2D70e416cdb7D6055f51);
+    address private constant curve = address(0x45F783CCE6B7FF23B2ab2D70e416cdb7D6055f51);
 
     // DEX related addresses
-    address constant private oneSplit = address(0x50FDA034C0Ce7a8f7EFDAebDA7Aa7cA21CC1267e);
-    address constant private uniswap = address(0x7a250d5630B4cF539739dF2C5dAcb4c659F2488D);
-    address constant private weth = address(0xC02aaA39b223FE8D0A0e5C4F27eAD9083C756Cc2); // used for crv <> weth <> dai route
+    address private constant oneSplit = address(0x50FDA034C0Ce7a8f7EFDAebDA7Aa7cA21CC1267e);
+    address private constant uniswap = address(0x7a250d5630B4cF539739dF2C5dAcb4c659F2488D);
+    address private constant weth = address(0xC02aaA39b223FE8D0A0e5C4F27eAD9083C756Cc2); // used for crv <> weth <> dai route
 
     // DAI yVault
-    address constant private yDai = address(0x16de59092dAE5CcF4A1E6439D611fd0653f0Bd01);
+    address private constant yDai = address(0x16de59092dAE5CcF4A1E6439D611fd0653f0Bd01);
 
     constructor(address _controller, address _vault) public {
         require(_controller != address(0)); // dev: controller = zero address
@@ -114,7 +114,7 @@ contract StrategyDaiToYcrv is IStrategy {
     @notice Get amout of DAI from yCrv
     @param _yCrvAmount Amount of yCrv to convert to DAI
     */
-    function _getYcrvToDai( uint _yCrvAmount) internal view returns (uint) {
+    function _getYcrvToDai(uint _yCrvAmount) internal view returns (uint) {
         // DAI = index 0
         return DepositY(depositY).calc_withdraw_one_coin(_yCrvAmount, int128(0));
     }
@@ -135,14 +135,14 @@ contract StrategyDaiToYcrv is IStrategy {
     */
     function _daiToYcrv() internal {
         // DAI to yDAI
-        uint256 daiBal = IERC20(dai).balanceOf(address(this));
+        uint daiBal = IERC20(dai).balanceOf(address(this));
         if (daiBal > 0) {
             IERC20(dai).safeApprove(yDai, daiBal);
             yERC20(yDai).deposit(daiBal);
         }
 
         // yDAI to yCRV
-        uint256 yDaiBal = IERC20(yDai).balanceOf(address(this));
+        uint yDaiBal = IERC20(yDai).balanceOf(address(this));
         if (yDaiBal > 0) {
             IERC20(yDai).safeApprove(curve, yDaiBal);
             // mint yCRV
@@ -151,7 +151,7 @@ contract StrategyDaiToYcrv is IStrategy {
         }
 
         // stake yCRV into Gauge
-        uint256 yCrvBal = IERC20(yCrv).balanceOf(address(this));
+        uint yCrvBal = IERC20(yCrv).balanceOf(address(this));
         if (yCrvBal > 0) {
             IERC20(yCrv).safeApprove(gauge, yCrvBal);
             Gauge(gauge).deposit(yCrvBal);
@@ -171,11 +171,10 @@ contract StrategyDaiToYcrv is IStrategy {
     @return value of yDAI
     */
     function _getDaiToYdai(uint _daiAmount) internal view returns (uint) {
-        return _daiAmount
-        .mul(10 ** 18)
-        .div(
-            yERC20(yDai).getPricePerFullShare() // returns yDAI / DAI
-        );
+        return
+            _daiAmount.mul(10**18).div(
+                yERC20(yDai).getPricePerFullShare() // returns yDAI / DAI
+            );
     }
 
     /*
@@ -200,9 +199,7 @@ contract StrategyDaiToYcrv is IStrategy {
 
         // withdraw yDAI from Curve
         // TODO: pass min as input?
-        ICurveFi(curve).remove_liquidity_imbalance(
-            [yDaiAmount, 0, 0, 0], _yCrvAmount
-        );
+        ICurveFi(curve).remove_liquidity_imbalance([yDaiAmount, 0, 0, 0], _yCrvAmount);
 
         // withdraw DAI from yVault
         uint yDaiBal = IERC20(yDai).balanceOf(address(this));
@@ -257,7 +254,6 @@ contract StrategyDaiToYcrv is IStrategy {
 
         _yCrvToDai(yCrvAmount);
         _depositYcrvDust();
-
 
         // transfer DAI to treasury and vault
         uint daiBal = IERC20(dai).balanceOf(address(this));
@@ -317,9 +313,7 @@ contract StrategyDaiToYcrv is IStrategy {
             path[2] = dai;
 
             // TODO: use 1inch?
-            Uniswap(uniswap).swapExactTokensForTokens(
-                crvBal, uint(0), path, address(this), now.add(1800)
-            );
+            Uniswap(uniswap).swapExactTokensForTokens(crvBal, uint(0), path, address(this), now.add(1800));
             // NOTE: Now this contract has DAI
         }
     }

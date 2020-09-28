@@ -15,7 +15,11 @@ contract MockStrategy is IStrategy {
     bool public _exitWasCalled_;
     bool public _harvestWasCalled_;
 
-    constructor(address _controller, address _vault, address _underlyingToken) public {
+    constructor(
+        address _controller,
+        address _vault,
+        address _underlyingToken
+    ) public {
         admin = msg.sender;
         controller = _controller;
         vault = _vault;

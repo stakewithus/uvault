@@ -25,7 +25,11 @@ contract StrategyTest is IStrategy {
     // test helper
     bool public _harvestWasCalled_;
 
-    constructor(address _controller, address _vault, address _underlying) public {
+    constructor(
+        address _controller,
+        address _vault,
+        address _underlying
+    ) public {
         require(_controller != address(0), "controller = zero address");
         require(_vault != address(0), "vault = zero address");
         require(_underlying != address(0), "underlying = zero address");
@@ -52,10 +56,7 @@ contract StrategyTest is IStrategy {
     }
 
     modifier onlyVaultOrController() {
-        require(
-            msg.sender == vault || msg.sender == controller,
-            "!vault and !controller"
-        );
+        require(msg.sender == vault || msg.sender == controller, "!vault and !controller");
         _;
     }
 
@@ -74,9 +75,7 @@ contract StrategyTest is IStrategy {
     function deposit(uint _underlyingAmount) external onlyVault {
         require(_underlyingAmount > 0, "underlying = 0");
 
-        IERC20(underlying).transferFrom(
-            vault, address(this), _underlyingAmount
-        );
+        IERC20(underlying).transferFrom(vault, address(this), _underlyingAmount);
     }
 
     function withdraw(uint _underlyingAmount) external onlyVault {
@@ -109,6 +108,7 @@ contract StrategyTest is IStrategy {
     function harvest() external onlyController {
         _harvestWasCalled_ = true;
     }
+
     function exit() external onlyVaultOrController {
         _withdrawAll();
     }

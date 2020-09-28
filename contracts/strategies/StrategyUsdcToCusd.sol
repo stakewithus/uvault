@@ -24,26 +24,26 @@ contract StrategyUsdcToCusd is IStrategy {
     uint public performanceFee = 50;
     uint public performanceFeeMax = 10000;
 
-    address constant private usdc = address(0xA0b86991c6218b36c1d19D4a2e9Eb0cE3606eB48);
-    address constant private dai = address(0x6B175474E89094C44Da98b954EedeAC495271d0F);
+    address private constant usdc = address(0xA0b86991c6218b36c1d19D4a2e9Eb0cE3606eB48);
+    address private constant dai = address(0x6B175474E89094C44Da98b954EedeAC495271d0F);
 
-    address constant private underlying = usdc;
+    address private constant underlying = usdc;
 
     // Curve
     // cDAI/cUSDC
-    address constant private cUsd = address(0x845838DF265Dcd2c412A1Dc9e959c7d08537f8a2);
+    address private constant cUsd = address(0x845838DF265Dcd2c412A1Dc9e959c7d08537f8a2);
     // DepositCompound
-    address constant private depositC = address(0xeB21209ae4C2c9FF2a86ACA31E123764A3B6Bc06);
+    address private constant depositC = address(0xeB21209ae4C2c9FF2a86ACA31E123764A3B6Bc06);
     // cUsd Gauge
-    address constant private gauge = address(0x7ca5b0a2910B33e9759DC7dDB0413949071D7575);
+    address private constant gauge = address(0x7ca5b0a2910B33e9759DC7dDB0413949071D7575);
     // Minter
-    address constant private minter = address(0xd061D61a4d941c39E5453435B6345Dc261C2fcE0);
+    address private constant minter = address(0xd061D61a4d941c39E5453435B6345Dc261C2fcE0);
     // DAO
-    address constant private crv = address(0xD533a949740bb3306d119CC777fa900bA034cd52);
+    address private constant crv = address(0xD533a949740bb3306d119CC777fa900bA034cd52);
 
     // DEX related addresses
-    address constant private uniswap = address(0x7a250d5630B4cF539739dF2C5dAcb4c659F2488D);
-    address constant private weth = address(0xC02aaA39b223FE8D0A0e5C4F27eAD9083C756Cc2); // used for crv <> weth <> usdc route
+    address private constant uniswap = address(0x7a250d5630B4cF539739dF2C5dAcb4c659F2488D);
+    address private constant weth = address(0xC02aaA39b223FE8D0A0e5C4F27eAD9083C756Cc2); // used for crv <> weth <> usdc route
 
     constructor(address _controller, address _vault) public {
         require(_controller != address(0), "controller = zero address");
@@ -70,10 +70,7 @@ contract StrategyUsdcToCusd is IStrategy {
     }
 
     modifier onlyVaultOrController() {
-        require(
-            msg.sender == vault || msg.sender == controller,
-            "!vault and !controller"
-        );
+        require(msg.sender == vault || msg.sender == controller, "!vault and !controller");
         _;
     }
 
@@ -106,8 +103,7 @@ contract StrategyUsdcToCusd is IStrategy {
 
         // DAI  = 0
         // USDC = 1
-        return DepositCompound(depositC)
-            .calc_withdraw_one_coin(gaugeBal, int128(1));
+        return DepositCompound(depositC).calc_withdraw_one_coin(gaugeBal, int128(1));
     }
 
     /*
@@ -122,7 +118,7 @@ contract StrategyUsdcToCusd is IStrategy {
     */
     function _depositUnderlying() internal {
         // underlying to cUsd
-        uint256 underlyingBal = IERC20(underlying).balanceOf(address(this));
+        uint underlyingBal = IERC20(underlying).balanceOf(address(this));
         if (underlyingBal > 0) {
             IERC20(underlying).approve(depositC, underlyingBal);
             // mint cUsd
@@ -130,7 +126,7 @@ contract StrategyUsdcToCusd is IStrategy {
         }
 
         // stake cUsd into Gauge
-        uint256 cUsdBal = IERC20(cUsd).balanceOf(address(this));
+        uint cUsdBal = IERC20(cUsd).balanceOf(address(this));
         if (cUsdBal > 0) {
             IERC20(cUsd).approve(gauge, cUsdBal);
             Gauge(gauge).deposit(cUsdBal);
@@ -242,9 +238,7 @@ contract StrategyUsdcToCusd is IStrategy {
             path[1] = weth;
             path[2] = underlying;
 
-            Uniswap(uniswap).swapExactTokensForTokens(
-                crvBal, uint(0), path, address(this), now.add(1800)
-            );
+            Uniswap(uniswap).swapExactTokensForTokens(crvBal, uint(0), path, address(this), now.add(1800));
             // NOTE: Now this contract has underlying token
         }
     }
