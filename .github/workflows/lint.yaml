@@ -27,6 +27,9 @@ jobs:
             - name: Install dependencies
               run: npm i
 
-            - name: Run linter on *.sol and *.json
+            - name: Run linter on *.sol
               run: npm run lint:check
+
+            - name: Run ethlint
+              run: npm run ethlint
 # TODO: Add Slither Static Analyzer
