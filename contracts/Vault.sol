@@ -154,12 +154,13 @@ contract Vault is ERC20, ERC20Detailed, IVault {
 
         // withdraw from current strategy
         if (strategy != address(0)) {
-            IERC20(token).approve(strategy, 0);
+            IERC20(token).safeApprove(strategy, 0);
             IStrategy(strategy).exit();
         }
 
         strategy = nextStrategy;
-        IERC20(token).approve(strategy, uint(-1));
+        IERC20(token).safeApprove(strategy, 0);
+        IERC20(token).safeApprove(strategy, uint(-1));
 
         emit SwitchStrategy(strategy);
     }

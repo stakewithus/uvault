@@ -122,7 +122,8 @@ contract StrategyUsdcToCusd is IStrategy {
         // underlying to cUsd
         uint underlyingBal = IERC20(underlying).balanceOf(address(this));
         if (underlyingBal > 0) {
-            IERC20(underlying).approve(depositC, underlyingBal);
+            IERC20(underlying).safeApprove(depositC, 0);
+            IERC20(underlying).safeApprove(depositC, underlyingBal);
             // mint cUsd
             DepositCompound(depositC).add_liquidity([0, underlyingBal], 0);
         }
@@ -130,7 +131,8 @@ contract StrategyUsdcToCusd is IStrategy {
         // stake cUsd into Gauge
         uint cUsdBal = IERC20(cUsd).balanceOf(address(this));
         if (cUsdBal > 0) {
-            IERC20(cUsd).approve(gauge, cUsdBal);
+            IERC20(cUsd).safeApprove(gauge, 0);
+            IERC20(cUsd).safeApprove(gauge, cUsdBal);
             Gauge(gauge).deposit(cUsdBal);
         }
     }
@@ -152,7 +154,8 @@ contract StrategyUsdcToCusd is IStrategy {
 
         // withdraw dai and usdc
         uint cUsdBal = IERC20(cUsd).balanceOf(address(this));
-        IERC20(cUsd).approve(depositC, cUsdBal);
+        IERC20(cUsd).safeApprove(depositC, 0);
+        IERC20(cUsd).safeApprove(depositC, cUsdBal);
         // NOTE: creates cUsd dust so we donate it
         DepositCompound(depositC).remove_liquidity_one_coin(cUsdBal, int128(1), 0, true);
 
@@ -232,7 +235,8 @@ contract StrategyUsdcToCusd is IStrategy {
         uint crvBal = IERC20(crv).balanceOf(address(this));
         if (crvBal > 0) {
             // use Uniswap to exchange CRV for underlying
-            IERC20(crv).approve(uniswap, crvBal);
+            IERC20(crv).safeApprove(uniswap, 0);
+            IERC20(crv).safeApprove(uniswap, crvBal);
 
             // route CRV > WETH > underlying
             address[] memory path = new address[](3);
