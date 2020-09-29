@@ -54,11 +54,12 @@ contract Vault is IVault, ERC20, ERC20Detailed {
     constructor(
         address _controller,
         address _token,
-        string memory _name,
-        string memory _symbol,
         uint _minWaitTime
-    ) public ERC20Detailed(_name, _symbol, ERC20Detailed(_token).decimals()) {
-        // NOTE: ERC20Detailed(_token).decimals() will fail if token = address(0)
+    ) public ERC20Detailed(
+        string(abi.encodePacked("unagi_", ERC20Detailed(_token).name())),
+        string(abi.encodePacked("u", ERC20Detailed(_token).symbol())),
+        ERC20Detailed(_token).decimals()
+     ) {
         require(_controller != address(0), "controller = zero address");
 
         admin = msg.sender;

@@ -20,18 +20,15 @@ contract("Vault", (accounts) => {
 
   describe("constructor", () => {
     it("should deploy", async () => {
-      const vault = await Vault.new(
-        controller,
-        erc20.address,
-        "vault",
-        "vault",
-        MIN_WAIT_TIME
-      )
+      const vault = await Vault.new(controller, erc20.address, MIN_WAIT_TIME)
 
       assert.equal(await vault.admin(), admin, "admin")
       assert.equal(await vault.controller(), controller, "controller")
       assert.equal(await vault.token(), erc20.address, "token")
       assert(eq(await vault.minWaitTime(), new BN(MIN_WAIT_TIME)), "min wait time")
+
+      assert.equal(await vault.name(), "unagi_test", "name")
+      assert.equal(await vault.symbol(), "uTEST", "symbol")
       assert(eq(await vault.decimals(), await erc20.decimals(), "decimals"))
 
       assert.equal(await vault.strategy(), ZERO_ADDRESS, "strategy")
@@ -39,14 +36,11 @@ contract("Vault", (accounts) => {
     })
 
     it("should reject if controller is zero address", async () => {
-      await expect(
-        Vault.new(ZERO_ADDRESS, erc20.address, "vault", "vault", MIN_WAIT_TIME)
-      ).to.be.rejected
+      await expect(Vault.new(ZERO_ADDRESS, erc20.address, MIN_WAIT_TIME)).to.be.rejected
     })
 
     it("should reject if token is zero address", async () => {
-      await expect(Vault.new(controller, ZERO_ADDRESS, "vault", "vault", MIN_WAIT_TIME))
-        .to.be.rejected
+      await expect(Vault.new(controller, ZERO_ADDRESS, MIN_WAIT_TIME)).to.be.rejected
     })
   })
 })

@@ -21,13 +21,7 @@ module.exports = (accounts, minWaitTime = 0) => {
   })
 
   beforeEach(async () => {
-    refs.vault = await Vault.new(
-      controller,
-      refs.erc20.address,
-      "vault",
-      "vault",
-      minWaitTime
-    )
+    refs.vault = await Vault.new(controller, refs.erc20.address, minWaitTime)
 
     refs.strategy = await MockStrategy.new(
       controller,

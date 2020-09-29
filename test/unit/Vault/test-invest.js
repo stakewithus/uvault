@@ -67,13 +67,7 @@ contract("Vault", (accounts) => {
     })
 
     it("should reject if strategy not set", async () => {
-      const vault = await Vault.new(
-        controller,
-        erc20.address,
-        "vault",
-        "vault",
-        MIN_WAIT_TIME
-      )
+      const vault = await Vault.new(controller, erc20.address, MIN_WAIT_TIME)
       assert.equal(await vault.strategy(), ZERO_ADDRESS, "strategy")
 
       await expect(vault.invest({from: controller})).to.be.rejectedWith(
