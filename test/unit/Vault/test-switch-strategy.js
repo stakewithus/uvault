@@ -36,7 +36,7 @@ contract("Vault", (accounts) => {
         "event arg switch strategy"
       );
       assert.equal(await vault.strategy(), strategy.address, "strategy");
-      assert.isTrue(await strategy.strategies(strategy.address), "approved strategy");
+      assert.isTrue(await vault.strategies(strategy.address), "approved strategy");
       assert(eq(await erc20.allowance(vault.address, strategy.address), MAX_UINT));
       assert.isFalse(await strategy._exitWasCalled_(), "exit");
     });
