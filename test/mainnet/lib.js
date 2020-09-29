@@ -11,7 +11,7 @@ function encodeInvest(web3, vault) {
       ],
     },
     [vault]
-  );
+  )
 }
 
 function encodeRebalance(web3, vault) {
@@ -27,7 +27,7 @@ function encodeRebalance(web3, vault) {
       ],
     },
     [vault]
-  );
+  )
 }
 
 function encodeSwitchStrategy(web3, vault) {
@@ -43,7 +43,7 @@ function encodeSwitchStrategy(web3, vault) {
       ],
     },
     [vault]
-  );
+  )
 }
 
 function encodeHarvest(web3, strategy) {
@@ -59,7 +59,7 @@ function encodeHarvest(web3, strategy) {
       ],
     },
     [strategy]
-  );
+  )
 }
 
 function encodeWithdrawAll(web3, strategy) {
@@ -75,7 +75,7 @@ function encodeWithdrawAll(web3, strategy) {
       ],
     },
     [strategy]
-  );
+  )
 }
 
 function encodeExit(web3, strategy) {
@@ -91,7 +91,7 @@ function encodeExit(web3, strategy) {
       ],
     },
     [strategy]
-  );
+  )
 }
 
 module.exports = {
@@ -101,4 +101,4 @@ module.exports = {
   encodeHarvest,
   encodeWithdrawAll,
   encodeExit,
-};
+}

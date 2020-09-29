@@ -1,4 +1,4 @@
-function getSnapshot({ strategy, usdc, cUsd, cGauge, crv, vault, treasury }) {
+function getSnapshot({strategy, usdc, cUsd, cGauge, crv, vault, treasury}) {
   return async () => {
     const snapshot = {
       strategy: {
@@ -18,12 +18,12 @@ function getSnapshot({ strategy, usdc, cUsd, cGauge, crv, vault, treasury }) {
       crv: {
         strategy: await crv.balanceOf(strategy.address),
       },
-    };
+    }
 
-    return snapshot;
-  };
+    return snapshot
+  }
 }
 
 module.exports = {
   getSnapshot,
-};
+}
