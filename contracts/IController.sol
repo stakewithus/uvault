@@ -8,7 +8,7 @@ interface IController {
     // calls to vault
     function invest(address _vault) external;
 
-    function switchStrategy(address _vault) external;
+    function setStrategy(address _vault, address _strategy) external;
 
     function rebalance(address _vault) external;
 

@@ -15,7 +15,7 @@ interface IVault {
 
     function setNextStrategy(address _strategy) external;
 
-    function switchStrategy() external;
+    function setStrategy(address _strategy) external;
 
     /*
     @notice Returns the amount of token in the vault

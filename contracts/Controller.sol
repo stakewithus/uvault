@@ -47,8 +47,8 @@ contract Controller is IController {
         IVault(_vault).invest();
     }
 
-    function switchStrategy(address _vault) external onlyAuthorized {
-        IVault(_vault).switchStrategy();
+    function setStrategy(address _vault, address _strategy) external onlyAuthorized {
+        IVault(_vault).setStrategy(_strategy);
     }
 
     function rebalance(address _vault) external onlyAuthorized {
