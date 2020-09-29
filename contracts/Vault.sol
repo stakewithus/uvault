@@ -22,12 +22,12 @@ import "./IVault.sol";
 - slippage when withdrawing all from strategy
 */
 
-contract Vault is ERC20, ERC20Detailed, IVault {
+contract Vault is IVault, ERC20, ERC20Detailed {
     using SafeERC20 for IERC20;
     using SafeMath for uint;
 
     event SetNextStrategy(address strategy);
-    event SwitchStrategy(address strategy);
+    event SetStrategy(address strategy);
 
     address public admin;
     address public controller;
@@ -149,10 +149,22 @@ contract Vault is ERC20, ERC20Detailed, IVault {
         emit SetNextStrategy(_nextStrategy);
     }
 
-    function _switchStrategy(address _strategy) internal {
+    /*
+    @notice Set strategy either to next strategy or back to previously approved strategy
+    @param _strategy Address of strategy used
+    */
+    function setStrategy(address _strategy) external onlyController {
+        require(_strategy != address(0), "strategy = zero address");
         require(_strategy != strategy, "new strategy = current strategy");
         require(IStrategy(_strategy).underlyingToken() == token, "strategy.token != vault.token");
         require(IStrategy(_strategy).vault() == address(this), "strategy.vault != vault");
+
+        if (_strategy == nextStrategy) {
+            require(block.timestamp >= timeLock, "timestamp < time lock");
+            strategies[_strategy] = true;
+        } else {
+            require(strategies[_strategy], "!approved strategy");
+        }
 
         // withdraw from current strategy
         if (strategy != address(0)) {
@@ -161,26 +173,19 @@ contract Vault is ERC20, ERC20Detailed, IVault {
         }
 
         strategy = _strategy;
-        if (!strategies[_strategy]) {
-            strategies[_strategy] = true;
-        }
 
         IERC20(token).safeApprove(strategy, 0);
         IERC20(token).safeApprove(strategy, uint(-1));
 
-        emit SwitchStrategy(strategy);
+        emit SetStrategy(strategy);
     }
 
     /*
-    @notice Switch strategy
-    @dev Only admin is allowed to call
-    @dev Must withdraw all tokens from current strategy
+    @notice Revoke strategy
+    @param _strategy Address of strategy to revoke
     */
-    function switchStrategy() external onlyController {
-        require(nextStrategy != address(0), "next strategy = zero address");
-        require(block.timestamp >= timeLock, "timestamp < time lock");
-
-        _switchStrategy(nextStrategy);
+    function revokeStrategy(address _strategy) external onlyAdmin {
+        strategies[_strategy] = false;
     }
 
     function _invest() internal {
