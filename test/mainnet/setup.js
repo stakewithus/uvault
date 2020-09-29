@@ -46,16 +46,9 @@ module.exports = (accounts) => {
     const controller = await Controller.new(treasury, gasRelayer.address, {
       from: admin,
     })
-    const vault = await Vault.new(
-      controller.address,
-      UNDERLYING,
-      "vault",
-      "vault",
-      MIN_WAIT_TIME,
-      {
-        from: admin,
-      }
-    )
+    const vault = await Vault.new(controller.address, UNDERLYING, MIN_WAIT_TIME, {
+      from: admin,
+    })
     const strategy = await StrategyTest.new(
       controller.address,
       vault.address,
