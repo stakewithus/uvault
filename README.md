@@ -9,7 +9,7 @@ npm run test:unit
 source .env.test
 
 ganache-cli \
---fork https://mainnet.infura.io/v3/$WEB3_INFURA_PROJECT_ID \
+--fork https://mainnet.infura.io/v3/$INFURA_API_KEY \
 --unlock $STABLE_COIN_HOLDER \
 --unlock $DAI_WHALE \
 --unlock $USDC_WHALE \
