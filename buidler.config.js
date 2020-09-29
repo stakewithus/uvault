@@ -1,5 +1,5 @@
 usePlugin("@nomiclabs/buidler-waffle")
-// usePlugin("@nomiclabs/buidler-etherscan")
+usePlugin("@nomiclabs/buidler-etherscan")
 // usePlugin("buidler-typechain")
 // usePlugin("solidity-coverage")
 
@@ -32,7 +32,7 @@ module.exports = {
     },
   },
   etherscan: {
-    url: "https://api-rinkeby.etherscan.io/api",
+    url: "https://api-ropsten.etherscan.io/api",
     apiKey: ETHERSCAN_API_KEY,
   },
   // typechain: {
