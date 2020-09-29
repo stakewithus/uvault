@@ -166,13 +166,14 @@ contract Vault is IVault, ERC20, ERC20Detailed {
             require(strategies[_strategy], "!approved strategy");
         }
 
-        // withdraw from current strategy
-        if (strategy != address(0)) {
-            IERC20(token).safeApprove(strategy, 0);
-            IStrategy(strategy).exit();
-        }
-
+        address oldStrategy = strategy;
         strategy = _strategy;
+
+        // withdraw from current strategy
+        if (oldStrategy != address(0)) {
+            IERC20(token).safeApprove(oldStrategy, 0);
+            IStrategy(oldStrategy).exit();
+        }
 
         IERC20(token).safeApprove(strategy, 0);
         IERC20(token).safeApprove(strategy, uint(-1));
