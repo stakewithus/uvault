@@ -1,6 +1,6 @@
 const BN = require("bn.js")
 const {eq, add} = require("../util")
-const {encodeInvest, encodeSwitchStrategy} = require("./lib")
+const {encodeInvest, encodeSetStrategy} = require("./lib")
 const setup = require("./setup")
 const {assert} = require("chai")
 
@@ -42,7 +42,7 @@ contract("integration", (accounts) => {
     )
   })
 
-  it("should switch strategy", async () => {
+  it("should set strategy", async () => {
     const snapshot = async () => {
       return {
         vault: {
@@ -59,7 +59,7 @@ contract("integration", (accounts) => {
     await vault.setNextStrategy(newStrategy.address, {from: admin})
 
     const gasTokenBal = await gasToken.balanceOf(gasRelayer.address)
-    const txData = encodeSwitchStrategy(web3, vault.address)
+    const txData = encodeSetStrategy(web3, vault.address, newStrategy.address)
 
     const before = await snapshot()
     await gasRelayer.relayTx(gasTokenBal, controller.address, txData)

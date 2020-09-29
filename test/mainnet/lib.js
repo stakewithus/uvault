@@ -30,19 +30,23 @@ function encodeRebalance(web3, vault) {
   )
 }
 
-function encodeSwitchStrategy(web3, vault) {
+function encodeSetStrategy(web3, vault, strategy) {
   return web3.eth.abi.encodeFunctionCall(
     {
-      name: "switchStrategy",
+      name: "setStrategy",
       type: "function",
       inputs: [
         {
           type: "address",
           name: "vault",
         },
+        {
+          type: "address",
+          name: "strategy",
+        },
       ],
     },
-    [vault]
+    [vault, strategy]
   )
 }
 
@@ -97,7 +101,7 @@ function encodeExit(web3, strategy) {
 module.exports = {
   encodeInvest,
   encodeRebalance,
-  encodeSwitchStrategy,
+  encodeSetStrategy,
   encodeHarvest,
   encodeWithdrawAll,
   encodeExit,
