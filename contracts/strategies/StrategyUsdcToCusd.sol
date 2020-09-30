@@ -24,11 +24,11 @@ contract StrategyUsdcToCusd is IStrategy {
     address public controller;
     address public vault;
 
-    uint public withdrawFee = 50;
+    uint public withdrawFee;
     uint public constant WITHDRAW_FEE_MAX = 10000;
 
     // performance fee sent to treasury when harvest() generates profit
-    uint public performanceFee = 50;
+    uint public performanceFee = 100;
     uint public constant PERFORMANCE_FEE_MAX = 10000;
 
     address private constant USDC = address(0xA0b86991c6218b36c1d19D4a2e9Eb0cE3606eB48);
