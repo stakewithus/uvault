@@ -15,25 +15,31 @@ contract("Controller", (accounts) => {
 
   describe("withdrawAll", () => {
     it("should withdrawAll admin", async () => {
-      await controller.withdrawAll(strategy.address, {from: admin})
+      await controller.withdrawAll(strategy.address, 0, {from: admin})
 
       assert(eq(await strategy._withdrawAmount_(), MAX_UINT), "withdraw")
     })
 
     it("should withdrawAll gas relayer", async () => {
-      await controller.withdrawAll(strategy.address, {from: gasRelayer})
+      await controller.withdrawAll(strategy.address, 0, {from: gasRelayer})
 
       assert(eq(await strategy._withdrawAmount_(), MAX_UINT), "withdraw")
     })
 
+    it("should reject if withdraw < min", async () => {
+      await expect(
+        controller.withdrawAll(strategy.address, 123, {from: admin})
+      ).to.be.rejectedWith("withdraw < min")
+    })
+
     it("should reject if caller not authorized", async () => {
       await expect(
-        controller.withdrawAll(strategy.address, {from: accounts[1]})
+        controller.withdrawAll(strategy.address, 0, {from: accounts[1]})
       ).to.be.rejectedWith("!authorized")
     })
 
     it("should reject invalid strategy address", async () => {
-      await expect(controller.withdrawAll(accounts[1], {from: admin})).to.be.rejected
+      await expect(controller.withdrawAll(accounts[1], 0, {from: admin})).to.be.rejected
     })
   })
 })

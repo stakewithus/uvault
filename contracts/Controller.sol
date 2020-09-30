@@ -1,10 +1,14 @@
 pragma solidity 0.5.17;
 
+import "@openzeppelin/contracts/math/SafeMath.sol";
+import "@openzeppelin/contracts/token/ERC20/IERC20.sol";
 import "./IController.sol";
 import "./IVault.sol";
 import "./IStrategy.sol";
 
 contract Controller is IController {
+    using SafeMath for uint;
+
     address public admin;
     address public treasury;
     address public gasRelayer;
@@ -59,8 +63,15 @@ contract Controller is IController {
         IStrategy(_strategy).harvest();
     }
 
-    function withdrawAll(address _strategy) external onlyAuthorized {
+    function withdrawAll(address _strategy, uint _min) external onlyAuthorized {
+        address vault = IStrategy(_strategy).vault();
+        address token = IVault(vault).token();
+
+        uint balBefore = IERC20(token).balanceOf(vault);
         IStrategy(_strategy).withdrawAll();
+        uint balAfter = IERC20(token).balanceOf(vault);
+
+        require(balAfter.sub(balBefore) >= _min, "withdraw < min");
     }
 
     function exit(address _strategy) external onlyAuthorized {
