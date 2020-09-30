@@ -22,5 +22,10 @@ interface IController {
     */
     function withdrawAll(address _strategy, uint _min) external;
 
-    function exit(address _strategy) external;
+    /*
+    @notice Exit from strategy
+    @param _strategy Address of strategy
+    @param _min Minimum amount of underlying token to withdraw
+    */
+    function exit(address _strategy, uint _min) external;
 }

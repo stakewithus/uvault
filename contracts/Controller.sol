@@ -63,18 +63,26 @@ contract Controller is IController {
         IStrategy(_strategy).harvest();
     }
 
-    function withdrawAll(address _strategy, uint _min) external onlyAuthorized {
+    modifier checkWithdraw(address _strategy, uint _min) {
         address vault = IStrategy(_strategy).vault();
         address token = IVault(vault).token();
 
         uint balBefore = IERC20(token).balanceOf(vault);
-        IStrategy(_strategy).withdrawAll();
+        _;
         uint balAfter = IERC20(token).balanceOf(vault);
 
         require(balAfter.sub(balBefore) >= _min, "withdraw < min");
     }
 
-    function exit(address _strategy) external onlyAuthorized {
+    function withdrawAll(address _strategy, uint _min)
+        external onlyAuthorized  checkWithdraw(_strategy, _min)
+    {
+        IStrategy(_strategy).withdrawAll();
+    }
+
+    function exit(address _strategy, uint _min)
+        external onlyAuthorized checkWithdraw(_strategy, _min)
+    {
         IStrategy(_strategy).exit();
     }
 }
