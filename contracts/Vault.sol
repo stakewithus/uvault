@@ -222,8 +222,31 @@ contract Vault is IVault, ERC20, ERC20Detailed {
     function deposit(uint _amount) external {
         require(_amount > 0, "amount = 0");
 
-        _mint(msg.sender, _amount);
+        uint totalUnderlying = _totalValueLocked();
+        uint totalShares = totalSupply();
+
+        uint balBefore = _balanceInVault();
         IERC20(token).safeTransferFrom(msg.sender, address(this), _amount);
+        uint balAfter = _balanceInVault();
+
+        uint diff = balAfter.sub(balBefore);
+        /*
+        s = shares to mint
+        T = total shares before mint
+        d = deposit amount
+        P = total in vault + strategy before deposit
+
+        s / (T + s) = d / (P + d)
+        s = d / P * T
+        */
+        uint shares;
+        if (totalShares == 0) {
+            shares = _amount;
+        } else {
+            shares = diff.mul(totalShares).div(totalUnderlying);
+        }
+
+        _mint(msg.sender, shares);
     }
 
     /*

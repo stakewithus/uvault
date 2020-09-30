@@ -24,7 +24,7 @@ contract("Vault", (accounts) => {
       await erc20.approve(vault.address, amount, {from: sender})
     })
 
-    it("should deposit", async () => {
+    it("should deposit when total supply is 0", async () => {
       const snapshot = async () => {
         return {
           erc20: {
@@ -55,6 +55,42 @@ contract("Vault", (accounts) => {
       )
       assert(
         eq(after.vault.totalSupply, add(before.vault.totalSupply, amount)),
+        "total supply"
+      )
+    })
+
+    it("should deposit when total supply > 0", async () => {
+      const snapshot = async () => {
+        return {
+          vault: {
+            balanceOf: {
+              sender: await vault.balanceOf(sender),
+            },
+            totalSupply: await vault.totalSupply(),
+            totalValueLocked: await vault.totalValueLocked(),
+          },
+        }
+      }
+
+      await vault.deposit(amount, {from: sender})
+
+      await erc20.mint(sender, amount)
+      await erc20.approve(vault.address, amount, {from: sender})
+
+      const before = await snapshot()
+      await vault.deposit(amount, {from: sender})
+      const after = await snapshot()
+
+      // check vault balance
+      const shares = amount
+        .mul(before.vault.totalSupply)
+        .div(before.vault.totalValueLocked)
+      assert(
+        eq(after.vault.balanceOf.sender, add(before.vault.balanceOf.sender, shares)),
+        "vault sender"
+      )
+      assert(
+        eq(after.vault.totalSupply, add(before.vault.totalSupply, shares)),
         "total supply"
       )
     })
