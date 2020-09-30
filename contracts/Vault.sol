@@ -249,11 +249,6 @@ contract Vault is IVault, ERC20, ERC20Detailed {
         uint totalUnderlying = _totalValueLocked();
         uint totalShares = totalSupply();
 
-        uint balBefore = _balanceInVault();
-        IERC20(token).safeTransferFrom(msg.sender, address(this), _amount);
-        uint balAfter = _balanceInVault();
-
-        uint diff = balAfter.sub(balBefore);
         /*
         s = shares to mint
         T = total shares before mint
@@ -267,10 +262,16 @@ contract Vault is IVault, ERC20, ERC20Detailed {
         if (totalShares == 0) {
             shares = _amount;
         } else {
-            shares = diff.mul(totalShares).div(totalUnderlying);
+            shares = _amount.mul(totalShares).div(totalUnderlying);
         }
 
         _mint(msg.sender, shares);
+
+        uint balBefore = _balanceInVault();
+        IERC20(token).safeTransferFrom(msg.sender, address(this), _amount);
+        uint balAfter = _balanceInVault();
+
+        require(balAfter.sub(balBefore) == _amount, "balance diff != transfer amount");
     }
 
     function _calcWithdraw(uint _shares) internal view returns (uint) {
