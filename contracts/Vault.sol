@@ -264,37 +264,33 @@ contract Vault is IVault, ERC20, ERC20Detailed {
     @param _min Minimum amount of underlying token expected to return
     */
     function withdraw(uint _shares, uint _min) external {
-        // NOTE: cache totalSupply before burning
-        uint totalShares = totalSupply();
-        require(totalShares > 0, "total shares = 0");
         require(_shares > 0, "shares = 0");
-
-        _burn(msg.sender, _shares);
-
         /*
         s = shares
         T = total supply of shares
-        u = amount of underlying token to withdraw
-        U = total amount of underlying token in vault + strategy
+        w = amount of underlying token to withdraw
+        P = total amount of underlying token in vault + strategy
 
-        s / T = u / U
-        u = s / T * U
+        s / T = w / P
+        w = s / T * P
         */
-        uint amountToWithdraw = _shares.mul(_totalValueLocked()).div(totalShares);
+        uint withdrawAmount = _shares.mul(_totalValueLocked()).div(totalSupply());
+
+        _burn(msg.sender, _shares);
 
         uint bal = _balanceInVault();
-        if (amountToWithdraw > bal) {
-            // safe to skip check for underflow since amountToWithdraw > bal
-            IStrategy(strategy).withdraw(amountToWithdraw - bal);
+        if (withdrawAmount > bal) {
+            // safe to skip check for underflow since withdrawAmount > bal
+            IStrategy(strategy).withdraw(withdrawAmount - bal);
 
             uint balAfter = _balanceInVault();
-            if (balAfter < amountToWithdraw) {
-                amountToWithdraw = balAfter;
+            if (balAfter < withdrawAmount) {
+                withdrawAmount = balAfter;
             }
         }
 
-        require(amountToWithdraw >= _min, "withdraw amount < min");
+        require(withdrawAmount >= _min, "withdraw amount < min");
 
-        IERC20(token).safeTransfer(msg.sender, amountToWithdraw);
+        IERC20(token).safeTransfer(msg.sender, withdrawAmount);
     }
 }
