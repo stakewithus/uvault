@@ -265,7 +265,7 @@ contract Vault is IVault, ERC20, ERC20Detailed {
     /*
     @notice Withdraw underlying token
     @param _shares Amount of shares to burn
-    @param _min Minimum amount of underlying token expected to return
+    @param _min Minimum amount of underlying token to return
     */
     function withdraw(uint _shares, uint _min) external {
         require(_shares > 0, "shares = 0");
