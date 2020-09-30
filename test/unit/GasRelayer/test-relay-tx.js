@@ -33,19 +33,27 @@ contract("GasRelayer", (accounts) => {
   })
 
   describe("relayTx", () => {
-    const amount = new BN(123)
+    const maxGasToken = new BN(1000)
     const data = encode(web3, "0x1212")
 
-    it("should relay tx", async () => {
-      gasRelayer.relayTx(amount, txReceiver.address, data, {from: admin})
+    it("should relay tx use gas token = max", async () => {
+      const maxGasToken = new BN(1)
+      gasRelayer.relayTx(txReceiver.address, data, maxGasToken, {from: admin})
 
-      assert(eq(await gasToken._freeUpToAmount_(), amount), "free up to amount")
+      assert(eq(await gasToken._freeUpToAmount_(), maxGasToken), "free up to amount")
+      assert.equal(await txReceiver._data_(), "0x1212", "tx data")
+    })
+
+    it("should relay tx use gas token <= max", async () => {
+      gasRelayer.relayTx(txReceiver.address, data, maxGasToken, {from: admin})
+
+      assert((await gasToken._freeUpToAmount_()).lte(maxGasToken), "free up to amount")
       assert.equal(await txReceiver._data_(), "0x1212", "tx data")
     })
 
     it("should reject if caller not admin", async () => {
       await expect(
-        gasRelayer.relayTx(amount, txReceiver.address, data, {
+        gasRelayer.relayTx(txReceiver.address, data, maxGasToken, {
           from: accounts[1],
         })
       ).to.be.rejectedWith("!admin")
@@ -55,7 +63,7 @@ contract("GasRelayer", (accounts) => {
       await txReceiver._setFail_(true)
 
       await expect(
-        gasRelayer.relayTx(amount, txReceiver.address, data, {from: admin})
+        gasRelayer.relayTx(txReceiver.address, data, maxGasToken, {from: admin})
       ).to.be.rejectedWith("failed")
     })
   })

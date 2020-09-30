@@ -42,13 +42,13 @@ contract("integration", (accounts) => {
     const txData = encodeInvest(web3, vault.address)
 
     const before = await snapshot()
-    await gasRelayer.relayTx(gasTokenBal, controller.address, txData, {
+    await gasRelayer.relayTx(controller.address, txData, gasTokenBal, {
       from: admin,
     })
     const after = await snapshot()
 
     // check gas token was used
-    assert(eq(after.gasToken.gasRelayer, new BN(0)), "gas token")
+    assert(after.gasToken.gasRelayer.lte(before.gasToken.gasRelayer), "gas token")
     // check underlying was transferred from vault to strategy
     assert(before.underlying.vault.gt(new BN(0)), "vault before")
     assert(

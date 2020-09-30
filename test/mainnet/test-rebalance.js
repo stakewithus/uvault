@@ -22,7 +22,7 @@ contract("integration", (accounts) => {
 
     // invest
     const txData = encodeInvest(web3, vault.address)
-    await gasRelayer.relayTx(0, controller.address, txData, {
+    await gasRelayer.relayTx(controller.address, txData, 0, {
       from: admin,
     })
   })
@@ -45,7 +45,7 @@ contract("integration", (accounts) => {
     await underlying.transfer(strategy.address, yieldAmount, {from: whale})
 
     const before = await snapshot()
-    await gasRelayer.relayTx(gasTokenBal, controller.address, txData)
+    await gasRelayer.relayTx(controller.address, txData, gasTokenBal, {from: admin})
     const after = await snapshot()
 
     // check vault balance increased

@@ -23,7 +23,7 @@ contract("integration", (accounts) => {
 
     // invest
     const txData = encodeInvest(web3, vault.address)
-    await gasRelayer.relayTx(0, controller.address, txData, {
+    await gasRelayer.relayTx(controller.address, txData, 0, {
       from: admin,
     })
   })
@@ -42,7 +42,7 @@ contract("integration", (accounts) => {
     const txData = encodeWithdrawAll(web3, strategy.address)
 
     const before = await snapshot()
-    await gasRelayer.relayTx(gasTokenBal, controller.address, txData)
+    await gasRelayer.relayTx(controller.address, txData, gasTokenBal)
     const after = await snapshot()
 
     // check strategy transferred all underlying token back to vault

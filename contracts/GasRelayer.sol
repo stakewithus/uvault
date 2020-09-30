@@ -1,5 +1,6 @@
 pragma solidity 0.5.17;
 
+import "@openzeppelin/contracts/math/Math.sol";
 import "./interfaces/GasToken.sol";
 
 contract GasRelayer {
@@ -16,6 +17,21 @@ contract GasRelayer {
     modifier onlyAdmin() {
         require(msg.sender == admin, "!admin");
         _;
+    }
+
+    // @dev use CHI token from 1inch to burn gas token
+    // https://medium.com/@1inch.exchange/1inch-introduces-chi-gastoken-d0bd5bb0f92b
+    modifier useChi(uint _max) {
+        uint gasStart = gasleft();
+        _;
+        uint gasSpent = 21000 + gasStart - gasleft() + 16 * msg.data.length;
+
+        if (_max > 0) {
+            GasToken(gasToken).freeUpTo(Math.min(
+                _max,
+                (gasSpent + 14154) / 41947)
+            );
+        }
     }
 
     function setAdmin(address _admin) external onlyAdmin {
@@ -37,14 +53,8 @@ contract GasRelayer {
     }
 
     function relayTx(
-        uint _amount,
-        address _to,
-        bytes calldata _data
-    ) external onlyAdmin {
-        if (_amount > 0) {
-            GasToken(gasToken).freeUpTo(_amount);
-        }
-
+        address _to, bytes calldata _data, uint _maxGasToken
+    ) external onlyAdmin useChi(_maxGasToken) {
         (bool success, ) = _to.call(_data);
         require(success, "relay failed");
     }

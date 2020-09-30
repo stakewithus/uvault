@@ -27,7 +27,7 @@ contract("integration", (accounts) => {
     const gasTokenBal = await gasToken.balanceOf(gasRelayer.address)
     const txData = encodeHarvest(web3, strategy.address)
 
-    await gasRelayer.relayTx(gasTokenBal, controller.address, txData)
+    await gasRelayer.relayTx(controller.address, txData, gasTokenBal)
 
     assert(await strategy._harvestWasCalled_(), "harvest")
   })
