@@ -249,13 +249,17 @@ contract Vault is IVault, ERC20, ERC20Detailed {
         _mint(msg.sender, shares);
     }
 
+    function _calcWithdraw(uint _shares) internal view returns (uint) {
+        return _shares.mul(_totalValueLocked()).div(totalSupply());
+    }
+
     /*
     @notice Calculate amount of underlying token that can be withdrawn
     @param _shares Amount of shares
     @return Amount of underlying token that can be withdrawn
     */
     function calcWithdraw(uint _shares) external view returns (uint) {
-        return _shares.mul(_totalValueLocked()).div(totalSupply());
+        return _calcWithdraw(_shares);
     }
 
     /*
@@ -274,7 +278,7 @@ contract Vault is IVault, ERC20, ERC20Detailed {
         s / T = w / P
         w = s / T * P
         */
-        uint withdrawAmount = _shares.mul(_totalValueLocked()).div(totalSupply());
+        uint withdrawAmount = _calcWithdraw(_shares);
 
         _burn(msg.sender, _shares);
 
