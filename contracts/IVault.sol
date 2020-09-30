@@ -27,6 +27,11 @@ interface IVault {
     function balanceInVault() external view returns (uint);
 
     /*
+    @notice Returns the amount of token in the strategy
+    */
+    function balanceInStrategy() external view returns (uint);
+
+    /*
     @notice Returns the amount of tokens available to be invested
     */
     function availableToInvest() external view returns (uint);
@@ -38,8 +43,9 @@ interface IVault {
 
     /*
     @notice Transfers token in vault to strategy
+    @param _min Minimum amount of redeemable underlying token
     */
-    function invest() external;
+    function invest(uint _min) external;
 
     /*
     @notice Refills token reserve in vault and then re-invests remaining token

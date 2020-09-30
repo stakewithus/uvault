@@ -11,12 +11,13 @@ contract MockVault is IVault {
     uint public timeLock;
 
     // test helpers
-    uint public _strategyMin_;
     bool public _investWasCalled_;
     bool public _rebalanceWasCalled_;
     uint public _depositAmount_;
     uint public _withdrawAmount_;
     uint public _withdrawMin_;
+    uint public _strategyMin_;
+    uint public _investMin_;
 
     constructor(address _controller, address _token) public {
         admin = msg.sender;
@@ -37,6 +38,10 @@ contract MockVault is IVault {
         return 0;
     }
 
+    function balanceInStrategy() external view returns (uint) {
+        return 0;
+    }
+
     function availableToInvest() external view returns (uint) {
         return 0;
     }
@@ -45,8 +50,9 @@ contract MockVault is IVault {
         return 0;
     }
 
-    function invest() external {
+    function invest(uint _min) external {
         _investWasCalled_ = true;
+        _investMin_ = _min;
     }
 
     function rebalance() external {

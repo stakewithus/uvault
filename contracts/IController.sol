@@ -6,7 +6,12 @@ interface IController {
     function treasury() external view returns (address);
 
     // calls to vault
-    function invest(address _vault) external;
+    /*
+    @notice Invest token in vault into strategy
+    @param _vault Address of vault
+    @param _min Minimum amount of redeemable underlying token
+    */
+    function invest(address _vault, uint _min) external;
 
     function setStrategy(address _vault, address _strategy, uint _min) external;
 

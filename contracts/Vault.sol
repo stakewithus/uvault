@@ -98,11 +98,27 @@ contract Vault is IVault, ERC20, ERC20Detailed {
     }
 
     /*
-    @notice Returns balance of tokens in vault
+    @notice Returns balance of token  s in vault
     @return Amount of token in vault
     */
     function balanceInVault() external view returns (uint) {
         return _balanceInVault();
+    }
+
+    function _balanceInStrategy() internal view returns (uint) {
+        if (strategy == address(0)) {
+            return 0;
+        }
+
+        return IStrategy(strategy).underlyingBalance();
+    }
+
+    /*
+    @notice Returns balance of underlying token in strategy
+    @return Amount of token in strategy
+    */
+    function balanceInStrategy() external view returns (uint) {
+        return _balanceInStrategy();
     }
 
     function _availableToInvest() internal view returns (uint) {
@@ -118,10 +134,7 @@ contract Vault is IVault, ERC20, ERC20Detailed {
     }
 
     function _totalValueLocked() internal view returns (uint) {
-        if (address(strategy) == address(0)) {
-            return _balanceInVault();
-        }
-        return _balanceInVault().add(IStrategy(strategy).underlyingBalance());
+        return _balanceInVault().add(_balanceInStrategy());
     }
 
     /*
@@ -196,21 +209,26 @@ contract Vault is IVault, ERC20, ERC20Detailed {
         strategies[_strategy] = false;
     }
 
-    function _invest() internal {
+    function _invest(uint _min) internal {
         uint amount = _availableToInvest();
 
         if (amount > 0) {
-            // NOTE: infinite approval is set when this strategy was set
+            // infinite approval is set when this strategy was set
+            uint balBefore = _balanceInStrategy();
             IStrategy(strategy).deposit(amount);
+            uint balAfter = _balanceInStrategy();
+
+            require(balAfter.sub(balBefore) >= _min, "withdraw < min");
         }
     }
 
     /*
     @notice Invest token from vault into strategy.
             Some token are kept in vault for cheap withdraw.
+    @param _min Minimum amount of underlying token that can be withdrawn
     */
-    function invest() external onlyController whenStrategyDefined {
-        _invest();
+    function invest(uint _min) external onlyController whenStrategyDefined {
+        _invest(_min);
     }
 
     /*
@@ -218,7 +236,7 @@ contract Vault is IVault, ERC20, ERC20Detailed {
     */
     function rebalance() external onlyController whenStrategyDefined {
         IStrategy(strategy).withdrawAll();
-        _invest();
+        _invest(0);
     }
 
     /*
