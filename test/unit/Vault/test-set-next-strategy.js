@@ -36,7 +36,7 @@ contract("Vault", (accounts) => {
 
     it("should set next strategy when current strategy is set", async () => {
       await vault.setNextStrategy(strategy.address, {from: admin})
-      await vault.setStrategy(strategy.address, {from: controller})
+      await vault.setStrategy(strategy.address, 0, {from: controller})
 
       assert.equal(await vault.strategy(), strategy.address, "strategy")
 

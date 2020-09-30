@@ -153,8 +153,9 @@ contract Vault is IVault, ERC20, ERC20Detailed {
     /*
     @notice Set strategy either to next strategy or back to previously approved strategy
     @param _strategy Address of strategy used
+    @param _min Minimum amount of underlying token to return from strategy
     */
-    function setStrategy(address _strategy) external onlyController {
+    function setStrategy(address _strategy, uint _min) external onlyController {
         require(_strategy != address(0), "strategy = zero address");
         require(_strategy != strategy, "new strategy = current strategy");
         require(IStrategy(_strategy).underlyingToken() == token, "strategy.token != vault.token");
@@ -173,7 +174,12 @@ contract Vault is IVault, ERC20, ERC20Detailed {
         // withdraw from current strategy
         if (oldStrategy != address(0)) {
             IERC20(token).safeApprove(oldStrategy, 0);
+
+            uint balBefore = _balanceInVault();
             IStrategy(oldStrategy).exit();
+            uint balAfter = _balanceInVault();
+
+            require(balAfter.sub(balBefore) >= _min, "exit < min");
         }
 
         IERC20(token).safeApprove(strategy, 0);
@@ -293,7 +299,7 @@ contract Vault is IVault, ERC20, ERC20Detailed {
             }
         }
 
-        require(withdrawAmount >= _min, "withdraw amount < min");
+        require(withdrawAmount >= _min, "withdraw < min");
 
         IERC20(token).safeTransfer(msg.sender, withdrawAmount);
     }

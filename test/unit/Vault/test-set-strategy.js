@@ -5,7 +5,6 @@ const setup = require("./setup")
 const {assert} = require("chai")
 
 const MockStrategy = artifacts.require("MockStrategy")
-const Vault = artifacts.require("Vault")
 
 contract("Vault", (accounts) => {
   const MIN_WAIT_TIME = 2
@@ -29,7 +28,7 @@ contract("Vault", (accounts) => {
 
     describe("next strategy", () => {
       it("should set new strategy", async () => {
-        const tx = await vault.setStrategy(strategy.address, {from: controller})
+        const tx = await vault.setStrategy(strategy.address, 0, {from: controller})
 
         // check log
         assert.equal(tx.logs[2].event, "SetStrategy", "event")
@@ -59,7 +58,7 @@ contract("Vault", (accounts) => {
             {from: admin}
           )
 
-          await vault.setStrategy(oldStrategy.address, {from: controller})
+          await vault.setStrategy(oldStrategy.address, 0, {from: controller})
           await vault.setNextStrategy(newStrategy.address, {from: admin})
         })
 
@@ -88,7 +87,7 @@ contract("Vault", (accounts) => {
           await timeout(MIN_WAIT_TIME)
 
           const before = await snapshot()
-          await vault.setStrategy(newStrategy.address, {from: controller})
+          await vault.setStrategy(newStrategy.address, 0, {from: controller})
           const after = await snapshot()
 
           // check state
@@ -107,9 +106,17 @@ contract("Vault", (accounts) => {
           assert(await oldStrategy._exitWasCalled_(), "exit")
         })
 
+        it("should reject if exit amount < min", async () => {
+          await timeout(MIN_WAIT_TIME)
+
+          await expect(
+            vault.setStrategy(newStrategy.address, 123, {from: controller})
+          ).to.be.rejectedWith("exit < min")
+        })
+
         it("should reject if timestamp < time lock", async () => {
           await expect(
-            vault.setStrategy(newStrategy.address, {from: controller})
+            vault.setStrategy(newStrategy.address, 0, {from: controller})
           ).to.be.rejectedWith("timestamp < time lock")
         })
       })
@@ -124,38 +131,38 @@ contract("Vault", (accounts) => {
           from: admin,
         })
 
-        await vault.setStrategy(oldStrategy.address, {from: controller})
+        await vault.setStrategy(oldStrategy.address, 0, {from: controller})
         await vault.setNextStrategy(newStrategy.address, {from: admin})
         await timeout(MIN_WAIT_TIME)
-        await vault.setStrategy(newStrategy.address, {from: controller})
+        await vault.setStrategy(newStrategy.address, 0, {from: controller})
       })
 
       it("should update strategy", async () => {
-        await vault.setStrategy(oldStrategy.address, {from: controller})
+        await vault.setStrategy(oldStrategy.address, 0, {from: controller})
         assert.equal(await vault.strategy(), oldStrategy.address, "old strategy")
 
-        await vault.setStrategy(newStrategy.address, {from: controller})
+        await vault.setStrategy(newStrategy.address, 0, {from: controller})
         assert.equal(await vault.strategy(), newStrategy.address, "new strategy")
       })
     })
 
     it("should reject if not controller", async () => {
       await expect(
-        vault.setStrategy(strategy.address, {from: accounts[0]})
+        vault.setStrategy(strategy.address, 0, {from: accounts[0]})
       ).to.be.rejectedWith("!controller")
     })
 
     it("should reject if strategy is zero address", async () => {
       await expect(
-        vault.setStrategy(ZERO_ADDRESS, {from: controller})
+        vault.setStrategy(ZERO_ADDRESS, 0, {from: controller})
       ).to.be.rejectedWith("strategy = zero address")
     })
 
     it("should reject if strategy is equal to current strategy", async () => {
-      await vault.setStrategy(strategy.address, {from: controller})
+      await vault.setStrategy(strategy.address, 0, {from: controller})
 
       await expect(
-        vault.setStrategy(strategy.address, {from: controller})
+        vault.setStrategy(strategy.address, 0, {from: controller})
       ).to.be.rejectedWith("new strategy = current strategy")
     })
 
@@ -163,7 +170,7 @@ contract("Vault", (accounts) => {
       await strategy._setUnderlyingToken_(accounts[0])
 
       await expect(
-        vault.setStrategy(strategy.address, {from: controller})
+        vault.setStrategy(strategy.address, 0, {from: controller})
       ).to.be.rejectedWith("strategy.token != vault.token")
     })
 
@@ -171,7 +178,7 @@ contract("Vault", (accounts) => {
       await strategy._setVault_(accounts[0])
 
       await expect(
-        vault.setStrategy(strategy.address, {from: controller})
+        vault.setStrategy(strategy.address, 0, {from: controller})
       ).to.be.rejectedWith("strategy.vault != vault")
     })
 
@@ -186,7 +193,7 @@ contract("Vault", (accounts) => {
       )
 
       await expect(
-        vault.setStrategy(strategy.address, {from: controller})
+        vault.setStrategy(strategy.address, 0, {from: controller})
       ).to.be.rejectedWith("!approved strategy")
     })
   })

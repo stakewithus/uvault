@@ -68,7 +68,7 @@ contract("Vault", (accounts) => {
       const min = add(amount, new BN(1))
 
       await expect(vault.withdraw(amount, min, {from: sender})).to.be.rejectedWith(
-        "withdraw amount < min"
+        "withdraw < min"
       )
     })
 

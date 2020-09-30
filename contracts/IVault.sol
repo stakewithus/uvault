@@ -15,7 +15,11 @@ interface IVault {
 
     function setNextStrategy(address _strategy) external;
 
-    function setStrategy(address _strategy) external;
+    /*
+    @notice Set strategy
+    @param _min Minimum amount of underlying tokens to return on exit
+    */
+    function setStrategy(address _strategy, uint _min) external;
 
     /*
     @notice Returns the amount of token in the vault
