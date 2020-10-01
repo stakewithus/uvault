@@ -39,7 +39,7 @@ contract("integration", (accounts) => {
     }
 
     const gasTokenBal = await gasToken.balanceOf(gasRelayer.address)
-    const min = new BN(0)
+    const min = await underlying.balanceOf(strategy.address)
     const txData = encodeWithdrawAll(web3, strategy.address, min)
 
     const before = await snapshot()
