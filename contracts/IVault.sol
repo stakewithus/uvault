@@ -76,5 +76,5 @@ interface IVault {
     @dev _token must not be equal to underlying token
     @dev Used to transfer token that was accidentally sent to this vault
     */
-    function clean(address _token) external;
+    function sweep(address _token) external;
 }

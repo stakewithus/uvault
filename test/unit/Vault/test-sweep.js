@@ -21,7 +21,7 @@ contract("Vault", (accounts) => {
     await erc20.mint(vault.address, amount)
   })
 
-  describe("clean", () => {
+  describe("sweep", () => {
     it("should withdraw token from vault", async () => {
       const snapshot = async () => {
         return {
@@ -33,7 +33,7 @@ contract("Vault", (accounts) => {
       }
 
       const before = await snapshot()
-      await vault.clean(erc20.address, {from: admin})
+      await vault.sweep(erc20.address, {from: admin})
       const after = await snapshot()
 
       // check erc20 balance
@@ -42,14 +42,14 @@ contract("Vault", (accounts) => {
     })
 
     it("should reject if not admin", async () => {
-      await expect(vault.clean(erc20.address, {from: accounts[1]})).to.be.rejectedWith(
+      await expect(vault.sweep(erc20.address, {from: accounts[1]})).to.be.rejectedWith(
         "!admin"
       )
     })
 
     it("should reject if token = vault.token", async () => {
       const token = await vault.token()
-      await expect(vault.clean(token, {from: admin})).to.be.rejectedWith(
+      await expect(vault.sweep(token, {from: admin})).to.be.rejectedWith(
         "token = vault.token"
       )
     })

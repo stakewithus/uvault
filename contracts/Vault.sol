@@ -330,7 +330,7 @@ contract Vault is IVault, ERC20, ERC20Detailed {
     @dev _token must not be equal to underlying token
     @dev Used to transfer token that was accidentally sent to this vault
     */
-    function clean(address _token) external onlyAdmin {
+    function sweep(address _token) external onlyAdmin {
         require(_token != token, "token = vault.token");
         IERC20(_token).transfer(admin, IERC20(_token).balanceOf(address(this)));
     }
