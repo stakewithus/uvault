@@ -30,7 +30,7 @@ function encodeRebalance(web3, vault) {
   )
 }
 
-function encodeSetStrategy(web3, vault, strategy) {
+function encodeSetStrategy(web3, vault, strategy, min) {
   return web3.eth.abi.encodeFunctionCall(
     {
       name: "setStrategy",
@@ -44,9 +44,13 @@ function encodeSetStrategy(web3, vault, strategy) {
           type: "address",
           name: "strategy",
         },
+        {
+          type: "uint256",
+          name: "min",
+        },
       ],
     },
-    [vault, strategy]
+    [vault, strategy, min.toString()]
   )
 }
 
