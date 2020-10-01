@@ -78,9 +78,7 @@ contract("Vault", (accounts) => {
     })
 
     it("should reject if roi < min", async () => {
-      await expect(vault.invest(123, {from: controller})).to.be.rejectedWith(
-        "roi < min"
-      )
+      await expect(vault.invest(1, {from: controller})).to.be.rejectedWith("roi < min")
     })
   })
 })

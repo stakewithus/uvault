@@ -110,7 +110,7 @@ contract("Vault", (accounts) => {
           await timeout(MIN_WAIT_TIME)
 
           await expect(
-            vault.setStrategy(newStrategy.address, 123, {from: controller})
+            vault.setStrategy(newStrategy.address, 1, {from: controller})
           ).to.be.rejectedWith("exit < min")
         })
 
