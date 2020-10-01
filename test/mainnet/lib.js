@@ -70,7 +70,7 @@ function encodeHarvest(web3, strategy) {
   )
 }
 
-function encodeWithdrawAll(web3, strategy) {
+function encodeWithdrawAll(web3, strategy, min) {
   return web3.eth.abi.encodeFunctionCall(
     {
       name: "withdrawAll",
@@ -80,9 +80,13 @@ function encodeWithdrawAll(web3, strategy) {
           type: "address",
           name: "strategy",
         },
+        {
+          type: "uint256",
+          name: "min",
+        },
       ],
     },
-    [strategy]
+    [strategy, min.toString()]
   )
 }
 
