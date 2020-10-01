@@ -35,7 +35,19 @@ interface IController {
     function harvest(address _strategy) external;
 
     /*
-    @notice Withdraw all from strategy
+    @notice Withdraw from strategy to vault
+    @param _strategy Address of strategy
+    @param _amount Amount of underlying token to withdraw
+    @param _min Minimum amount of underlying token to withdraw
+    */
+    function withdraw(
+        address _strategy,
+        uint _amount,
+        uint _min
+    ) external;
+
+    /*
+    @notice Withdraw all from strategy to vault
     @param _strategy Address of strategy
     @param _min Minimum amount of underlying token to withdraw
     */

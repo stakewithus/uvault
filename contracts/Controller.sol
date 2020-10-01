@@ -82,6 +82,14 @@ contract Controller is IController {
         require(balAfter.sub(balBefore) >= _min, "withdraw < min");
     }
 
+    function withdraw(
+        address _strategy,
+        uint _amount,
+        uint _min
+    ) external onlyAuthorized checkWithdraw(_strategy, _min) {
+        IStrategy(_strategy).withdraw(_amount);
+    }
+
     function withdrawAll(address _strategy, uint _min) external onlyAuthorized checkWithdraw(_strategy, _min) {
         IStrategy(_strategy).withdrawAll();
     }
