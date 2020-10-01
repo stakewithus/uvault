@@ -23,6 +23,8 @@ contract("Vault", (accounts) => {
   describe("rebalance", () => {
     const sender = accounts[1]
     const amount = new BN(10).pow(new BN(18))
+    const minOut = new BN(0)
+    const minIn = new BN(0)
 
     beforeEach(async () => {
       await erc20.mint(sender, amount)
@@ -46,7 +48,7 @@ contract("Vault", (accounts) => {
       }
 
       const before = await snapshot()
-      await vault.rebalance({from: controller})
+      await vault.rebalance(minOut, minIn, {from: controller})
       const after = await snapshot()
 
       assert(eq(await strategy._withdrawAmount_(), MAX_UINT), "withdraw")
@@ -61,18 +63,34 @@ contract("Vault", (accounts) => {
     })
 
     it("should reject if not controller", async () => {
-      await expect(vault.rebalance({from: accounts[0]})).to.be.rejectedWith(
-        "!controller"
-      )
+      await expect(
+        vault.rebalance(minOut, minIn, {from: accounts[0]})
+      ).to.be.rejectedWith("!controller")
     })
 
     it("should reject if strategy not set", async () => {
       const vault = await Vault.new(controller, erc20.address, MIN_WAIT_TIME)
       assert.equal(await vault.strategy(), ZERO_ADDRESS, "strategy")
 
-      await expect(vault.rebalance({from: controller})).to.be.rejectedWith(
-        "strategy = zero address"
-      )
+      await expect(
+        vault.rebalance(minOut, minIn, {from: controller})
+      ).to.be.rejectedWith("strategy = zero address")
+    })
+
+    it("should reject if withdraw < min out", async () => {
+      const minOut = new BN(1)
+
+      await expect(
+        vault.rebalance(minOut, minIn, {from: controller})
+      ).to.be.rejectedWith("balance diff < min out")
+    })
+
+    it("should reject if  < min out", async () => {
+      const minIn = new BN(1)
+
+      await expect(
+        vault.rebalance(minOut, minIn, {from: controller})
+      ).to.be.rejectedWith("roi < min")
     })
   })
 })
