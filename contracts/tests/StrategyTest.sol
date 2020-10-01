@@ -15,9 +15,6 @@ contract StrategyTest is IStrategy {
     address public controller;
     address public vault;
 
-    uint public withdrawFee = 50;
-    uint public constant WITHDRAW_FEE_MAX = 10000;
-
     // performance fee sent to treasury when harvest() generates profit
     uint public performanceFee = 50;
     uint public constant PERFORMANCE_FEE_MAX = 10000;
@@ -83,17 +80,8 @@ contract StrategyTest is IStrategy {
     function withdraw(uint _underlyingAmount) external onlyVault {
         require(_underlyingAmount > 0, "underlying = 0");
 
-        // transfer fee to treasury
-        uint fee = _underlyingAmount.mul(withdrawFee).div(WITHDRAW_FEE_MAX);
-        if (fee > 0) {
-            address treasury = IController(controller).treasury();
-            require(treasury != address(0), "treasury = zero address");
-
-            IERC20(underlying).safeTransfer(treasury, fee);
-        }
-
-        // transfer rest to vault
-        IERC20(underlying).safeTransfer(vault, _underlyingAmount.sub(fee));
+        // transfer to vault
+        IERC20(underlying).safeTransfer(vault, _underlyingAmount);
     }
 
     function _withdrawAll() internal {

@@ -24,9 +24,6 @@ contract StrategyUsdcToCusd is IStrategy {
     address public controller;
     address public vault;
 
-    uint public withdrawFee;
-    uint public constant WITHDRAW_FEE_MAX = 10000;
-
     // performance fee sent to treasury when harvest() generates profit
     uint public performanceFee = 100;
     uint public constant PERFORMANCE_FEE_MAX = 10000;
@@ -90,11 +87,6 @@ contract StrategyUsdcToCusd is IStrategy {
     function setController(address _controller) external onlyAdmin {
         require(_controller != address(0), "controller = zero address");
         controller = _controller;
-    }
-
-    function setWithdrawFee(uint _fee) external onlyAdmin {
-        require(_fee <= WITHDRAW_FEE_MAX, "withdraw fee > max");
-        withdrawFee = _fee;
     }
 
     function setPerformanceFee(uint _fee) external onlyAdmin {
@@ -169,7 +161,7 @@ contract StrategyUsdcToCusd is IStrategy {
     }
 
     /*
-    @notice Withdraw undelying token to vault and treasury
+    @notice Withdraw undelying token to vault
     @param _underlyingAmount Amount of underlying token to withdraw
     */
     function withdraw(uint _underlyingAmount) external onlyVault {
@@ -194,20 +186,10 @@ contract StrategyUsdcToCusd is IStrategy {
             _withdrawUnderlying(cUsdAmount);
         }
 
-        // transfer underlying token to treasury and vault
+        // transfer underlying token to vault
         uint underlyingBal = IERC20(UNDERLYING).balanceOf(address(this));
         if (underlyingBal > 0) {
-            // transfer fee to treasury
-            uint fee = underlyingBal.mul(withdrawFee).div(WITHDRAW_FEE_MAX);
-            if (fee > 0) {
-                address treasury = IController(controller).treasury();
-                require(treasury != address(0), "treasury = zero address");
-
-                IERC20(UNDERLYING).safeTransfer(treasury, fee);
-            }
-
-            // transfer rest to vault
-            IERC20(UNDERLYING).safeTransfer(vault, underlyingBal.sub(fee));
+            IERC20(UNDERLYING).safeTransfer(vault, underlyingBal);
         }
     }
 
