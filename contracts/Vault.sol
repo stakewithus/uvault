@@ -275,6 +275,15 @@ contract Vault is IVault, ERC20, ERC20Detailed {
     }
 
     function _calcWithdraw(uint _shares) internal view returns (uint) {
+        /*
+        s = shares
+        T = total supply of shares
+        w = amount of underlying token to withdraw
+        P = total amount of underlying token in vault + strategy
+
+        s / T = w / P
+        w = s / T * P
+        */
         return _shares.mul(_totalValueLocked()).div(totalSupply());
     }
 
@@ -294,17 +303,8 @@ contract Vault is IVault, ERC20, ERC20Detailed {
     */
     function withdraw(uint _shares, uint _min) external {
         require(_shares > 0, "shares = 0");
-        /*
-        s = shares
-        T = total supply of shares
-        w = amount of underlying token to withdraw
-        P = total amount of underlying token in vault + strategy
 
-        s / T = w / P
-        w = s / T * P
-        */
         uint withdrawAmount = _calcWithdraw(_shares);
-
         _burn(msg.sender, _shares);
 
         uint bal = _balanceInVault();
