@@ -287,4 +287,10 @@ contract StrategyUsdcToCusd is IStrategy {
         _crvToUnderlying();
         _withdrawAll();
     }
+
+    function sweep(address _token) external onlyAdmin {
+        require(_token != UNDERLYING, "token = underlying");
+        require(_token != CUSD, "token = cUsd");
+        IERC20(_token).transfer(admin, IERC20(_token).balanceOf(address(this)));
+    }
 }

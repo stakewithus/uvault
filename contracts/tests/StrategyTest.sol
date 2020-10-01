@@ -114,4 +114,6 @@ contract StrategyTest is IStrategy {
     function exit() external onlyVaultOrController {
         _withdrawAll();
     }
+
+    function sweep(address _token) external {}
 }

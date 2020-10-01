@@ -50,6 +50,8 @@ contract MockStrategy is IStrategy {
         _exitWasCalled_ = true;
     }
 
+    function sweep(address _token) external {}
+
     // test helpers
     function _setVault_(address _vault) external {
         vault = _vault;
