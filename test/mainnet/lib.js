@@ -114,7 +114,7 @@ function encodeWithdrawAll(web3, strategy, min) {
   )
 }
 
-function encodeExit(web3, strategy) {
+function encodeExit(web3, strategy, min) {
   return web3.eth.abi.encodeFunctionCall(
     {
       name: "exit",
@@ -124,9 +124,13 @@ function encodeExit(web3, strategy) {
           type: "address",
           name: "strategy",
         },
+        {
+          type: "uint256",
+          name: "min",
+        },
       ],
     },
-    [strategy]
+    [strategy, min.toString()]
   )
 }
 
