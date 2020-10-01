@@ -68,4 +68,13 @@ interface IVault {
     @param _min Minimum amount of underlying token expected to return
     */
     function withdraw(uint _shares, uint _min) external;
+
+    /*
+    @notice Transfer token != underlying token in vault to admin
+    @param _token Address of token to transfer
+    @dev Must transfer token to admin
+    @dev _token must not be equal to underlying token
+    @dev Used to transfer token that was accidentally sent to this vault
+    */
+    function clean(address _token) external;
 }

@@ -71,4 +71,6 @@ contract MockVault is IVault {
         _withdrawAmount_ = _shares;
         _withdrawMin_ = _min;
     }
+
+    function clean(address _token) external {}
 }
