@@ -9,9 +9,8 @@ interface IController {
     /*
     @notice Invest token in vault into strategy
     @param _vault Address of vault
-    @param _min Minimum amount of redeemable underlying token
     */
-    function invest(address _vault, uint _min) external;
+    function invest(address _vault) external;
 
     function setStrategy(
         address _vault,

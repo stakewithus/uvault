@@ -17,7 +17,6 @@ contract MockVault is IVault {
     uint public _withdrawAmount_;
     uint public _withdrawMin_;
     uint public _strategyMin_;
-    uint public _investMin_;
     uint public _rebalanceMinOut_;
     uint public _rebalanceMinIn_;
 
@@ -54,7 +53,6 @@ contract MockVault is IVault {
 
     function invest(uint _min) external {
         _investWasCalled_ = true;
-        _investMin_ = _min;
     }
 
     function rebalance(uint _minOut, uint _minIn) external {

@@ -47,8 +47,8 @@ contract Controller is IController {
         gasRelayer = _gasRelayer;
     }
 
-    function invest(address _vault, uint _min) external onlyAuthorized {
-        IVault(_vault).invest(_min);
+    function invest(address _vault) external onlyAuthorized {
+        IVault(_vault).invest(0);
     }
 
     function setStrategy(
