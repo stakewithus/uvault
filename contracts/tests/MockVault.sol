@@ -51,7 +51,7 @@ contract MockVault is IVault {
         return 0;
     }
 
-    function invest(uint _min) external {
+    function invest() external {
         _investWasCalled_ = true;
     }
 

@@ -43,7 +43,7 @@ contract("Vault", (accounts) => {
       }
 
       const before = await snapshot()
-      await vault.invest(0, {from: controller})
+      await vault.invest({from: controller})
       const after = await snapshot()
 
       assert(
@@ -57,28 +57,22 @@ contract("Vault", (accounts) => {
 
       assert(eq(await vault.availableToInvest(), new BN(0)), "available")
 
-      await vault.invest(0, {from: controller})
+      await vault.invest({from: controller})
 
       assert(eq(await strategy._depositAmount_(), new BN(0)), "deposit")
     })
 
     it("should reject if not controller", async () => {
-      await expect(vault.invest(0, {from: accounts[0]})).to.be.rejectedWith(
-        "!controller"
-      )
+      await expect(vault.invest({from: accounts[0]})).to.be.rejectedWith("!controller")
     })
 
     it("should reject if strategy not set", async () => {
       const vault = await Vault.new(controller, erc20.address, MIN_WAIT_TIME)
       assert.equal(await vault.strategy(), ZERO_ADDRESS, "strategy")
 
-      await expect(vault.invest(0, {from: controller})).to.be.rejectedWith(
+      await expect(vault.invest({from: controller})).to.be.rejectedWith(
         "strategy = zero address"
       )
-    })
-
-    it("should reject if roi < min", async () => {
-      await expect(vault.invest(1, {from: controller})).to.be.rejectedWith("roi < min")
     })
   })
 })

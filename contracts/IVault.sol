@@ -43,9 +43,8 @@ interface IVault {
 
     /*
     @notice Transfers token in vault to strategy
-    @param _min Minimum amount of redeemable underlying token
     */
-    function invest(uint _min) external;
+    function invest() external;
 
     /*
     @notice Withdraw from strategy, fills up reserve and re-invests the rest of tokens
