@@ -14,33 +14,30 @@ contract("Controller", (accounts) => {
     vault = refs.vault
   })
 
-  const minIn = new BN(1)
-  const minOut = new BN(10)
+  const min = new BN(10)
 
   describe("rebalance", () => {
     it("should rebalance admin", async () => {
-      await controller.rebalance(vault.address, minOut, minIn, {from: admin})
+      await controller.rebalance(vault.address, min, {from: admin})
 
       assert(await vault._rebalanceWasCalled_(), "rebalance")
-      assert(eq(await vault._rebalanceMinOut_(), minOut), "min out")
-      assert(eq(await vault._rebalanceMinIn_(), minIn), "min in")
+      assert(eq(await vault._rebalanceMin_(), min), "min")
     })
 
     it("should rebalance gas relayer", async () => {
-      await controller.rebalance(vault.address, minOut, minIn, {from: gasRelayer})
+      await controller.rebalance(vault.address, min, {from: gasRelayer})
 
       assert(await vault._rebalanceWasCalled_(), "rebalance")
     })
 
     it("should reject if caller not authorized", async () => {
       await expect(
-        controller.rebalance(vault.address, minOut, minIn, {from: accounts[1]})
+        controller.rebalance(vault.address, min, {from: accounts[1]})
       ).to.be.rejectedWith("!authorized")
     })
 
     it("should reject invalid vault address", async () => {
-      await expect(controller.rebalance(accounts[1], minOut, minIn, {from: admin})).to
-        .be.rejected
+      await expect(controller.rebalance(accounts[1], min, {from: admin})).to.be.rejected
     })
   })
 })
