@@ -55,11 +55,14 @@ contract Vault is IVault, ERC20, ERC20Detailed {
         address _controller,
         address _token,
         uint _minWaitTime
-    ) public ERC20Detailed(
-        string(abi.encodePacked("unagi_", ERC20Detailed(_token).name())),
-        string(abi.encodePacked("u", ERC20Detailed(_token).symbol())),
-        ERC20Detailed(_token).decimals()
-     ) {
+    )
+        public
+        ERC20Detailed(
+            string(abi.encodePacked("unagi_", ERC20Detailed(_token).name())),
+            string(abi.encodePacked("u", ERC20Detailed(_token).symbol())),
+            ERC20Detailed(_token).decimals()
+        )
+    {
         require(_controller != address(0), "controller = zero address");
 
         admin = msg.sender;
