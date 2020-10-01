@@ -59,10 +59,6 @@ contract Controller is IController {
         IVault(_vault).setStrategy(_strategy, _min);
     }
 
-    function rebalance(address _vault, uint _min) external onlyAuthorized {
-        IVault(_vault).rebalance(_min);
-    }
-
     function harvest(address _strategy) external onlyAuthorized {
         IStrategy(_strategy).harvest();
     }

@@ -212,35 +212,17 @@ contract Vault is IVault, ERC20, ERC20Detailed {
         strategies[_strategy] = false;
     }
 
-    function _invest() internal {
+    /*
+    @notice Invest token from vault into strategy.
+            Some token are kept in vault for cheap withdraw.
+    */
+    function invest() external onlyController whenStrategyDefined {
         uint amount = _availableToInvest();
 
         if (amount > 0) {
             // infinite approval is set when this strategy was set
             IStrategy(strategy).deposit(amount);
         }
-    }
-
-    /*
-    @notice Invest token from vault into strategy.
-            Some token are kept in vault for cheap withdraw.
-    */
-    function invest() external onlyController whenStrategyDefined {
-        _invest();
-    }
-
-    /*
-    @notice Withdraw from strategy, fills up reserve and re-invests the rest of tokens
-    @param _min Minimum amount of token that must be withdrawn from strategy
-    */
-    function rebalance(uint _min) external onlyController whenStrategyDefined {
-        uint balBefore = _balanceInVault();
-        IStrategy(strategy).withdrawAll();
-        uint balAfter = _balanceInVault();
-
-        require(balAfter.sub(balBefore) >= _min, "balance diff < min");
-
-        _invest();
     }
 
     /*

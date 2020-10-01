@@ -12,12 +12,10 @@ contract MockVault is IVault {
 
     // test helpers
     bool public _investWasCalled_;
-    bool public _rebalanceWasCalled_;
     uint public _depositAmount_;
     uint public _withdrawAmount_;
     uint public _withdrawMin_;
     uint public _strategyMin_;
-    uint public _rebalanceMin_;
 
     constructor(address _controller, address _token) public {
         admin = msg.sender;
@@ -52,11 +50,6 @@ contract MockVault is IVault {
 
     function invest() external {
         _investWasCalled_ = true;
-    }
-
-    function rebalance(uint _min) external {
-        _rebalanceWasCalled_ = true;
-        _rebalanceMin_ = _min;
     }
 
     function deposit(uint _amount) external {

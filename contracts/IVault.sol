@@ -46,12 +46,6 @@ interface IVault {
     */
     function invest() external;
 
-    /*
-    @notice Withdraw from strategy, fills up reserve and re-invests the rest of tokens
-    @param _min Minimum amount of token that must be withdrawn from strategy
-    */
-    function rebalance(uint _min) external;
-
     function deposit(uint _amount) external;
 
     /*
