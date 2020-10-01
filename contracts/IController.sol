@@ -21,14 +21,9 @@ interface IController {
     /*
     @notice Withdraw from strategy, fills up reserve and re-invests the rest of tokens
     @param _vault Address of the vault
-    @param _minOut Minimum amount of token that must be withdrawn from strategy
-    @param _minIn Minimum amount of token that must be redeemable from strategy
+    @param _min Minimum amount of token that must be withdrawn from strategy
     */
-    function rebalance(
-        address _vault,
-        uint _minOut,
-        uint _minIn
-    ) external;
+    function rebalance(address _vault, uint _min) external;
 
     // calls to strategy
     function harvest(address _strategy) external;

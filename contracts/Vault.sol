@@ -231,15 +231,14 @@ contract Vault is IVault, ERC20, ERC20Detailed {
 
     /*
     @notice Withdraw from strategy, fills up reserve and re-invests the rest of tokens
-    @param _minOut Minimum amount of token that must be withdrawn from strategy
-    @param _minIn Minimum amount of token that must be redeemable from strategy
+    @param _min Minimum amount of token that must be withdrawn from strategy
     */
-    function rebalance(uint _minOut, uint _minIn) external onlyController whenStrategyDefined {
+    function rebalance(uint _min) external onlyController whenStrategyDefined {
         uint balBefore = _balanceInVault();
         IStrategy(strategy).withdrawAll();
         uint balAfter = _balanceInVault();
 
-        require(balAfter.sub(balBefore) >= _minOut, "balance diff < min out");
+        require(balAfter.sub(balBefore) >= _min, "balance diff < min");
 
         _invest();
     }
