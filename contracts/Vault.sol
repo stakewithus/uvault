@@ -218,7 +218,7 @@ contract Vault is IVault, ERC20, ERC20Detailed {
             IStrategy(strategy).deposit(amount);
             uint balAfter = _balanceInStrategy();
 
-            require(balAfter.sub(balBefore) >= _min, "withdraw < min");
+            require(balAfter.sub(balBefore) >= _min, "roi < min");
         }
     }
 
