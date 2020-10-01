@@ -228,7 +228,7 @@ contract Vault is IVault, ERC20, ERC20Detailed {
     /*
     @notice Invest token from vault into strategy.
             Some token are kept in vault for cheap withdraw.
-    @param _min Minimum amount of underlying token that can be withdrawn
+    @param _min Minimum amount of underlying token that can be redeemed
     */
     function invest(uint _min) external onlyController whenStrategyDefined {
         _invest(_min);
@@ -236,10 +236,17 @@ contract Vault is IVault, ERC20, ERC20Detailed {
 
     /*
     @notice Withdraw from strategy, fills up reserve and re-invests the rest of tokens
+    @param _minOut Minimum amount of token that must be withdrawn from strategy
+    @param _minIn Minimum amount of token that must be redeemable from strategy
     */
-    function rebalance() external onlyController whenStrategyDefined {
+    function rebalance(uint _minOut, uint _minIn) external onlyController whenStrategyDefined {
+        uint balBefore = _balanceInVault();
         IStrategy(strategy).withdrawAll();
-        _invest(0);
+        uint balAfter = _balanceInVault();
+
+        require(balAfter.sub(balBefore) >= _minOut, "balance diff < min out");
+
+        _invest(_minIn);
     }
 
     /*

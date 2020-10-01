@@ -48,10 +48,11 @@ interface IVault {
     function invest(uint _min) external;
 
     /*
-    @notice Refills token reserve in vault and then re-invests remaining token
-            into strategy
+    @notice Withdraw from strategy, fills up reserve and re-invests the rest of tokens
+    @param _minOut Minimum amount of token that must be withdrawn from strategy
+    @param _minIn Minimum amount of token that must be redeemable from strategy
     */
-    function rebalance() external;
+    function rebalance(uint _minOut, uint _minIn) external;
 
     function deposit(uint _amount) external;
 

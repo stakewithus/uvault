@@ -18,6 +18,8 @@ contract MockVault is IVault {
     uint public _withdrawMin_;
     uint public _strategyMin_;
     uint public _investMin_;
+    uint public _rebalanceMinOut_;
+    uint public _rebalanceMinIn_;
 
     constructor(address _controller, address _token) public {
         admin = msg.sender;
@@ -55,8 +57,10 @@ contract MockVault is IVault {
         _investMin_ = _min;
     }
 
-    function rebalance() external {
+    function rebalance(uint _minOut, uint _minIn) external {
         _rebalanceWasCalled_ = true;
+        _rebalanceMinOut_ = _minOut;
+        _rebalanceMinIn_ = _minIn;
     }
 
     function deposit(uint _amount) external {

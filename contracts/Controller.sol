@@ -51,12 +51,20 @@ contract Controller is IController {
         IVault(_vault).invest(_min);
     }
 
-    function setStrategy(address _vault, address _strategy, uint _min) external onlyAuthorized {
+    function setStrategy(
+        address _vault,
+        address _strategy,
+        uint _min
+    ) external onlyAuthorized {
         IVault(_vault).setStrategy(_strategy, _min);
     }
 
-    function rebalance(address _vault) external onlyAuthorized {
-        IVault(_vault).rebalance();
+    function rebalance(
+        address _vault,
+        uint _minOut,
+        uint _minIn
+    ) external onlyAuthorized {
+        IVault(_vault).rebalance(_minOut, _minIn);
     }
 
     function harvest(address _strategy) external onlyAuthorized {
@@ -74,15 +82,11 @@ contract Controller is IController {
         require(balAfter.sub(balBefore) >= _min, "withdraw < min");
     }
 
-    function withdrawAll(address _strategy, uint _min)
-        external onlyAuthorized  checkWithdraw(_strategy, _min)
-    {
+    function withdrawAll(address _strategy, uint _min) external onlyAuthorized checkWithdraw(_strategy, _min) {
         IStrategy(_strategy).withdrawAll();
     }
 
-    function exit(address _strategy, uint _min)
-        external onlyAuthorized checkWithdraw(_strategy, _min)
-    {
+    function exit(address _strategy, uint _min) external onlyAuthorized checkWithdraw(_strategy, _min) {
         IStrategy(_strategy).exit();
     }
 }
