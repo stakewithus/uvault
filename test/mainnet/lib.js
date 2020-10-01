@@ -70,6 +70,30 @@ function encodeHarvest(web3, strategy) {
   )
 }
 
+function encodeWithdraw(web3, strategy, amount, min) {
+  return web3.eth.abi.encodeFunctionCall(
+    {
+      name: "withdraw",
+      type: "function",
+      inputs: [
+        {
+          type: "address",
+          name: "strategy",
+        },
+        {
+          type: "uint256",
+          name: "amount",
+        },
+        {
+          type: "uint256",
+          name: "min",
+        },
+      ],
+    },
+    [strategy, amount.toString(), min.toString()]
+  )
+}
+
 function encodeWithdrawAll(web3, strategy, min) {
   return web3.eth.abi.encodeFunctionCall(
     {
@@ -111,6 +135,7 @@ module.exports = {
   encodeRebalance,
   encodeSetStrategy,
   encodeHarvest,
+  encodeWithdraw,
   encodeWithdrawAll,
   encodeExit,
 }

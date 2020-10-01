@@ -77,7 +77,7 @@ contract StrategyTest is IStrategy {
         IERC20(underlying).safeTransferFrom(vault, address(this), _underlyingAmount);
     }
 
-    function withdraw(uint _underlyingAmount) external onlyVault {
+    function withdraw(uint _underlyingAmount) external onlyVaultOrController {
         require(_underlyingAmount > 0, "underlying = 0");
 
         // transfer to vault

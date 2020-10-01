@@ -164,7 +164,7 @@ contract StrategyUsdcToCusd is IStrategy {
     @notice Withdraw undelying token to vault
     @param _underlyingAmount Amount of underlying token to withdraw
     */
-    function withdraw(uint _underlyingAmount) external onlyVault {
+    function withdraw(uint _underlyingAmount) external onlyVaultOrController {
         require(_underlyingAmount > 0, "underlying = 0");
         uint totalUnderlying = _underlyingBalance();
         require(_underlyingAmount <= totalUnderlying, "underlying > total");
