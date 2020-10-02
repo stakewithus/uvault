@@ -293,14 +293,23 @@ contract Vault is IVault, ERC20, ERC20Detailed {
         uint withdrawAmount = _calcWithdraw(_shares);
         _burn(msg.sender, _shares);
 
-        uint bal = _balanceInVault();
-        if (withdrawAmount > bal) {
-            // safe to skip check for underflow since withdrawAmount > bal
-            IStrategy(strategy).withdraw(withdrawAmount - bal);
+        uint balInVault = _balanceInVault();
+        if (withdrawAmount > balInVault) {
+            // maximize withdraw amount from strategy
+            uint balInStrat = _balanceInStrategy();
+            uint amountFromStrat = withdrawAmount;
+            if (balInStrat < withdrawAmount) {
+                amountFromStrat = balInStrat;
+            }
+
+            IStrategy(strategy).withdraw(amountFromStrat);
 
             uint balAfter = _balanceInVault();
-            if (balAfter < withdrawAmount) {
-                withdrawAmount = balAfter;
+            uint diff = balAfter.sub(balInVault);
+            if (diff < amountFromStrat) {
+                // withdraw amount - withdraw amount from strat = amount to withdraw from vault
+                // diff = actual amount returned from strategy
+                withdrawAmount = withdrawAmount.sub(amountFromStrat).add(diff);
             }
         }
 
