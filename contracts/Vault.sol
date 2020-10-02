@@ -8,6 +8,7 @@ import "@openzeppelin/contracts/token/ERC20/ERC20Detailed.sol";
 
 import "./IStrategy.sol";
 import "./IVault.sol";
+import "./IController.sol";
 
 // TODO: batch deposit and batch withdraw
 
@@ -318,6 +319,16 @@ contract Vault is IVault, ERC20, ERC20Detailed {
                 // withdraw amount - withdraw amount from strat = amount to withdraw from vault
                 // diff = actual amount returned from strategy
                 withdrawAmount = withdrawAmount.sub(amountFromStrat).add(diff);
+            }
+
+            // transfer to treasury
+            uint fee = withdrawAmount.mul(withdrawFee).div(WITHDRAW_FEE_MAX);
+            if (fee > 0) {
+                address treasury = IController(controller).treasury();
+                require(treasury != address(0), "treasury = zero address");
+
+                withdrawAmount = withdrawAmount.sub(fee);
+                IERC20(token).safeTransfer(treasury, fee);
             }
         }
 

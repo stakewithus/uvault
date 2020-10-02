@@ -8,7 +8,7 @@ contract("Vault", (accounts) => {
   const MIN_WAIT_TIME = 0
 
   const refs = setup(accounts, MIN_WAIT_TIME)
-  const {admin} = refs
+  const {admin, treasury} = refs
 
   let vault
   let erc20
@@ -20,7 +20,7 @@ contract("Vault", (accounts) => {
   })
 
   describe("withdraw", () => {
-    const sender = accounts[1]
+    const sender = accounts[2]
     const amount = new BN(10).pow(new BN(18)).mul(new BN(10))
     const min = frac(amount, new BN(99), new BN(100))
 
@@ -31,6 +31,7 @@ contract("Vault", (accounts) => {
 
       await vault.setNextStrategy(strategy.address, {from: admin})
       await vault.setStrategy(strategy.address, 0, {from: admin})
+      await vault.setWithdrawFee(100, {from: admin})
     })
 
     const snapshot = async () => {
@@ -38,6 +39,7 @@ contract("Vault", (accounts) => {
         erc20: {
           sender: await erc20.balanceOf(sender),
           vault: await erc20.balanceOf(vault.address),
+          treasury: await erc20.balanceOf(treasury),
         },
         vault: {
           balanceOf: {
@@ -113,7 +115,7 @@ contract("Vault", (accounts) => {
         ),
         "strategy withdraw"
       )
-      assert(eq(after.erc20.vault, new BN(0)), "vault balance")
+      assert(after.erc20.treasury.gt(before.erc20.treasury), "treasury fee")
     })
 
     it("should reject if returned amount < min", async () => {
