@@ -27,10 +27,7 @@ contract GasRelayer {
         uint gasSpent = 21000 + gasStart - gasleft() + 16 * msg.data.length;
 
         if (_max > 0) {
-            GasToken(gasToken).freeUpTo(Math.min(
-                _max,
-                (gasSpent + 14154) / 41947)
-            );
+            GasToken(gasToken).freeUpTo(Math.min(_max, (gasSpent + 14154) / 41947));
         }
     }
 
@@ -53,7 +50,9 @@ contract GasRelayer {
     }
 
     function relayTx(
-        address _to, bytes calldata _data, uint _maxGasToken
+        address _to,
+        bytes calldata _data,
+        uint _maxGasToken
     ) external onlyAdmin useChi(_maxGasToken) {
         (bool success, ) = _to.call(_data);
         require(success, "relay failed");
