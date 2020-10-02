@@ -9,12 +9,14 @@ contract("Vault", (accounts) => {
   const MIN_WAIT_TIME = 0
 
   const refs = setup(accounts, MIN_WAIT_TIME)
-  const {admin, controller} = refs
+  const {admin} = refs
 
+  let controller
   let vault
   let erc20
   let strategy
   beforeEach(() => {
+    controller = refs.controller
     vault = refs.vault
     erc20 = refs.erc20
     strategy = refs.strategy
@@ -30,7 +32,7 @@ contract("Vault", (accounts) => {
       await vault.deposit(amount, {from: sender})
 
       await vault.setNextStrategy(strategy.address, {from: admin})
-      await vault.setStrategy(strategy.address, 0, {from: controller})
+      await vault.setStrategy(strategy.address, 0, {from: admin})
     })
 
     it("should invest", async () => {
@@ -43,7 +45,7 @@ contract("Vault", (accounts) => {
       }
 
       const before = await snapshot()
-      await vault.invest({from: controller})
+      await vault.invest({from: admin})
       const after = await snapshot()
 
       assert(
@@ -57,20 +59,20 @@ contract("Vault", (accounts) => {
 
       assert(eq(await vault.availableToInvest(), new BN(0)), "available")
 
-      await vault.invest({from: controller})
+      await vault.invest({from: admin})
 
       assert(eq(await strategy._depositAmount_(), new BN(0)), "deposit")
     })
 
-    it("should reject if not controller", async () => {
-      await expect(vault.invest({from: accounts[0]})).to.be.rejectedWith("!controller")
+    it("should reject if not authorized", async () => {
+      await expect(vault.invest({from: accounts[1]})).to.be.rejectedWith("!authorized")
     })
 
     it("should reject if strategy not set", async () => {
-      const vault = await Vault.new(controller, erc20.address, MIN_WAIT_TIME)
+      const vault = await Vault.new(controller.address, erc20.address, MIN_WAIT_TIME)
       assert.equal(await vault.strategy(), ZERO_ADDRESS, "strategy")
 
-      await expect(vault.invest({from: controller})).to.be.rejectedWith(
+      await expect(vault.invest({from: admin})).to.be.rejectedWith(
         "strategy = zero address"
       )
     })

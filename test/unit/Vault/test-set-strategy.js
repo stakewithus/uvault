@@ -10,12 +10,14 @@ contract("Vault", (accounts) => {
   const MIN_WAIT_TIME = 2
 
   const refs = setup(accounts, MIN_WAIT_TIME)
-  const {admin, controller} = refs
+  const {admin} = refs
 
+  let controller
   let vault
   let erc20
   let strategy
   beforeEach(() => {
+    controller = refs.controller
     vault = refs.vault
     erc20 = refs.erc20
     strategy = refs.strategy
@@ -28,7 +30,9 @@ contract("Vault", (accounts) => {
 
     describe("next strategy", () => {
       it("should set new strategy", async () => {
-        const tx = await vault.setStrategy(strategy.address, 0, {from: controller})
+        const tx = await vault.setStrategy(strategy.address, 0, {
+          from: admin,
+        })
 
         // check log
         assert.equal(tx.logs[2].event, "SetStrategy", "event")
@@ -52,13 +56,13 @@ contract("Vault", (accounts) => {
         beforeEach(async () => {
           oldStrategy = strategy
           newStrategy = await MockStrategy.new(
-            controller,
+            controller.address,
             vault.address,
             erc20.address,
             {from: admin}
           )
 
-          await vault.setStrategy(oldStrategy.address, 0, {from: controller})
+          await vault.setStrategy(oldStrategy.address, 0, {from: admin})
           await vault.setNextStrategy(newStrategy.address, {from: admin})
         })
 
@@ -87,7 +91,7 @@ contract("Vault", (accounts) => {
           await timeout(MIN_WAIT_TIME)
 
           const before = await snapshot()
-          await vault.setStrategy(newStrategy.address, 0, {from: controller})
+          await vault.setStrategy(newStrategy.address, 0, {from: admin})
           const after = await snapshot()
 
           // check state
@@ -110,13 +114,13 @@ contract("Vault", (accounts) => {
           await timeout(MIN_WAIT_TIME)
 
           await expect(
-            vault.setStrategy(newStrategy.address, 1, {from: controller})
+            vault.setStrategy(newStrategy.address, 1, {from: admin})
           ).to.be.rejectedWith("exit < min")
         })
 
         it("should reject if timestamp < time lock", async () => {
           await expect(
-            vault.setStrategy(newStrategy.address, 0, {from: controller})
+            vault.setStrategy(newStrategy.address, 0, {from: admin})
           ).to.be.rejectedWith("timestamp < time lock")
         })
       })
@@ -127,42 +131,47 @@ contract("Vault", (accounts) => {
       let newStrategy
       beforeEach(async () => {
         oldStrategy = strategy
-        newStrategy = await MockStrategy.new(controller, vault.address, erc20.address, {
-          from: admin,
-        })
+        newStrategy = await MockStrategy.new(
+          controller.address,
+          vault.address,
+          erc20.address,
+          {
+            from: admin,
+          }
+        )
 
-        await vault.setStrategy(oldStrategy.address, 0, {from: controller})
+        await vault.setStrategy(oldStrategy.address, 0, {from: admin})
         await vault.setNextStrategy(newStrategy.address, {from: admin})
         await timeout(MIN_WAIT_TIME)
-        await vault.setStrategy(newStrategy.address, 0, {from: controller})
+        await vault.setStrategy(newStrategy.address, 0, {from: admin})
       })
 
       it("should update strategy", async () => {
-        await vault.setStrategy(oldStrategy.address, 0, {from: controller})
+        await vault.setStrategy(oldStrategy.address, 0, {from: admin})
         assert.equal(await vault.strategy(), oldStrategy.address, "old strategy")
 
-        await vault.setStrategy(newStrategy.address, 0, {from: controller})
+        await vault.setStrategy(newStrategy.address, 0, {from: admin})
         assert.equal(await vault.strategy(), newStrategy.address, "new strategy")
       })
     })
 
-    it("should reject if not controller", async () => {
+    it("should reject if not authorized", async () => {
       await expect(
-        vault.setStrategy(strategy.address, 0, {from: accounts[0]})
-      ).to.be.rejectedWith("!controller")
+        vault.setStrategy(strategy.address, 0, {from: accounts[1]})
+      ).to.be.rejectedWith("!authorized")
     })
 
     it("should reject if strategy is zero address", async () => {
       await expect(
-        vault.setStrategy(ZERO_ADDRESS, 0, {from: controller})
+        vault.setStrategy(ZERO_ADDRESS, 0, {from: admin})
       ).to.be.rejectedWith("strategy = zero address")
     })
 
     it("should reject if strategy is equal to current strategy", async () => {
-      await vault.setStrategy(strategy.address, 0, {from: controller})
+      await vault.setStrategy(strategy.address, 0, {from: admin})
 
       await expect(
-        vault.setStrategy(strategy.address, 0, {from: controller})
+        vault.setStrategy(strategy.address, 0, {from: admin})
       ).to.be.rejectedWith("new strategy = current strategy")
     })
 
@@ -170,7 +179,7 @@ contract("Vault", (accounts) => {
       await strategy._setUnderlyingToken_(accounts[0])
 
       await expect(
-        vault.setStrategy(strategy.address, 0, {from: controller})
+        vault.setStrategy(strategy.address, 0, {from: admin})
       ).to.be.rejectedWith("strategy.token != vault.token")
     })
 
@@ -178,13 +187,13 @@ contract("Vault", (accounts) => {
       await strategy._setVault_(accounts[0])
 
       await expect(
-        vault.setStrategy(strategy.address, 0, {from: controller})
+        vault.setStrategy(strategy.address, 0, {from: admin})
       ).to.be.rejectedWith("strategy.vault != vault")
     })
 
     it("should reject if not next strategy or approved strategy", async () => {
       const strategy = await MockStrategy.new(
-        controller,
+        controller.address,
         vault.address,
         erc20.address,
         {
@@ -193,7 +202,7 @@ contract("Vault", (accounts) => {
       )
 
       await expect(
-        vault.setStrategy(strategy.address, 0, {from: controller})
+        vault.setStrategy(strategy.address, 0, {from: admin})
       ).to.be.rejectedWith("!approved strategy")
     })
   })

@@ -6,7 +6,7 @@ contract("Vault", (accounts) => {
   const MIN_WAIT_TIME = 0
 
   const refs = setup(accounts, MIN_WAIT_TIME)
-  const {admin, controller} = refs
+  const {admin} = refs
 
   let vault
   let erc20
@@ -20,7 +20,7 @@ contract("Vault", (accounts) => {
   describe("revokeStrategy", () => {
     beforeEach(async () => {
       await vault.setNextStrategy(strategy.address, {from: admin})
-      await vault.setStrategy(strategy.address, 0, {from: controller})
+      await vault.setStrategy(strategy.address, 0, {from: admin})
     })
 
     it("should revoke", async () => {

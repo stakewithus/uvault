@@ -9,12 +9,14 @@ contract("Vault", (accounts) => {
   const MIN_WAIT_TIME = 100
 
   const refs = setup(accounts, MIN_WAIT_TIME)
-  const {admin, controller} = refs
+  const {admin} = refs
 
+  let controller
   let vault
   let erc20
   let strategy
   beforeEach(() => {
+    controller = refs.controller
     vault = refs.vault
     erc20 = refs.erc20
     strategy = refs.strategy
@@ -36,12 +38,12 @@ contract("Vault", (accounts) => {
 
     it("should set next strategy when current strategy is set", async () => {
       await vault.setNextStrategy(strategy.address, {from: admin})
-      await vault.setStrategy(strategy.address, 0, {from: controller})
+      await vault.setStrategy(strategy.address, 0, {from: admin})
 
       assert.equal(await vault.strategy(), strategy.address, "strategy")
 
       const newStrategy = await MockStrategy.new(
-        controller,
+        controller.address,
         vault.address,
         erc20.address,
         {from: admin}

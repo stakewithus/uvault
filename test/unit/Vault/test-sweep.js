@@ -3,7 +3,6 @@ const {expect} = require("../../setup")
 const {eq, add, sub, frac} = require("../../util")
 const setup = require("./setup")
 
-const MockStrategy = artifacts.require("MockStrategy")
 const ERC20Token = artifacts.require("ERC20Token")
 
 contract("Vault", (accounts) => {

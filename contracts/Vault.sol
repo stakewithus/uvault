@@ -79,8 +79,8 @@ contract Vault is IVault, ERC20, ERC20Detailed {
         _;
     }
 
-    modifier onlyController() {
-        require(msg.sender == controller, "!controller");
+    modifier onlyAuthorized() {
+        require(msg.sender == admin || msg.sender == controller, "!authorized");
         _;
     }
 
@@ -179,7 +179,7 @@ contract Vault is IVault, ERC20, ERC20Detailed {
     @param _strategy Address of strategy used
     @param _min Minimum amount of underlying token to return from strategy
     */
-    function setStrategy(address _strategy, uint _min) external onlyController {
+    function setStrategy(address _strategy, uint _min) external onlyAuthorized {
         require(_strategy != address(0), "strategy = zero address");
         require(_strategy != strategy, "new strategy = current strategy");
         require(IStrategy(_strategy).underlyingToken() == token, "strategy.token != vault.token");
@@ -224,7 +224,7 @@ contract Vault is IVault, ERC20, ERC20Detailed {
     @notice Invest token from vault into strategy.
             Some token are kept in vault for cheap withdraw.
     */
-    function invest() external onlyController whenStrategyDefined {
+    function invest() external onlyAuthorized whenStrategyDefined {
         uint amount = _availableToInvest();
 
         if (amount > 0) {
