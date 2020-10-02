@@ -38,6 +38,9 @@ contract Vault is IVault, ERC20, ERC20Detailed {
     uint public min = 9500;
     uint public constant MAX = 10000;
 
+    uint public withdrawFee;
+    uint public constant WITHDRAW_FEE_MAX = 10000;
+
     // address of next strategy to be used
     address public nextStrategy;
     // timestamp of when the next strategy can be used
@@ -94,6 +97,11 @@ contract Vault is IVault, ERC20, ERC20Detailed {
     function setMin(uint _min) external onlyAdmin {
         require(_min <= MAX, "min > max");
         min = _min;
+    }
+
+    function setWithdrawFee(uint _fee) external onlyAdmin {
+        require(_fee <= WITHDRAW_FEE_MAX, "withdraw fee > max");
+        withdrawFee = _fee;
     }
 
     function _balanceInVault() internal view returns (uint) {
