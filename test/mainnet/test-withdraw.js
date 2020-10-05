@@ -47,15 +47,7 @@ contract("mainnet integration", (accounts) => {
     await gasRelayer.relayTx(controller.address, txData, gasTokenBal)
     const after = await snapshot()
 
-    // check strategy transferred all underlying token back to vault
-    assert(
-      eq(
-        after.underlying.vault,
-        add(before.underlying.vault, before.underlying.strategy)
-      ),
-      "vault"
-    )
-    // check strategy balance is zero
-    assert(eq(after.underlying.strategy, new BN(0)), "strategy")
+    // check strategy transferred underlying token back to vault
+    assert(eq(after.underlying.vault, add(before.underlying.vault, amount)), "vault")
   })
 })
