@@ -3,7 +3,7 @@ const {eq, sub} = require("../util")
 const {encodeInvest} = require("./lib")
 const setup = require("./setup")
 
-contract("integration", (accounts) => {
+contract("mainnet integration", (accounts) => {
   const refs = setup(accounts)
   const {admin} = refs
 

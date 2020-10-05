@@ -6,7 +6,7 @@ const {assert} = require("chai")
 
 const StrategyTest = artifacts.require("StrategyTest")
 
-contract("integration", (accounts) => {
+contract("mainnet integration", (accounts) => {
   const refs = setup(accounts)
   const {admin} = refs
 

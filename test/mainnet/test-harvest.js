@@ -1,12 +1,9 @@
-const BN = require("bn.js")
-const {eq, add} = require("../util")
 const {encodeHarvest} = require("./lib")
 const setup = require("./setup")
 const {assert} = require("chai")
 
-contract("integration", (accounts) => {
+contract("mainnet integration", (accounts) => {
   const refs = setup(accounts)
-  const {admin} = refs
 
   let gasRelayer
   let gasToken
