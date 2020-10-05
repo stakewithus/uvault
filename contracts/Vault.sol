@@ -39,6 +39,11 @@ contract Vault is IVault, ERC20, ERC20Detailed {
     uint public reserveMin = 500;
     uint public constant RESERVE_MAX = 10000;
 
+    // percentage of reward given to caller of invest
+    uint public investFee = 10;
+    uint public constant INVEST_FEE_CAP = 100; // upper limit to investFee
+    uint public constant INVEST_FEE_MAX = 10000;
+
     uint public withdrawFee;
     uint public constant WITHDRAW_FEE_MAX = 10000;
 
@@ -98,6 +103,11 @@ contract Vault is IVault, ERC20, ERC20Detailed {
     function setReserveMin(uint _reserveMin) external onlyAdmin {
         require(_reserveMin <= RESERVE_MAX, "reserve min > max");
         reserveMin = _reserveMin;
+    }
+
+    function setInvestFee(uint _fee) external onlyAdmin {
+        require(_fee <= INVEST_FEE_CAP, "invest fee > cap");
+        investFee = _fee;
     }
 
     function setWithdrawFee(uint _fee) external onlyAdmin {
