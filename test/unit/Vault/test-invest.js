@@ -62,10 +62,6 @@ contract("Vault", (accounts) => {
       await expect(vault.invest({from: admin})).to.be.rejectedWith("available = 0")
     })
 
-    it("should reject if not authorized", async () => {
-      await expect(vault.invest({from: accounts[1]})).to.be.rejectedWith("!authorized")
-    })
-
     it("should reject if strategy not set", async () => {
       const vault = await Vault.new(controller.address, erc20.address, MIN_WAIT_TIME)
       assert.equal(await vault.strategy(), ZERO_ADDRESS, "strategy")
