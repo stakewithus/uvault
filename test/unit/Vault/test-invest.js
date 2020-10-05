@@ -54,14 +54,12 @@ contract("Vault", (accounts) => {
       )
     })
 
-    it("should not call strategy.deposit if balance = 0", async () => {
+    it("should reject if available = 0", async () => {
       await vault.withdraw(amount, 0, {from: sender})
 
       assert(eq(await vault.availableToInvest(), new BN(0)), "available")
 
-      await vault.invest({from: admin})
-
-      assert(eq(await strategy._depositAmount_(), new BN(0)), "deposit")
+      await expect(vault.invest({from: admin})).to.be.rejectedWith("available = 0")
     })
 
     it("should reject if not authorized", async () => {

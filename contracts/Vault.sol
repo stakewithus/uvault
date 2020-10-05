@@ -133,18 +133,6 @@ contract Vault is IVault, ERC20, ERC20Detailed {
         return _balanceInStrategy();
     }
 
-    function _availableToInvest() internal view returns (uint) {
-        return _balanceInVault().mul(min).div(MAX);
-    }
-
-    /*
-    @notice Returns amount of token available to be invested into strategy
-    @return Amount of token available to be invested into strategy
-    */
-    function availableToInvest() external view returns (uint) {
-        return _availableToInvest();
-    }
-
     function _totalValueLocked() internal view returns (uint) {
         return _balanceInVault().add(_balanceInStrategy());
     }
@@ -155,6 +143,26 @@ contract Vault is IVault, ERC20, ERC20Detailed {
     */
     function totalValueLocked() external view returns (uint) {
         return _totalValueLocked();
+    }
+
+    function _availableToInvest() internal view returns (uint) {
+        uint balInVault = _balanceInVault();
+        uint minReserve = _totalValueLocked().mul(min).div(MAX);
+
+        if (balInVault <= minReserve) {
+            return 0;
+        }
+
+        // balInVault > minReserve
+        return balInVault - minReserve;
+    }
+
+    /*
+    @notice Returns amount of token available to be invested into strategy
+    @return Amount of token available to be invested into strategy
+    */
+    function availableToInvest() external view returns (uint) {
+        return _availableToInvest();
     }
 
     /*
@@ -227,11 +235,10 @@ contract Vault is IVault, ERC20, ERC20Detailed {
     */
     function invest() external onlyAuthorized whenStrategyDefined {
         uint amount = _availableToInvest();
+        require(amount > 0, "available = 0");
 
-        if (amount > 0) {
-            // infinite approval is set when this strategy was set
-            IStrategy(strategy).deposit(amount);
-        }
+        // infinite approval is set when this strategy was set
+        IStrategy(strategy).deposit(amount);
     }
 
     /*
