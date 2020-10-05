@@ -59,6 +59,7 @@ contract Controller is IController {
         IVault(_vault).setStrategy(_strategy, _min);
     }
 
+    // @dev Warning: harvest can be called on strategy that is not set to any vault
     function harvest(address _strategy) external onlyAuthorized {
         IStrategy(_strategy).harvest();
     }
@@ -74,6 +75,7 @@ contract Controller is IController {
         require(balAfter.sub(balBefore) >= _min, "withdraw < min");
     }
 
+    // @dev Warning: withdraw can be called on strategy that is not set to any vault
     function withdraw(
         address _strategy,
         uint _amount,
@@ -82,10 +84,12 @@ contract Controller is IController {
         IStrategy(_strategy).withdraw(_amount);
     }
 
+    // @dev Warning: withdrawAll can be called on strategy that is not set to any vault
     function withdrawAll(address _strategy, uint _min) external onlyAuthorized checkWithdraw(_strategy, _min) {
         IStrategy(_strategy).withdrawAll();
     }
 
+    // @dev Warning: exit can be called on strategy that is not set to any vault
     function exit(address _strategy, uint _min) external onlyAuthorized checkWithdraw(_strategy, _min) {
         IStrategy(_strategy).exit();
     }
