@@ -28,3 +28,6 @@ jobs:
 
       - name: Run unit test
         run: npm run test:unit
+
+      - name: Run integration test
+        run: npm run test:integration
