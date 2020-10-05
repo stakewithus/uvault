@@ -35,9 +35,9 @@ contract Vault is IVault, ERC20, ERC20Detailed {
     address public token;
     address public strategy;
 
-    // percentange of token available to be invested into strategy
-    uint public min = 9500;
-    uint public constant MAX = 10000;
+    // percentange of token reserved in vault for cheap withdraw
+    uint public reserveMin = 500;
+    uint public constant RESERVE_MAX = 10000;
 
     uint public withdrawFee;
     uint public constant WITHDRAW_FEE_MAX = 10000;
@@ -95,9 +95,9 @@ contract Vault is IVault, ERC20, ERC20Detailed {
         admin = _admin;
     }
 
-    function setMin(uint _min) external onlyAdmin {
-        require(_min <= MAX, "min > max");
-        min = _min;
+    function setReserveMin(uint _reserveMin) external onlyAdmin {
+        require(_reserveMin <= RESERVE_MAX, "reserve min > max");
+        reserveMin = _reserveMin;
     }
 
     function setWithdrawFee(uint _fee) external onlyAdmin {
@@ -147,7 +147,7 @@ contract Vault is IVault, ERC20, ERC20Detailed {
 
     function _availableToInvest() internal view returns (uint) {
         uint balInVault = _balanceInVault();
-        uint minReserve = _totalValueLocked().mul(min).div(MAX);
+        uint minReserve = _totalValueLocked().mul(reserveMin).div(RESERVE_MAX);
 
         if (balInVault <= minReserve) {
             return 0;
@@ -233,7 +233,7 @@ contract Vault is IVault, ERC20, ERC20Detailed {
     @notice Invest token from vault into strategy.
             Some token are kept in vault for cheap withdraw.
     */
-    function invest() external onlyAuthorized whenStrategyDefined {
+    function invest() external whenStrategyDefined {
         uint amount = _availableToInvest();
         require(amount > 0, "available = 0");
 

@@ -14,19 +14,23 @@ contract("Vault", (accounts) => {
     erc20 = refs.erc20
   })
 
-  describe("setMin", () => {
+  describe("setReserveMin", () => {
     it("should set min", async () => {
-      await vault.setMin(123, {from: admin})
+      await vault.setReserveMin(123, {from: admin})
 
-      assert.equal(await vault.min(), 123)
+      assert.equal(await vault.reserveMin(), 123)
     })
 
     it("should reject if caller not admin", async () => {
-      await expect(vault.setMin(123, {from: accounts[1]})).to.be.rejectedWith("!admin")
+      await expect(vault.setReserveMin(123, {from: accounts[1]})).to.be.rejectedWith(
+        "!admin"
+      )
     })
 
     it("should reject min > max", async () => {
-      await expect(vault.setMin(10001, {from: admin})).to.be.rejectedWith("min > max")
+      await expect(vault.setReserveMin(10001, {from: admin})).to.be.rejectedWith(
+        "reserve min > max"
+      )
     })
   })
 })
