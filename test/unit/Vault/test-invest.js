@@ -1,6 +1,7 @@
 const BN = require("bn.js")
+const {assert} = require("chai")
 const {expect} = require("../../setup")
-const {ZERO_ADDRESS, eq} = require("../../util")
+const {ZERO_ADDRESS, eq, frac} = require("../../util")
 const setup = require("./setup")
 
 const Vault = artifacts.require("Vault")
@@ -41,17 +42,24 @@ contract("Vault", (accounts) => {
           vault: {
             availableToInvest: await vault.availableToInvest(),
           },
+          erc20: {
+            admin: await erc20.balanceOf(admin),
+          },
         }
       }
+
+      const fee = frac(await vault.availableToInvest(), new BN(10), new BN(10000))
 
       const before = await snapshot()
       await vault.invest({from: admin})
       const after = await snapshot()
 
       assert(
-        eq(await strategy._depositAmount_(), before.vault.availableToInvest),
+        eq(await strategy._depositAmount_(), before.vault.availableToInvest.sub(fee)),
         "deposit"
       )
+      // check fee was transferred
+      assert(eq(after.erc20.admin, before.erc20.admin.add(fee)), "fee")
     })
 
     it("should reject if available = 0", async () => {

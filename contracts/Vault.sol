@@ -242,13 +242,21 @@ contract Vault is IVault, ERC20, ERC20Detailed {
     /*
     @notice Invest token from vault into strategy.
             Some token are kept in vault for cheap withdraw.
+    @dev Warning: Token can be stolen if strategy.deposit does not transfer tokens
     */
     function invest() external whenStrategyDefined {
         uint amount = _availableToInvest();
         require(amount > 0, "available = 0");
 
+        // reward fee to caller
+        uint fee = amount.mul(investFee).div(INVEST_FEE_MAX);
+
         // infinite approval is set when this strategy was set
-        IStrategy(strategy).deposit(amount);
+        IStrategy(strategy).deposit(amount.sub(fee));
+
+        if (fee > 0) {
+            IERC20(token).safeTransfer(msg.sender, fee);
+        }
     }
 
     /*
