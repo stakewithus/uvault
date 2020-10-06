@@ -350,7 +350,7 @@ contract Vault is IVault, ERC20, ERC20Detailed, ReentrancyGuard {
         _burn(msg.sender, _shares);
 
         uint balInVault = _balanceInVault();
-        if (withdrawAmount > balInVault) {
+        if (balInVault < withdrawAmount) {
             // maximize withdraw amount from strategy
             uint balInStrat = _balanceInStrategy();
             uint amountFromStrat = withdrawAmount;
