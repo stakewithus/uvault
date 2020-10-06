@@ -28,27 +28,27 @@ contract StrategyUsdcToCusd is IStrategy {
     uint public performanceFee = 100;
     uint public constant PERFORMANCE_FEE_MAX = 10000;
 
-    address private usdc = address(0xA0b86991c6218b36c1d19D4a2e9Eb0cE3606eB48);
-    // address private  DAI = address(0x6B175474E89094C44Da98b954EedeAC495271d0F);
+    address internal usdc = address(0xA0b86991c6218b36c1d19D4a2e9Eb0cE3606eB48);
+    // address internal  DAI = address(0x6B175474E89094C44Da98b954EedeAC495271d0F);
 
-    address private underlying = usdc;
+    address internal underlying = usdc;
 
     // Curve
     // cDAI/cUSDC
-    address private cUsd = address(0x845838DF265Dcd2c412A1Dc9e959c7d08537f8a2);
+    address internal cUsd = address(0x845838DF265Dcd2c412A1Dc9e959c7d08537f8a2);
     // DepositCompound
-    address private depositC = address(0xeB21209ae4C2c9FF2a86ACA31E123764A3B6Bc06);
+    address internal depositC = address(0xeB21209ae4C2c9FF2a86ACA31E123764A3B6Bc06);
     // cUsd Gauge
-    address private gauge = address(0x7ca5b0a2910B33e9759DC7dDB0413949071D7575);
+    address internal gauge = address(0x7ca5b0a2910B33e9759DC7dDB0413949071D7575);
     // Minter
-    address private minter = address(0xd061D61a4d941c39E5453435B6345Dc261C2fcE0);
+    address internal minter = address(0xd061D61a4d941c39E5453435B6345Dc261C2fcE0);
     // DAO
-    address private crv = address(0xD533a949740bb3306d119CC777fa900bA034cd52);
+    address internal crv = address(0xD533a949740bb3306d119CC777fa900bA034cd52);
 
     // DEX related addresses
-    address private uniswap = address(0x7a250d5630B4cF539739dF2C5dAcb4c659F2488D);
+    address internal uniswap = address(0x7a250d5630B4cF539739dF2C5dAcb4c659F2488D);
     // used for crv <> weth <> usdc route
-    address private weth = address(0xC02aaA39b223FE8D0A0e5C4F27eAD9083C756Cc2);
+    address internal weth = address(0xC02aaA39b223FE8D0A0e5C4F27eAD9083C756Cc2);
 
     constructor(address _controller, address _vault) public {
         require(_controller != address(0), "controller = zero address");
