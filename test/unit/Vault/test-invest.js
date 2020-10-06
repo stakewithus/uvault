@@ -34,6 +34,8 @@ contract("Vault", (accounts) => {
 
       await vault.setNextStrategy(strategy.address, {from: admin})
       await vault.setStrategy(strategy.address, 0, {from: admin})
+
+      await vault.setInvestFee(new BN(100))
     })
 
     it("should invest", async () => {
@@ -48,7 +50,7 @@ contract("Vault", (accounts) => {
         }
       }
 
-      const fee = frac(await vault.availableToInvest(), new BN(10), new BN(10000))
+      const fee = frac(await vault.availableToInvest(), new BN(100), new BN(10000))
 
       const before = await snapshot()
       await vault.invest({from: admin})

@@ -40,7 +40,7 @@ contract Vault is IVault, ERC20, ERC20Detailed {
     uint public constant RESERVE_MAX = 10000;
 
     // percentage of reward given to caller of invest
-    uint public investFee = 10;
+    uint public investFee;
     uint public constant INVEST_FEE_CAP = 100; // upper limit to investFee
     uint public constant INVEST_FEE_MAX = 10000;
 
