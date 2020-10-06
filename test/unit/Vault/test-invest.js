@@ -64,6 +64,11 @@ contract("Vault", (accounts) => {
       assert(eq(after.erc20.admin, before.erc20.admin.add(fee)), "fee")
     })
 
+    it("should reject if paused", async () => {
+      await vault.pause({from: admin})
+      await expect(vault.invest({from: sender})).to.be.rejectedWith("paused")
+    })
+
     it("should reject if available = 0", async () => {
       await vault.withdraw(amount, 0, {from: sender})
 

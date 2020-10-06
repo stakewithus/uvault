@@ -265,7 +265,7 @@ contract Vault is IVault, ERC20, ERC20Detailed {
             Some token are kept in vault for cheap withdraw.
     @dev Warning: Token can be stolen if strategy.deposit does not transfer tokens
     */
-    function invest() external whenStrategyDefined {
+    function invest() external whenStrategyDefined whenNotPaused {
         uint amount = _availableToInvest();
         require(amount > 0, "available = 0");
 
