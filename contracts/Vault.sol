@@ -58,6 +58,8 @@ contract Vault is IVault, ERC20, ERC20Detailed {
     // mapping of approved strategies
     mapping(address => bool) public strategies;
 
+    bool public paused;
+
     /*
     @dev vault decimals must be equal to token decimals
     */
@@ -96,6 +98,16 @@ contract Vault is IVault, ERC20, ERC20Detailed {
         _;
     }
 
+    modifier whenPaused() {
+        require(paused, "!paused");
+        _;
+    }
+
+    modifier whenNotPaused() {
+        require(!paused, "paused");
+        _;
+    }
+
     function setAdmin(address _admin) external onlyAdmin {
         require(_admin != address(0), "admin = zero address");
         admin = _admin;
@@ -114,6 +126,14 @@ contract Vault is IVault, ERC20, ERC20Detailed {
     function setWithdrawFee(uint _fee) external onlyAdmin {
         require(_fee <= WITHDRAW_FEE_CAP, "withdraw fee > cap");
         withdrawFee = _fee;
+    }
+
+    function pause() external onlyAdmin whenNotPaused {
+        paused = true;
+    }
+
+    function unpause() external onlyAdmin whenPaused {
+        paused = false;
     }
 
     function _balanceInVault() internal view returns (uint) {
