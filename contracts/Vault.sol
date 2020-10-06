@@ -45,7 +45,7 @@ contract Vault is IVault, ERC20, ERC20Detailed {
     uint public constant INVEST_FEE_MAX = 10000;
 
     uint public withdrawFee;
-    uint public constant WITHDRAW_FEE_CAP = 500; // upper limit to investFee
+    uint public constant WITHDRAW_FEE_CAP = 500; // upper limit to withdrawFee
     uint public constant WITHDRAW_FEE_MAX = 10000;
 
     // address of next strategy to be used
