@@ -7,6 +7,7 @@ contract("Vault", (accounts) => {
   const MIN_WAIT_TIME = 0
 
   const refs = setup(accounts, MIN_WAIT_TIME)
+  const {admin} = refs
 
   let vault
   let erc20
@@ -57,6 +58,11 @@ contract("Vault", (accounts) => {
         eq(after.vault.totalSupply, add(before.vault.totalSupply, amount)),
         "total supply"
       )
+    })
+
+    it("should reject if paused", async () => {
+      await vault.pause({from: admin})
+      await expect(vault.deposit(amount, {from: sender})).to.be.rejectedWith("paused")
     })
 
     it("should deposit when total supply > 0", async () => {

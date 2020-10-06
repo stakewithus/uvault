@@ -284,7 +284,7 @@ contract Vault is IVault, ERC20, ERC20Detailed {
     @notice Deposit token into vault
     @param _amount Amount of token to transfer from `msg.sender`
     */
-    function deposit(uint _amount) external {
+    function deposit(uint _amount) external whenNotPaused {
         require(_amount > 0, "amount = 0");
 
         uint totalUnderlying = _totalValueLocked();
