@@ -1,5 +1,9 @@
 # Unagi Vault
 
+### Contract Design Goals
+
+Safe > Gas cost > ROI
+
 ### Contract Architecture
 
 ![unagi arch](unagi-arch.png)
