@@ -1,6 +1,7 @@
 pragma solidity 0.5.17;
 
 import "@openzeppelin/contracts/math/SafeMath.sol";
+import "@openzeppelin/contracts/utils/ReentrancyGuard.sol";
 import "@openzeppelin/contracts/token/ERC20/SafeERC20.sol";
 import "@openzeppelin/contracts/token/ERC20/IERC20.sol";
 import "@openzeppelin/contracts/token/ERC20/ERC20.sol";
@@ -23,7 +24,7 @@ import "./IController.sol";
 - slippage when withdrawing all from strategy
 */
 
-contract Vault is IVault, ERC20, ERC20Detailed {
+contract Vault is IVault, ERC20, ERC20Detailed, ReentrancyGuard {
     using SafeERC20 for IERC20;
     using SafeMath for uint;
 
@@ -284,7 +285,7 @@ contract Vault is IVault, ERC20, ERC20Detailed {
     @notice Deposit token into vault
     @param _amount Amount of token to transfer from `msg.sender`
     */
-    function deposit(uint _amount) external whenNotPaused {
+    function deposit(uint _amount) external whenNotPaused nonReentrant {
         require(_amount > 0, "amount = 0");
 
         uint totalUnderlying = _totalValueLocked();
@@ -342,7 +343,7 @@ contract Vault is IVault, ERC20, ERC20Detailed {
     @param _shares Amount of shares to burn
     @param _min Minimum amount of underlying token to return
     */
-    function withdraw(uint _shares, uint _min) external {
+    function withdraw(uint _shares, uint _min) external nonReentrant {
         require(_shares > 0, "shares = 0");
 
         uint withdrawAmount = _calcWithdraw(_shares);
