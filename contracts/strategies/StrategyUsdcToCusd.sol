@@ -28,35 +28,55 @@ contract StrategyUsdcToCusd is IStrategy {
     uint public performanceFee = 100;
     uint public constant PERFORMANCE_FEE_MAX = 10000;
 
-    address internal usdc = address(0xA0b86991c6218b36c1d19D4a2e9Eb0cE3606eB48);
-    // address internal  DAI = address(0x6B175474E89094C44Da98b954EedeAC495271d0F);
-
-    address internal underlying = usdc;
+    address internal usdc;
+    address internal underlying;
 
     // Curve
     // cDAI/cUSDC
-    address internal cUsd = address(0x845838DF265Dcd2c412A1Dc9e959c7d08537f8a2);
+    address internal cUsd;
     // DepositCompound
-    address internal depositC = address(0xeB21209ae4C2c9FF2a86ACA31E123764A3B6Bc06);
+    address internal depositC;
     // cUsd Gauge
-    address internal gauge = address(0x7ca5b0a2910B33e9759DC7dDB0413949071D7575);
+    address internal gauge;
     // Minter
-    address internal minter = address(0xd061D61a4d941c39E5453435B6345Dc261C2fcE0);
+    address internal minter;
     // DAO
-    address internal crv = address(0xD533a949740bb3306d119CC777fa900bA034cd52);
+    address internal crv;
 
     // DEX related addresses
-    address internal uniswap = address(0x7a250d5630B4cF539739dF2C5dAcb4c659F2488D);
+    address internal uniswap;
     // used for crv <> weth <> usdc route
-    address internal weth = address(0xC02aaA39b223FE8D0A0e5C4F27eAD9083C756Cc2);
+    address internal weth;
 
-    constructor(address _controller, address _vault) public {
+    constructor(
+        address _controller,
+        address _vault,
+        address _usdc,
+        address _cUsd,
+        address _depositC,
+        address _gauge,
+        address _minter,
+        address _crv,
+        address _uniswap,
+        address _weth
+    ) public {
         require(_controller != address(0), "controller = zero address");
         require(_vault != address(0), "vault = zero address");
 
         admin = msg.sender;
         controller = _controller;
         vault = _vault;
+
+        usdc = _usdc;
+        cUsd = _cUsd;
+        depositC = _depositC;
+        gauge = _gauge;
+        minter = _minter;
+        crv = _crv;
+        uniswap = _uniswap;
+        weth = _weth;
+
+        underlying = usdc;
     }
 
     modifier onlyAdmin() {
