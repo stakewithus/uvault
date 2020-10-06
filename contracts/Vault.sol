@@ -45,6 +45,7 @@ contract Vault is IVault, ERC20, ERC20Detailed {
     uint public constant INVEST_FEE_MAX = 10000;
 
     uint public withdrawFee;
+    uint public constant WITHDRAW_FEE_CAP = 500; // upper limit to investFee
     uint public constant WITHDRAW_FEE_MAX = 10000;
 
     // address of next strategy to be used
@@ -111,7 +112,7 @@ contract Vault is IVault, ERC20, ERC20Detailed {
     }
 
     function setWithdrawFee(uint _fee) external onlyAdmin {
-        require(_fee <= WITHDRAW_FEE_MAX, "withdraw fee > max");
+        require(_fee <= WITHDRAW_FEE_CAP, "withdraw fee > cap");
         withdrawFee = _fee;
     }
 
