@@ -30,7 +30,7 @@ contract("Vault", (accounts) => {
     })
 
     it("should reject min > max", async () => {
-      await expect(vault.setInvestFee(101, {from: admin})).to.be.rejectedWith(
+      await expect(vault.setInvestFee(501, {from: admin})).to.be.rejectedWith(
         "invest fee > cap"
       )
     })
