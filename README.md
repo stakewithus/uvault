@@ -2,7 +2,8 @@
 
 ### Contract Design Goals
 
-Safety > Gas cost > ROI
+- Safety > Gas cost > ROI
+- permissionless deposit / withdraw
 
 ### Contract Architecture
 
