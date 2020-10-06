@@ -29,7 +29,7 @@ contract StrategyUsdcToCusd is IStrategy {
     uint public constant PERFORMANCE_FEE_MAX = 10000;
 
     address internal usdc;
-    address internal underlying;
+    address public underlying;
 
     // Curve
     // cDAI/cUSDC
@@ -112,10 +112,6 @@ contract StrategyUsdcToCusd is IStrategy {
     function setPerformanceFee(uint _fee) external onlyAdmin {
         require(_fee <= performanceFee, "performance fee > max");
         performanceFee = _fee;
-    }
-
-    function underlyingToken() external view returns (address) {
-        return underlying;
     }
 
     function _underlyingBalance() internal view returns (uint) {

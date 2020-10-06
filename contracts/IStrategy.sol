@@ -7,7 +7,10 @@ interface IStrategy {
 
     function vault() external view returns (address);
 
-    function underlyingToken() external view returns (address);
+    /*
+    @notice Returns address of underlying token
+    */
+    function underlying() external view returns (address);
 
     /*
     @notice Returns balance of underlying token

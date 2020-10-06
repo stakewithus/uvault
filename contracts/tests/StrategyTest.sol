@@ -59,10 +59,6 @@ contract StrategyTest is IStrategy {
         _;
     }
 
-    function underlyingToken() external view returns (address) {
-        return underlying;
-    }
-
     function _underlyingBalance() internal view returns (uint) {
         return IERC20(underlying).balanceOf(address(this));
     }

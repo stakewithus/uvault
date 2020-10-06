@@ -6,7 +6,7 @@ contract MockStrategy is IStrategy {
     address public admin;
     address public controller;
     address public vault;
-    address public underlyingToken;
+    address public underlying;
 
     // test helper
     uint public _balance_;
@@ -18,12 +18,12 @@ contract MockStrategy is IStrategy {
     constructor(
         address _controller,
         address _vault,
-        address _underlyingToken
+        address _underlying
     ) public {
         admin = msg.sender;
         controller = _controller;
         vault = _vault;
-        underlyingToken = _underlyingToken;
+        underlying = _underlying;
     }
 
     function underlyingBalance() external view returns (uint) {
@@ -57,8 +57,8 @@ contract MockStrategy is IStrategy {
         vault = _vault;
     }
 
-    function _setUnderlyingToken_(address _token) external {
-        underlyingToken = _token;
+    function _setUnderlying_(address _token) external {
+        underlying = _token;
     }
 
     function _setBalance_(uint _balance) external {
