@@ -2,7 +2,7 @@
 
 ### Contract Design Goals
 
-Safe > Gas cost > ROI
+Safety > Gas cost > ROI
 
 ### Contract Architecture
 
