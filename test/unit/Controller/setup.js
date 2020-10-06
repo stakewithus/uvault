@@ -13,7 +13,7 @@ module.exports = (accounts) => {
   const refs = {
     admin,
     treasury,
-    underlyingToken: null,
+    underlying: null,
     gasRelayer,
     controller: null,
     vault: null,
@@ -21,18 +21,15 @@ module.exports = (accounts) => {
   }
 
   beforeEach(async () => {
-    refs.underlyingToken = await ERC20Token.new()
+    refs.underlying = await ERC20Token.new()
     refs.controller = await Controller.new(treasury, gasRelayer, {
       from: admin,
     })
-    refs.vault = await MockVault.new(
-      refs.controller.address,
-      refs.underlyingToken.address
-    )
+    refs.vault = await MockVault.new(refs.controller.address, refs.underlying.address)
     refs.strategy = await MockStrategy.new(
       refs.controller.address,
       refs.vault.address,
-      refs.underlyingToken.address
+      refs.underlying.address
     )
   })
 

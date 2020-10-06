@@ -176,7 +176,7 @@ contract("Vault", (accounts) => {
     })
 
     it("should reject if vault.token != strategy.token", async () => {
-      await strategy._setUnderlyingToken_(accounts[0])
+      await strategy._setUnderlying_(accounts[0])
 
       await expect(
         vault.setStrategy(strategy.address, 0, {from: admin})
