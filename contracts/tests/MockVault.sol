@@ -12,6 +12,7 @@ contract MockVault is IVault {
 
     // test helpers
     bool public _investWasCalled_;
+    bool public _rebalanceWasCalled_;
     uint public _depositAmount_;
     uint public _withdrawAmount_;
     uint public _withdrawMin_;
@@ -50,6 +51,10 @@ contract MockVault is IVault {
 
     function invest() external {
         _investWasCalled_ = true;
+    }
+
+    function rebalance() external {
+        _rebalanceWasCalled_ = true;
     }
 
     function deposit(uint _amount) external {

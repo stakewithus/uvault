@@ -46,6 +46,12 @@ interface IVault {
     */
     function invest() external;
 
+    /*
+    @notice Withdraws from strategy to fill reserve. Percentage of refill
+            is rewarded to caller.
+    */
+    function rebalance() external;
+
     function deposit(uint _amount) external;
 
     /*
