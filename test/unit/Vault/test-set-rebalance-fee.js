@@ -17,7 +17,7 @@ contract("Vault", (accounts) => {
   const fee = new BN(1)
 
   describe("setRebalanceFee", () => {
-    it("should set invest fee", async () => {
+    it("should set rebalance fee", async () => {
       await vault.setRebalanceFee(fee, {from: admin})
 
       assert(eq(await vault.rebalanceFee(), fee), "rebalance fee")
