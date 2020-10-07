@@ -187,9 +187,13 @@ contract Vault is IVault, ERC20, ERC20Detailed, ReentrancyGuard {
         return _totalValueLocked();
     }
 
+    function _minReserve() internal view returns (uint) {
+        return _totalValueLocked().mul(reserveMin).div(RESERVE_MAX);
+    }
+
     function _availableToInvest() internal view returns (uint) {
         uint balInVault = _balanceInVault();
-        uint minReserve = _totalValueLocked().mul(reserveMin).div(RESERVE_MAX);
+        uint minReserve = _minReserve();
 
         if (balInVault <= minReserve) {
             return 0;
@@ -295,7 +299,29 @@ contract Vault is IVault, ERC20, ERC20Detailed, ReentrancyGuard {
     @notice Withdraws from strategy to fill reserve. Percentage of refill
             is rewarded to caller.
     */
-    function rebalance() external whenStrategyDefined whenNotPaused {}
+    function rebalance() external whenStrategyDefined whenNotPaused {
+        uint balInVault = _balanceInVault();
+        uint minReserve = _minReserve();
+
+        if (balInVault < minReserve) {
+            uint withdrawAmount = minReserve - balInVault;
+            IStrategy(strategy).withdraw(withdrawAmount);
+
+            uint balAfter = _balanceInVault();
+            uint diff = balAfter.sub(balInVault);
+
+            // TODO: state variables
+            uint withdrawMin = 9900;
+            uint WITHDRAW_MAX = 10000;
+
+            require(diff >= withdrawAmount.mul(withdrawMin).div(WITHDRAW_MAX), "withdraw < min");
+
+            uint fee = diff.mul(rebalanceFee).div(FEE_MAX);
+            if (fee > 0) {
+                IERC20(token).transfer(msg.sender, fee);
+            }
+        }
+    }
 
     /*
     @notice Deposit token into vault
