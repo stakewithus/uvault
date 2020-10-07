@@ -47,10 +47,6 @@ contract Vault is IVault, ERC20, ERC20Detailed, ReentrancyGuard {
     // Denominator used to calculate fees
     uint private constant FEE_MAX = 10000;
 
-    // percentage of reward given to caller of invest
-    uint public investFee;
-    uint private constant INVEST_FEE_CAP = 500; // upper limit to investFee
-
     // percentage of reward given to caller of rebalance
     uint public rebalanceFee;
     uint private constant REBALANCE_FEE_CAP = 500; // upper limit to rebalanceFee
@@ -131,11 +127,6 @@ contract Vault is IVault, ERC20, ERC20Detailed, ReentrancyGuard {
     function setWithdrawMin(uint _withdrawMin) external onlyAdmin {
         require(_withdrawMin <= WITHDRAW_MAX, "withdraw min > max");
         withdrawMin = _withdrawMin;
-    }
-
-    function setInvestFee(uint _fee) external onlyAdmin {
-        require(_fee <= INVEST_FEE_CAP, "invest fee > cap");
-        investFee = _fee;
     }
 
     function setRebalanceFee(uint _fee) external onlyAdmin {
