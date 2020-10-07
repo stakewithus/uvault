@@ -28,7 +28,8 @@ contract("Vault", (accounts) => {
 
   describe("rebalance", () => {
     beforeEach(async () => {
-      const amount = new BN(10).pow(new BN(18))
+      // mint 100 tokens
+      const amount = new BN(10).pow(new BN(18)).mul(new BN(100))
 
       await erc20.mint(user, amount)
       await erc20.approve(vault.address, amount, {from: user})
@@ -67,10 +68,22 @@ contract("Vault", (accounts) => {
       await expect(vault.rebalance()).to.be.rejectedWith("paused")
     })
 
+    it("should not rebalance if (vault / reserve) ratio > 95 and < 105", async () => {
+      await vault.rebalance({from: user})
+
+      const before = await snapshot()
+      await vault.rebalance({from: user})
+      const after = await snapshot()
+
+      assert(eq(after.erc20.vault, before.erc20.vault), "vault")
+      assert(eq(after.erc20.strategy, before.erc20.strategy), "strategy")
+    })
+
     describe("withdraw", () => {
       beforeEach(async () => {
         // setup balance in vault to be < min reserve
-        await vault.withdraw(10000, 0, {from: user})
+        const amount = new BN(10).pow(new BN(18))
+        await vault.withdraw(amount, 0, {from: user})
       })
 
       it("should withdraw if balance in vault < min reserve", async () => {

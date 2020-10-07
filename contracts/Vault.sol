@@ -321,6 +321,21 @@ contract Vault is IVault, ERC20, ERC20Detailed, ReentrancyGuard {
         uint balInVault = _balanceInVault();
         uint reserve = _minReserve();
 
+        /*
+        b = balance in vault
+        r = min reserve
+
+        Don't rebalance if
+        b / r > 95 / 100 and
+        b / r < 105 / 100
+        */
+        if (reserve > 0) {
+            uint ratio = balInVault.mul(100).div(reserve);
+            if (ratio > 95 && ratio < 105) {
+                return;
+            }
+        }
+
         if (balInVault == reserve) {
             return;
         } else if (balInVault < reserve) {
