@@ -449,6 +449,6 @@ contract Vault is IVault, ERC20, ERC20Detailed, ReentrancyGuard {
     */
     function sweep(address _token) external onlyAdmin {
         require(_token != token, "token = vault.token");
-        IERC20(_token).transfer(admin, IERC20(_token).balanceOf(address(this)));
+        IERC20(_token).safeTransfer(admin, IERC20(_token).balanceOf(address(this)));
     }
 }
