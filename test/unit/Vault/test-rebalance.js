@@ -40,8 +40,6 @@ contract("Vault", (accounts) => {
       await vault.setRebalanceFee(REBALANCE_FEE, {from: admin})
 
       await vault.invest()
-      // setup balance in vault to be < min reserve
-      await vault.withdraw(10000, 0, {from: user})
     })
 
     const snapshot = async () => {
@@ -69,51 +67,73 @@ contract("Vault", (accounts) => {
       await expect(vault.rebalance()).to.be.rejectedWith("paused")
     })
 
-    it("should withdraw if balance in vault < min reserve", async () => {
-      const before = await snapshot()
-      await vault.rebalance({from: user})
-      const after = await snapshot()
+    describe("withdraw", () => {
+      beforeEach(async () => {
+        // setup balance in vault to be < min reserve
+        await vault.withdraw(10000, 0, {from: user})
+      })
 
-      // check withdraw amount > 0
-      const withdrawAmount = before.vault.minReserve.sub(before.erc20.vault)
-      assert(withdrawAmount.gt(new BN(0)), "withdraw amount")
-      // check withdraw from strategy
-      assert(
-        eq(after.erc20.strategy, before.erc20.strategy.sub(withdrawAmount)),
-        "strategy"
-      )
-      // check transfer to vault
-      const fee = frac(withdrawAmount, REBALANCE_FEE, new BN(10000))
-      assert(
-        eq(after.erc20.vault, before.erc20.vault.add(withdrawAmount.sub(fee))),
-        "vault"
-      )
-      // check tranfser to caller
-      assert(eq(after.erc20.user, before.erc20.user.add(fee)), "fee")
+      it("should withdraw if balance in vault < min reserve", async () => {
+        const before = await snapshot()
+        await vault.rebalance({from: user})
+        const after = await snapshot()
+
+        // check withdraw amount > 0
+        const withdrawAmount = before.vault.minReserve.sub(before.erc20.vault)
+        assert(withdrawAmount.gt(new BN(0)), "withdraw amount")
+        // check withdraw from strategy
+        assert(
+          eq(after.erc20.strategy, before.erc20.strategy.sub(withdrawAmount)),
+          "strategy"
+        )
+        // check transfer to vault
+        const fee = frac(withdrawAmount, REBALANCE_FEE, new BN(10000))
+        assert(
+          eq(after.erc20.vault, before.erc20.vault.add(withdrawAmount.sub(fee))),
+          "vault"
+        )
+        // check tranfser to caller
+        assert(eq(after.erc20.user, before.erc20.user.add(fee)), "fee")
+      })
+
+      it("should reject withdraw if withdraw < min", async () => {
+        // simulate failing transfer
+        await strategy._setShouldTransfer_(false)
+
+        await expect(vault.rebalance()).to.be.rejectedWith("withdraw < min")
+      })
     })
 
-    it("should not withdraw if balance in vault >= min reserve", async () => {
-      await vault.rebalance()
-      // vault balance < min reserve from paying out fee
-      // deposit into vault so that balance >= min reserve
-      const amount = new BN(10).pow(new BN(18))
-      await erc20.mint(user, amount)
-      await erc20.approve(vault.address, amount, {from: user})
-      await vault.deposit(amount, {from: user})
+    describe("deposit", () => {
+      beforeEach(async () => {
+        // setup balance in vault to be > min reserve
+        const amount = new BN(10).pow(new BN(18))
+        await erc20.mint(user, amount)
+        await erc20.approve(vault.address, amount, {from: user})
+        await vault.deposit(amount, {from: user})
+      })
 
-      const before = await snapshot()
-      await vault.rebalance()
-      const after = await snapshot()
+      it("should deposit if balance in vault > min reserve", async () => {
+        const before = await snapshot()
+        await vault.rebalance({from: user})
+        const after = await snapshot()
 
-      assert(eq(before.erc20.vault, after.erc20.vault), "vault")
-      assert(eq(before.erc20.strategy, after.erc20.strategy), "strategy")
-    })
+        // check deposit amount > 0
+        const reserveDiff = before.erc20.vault.sub(before.vault.minReserve)
+        const fee = frac(reserveDiff, REBALANCE_FEE, new BN(10000))
+        const depositAmount = reserveDiff.sub(fee)
+        assert(depositAmount.gt(new BN(0)), "deposit amount")
 
-    it("should reject withdraw if withdraw < min", async () => {
-      // simulate failing transfer
-      await strategy._setShouldTransfer_(false)
-
-      await expect(vault.rebalance()).to.be.rejectedWith("withdraw < min")
+        // check deposit to strategy
+        assert(
+          eq(after.erc20.strategy, before.erc20.strategy.add(depositAmount)),
+          "strategy"
+        )
+        // check transfer from vault
+        assert(eq(after.erc20.vault, before.erc20.vault.sub(reserveDiff)), "vault")
+        // check tranfser to caller
+        assert(eq(after.erc20.user, before.erc20.user.add(fee)), "fee")
+      })
     })
   })
 })

@@ -54,7 +54,7 @@ interface IVault {
     function invest() external;
 
     /*
-    @notice Withdraws from strategy to fill reserve. Percentage of refill
+    @notice Rebalance the balances in vault and strategy. Percentage of rebalance
             is rewarded to caller.
     */
     function rebalance() external;

@@ -314,15 +314,18 @@ contract Vault is IVault, ERC20, ERC20Detailed, ReentrancyGuard {
     }
 
     /*
-    @notice Withdraws from strategy to fill reserve. Percentage of refill
+    @notice Rebalance the balances in vault and strategy. Percentage of rebalance
             is rewarded to caller.
     */
     function rebalance() external whenStrategyDefined whenNotPaused nonReentrant {
         uint balInVault = _balanceInVault();
         uint reserve = _minReserve();
 
-        if (balInVault < reserve) {
-            uint withdrawAmount = reserve - balInVault;
+        if (balInVault == reserve) {
+            return;
+        } else if (balInVault < reserve) {
+            uint withdrawAmount = reserve.sub(balInVault);
+
             IStrategy(strategy).withdraw(withdrawAmount);
 
             uint balAfter = _balanceInVault();
@@ -330,9 +333,35 @@ contract Vault is IVault, ERC20, ERC20Detailed, ReentrancyGuard {
 
             require(diff >= withdrawAmount.mul(withdrawMin).div(WITHDRAW_MAX), "withdraw < min");
 
+            // set withdraw amount to minimum of diff and withdrawAmount
+            // this is used to calculate fee
+            if (diff < withdrawAmount) {
+                withdrawAmount = diff;
+            }
+
             uint fee = withdrawAmount.mul(rebalanceFee).div(FEE_MAX);
             if (fee > 0) {
-                IERC20(token).transfer(msg.sender, fee);
+                IERC20(token).safeTransfer(msg.sender, fee);
+            }
+        } else {
+            // balInVault > reserve
+            uint reserveDiff = balInVault.sub(reserve);
+            uint fee = reserveDiff.mul(rebalanceFee).div(FEE_MAX);
+            uint depositAmount = reserveDiff.sub(fee);
+
+            // infinite approval is set when this strategy was set
+            IStrategy(strategy).deposit(depositAmount);
+
+            uint balAfter = _balanceInVault();
+            uint diff = balInVault.sub(balAfter);
+
+            // recalculate fee based on actual deposit
+            if (diff < depositAmount) {
+                fee = diff.mul(rebalanceFee).div(FEE_MAX);
+            }
+
+            if (fee > 0) {
+                IERC20(token).safeTransfer(msg.sender, fee);
             }
         }
     }
