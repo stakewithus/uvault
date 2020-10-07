@@ -51,6 +51,10 @@ contract Controller is IController {
         IVault(_vault).invest();
     }
 
+    function rebalance(address _vault) external onlyAuthorized {
+        IVault(_vault).rebalance();
+    }
+
     function setStrategy(
         address _vault,
         address _strategy,

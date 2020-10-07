@@ -13,6 +13,8 @@ contract MockController is IController {
 
     function invest(address _vault) external {}
 
+    function rebalance(address _vault) external {}
+
     function setStrategy(
         address _vault,
         address _strategy,

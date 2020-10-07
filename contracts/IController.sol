@@ -18,6 +18,12 @@ interface IController {
         uint _min
     ) external;
 
+    /*
+    @notice Rebalance token locked in vault and strategy
+    @param _vault Address of vault
+    */
+    function rebalance(address _vault) external;
+
     // calls to strategy
     function harvest(address _strategy) external;
 
