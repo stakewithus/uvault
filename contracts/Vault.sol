@@ -40,19 +40,19 @@ contract Vault is IVault, ERC20, ERC20Detailed, ReentrancyGuard {
     uint public reserveMin = 500;
     uint public constant RESERVE_MAX = 10000;
 
+    // Denominator used to calculate fees
+    uint public constant FEE_MAX = 10000;
+
     // percentage of reward given to caller of invest
     uint public investFee;
     uint public constant INVEST_FEE_CAP = 500; // upper limit to investFee
-    uint public constant INVEST_FEE_MAX = 10000;
 
     // percentage of reward given to caller of rebalance
     uint public rebalanceFee;
     uint public constant REBALANCE_FEE_CAP = 500; // upper limit to rebalanceFee
-    uint public constant REBALANCE_FEE_MAX = 10000;
 
     uint public withdrawFee;
     uint public constant WITHDRAW_FEE_CAP = 500; // upper limit to withdrawFee
-    uint public constant WITHDRAW_FEE_MAX = 10000;
 
     // address of next strategy to be used
     address public nextStrategy;
@@ -281,7 +281,7 @@ contract Vault is IVault, ERC20, ERC20Detailed, ReentrancyGuard {
         require(amount > 0, "available = 0");
 
         // reward fee to caller
-        uint fee = amount.mul(investFee).div(INVEST_FEE_MAX);
+        uint fee = amount.mul(investFee).div(FEE_MAX);
 
         // infinite approval is set when this strategy was set
         IStrategy(strategy).deposit(amount.sub(fee));
@@ -379,7 +379,7 @@ contract Vault is IVault, ERC20, ERC20Detailed, ReentrancyGuard {
             }
 
             // transfer to treasury
-            uint fee = withdrawAmount.mul(withdrawFee).div(WITHDRAW_FEE_MAX);
+            uint fee = withdrawAmount.mul(withdrawFee).div(FEE_MAX);
             if (fee > 0) {
                 address treasury = IController(controller).treasury();
                 require(treasury != address(0), "treasury = zero address");
