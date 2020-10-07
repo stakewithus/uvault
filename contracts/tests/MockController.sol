@@ -11,8 +11,6 @@ contract MockController is IController {
         treasury = _treasury;
     }
 
-    function invest(address _vault) external {}
-
     function rebalance(address _vault) external {}
 
     function setStrategy(

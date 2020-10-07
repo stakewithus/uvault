@@ -294,26 +294,6 @@ contract Vault is IVault, ERC20, ERC20Detailed, ReentrancyGuard {
     }
 
     /*
-    @notice Invest token from vault into strategy.
-            Some token are kept in vault for cheap withdraw.
-    @dev Warning: Token can be stolen if strategy.deposit does not transfer tokens
-    */
-    function invest() external whenStrategyDefined whenNotPaused {
-        uint amount = _availableToInvest();
-        require(amount > 0, "available = 0");
-
-        // reward fee to caller
-        uint fee = amount.mul(investFee).div(FEE_MAX);
-
-        // infinite approval is set when this strategy was set
-        IStrategy(strategy).deposit(amount.sub(fee));
-
-        if (fee > 0) {
-            IERC20(token).safeTransfer(msg.sender, fee);
-        }
-    }
-
-    /*
     @notice Rebalance the balances in vault and strategy. Percentage of rebalance
             is rewarded to caller.
     */

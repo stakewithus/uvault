@@ -49,11 +49,6 @@ interface IVault {
     function totalAssets() external view returns (uint);
 
     /*
-    @notice Transfers token in vault to strategy
-    */
-    function invest() external;
-
-    /*
     @notice Rebalance the balances in vault and strategy. Percentage of rebalance
             is rewarded to caller.
     */

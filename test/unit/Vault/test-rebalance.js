@@ -40,7 +40,7 @@ contract("Vault", (accounts) => {
 
       await vault.setRebalanceFee(REBALANCE_FEE, {from: admin})
 
-      await vault.invest()
+      await vault.rebalance()
     })
 
     const snapshot = async () => {

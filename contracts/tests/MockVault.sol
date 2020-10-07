@@ -11,7 +11,6 @@ contract MockVault is IVault {
     uint public timeLock;
 
     // test helpers
-    bool public _investWasCalled_;
     bool public _rebalanceWasCalled_;
     uint public _depositAmount_;
     uint public _withdrawAmount_;
@@ -51,10 +50,6 @@ contract MockVault is IVault {
 
     function totalAssets() external view returns (uint) {
         return 0;
-    }
-
-    function invest() external {
-        _investWasCalled_ = true;
     }
 
     function rebalance() external {
