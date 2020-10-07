@@ -49,7 +49,7 @@ contract MockVault is IVault {
         return 0;
     }
 
-    function totalValueLocked() external view returns (uint) {
+    function totalAssets() external view returns (uint) {
         return 0;
     }
 

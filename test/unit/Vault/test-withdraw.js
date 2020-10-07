@@ -73,7 +73,7 @@ contract("Vault", (accounts) => {
     })
 
     it("should withdraw from strategy", async () => {
-      // set balance in strategy, this would increate vault.totalValueLocked()
+      // set balance in strategy, this would increate vault.totalAssets()
       const balInStrategy = new BN(10).pow(new BN(18)).mul(new BN(40))
       await erc20.mint(strategy.address, balInStrategy)
       // vault bal = 10
@@ -97,7 +97,7 @@ contract("Vault", (accounts) => {
     })
 
     it("should withdraw from vault and strategy", async () => {
-      // set balance in strategy, this would increate vault.totalValueLocked()
+      // set balance in strategy, this would increate vault.totalAssets()
       const balInStrategy = new BN(10).pow(new BN(18)).mul(new BN(10))
       await erc20.mint(strategy.address, balInStrategy)
       // vault bal = 10

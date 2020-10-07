@@ -73,7 +73,7 @@ contract("Vault", (accounts) => {
               sender: await vault.balanceOf(sender),
             },
             totalSupply: await vault.totalSupply(),
-            totalValueLocked: await vault.totalValueLocked(),
+            totalAssets: await vault.totalAssets(),
           },
         }
       }
@@ -88,9 +88,7 @@ contract("Vault", (accounts) => {
       const after = await snapshot()
 
       // check vault balance
-      const shares = amount
-        .mul(before.vault.totalSupply)
-        .div(before.vault.totalValueLocked)
+      const shares = amount.mul(before.vault.totalSupply).div(before.vault.totalAssets)
       assert(
         eq(after.vault.balanceOf.sender, add(before.vault.balanceOf.sender, shares)),
         "vault sender"

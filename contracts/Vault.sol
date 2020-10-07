@@ -184,7 +184,7 @@ contract Vault is IVault, ERC20, ERC20Detailed, ReentrancyGuard {
         return _balanceInStrategy();
     }
 
-    function _totalValueLocked() internal view returns (uint) {
+    function _totalAssets() internal view returns (uint) {
         return _balanceInVault().add(_balanceInStrategy());
     }
 
@@ -192,12 +192,12 @@ contract Vault is IVault, ERC20, ERC20Detailed, ReentrancyGuard {
     @notice Returns the total amount of tokens in vault + strategy
     @return Total amount of tokens in vault + strategy
     */
-    function totalValueLocked() external view returns (uint) {
-        return _totalValueLocked();
+    function totalAssets() external view returns (uint) {
+        return _totalAssets();
     }
 
     function _minReserve() internal view returns (uint) {
-        return _totalValueLocked().mul(reserveMin).div(RESERVE_MAX);
+        return _totalAssets().mul(reserveMin).div(RESERVE_MAX);
     }
 
     /*
@@ -344,7 +344,7 @@ contract Vault is IVault, ERC20, ERC20Detailed, ReentrancyGuard {
     function deposit(uint _amount) external whenNotPaused nonReentrant {
         require(_amount > 0, "amount = 0");
 
-        uint totalUnderlying = _totalValueLocked();
+        uint totalUnderlying = _totalAssets();
         uint totalShares = totalSupply();
 
         /*
@@ -382,7 +382,7 @@ contract Vault is IVault, ERC20, ERC20Detailed, ReentrancyGuard {
         s / T = w / P
         w = s / T * P
         */
-        return _shares.mul(_totalValueLocked()).div(totalSupply());
+        return _shares.mul(_totalAssets()).div(totalSupply());
     }
 
     /*
