@@ -1,5 +1,5 @@
+const BN = require("bn.js")
 const {expect} = require("../../setup")
-const {eq, MAX_UINT} = require("../../util")
 const setup = require("./setup")
 
 contract("Controller", (accounts) => {
@@ -17,18 +17,21 @@ contract("Controller", (accounts) => {
     it("should withdrawAll admin", async () => {
       await controller.withdrawAll(strategy.address, 0, {from: admin})
 
-      assert(eq(await strategy._withdrawAmount_(), MAX_UINT), "withdraw")
+      assert(await strategy._withdrawAllWasCalled_(), "withdraw")
     })
 
     it("should withdrawAll gas relayer", async () => {
       await controller.withdrawAll(strategy.address, 0, {from: gasRelayer})
 
-      assert(eq(await strategy._withdrawAmount_(), MAX_UINT), "withdraw")
+      assert(await strategy._withdrawAllWasCalled_(), "withdraw")
     })
 
     it("should reject if withdraw < min", async () => {
+      const bal = await strategy.underlyingBalance()
+      const min = bal.add(new BN(1))
+
       await expect(
-        controller.withdrawAll(strategy.address, 123, {from: admin})
+        controller.withdrawAll(strategy.address, min, {from: admin})
       ).to.be.rejectedWith("withdraw < min")
     })
 

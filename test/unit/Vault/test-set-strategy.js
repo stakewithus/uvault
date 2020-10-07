@@ -4,7 +4,7 @@ const {ZERO_ADDRESS, eq, getBlockTimestamp, timeout, MAX_UINT} = require("../../
 const setup = require("./setup")
 const {assert} = require("chai")
 
-const MockStrategy = artifacts.require("MockStrategy")
+const StrategyTest = artifacts.require("StrategyTest")
 
 contract("Vault", (accounts) => {
   const MIN_WAIT_TIME = 2
@@ -55,7 +55,7 @@ contract("Vault", (accounts) => {
         let newStrategy
         beforeEach(async () => {
           oldStrategy = strategy
-          newStrategy = await MockStrategy.new(
+          newStrategy = await StrategyTest.new(
             controller.address,
             vault.address,
             erc20.address,
@@ -131,7 +131,7 @@ contract("Vault", (accounts) => {
       let newStrategy
       beforeEach(async () => {
         oldStrategy = strategy
-        newStrategy = await MockStrategy.new(
+        newStrategy = await StrategyTest.new(
           controller.address,
           vault.address,
           erc20.address,
@@ -192,7 +192,7 @@ contract("Vault", (accounts) => {
     })
 
     it("should reject if not next strategy or approved strategy", async () => {
-      const strategy = await MockStrategy.new(
+      const strategy = await StrategyTest.new(
         controller.address,
         vault.address,
         erc20.address,

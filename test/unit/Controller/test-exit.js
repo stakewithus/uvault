@@ -1,3 +1,4 @@
+const BN = require("bn.js")
 const {expect} = require("../../setup")
 const setup = require("./setup")
 
@@ -26,8 +27,11 @@ contract("Controller", (accounts) => {
     })
 
     it("should reject if withdraw < min", async () => {
+      const bal = await strategy.underlyingBalance()
+      const min = bal.add(new BN(1))
+
       await expect(
-        controller.exit(strategy.address, 123, {from: admin})
+        controller.exit(strategy.address, min, {from: admin})
       ).to.be.rejectedWith("withdraw < min")
     })
 

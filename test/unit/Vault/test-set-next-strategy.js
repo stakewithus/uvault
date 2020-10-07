@@ -3,7 +3,7 @@ const {expect} = require("../../setup")
 const {ZERO_ADDRESS, eq, getBlockTimestamp} = require("../../util")
 const setup = require("./setup")
 
-const MockStrategy = artifacts.require("MockStrategy")
+const StrategyTest = artifacts.require("StrategyTest")
 
 contract("Vault", (accounts) => {
   const MIN_WAIT_TIME = 100
@@ -42,7 +42,7 @@ contract("Vault", (accounts) => {
 
       assert.equal(await vault.strategy(), strategy.address, "strategy")
 
-      const newStrategy = await MockStrategy.new(
+      const newStrategy = await StrategyTest.new(
         controller.address,
         vault.address,
         erc20.address,

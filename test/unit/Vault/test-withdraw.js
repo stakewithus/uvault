@@ -40,6 +40,7 @@ contract("Vault", (accounts) => {
           sender: await erc20.balanceOf(sender),
           vault: await erc20.balanceOf(vault.address),
           treasury: await erc20.balanceOf(treasury),
+          strategy: await erc20.balanceOf(strategy.address),
         },
         vault: {
           balanceOf: {
@@ -74,7 +75,7 @@ contract("Vault", (accounts) => {
     it("should withdraw from strategy", async () => {
       // set balance in strategy, this would increate vault.totalValueLocked()
       const balInStrategy = new BN(10).pow(new BN(18)).mul(new BN(40))
-      await strategy._setBalance_(balInStrategy)
+      await erc20.mint(strategy.address, balInStrategy)
       // vault bal = 10
       // strategy bal = 40
       // shares to burn = shares * (bal in strategy / (bal in vault + strategy))
@@ -88,7 +89,7 @@ contract("Vault", (accounts) => {
       const after = await snapshot()
 
       assert(
-        eq(await strategy._withdrawAmount_(), amountToWithdraw),
+        eq(before.erc20.strategy.sub(after.erc20.strategy), amountToWithdraw),
         "strategy withdraw"
       )
       // check no tokens where withdrawn from vault
@@ -98,7 +99,7 @@ contract("Vault", (accounts) => {
     it("should withdraw from vault and strategy", async () => {
       // set balance in strategy, this would increate vault.totalValueLocked()
       const balInStrategy = new BN(10).pow(new BN(18)).mul(new BN(10))
-      await strategy._setBalance_(balInStrategy)
+      await erc20.mint(strategy.address, balInStrategy)
       // vault bal = 10
       // strategy bal = 10
       // shares to burn = shares * (bal in strategy / (bal in vault + strategy))
@@ -110,7 +111,7 @@ contract("Vault", (accounts) => {
 
       assert(
         eq(
-          await strategy._withdrawAmount_(),
+          before.erc20.strategy.sub(after.erc20.strategy),
           sub(amountToWithdraw, before.vault.balanceInVault)
         ),
         "strategy withdraw"

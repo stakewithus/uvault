@@ -23,6 +23,11 @@ contract StrategyTest is IStrategy {
 
     // test helper
     bool public _harvestWasCalled_;
+    bool public _exitWasCalled_;
+    bool public _sweepWasCalled_;
+    address public _sweepToken_;
+    bool public _withdrawAllWasCalled_;
+    uint public _withdrawAmount_;
 
     constructor(
         address _controller,
@@ -76,13 +81,17 @@ contract StrategyTest is IStrategy {
     function withdraw(uint _underlyingAmount) external onlyVaultOrController {
         require(_underlyingAmount > 0, "underlying = 0");
 
+        _withdrawAmount_ = _underlyingAmount;
         // transfer to vault
         IERC20(underlying).safeTransfer(vault, _underlyingAmount);
     }
 
     function _withdrawAll() internal {
+        _withdrawAllWasCalled_ = true;
+
         uint underlyingBal = IERC20(underlying).balanceOf(address(this));
         if (underlyingBal > 0) {
+            _withdrawAmount_ = underlyingBal;
             IERC20(underlying).safeTransfer(vault, underlyingBal);
         }
     }
@@ -96,8 +105,21 @@ contract StrategyTest is IStrategy {
     }
 
     function exit() external onlyVaultOrController {
+        _exitWasCalled_ = true;
         _withdrawAll();
     }
 
-    function sweep(address _token) external {}
+    function sweep(address _token) external {
+        _sweepWasCalled_ = true;
+        _sweepToken_ = _token;
+    }
+
+    // test helpers
+    function _setVault_(address _vault) external {
+        vault = _vault;
+    }
+
+    function _setUnderlying_(address _token) external {
+        underlying = _token;
+    }
 }

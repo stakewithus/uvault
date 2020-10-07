@@ -46,6 +46,7 @@ contract("Vault", (accounts) => {
           },
           erc20: {
             admin: await erc20.balanceOf(admin),
+            strategy: await erc20.balanceOf(strategy.address),
           },
         }
       }
@@ -56,8 +57,9 @@ contract("Vault", (accounts) => {
       await vault.invest({from: admin})
       const after = await snapshot()
 
+      // check token transfer to strategy
       assert(
-        eq(await strategy._depositAmount_(), before.vault.availableToInvest.sub(fee)),
+        eq(after.erc20.strategy, before.vault.availableToInvest.sub(fee)),
         "deposit"
       )
       // check fee was transferred

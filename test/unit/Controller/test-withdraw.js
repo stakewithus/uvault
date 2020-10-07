@@ -31,8 +31,9 @@ contract("Controller", (accounts) => {
     })
 
     it("should reject if withdraw < min", async () => {
+      const min = amount.add(new BN(1))
       await expect(
-        controller.withdraw(strategy.address, amount, 1, {from: admin})
+        controller.withdraw(strategy.address, amount, min, {from: admin})
       ).to.be.rejectedWith("withdraw < min")
     })
 

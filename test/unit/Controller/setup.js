@@ -1,6 +1,6 @@
 const ERC20Token = artifacts.require("ERC20Token")
 const Controller = artifacts.require("Controller")
-const MockStrategy = artifacts.require("MockStrategy")
+const StrategyTest = artifacts.require("StrategyTest")
 const MockVault = artifacts.require("MockVault")
 
 module.exports = (accounts) => {
@@ -26,11 +26,14 @@ module.exports = (accounts) => {
       from: admin,
     })
     refs.vault = await MockVault.new(refs.controller.address, refs.underlying.address)
-    refs.strategy = await MockStrategy.new(
+    refs.strategy = await StrategyTest.new(
       refs.controller.address,
       refs.vault.address,
       refs.underlying.address
     )
+
+    // fund strategy
+    await refs.underlying.mint(refs.strategy.address, 1000)
   })
 
   return refs
