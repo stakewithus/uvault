@@ -317,7 +317,7 @@ contract Vault is IVault, ERC20, ERC20Detailed, ReentrancyGuard {
     @notice Withdraws from strategy to fill reserve. Percentage of refill
             is rewarded to caller.
     */
-    function rebalance() external whenStrategyDefined whenNotPaused {
+    function rebalance() external whenStrategyDefined whenNotPaused nonReentrant {
         uint balInVault = _balanceInVault();
         uint reserve = _minReserve();
 
