@@ -32,6 +32,13 @@ interface IVault {
     function balanceInStrategy() external view returns (uint);
 
     /*
+    @notice Returns minimum amount of tokens that should be kept in vault for
+            cheap withdraw
+    @return Reserve amount
+    */
+    function minReserve() external view returns (uint);
+
+    /*
     @notice Returns the amount of tokens available to be invested
     */
     function availableToInvest() external view returns (uint);

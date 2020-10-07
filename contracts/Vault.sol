@@ -191,16 +191,25 @@ contract Vault is IVault, ERC20, ERC20Detailed, ReentrancyGuard {
         return _totalValueLocked().mul(reserveMin).div(RESERVE_MAX);
     }
 
+    /*
+    @notice Returns minimum amount of tokens that should be kept in vault for
+            cheap withdraw
+    @return Reserve amount
+    */
+    function minReserve() external view returns (uint) {
+        return _minReserve();
+    }
+
     function _availableToInvest() internal view returns (uint) {
         uint balInVault = _balanceInVault();
-        uint minReserve = _minReserve();
+        uint reserve = _minReserve();
 
-        if (balInVault <= minReserve) {
+        if (balInVault <= reserve) {
             return 0;
         }
 
-        // balInVault > minReserve
-        return balInVault - minReserve;
+        // balInVault > reserve
+        return balInVault - reserve;
     }
 
     /*
@@ -301,10 +310,10 @@ contract Vault is IVault, ERC20, ERC20Detailed, ReentrancyGuard {
     */
     function rebalance() external whenStrategyDefined whenNotPaused {
         uint balInVault = _balanceInVault();
-        uint minReserve = _minReserve();
+        uint reserve = _minReserve();
 
-        if (balInVault < minReserve) {
-            uint withdrawAmount = minReserve - balInVault;
+        if (balInVault < reserve) {
+            uint withdrawAmount = reserve - balInVault;
             IStrategy(strategy).withdraw(withdrawAmount);
 
             uint balAfter = _balanceInVault();
