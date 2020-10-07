@@ -28,6 +28,7 @@ contract StrategyTest is IStrategy {
     address public _sweepToken_;
     bool public _withdrawAllWasCalled_;
     uint public _withdrawAmount_;
+    bool public _shouldTransfer_ = true; // flag to simulate failing transfer
 
     constructor(
         address _controller,
@@ -83,7 +84,7 @@ contract StrategyTest is IStrategy {
 
         _withdrawAmount_ = _underlyingAmount;
         // transfer to vault
-        IERC20(underlying).safeTransfer(vault, _underlyingAmount);
+        _transfer(vault, _underlyingAmount);
     }
 
     function _withdrawAll() internal {
@@ -92,7 +93,7 @@ contract StrategyTest is IStrategy {
         uint underlyingBal = IERC20(underlying).balanceOf(address(this));
         if (underlyingBal > 0) {
             _withdrawAmount_ = underlyingBal;
-            IERC20(underlying).safeTransfer(vault, underlyingBal);
+            _transfer(vault, underlyingBal);
         }
     }
 
@@ -121,5 +122,15 @@ contract StrategyTest is IStrategy {
 
     function _setUnderlying_(address _token) external {
         underlying = _token;
+    }
+
+    function _setShouldTransfer_(bool _shouldTransfer) external {
+        _shouldTransfer_ = _shouldTransfer;
+    }
+
+    function _transfer(address _to, uint _amount) internal {
+        if (_shouldTransfer_) {
+            IERC20(underlying).safeTransfer(_to, _amount);
+        }
     }
 }
