@@ -325,7 +325,7 @@ contract Vault is IVault, ERC20, ERC20Detailed, ReentrancyGuard {
 
             require(diff >= withdrawAmount.mul(withdrawMin).div(WITHDRAW_MAX), "withdraw < min");
 
-            uint fee = diff.mul(rebalanceFee).div(FEE_MAX);
+            uint fee = withdrawAmount.mul(rebalanceFee).div(FEE_MAX);
             if (fee > 0) {
                 IERC20(token).transfer(msg.sender, fee);
             }
