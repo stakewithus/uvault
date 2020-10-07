@@ -38,21 +38,21 @@ contract Vault is IVault, ERC20, ERC20Detailed, ReentrancyGuard {
 
     // percentange of token reserved in vault for cheap withdraw
     uint public reserveMin = 500;
-    uint public constant RESERVE_MAX = 10000;
+    uint private constant RESERVE_MAX = 10000;
 
     // Denominator used to calculate fees
-    uint public constant FEE_MAX = 10000;
+    uint private constant FEE_MAX = 10000;
 
     // percentage of reward given to caller of invest
     uint public investFee;
-    uint public constant INVEST_FEE_CAP = 500; // upper limit to investFee
+    uint private constant INVEST_FEE_CAP = 500; // upper limit to investFee
 
     // percentage of reward given to caller of rebalance
     uint public rebalanceFee;
-    uint public constant REBALANCE_FEE_CAP = 500; // upper limit to rebalanceFee
+    uint private constant REBALANCE_FEE_CAP = 500; // upper limit to rebalanceFee
 
     uint public withdrawFee;
-    uint public constant WITHDRAW_FEE_CAP = 500; // upper limit to withdrawFee
+    uint private constant WITHDRAW_FEE_CAP = 500; // upper limit to withdrawFee
 
     // address of next strategy to be used
     address public nextStrategy;
