@@ -45,6 +45,11 @@ contract Vault is IVault, ERC20, ERC20Detailed, ReentrancyGuard {
     uint public constant INVEST_FEE_CAP = 500; // upper limit to investFee
     uint public constant INVEST_FEE_MAX = 10000;
 
+    // percentage of reward given to caller of rebalance
+    uint public rebalanceFee;
+    uint public constant REBALANCE_FEE_CAP = 500; // upper limit to rebalanceFee
+    uint public constant REBALANCE_FEE_MAX = 10000;
+
     uint public withdrawFee;
     uint public constant WITHDRAW_FEE_CAP = 500; // upper limit to withdrawFee
     uint public constant WITHDRAW_FEE_MAX = 10000;
@@ -122,6 +127,11 @@ contract Vault is IVault, ERC20, ERC20Detailed, ReentrancyGuard {
     function setInvestFee(uint _fee) external onlyAdmin {
         require(_fee <= INVEST_FEE_CAP, "invest fee > cap");
         investFee = _fee;
+    }
+
+    function setRebalanceFee(uint _fee) external onlyAdmin {
+        require(_fee <= REBALANCE_FEE_CAP, "rebalance fee > cap");
+        rebalanceFee = _fee;
     }
 
     function setWithdrawFee(uint _fee) external onlyAdmin {
