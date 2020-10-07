@@ -119,15 +119,15 @@ contract StrategyDaiToYcrv is IStrategy {
         return DepositY(depositY).calc_withdraw_one_coin(_yCrvAmount, int128(0));
     }
 
-    function _underlyingBalance() internal view returns (uint) {
+    function _totalAssets() internal view returns (uint) {
         return _getYcrvToDai(Gauge(gauge).balanceOf(address(this)));
     }
 
     /*
     @notice Returns amount of DAI locked in this contract
     */
-    function underlyingBalance() external view returns (uint) {
-        return _underlyingBalance();
+    function totalAssets() external view returns (uint) {
+        return _totalAssets();
     }
 
     /*
@@ -227,7 +227,7 @@ contract StrategyDaiToYcrv is IStrategy {
     */
     function withdraw(uint _daiAmount) external onlyVault {
         require(_daiAmount > 0); // dev: amount == 0
-        uint totalDai = _underlyingBalance();
+        uint totalDai = _totalAssets();
         require(_daiAmount <= totalDai); // dev: dai > total redeemable dai
 
         // get yCrv amount to withdraw from DAI

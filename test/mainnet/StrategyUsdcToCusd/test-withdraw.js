@@ -45,7 +45,7 @@ contract("StrategyUsdcToCusd", (accounts) => {
 
     // withdraw amount may be < deposit amount
     // so here we get the maximum redeemable amount
-    const withdrawAmount = await strategy.underlyingBalance()
+    const withdrawAmount = await strategy.totalAssets()
 
     const before = await snapshot()
     await strategy.withdraw(withdrawAmount, {from: vault})

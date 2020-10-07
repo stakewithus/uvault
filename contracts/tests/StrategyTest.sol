@@ -65,12 +65,12 @@ contract StrategyTest is IStrategy {
         _;
     }
 
-    function _underlyingBalance() internal view returns (uint) {
+    function _totalAssets() internal view returns (uint) {
         return IERC20(underlying).balanceOf(address(this));
     }
 
-    function underlyingBalance() external view returns (uint) {
-        return _underlyingBalance();
+    function totalAssets() external view returns (uint) {
+        return _totalAssets();
     }
 
     function deposit(uint _underlyingAmount) external onlyVault {

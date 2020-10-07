@@ -52,10 +52,7 @@ contract("StrategyUsdcToCusd", (accounts) => {
     const minCusd = frac(amount.mul(USDC_TO_CUSD_DECIMALS), new BN(95), new BN(100))
 
     const cUsdDiff = sub(after.cGauge.strategy, before.cGauge.strategy)
-    const usdcDiff = sub(
-      after.strategy.underlyingBalance,
-      before.strategy.underlyingBalance
-    )
+    const usdcDiff = sub(after.strategy.totalAssets, before.strategy.totalAssets)
 
     // USDC transferred from vault to strategy
     assert(eq(after.usdc.vault, sub(before.usdc.vault, amount)), "usdc vault")

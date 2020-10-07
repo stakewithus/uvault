@@ -48,7 +48,7 @@ contract("StrategyUsdcToCusd", (accounts) => {
     const after = await snapshot()
 
     // minimum amount of USDC that can be withdrawn
-    const minUsdc = frac(before.strategy.underlyingBalance, new BN(99), new BN(100))
+    const minUsdc = frac(before.strategy.totalAssets, new BN(99), new BN(100))
 
     // check balance of usdc transferred to treasury and vault
     const usdcDiff = sub(after.usdc.vault, before.usdc.vault)

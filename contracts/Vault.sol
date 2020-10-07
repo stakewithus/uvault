@@ -173,7 +173,7 @@ contract Vault is IVault, ERC20, ERC20Detailed, ReentrancyGuard {
             return 0;
         }
 
-        return IStrategy(strategy).underlyingBalance();
+        return IStrategy(strategy).totalAssets();
     }
 
     /*

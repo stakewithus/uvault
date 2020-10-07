@@ -49,7 +49,7 @@ contract("StrategyUsdcToCusd", (accounts) => {
 
     assert(after.usdc.treasury.gte(before.usdc.treasury), "usdc treasury")
     assert(
-      after.strategy.underlyingBalance.gte(before.strategy.underlyingBalance),
+      after.strategy.totalAssets.gte(before.strategy.totalAssets),
       "strategy underlying balance"
     )
     assert(after.cGauge.strategy.gte(before.cGauge.strategy), "cGauge strategy")

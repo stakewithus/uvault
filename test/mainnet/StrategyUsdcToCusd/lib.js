@@ -2,7 +2,7 @@ function getSnapshot({strategy, usdc, cUsd, cGauge, crv, vault, treasury}) {
   return async () => {
     const snapshot = {
       strategy: {
-        underlyingBalance: await strategy.underlyingBalance(),
+        totalAssets: await strategy.totalAssets(),
       },
       usdc: {
         vault: await usdc.balanceOf(vault),

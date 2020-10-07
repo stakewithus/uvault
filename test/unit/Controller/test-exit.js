@@ -27,7 +27,7 @@ contract("Controller", (accounts) => {
     })
 
     it("should reject if withdraw < min", async () => {
-      const bal = await strategy.underlyingBalance()
+      const bal = await strategy.totalAssets()
       const min = bal.add(new BN(1))
 
       await expect(

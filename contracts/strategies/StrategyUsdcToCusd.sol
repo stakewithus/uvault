@@ -114,7 +114,7 @@ contract StrategyUsdcToCusd is IStrategy {
         performanceFee = _fee;
     }
 
-    function _underlyingBalance() internal view returns (uint) {
+    function _totalAssets() internal view returns (uint) {
         uint gaugeBal = Gauge(gauge).balanceOf(address(this));
 
         // DAI  = 0
@@ -125,8 +125,8 @@ contract StrategyUsdcToCusd is IStrategy {
     /*
     @notice Returns amount of underlying stable coin locked in this contract
     */
-    function underlyingBalance() external view returns (uint) {
-        return _underlyingBalance();
+    function totalAssets() external view returns (uint) {
+        return _totalAssets();
     }
 
     /*
@@ -182,7 +182,7 @@ contract StrategyUsdcToCusd is IStrategy {
     */
     function withdraw(uint _underlyingAmount) external onlyVaultOrController {
         require(_underlyingAmount > 0, "underlying = 0");
-        uint totalUnderlying = _underlyingBalance();
+        uint totalUnderlying = _totalAssets();
         require(_underlyingAmount <= totalUnderlying, "underlying > total");
 
         // calculate cUsd amount to withdraw from underlying

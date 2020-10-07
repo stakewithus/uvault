@@ -47,10 +47,7 @@ contract("StrategyUsdcToCusd", (accounts) => {
     await strategy.exit({from: vault})
     const after = await snapshot()
 
-    assert(
-      eq(after.strategy.underlyingBalance, new BN(0)),
-      "strategy underlying balance"
-    )
+    assert(eq(after.strategy.totalAssets, new BN(0)), "strategy underlying balance")
     assert(eq(after.cGauge.strategy, new BN(0)), "cGauge strategy")
     assert(eq(after.cUsd.strategy, new BN(0)), "cUsd strategy")
     assert(eq(after.usdc.strategy, new BN(0)), "usdc strategy")
