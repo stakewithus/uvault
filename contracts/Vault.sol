@@ -255,6 +255,38 @@ contract Vault is IVault, ERC20, ERC20Detailed, ReentrancyGuard {
         strategies[_strategy] = false;
     }
 
+    function _availableToInvest() internal view returns (uint) {
+        uint balInVault = _balanceInVault();
+        uint reserve = _minReserve();
+
+        if (balInVault <= reserve) {
+            return 0;
+        }
+
+        // balInVault > reserve
+        return balInVault - reserve;
+    }
+
+    /*
+    @notice Returns amount of token available to be invested into strategy
+    @return Amount of token available to be invested into strategy
+    */
+    function availableToInvest() external view returns (uint) {
+        return _availableToInvest();
+    }
+
+    /*
+    @notice Invest token from vault into strategy.
+            Some token are kept in vault for cheap withdraw.
+    */
+    function invest() external whenStrategyDefined whenNotPaused onlyAuthorized {
+        uint amount = _availableToInvest();
+        require(amount > 0, "available = 0");
+
+        // infinite approval is set when this strategy was set
+        IStrategy(strategy).deposit(amount);
+    }
+
     /*
     @notice Deposit token into vault
     @param _amount Amount of token to transfer from `msg.sender`

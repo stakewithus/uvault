@@ -12,6 +12,12 @@ interface IController {
     ) external;
 
     // calls to strategy
+    /*
+    @notice Invest token in vault into strategy
+    @param _vault Address of vault
+    */
+    function invest(address _vault) external;
+
     function harvest(address _strategy) external;
 
     /*

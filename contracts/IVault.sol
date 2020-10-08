@@ -43,6 +43,16 @@ interface IVault {
     */
     function totalAssets() external view returns (uint);
 
+    /*
+    @notice Returns the amount of tokens available to be invested
+    */
+    function availableToInvest() external view returns (uint);
+
+    /*
+    @notice Transfers token in vault to strategy
+    */
+    function invest() external;
+
     function deposit(uint _amount) external;
 
     /*

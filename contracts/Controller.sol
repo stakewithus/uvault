@@ -55,6 +55,10 @@ contract Controller is IController {
         IVault(_vault).setStrategy(_strategy, _min);
     }
 
+    function invest(address _vault) external onlyAuthorized {
+        IVault(_vault).invest();
+    }
+
     // @dev Warning: harvest can be called on strategy that is not set to any vault
     function harvest(address _strategy) external onlyAuthorized {
         IStrategy(_strategy).harvest();
