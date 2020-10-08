@@ -200,6 +200,50 @@ contract Vault is IVault, ERC20, ERC20Detailed, ReentrancyGuard {
         return _minReserve();
     }
 
+    function _rebalanceAmount() internal view returns (uint) {
+        if (strategy == address(0)) {
+            return 0;
+        }
+
+        uint balInVault = _balanceInVault();
+        uint reserve = _minReserve();
+
+        if (reserve == 0) {
+            return balInVault;
+        }
+
+        /*
+        b = balance in vault
+        r = min reserve
+
+        Don't rebalance if
+        b / r > 95 / 100 and
+        b / r < 105 / 100
+        */
+        uint ratio = balInVault.mul(100).div(reserve);
+        if (ratio > 95 && ratio < 105) {
+            return 0;
+        }
+
+        // b / r <= 95, withdraw from strategy
+        if (balInVault <= reserve) {
+            return reserve - balInVault;
+        }
+
+        // b / r >= 105, deposit into strategy
+        return balInVault - reserve;
+    }
+
+    /*
+    @notice Returns amount of tokens that can be transferred to or from strategy
+            in order to fill the reserve or transfer excess token in vault into
+            strategy
+    @return Amount of tokens that will be transferred to or from strategy
+    */
+    function rebalanceAmount() external view returns (uint) {
+        return _rebalanceAmount();
+    }
+
     /*
     @notice Set next strategy
     @param _nextStrategy Address of next strategy
@@ -269,23 +313,12 @@ contract Vault is IVault, ERC20, ERC20Detailed, ReentrancyGuard {
             is rewarded to caller.
     */
     function rebalance() external whenStrategyDefined whenNotPaused nonReentrant {
+        if (_rebalanceAmount() == 0) {
+            return;
+        }
+
         uint balInVault = _balanceInVault();
         uint reserve = _minReserve();
-
-        /*
-        b = balance in vault
-        r = min reserve
-
-        Don't rebalance if
-        b / r > 95 / 100 and
-        b / r < 105 / 100
-        */
-        if (reserve > 0) {
-            uint ratio = balInVault.mul(100).div(reserve);
-            if (ratio > 95 && ratio < 105) {
-                return;
-            }
-        }
 
         if (balInVault == reserve) {
             return;

@@ -48,6 +48,10 @@ contract MockVault is IVault {
         return 0;
     }
 
+    function rebalanceAmount() external view returns (uint) {
+        return 0;
+    }
+
     function rebalance() external {
         _rebalanceWasCalled_ = true;
     }

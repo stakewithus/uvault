@@ -44,6 +44,14 @@ interface IVault {
     function totalAssets() external view returns (uint);
 
     /*
+    @notice Returns amount of tokens that can be transferred to or from strategy
+            in order to fill the reserve or transfer excess token in vault into
+            strategy
+    @return Amount of tokens that will be transferred to or from strategy
+    */
+    function rebalanceAmount() external view returns (uint);
+
+    /*
     @notice Rebalance the balances in vault and strategy. Percentage of rebalance
             is rewarded to caller.
     */
