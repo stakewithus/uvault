@@ -47,10 +47,6 @@ contract Controller is IController {
         gasRelayer = _gasRelayer;
     }
 
-    function rebalance(address _vault) external onlyAuthorized {
-        IVault(_vault).rebalance();
-    }
-
     function setStrategy(
         address _vault,
         address _strategy,

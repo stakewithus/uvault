@@ -48,14 +48,6 @@ contract MockVault is IVault {
         return 0;
     }
 
-    function rebalanceAmount() external view returns (uint) {
-        return 0;
-    }
-
-    function rebalance() external {
-        _rebalanceWasCalled_ = true;
-    }
-
     function deposit(uint _amount) external {
         _depositAmount_ = _amount;
     }

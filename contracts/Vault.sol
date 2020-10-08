@@ -47,10 +47,6 @@ contract Vault is IVault, ERC20, ERC20Detailed, ReentrancyGuard {
     // Denominator used to calculate fees
     uint private constant FEE_MAX = 10000;
 
-    // percentage of reward given to caller of rebalance
-    uint public rebalanceFee;
-    uint private constant REBALANCE_FEE_CAP = 500; // upper limit to rebalanceFee
-
     uint public withdrawFee;
     uint private constant WITHDRAW_FEE_CAP = 500; // upper limit to withdrawFee
 
@@ -127,11 +123,6 @@ contract Vault is IVault, ERC20, ERC20Detailed, ReentrancyGuard {
     function setWithdrawMin(uint _withdrawMin) external onlyAdmin {
         require(_withdrawMin <= WITHDRAW_MAX, "withdraw min > max");
         withdrawMin = _withdrawMin;
-    }
-
-    function setRebalanceFee(uint _fee) external onlyAdmin {
-        require(_fee <= REBALANCE_FEE_CAP, "rebalance fee > cap");
-        rebalanceFee = _fee;
     }
 
     function setWithdrawFee(uint _fee) external onlyAdmin {
@@ -262,107 +253,6 @@ contract Vault is IVault, ERC20, ERC20Detailed, ReentrancyGuard {
     */
     function revokeStrategy(address _strategy) external onlyAdmin {
         strategies[_strategy] = false;
-    }
-
-    function _rebalanceAmount() internal view returns (uint) {
-        if (strategy == address(0)) {
-            return 0;
-        }
-
-        uint balInVault = _balanceInVault();
-        uint reserve = _minReserve();
-
-        if (reserve == 0) {
-            return balInVault;
-        }
-
-        /*
-        b = balance in vault
-        r = min reserve
-
-        Don't rebalance if
-        b / r > 95 / 100 and
-        b / r < 105 / 100
-        */
-        uint ratio = balInVault.mul(100).div(reserve);
-        if (ratio > 95 && ratio < 105) {
-            return 0;
-        }
-
-        // b / r <= 95, withdraw from strategy
-        if (balInVault <= reserve) {
-            return reserve - balInVault;
-        }
-
-        // b / r >= 105, deposit into strategy
-        return balInVault - reserve;
-    }
-
-    /*
-    @notice Returns amount of tokens that can be transferred to or from strategy
-            in order to fill the reserve or transfer excess token in vault into
-            strategy
-    @return Amount of tokens that will be transferred to or from strategy
-    */
-    function rebalanceAmount() external view returns (uint) {
-        return _rebalanceAmount();
-    }
-
-    /*
-    @notice Rebalance the balances in vault and strategy. Percentage of rebalance
-            is rewarded to caller.
-    */
-    function rebalance() external whenStrategyDefined whenNotPaused nonReentrant {
-        if (_rebalanceAmount() == 0) {
-            return;
-        }
-
-        uint balInVault = _balanceInVault();
-        uint reserve = _minReserve();
-
-        if (balInVault == reserve) {
-            return;
-        } else if (balInVault < reserve) {
-            uint withdrawAmount = reserve.sub(balInVault);
-
-            IStrategy(strategy).withdraw(withdrawAmount);
-
-            uint balAfter = _balanceInVault();
-            uint diff = balAfter.sub(balInVault);
-
-            require(diff >= withdrawAmount.mul(withdrawMin).div(WITHDRAW_MAX), "withdraw < min");
-
-            // set withdraw amount to minimum of diff and withdrawAmount
-            // this is used to calculate fee
-            if (diff < withdrawAmount) {
-                withdrawAmount = diff;
-            }
-
-            uint fee = withdrawAmount.mul(rebalanceFee).div(FEE_MAX);
-            if (fee > 0) {
-                IERC20(token).safeTransfer(msg.sender, fee);
-            }
-        } else {
-            // balInVault > reserve
-            uint reserveDiff = balInVault.sub(reserve);
-            uint fee = reserveDiff.mul(rebalanceFee).div(FEE_MAX);
-            uint depositAmount = reserveDiff.sub(fee);
-
-            // infinite approval is set when this strategy was set
-            IStrategy(strategy).deposit(depositAmount);
-
-            uint balAfter = _balanceInVault();
-            uint diff = balInVault.sub(balAfter);
-
-            // recalculate fee based on actual deposit
-            if (diff < depositAmount) {
-                fee = diff.mul(rebalanceFee).div(FEE_MAX);
-            }
-
-            if (fee > 0) {
-                IERC20(token).safeTransfer(msg.sender, fee);
-            }
-        }
     }
 
     /*
