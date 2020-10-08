@@ -256,6 +256,10 @@ contract Vault is IVault, ERC20, ERC20Detailed, ReentrancyGuard {
     }
 
     function _availableToInvest() internal view returns (uint) {
+        if (strategy == address(0)) {
+            return 0;
+        }
+
         uint balInVault = _balanceInVault();
         uint reserve = _minReserve();
 
