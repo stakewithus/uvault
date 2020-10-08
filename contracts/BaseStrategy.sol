@@ -7,7 +7,7 @@ contract BaseStrategy {
 
     // performance fee sent to treasury when harvest() generates profit
     uint public performanceFee = 100;
-    uint private constant PERFORMANCE_FEE_MAX = 10000;
+    uint internal constant PERFORMANCE_FEE_MAX = 10000;
 
     constructor(address _controller, address _vault) public {
         require(_controller != address(0), "controller = zero address");

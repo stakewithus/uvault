@@ -10,23 +10,16 @@ import "../interfaces/curve/Minter.sol";
 import "../interfaces/curve/DepositCompound.sol";
 import "../IController.sol";
 import "../IStrategy.sol";
+import "../BaseStrategy.sol";
 
 /* potential hacks?
 - front running?
 - slippage when withdrawing all from strategy
 */
 
-contract StrategyUsdcToCusd is IStrategy {
+contract StrategyUsdcToCusd is IStrategy, BaseStrategy {
     using SafeERC20 for IERC20;
     using SafeMath for uint;
-
-    address public admin;
-    address public controller;
-    address public vault;
-
-    // performance fee sent to treasury when harvest() generates profit
-    uint public performanceFee = 100;
-    uint public constant PERFORMANCE_FEE_MAX = 10000;
 
     address internal usdc;
     address public underlying;
@@ -59,14 +52,7 @@ contract StrategyUsdcToCusd is IStrategy {
         address _crv,
         address _uniswap,
         address _weth
-    ) public {
-        require(_controller != address(0), "controller = zero address");
-        require(_vault != address(0), "vault = zero address");
-
-        admin = msg.sender;
-        controller = _controller;
-        vault = _vault;
-
+    ) public BaseStrategy(_controller, _vault) {
         usdc = _usdc;
         cUsd = _cUsd;
         depositC = _depositC;
@@ -77,11 +63,6 @@ contract StrategyUsdcToCusd is IStrategy {
         weth = _weth;
 
         underlying = usdc;
-    }
-
-    modifier onlyAdmin() {
-        require(msg.sender == admin, "!admin");
-        _;
     }
 
     modifier onlyController() {
@@ -97,21 +78,6 @@ contract StrategyUsdcToCusd is IStrategy {
     modifier onlyVaultOrController() {
         require(msg.sender == vault || msg.sender == controller, "!vault and !controller");
         _;
-    }
-
-    function setAdmin(address _admin) external onlyAdmin {
-        require(_admin != address(0), "admin = zero address");
-        admin = _admin;
-    }
-
-    function setController(address _controller) external onlyAdmin {
-        require(_controller != address(0), "controller = zero address");
-        controller = _controller;
-    }
-
-    function setPerformanceFee(uint _fee) external onlyAdmin {
-        require(_fee <= performanceFee, "performance fee > max");
-        performanceFee = _fee;
     }
 
     function _totalAssets() internal view returns (uint) {
