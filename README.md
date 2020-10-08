@@ -67,6 +67,30 @@ slither . --print function-summary
 slither . --print vars-and-auth
 ```
 
+### Deploy
+
+```shell
+# deploy ERC20 token (used for testing)
+env $(cat .env.test) npx buidler run scripts/deploy-ropsten-erc20.js --network ropsten
+
+# deploy GasRelayer
+env $(cat .env.test) npx buidler run scripts/deploy-gas-relayer.js --network ropsten
+# deploy Controller
+env $(cat .env.test) npx buidler run scripts/deploy-controller.js --network ropsten
+# deploy Vault
+env $(cat .env.test) npx buidler run scripts/deploy-ropsten-vault.js --network ropsten
+# deploy StrategyTest
+nv $(cat .env.test) npx buidler run scripts/deploy-ropsten-strategy-test.js --network ropsten
+```
+
+##### Ropsten
+
+`ERC20` 0x8D760CAbe956332e6021990FCCE40CBDDd5d7890
+`GasRelayer` 0x7e5b8bA159b326F2DF74e4357DB42D17801896c7
+`Controller` 0xB1fA981B43EC0D5B2C6537DBcfFc7599613d7d39
+`Vault` 0x8496d69D51dF633a851B0CE96b33974BDfeAff73
+`StrategyTest` 0x042a9f1537d809255682B749E9F2Db6FD24505cA
+
 ### APY
 
 ```
