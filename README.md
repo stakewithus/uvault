@@ -9,6 +9,15 @@
 
 ![unagi arch](unagi-arch.png)
 
+### Install
+
+```shell
+npm i
+npm run compile
+```
+
+### Test
+
 ```shell
 cp .env.sample .env.test
 # unit test
