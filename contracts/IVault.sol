@@ -39,11 +39,6 @@ interface IVault {
     function minReserve() external view returns (uint);
 
     /*
-    @notice Returns the amount of tokens available to be invested
-    */
-    function availableToInvest() external view returns (uint);
-
-    /*
     @notice Returns the total amount of token in vault + strategy
     */
     function totalAssets() external view returns (uint);

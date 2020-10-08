@@ -25,9 +25,6 @@ contract("integration", (accounts) => {
         vault: await underlying.balanceOf(vault.address),
         strategy: await underlying.balanceOf(strategy.address),
       },
-      vault: {
-        availableToInvest: await vault.availableToInvest(),
-      },
     }
   }
 

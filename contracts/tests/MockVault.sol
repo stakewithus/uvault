@@ -44,10 +44,6 @@ contract MockVault is IVault {
         return 0;
     }
 
-    function availableToInvest() external view returns (uint) {
-        return 0;
-    }
-
     function totalAssets() external view returns (uint) {
         return 0;
     }
