@@ -314,12 +314,7 @@ contract Vault is IVault, ERC20, ERC20Detailed, ReentrancyGuard {
         }
 
         _mint(msg.sender, shares);
-
-        uint balBefore = _balanceInVault();
         IERC20(token).safeTransferFrom(msg.sender, address(this), _amount);
-        uint balAfter = _balanceInVault();
-
-        require(balAfter.sub(balBefore) == _amount, "balance diff != transfer amount");
     }
 
     function _calcWithdraw(uint _shares) internal view returns (uint) {
