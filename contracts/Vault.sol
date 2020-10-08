@@ -115,6 +115,11 @@ contract Vault is IVault, ERC20, ERC20Detailed, ReentrancyGuard {
         admin = _admin;
     }
 
+    function setController(address _controller) external onlyAdmin {
+        require(_controller != address(0), "controller = zero address");
+        controller = _controller;
+    }
+
     function setReserveMin(uint _reserveMin) external onlyAdmin {
         require(_reserveMin <= RESERVE_MAX, "reserve min > max");
         reserveMin = _reserveMin;
