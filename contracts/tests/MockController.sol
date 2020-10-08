@@ -13,11 +13,7 @@ contract MockController is IController {
 
     function invest(address _vault) external {}
 
-    function setStrategy(
-        address _vault,
-        address _strategy,
-        uint _min
-    ) external {}
+    function setStrategy(address _vault, address _strategy) external {}
 
     function harvest(address _strategy) external {}
 
