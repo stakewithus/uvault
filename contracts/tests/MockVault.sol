@@ -15,7 +15,6 @@ contract MockVault is IVault {
     uint public _depositAmount_;
     uint public _withdrawAmount_;
     uint public _withdrawMin_;
-    uint public _strategyMin_;
 
     constructor(address _controller, address _token) public {
         admin = msg.sender;
@@ -27,9 +26,8 @@ contract MockVault is IVault {
         nextStrategy = _strategy;
     }
 
-    function setStrategy(address _strategy, uint _min) external {
+    function setStrategy(address _strategy) external {
         strategy = _strategy;
-        _strategyMin_ = _min;
     }
 
     function balanceInVault() external view returns (uint) {

@@ -212,9 +212,9 @@ contract Vault is IVault, ERC20, ERC20Detailed, ReentrancyGuard {
     /*
     @notice Set strategy either to next strategy or back to previously approved strategy
     @param _strategy Address of strategy used
-    @param _min Minimum amount of underlying token to return from strategy
     */
-    function setStrategy(address _strategy, uint _min) external onlyAuthorized {
+    function setStrategy(address _strategy) external onlyAuthorized {
+        uint _min = 0;
         require(_strategy != address(0), "strategy = zero address");
         require(_strategy != strategy, "new strategy = current strategy");
         require(IStrategy(_strategy).underlying() == token, "strategy.token != vault.token");
