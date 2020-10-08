@@ -110,13 +110,18 @@ contract("Vault", (accounts) => {
           assert(await oldStrategy._exitWasCalled_(), "exit")
         })
 
-        // it("should reject if exit amount < min", async () => {
-        //   await timeout(MIN_WAIT_TIME)
+        it("should reject if exit amount < min", async () => {
+          // simulate token in vault
+          await erc20.mint(oldStrategy.address, 123)
+          // simulate transfer < balance of strategy
+          await oldStrategy._setMaxTransferAmount_(1)
 
-        //   await expect(
-        //     vault.setStrategy(newStrategy.address, {from: admin})
-        //   ).to.be.rejectedWith("exit < min")
-        // })
+          await timeout(MIN_WAIT_TIME)
+
+          await expect(
+            vault.setStrategy(newStrategy.address, {from: admin})
+          ).to.be.rejectedWith("exit < min")
+        })
 
         it("should reject if timestamp < time lock", async () => {
           await expect(
