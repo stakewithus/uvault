@@ -2,7 +2,7 @@ const {expect} = require("../../setup")
 const {ZERO_ADDRESS} = require("../../util")
 const setup = require("./setup")
 
-contract("StrategyUsdcToCusd", (accounts) => {
+contract("BaseStrategy", (accounts) => {
   const refs = setup(accounts)
   const {admin} = refs
 
