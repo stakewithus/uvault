@@ -20,7 +20,7 @@ contract("Vault", (accounts) => {
   describe("revokeStrategy", () => {
     beforeEach(async () => {
       await vault.setNextStrategy(strategy.address, {from: admin})
-      await vault.setStrategy(strategy.address, 0, {from: admin})
+      await vault.setStrategy(strategy.address, {from: admin})
     })
 
     it("should revoke", async () => {
