@@ -14,23 +14,7 @@ function encodeInvest(web3, vault) {
   )
 }
 
-function encodeRebalance(web3, vault) {
-  return web3.eth.abi.encodeFunctionCall(
-    {
-      name: "rebalance",
-      type: "function",
-      inputs: [
-        {
-          type: "address",
-          name: "vault",
-        },
-      ],
-    },
-    [vault]
-  )
-}
-
-function encodeSetStrategy(web3, vault, strategy, min) {
+function encodeSetStrategy(web3, vault, strategy) {
   return web3.eth.abi.encodeFunctionCall(
     {
       name: "setStrategy",
@@ -44,13 +28,9 @@ function encodeSetStrategy(web3, vault, strategy, min) {
           type: "address",
           name: "strategy",
         },
-        {
-          type: "uint256",
-          name: "min",
-        },
       ],
     },
-    [vault, strategy, min.toString()]
+    [vault, strategy]
   )
 }
 
@@ -136,7 +116,6 @@ function encodeExit(web3, strategy, min) {
 
 module.exports = {
   encodeInvest,
-  encodeRebalance,
   encodeSetStrategy,
   encodeHarvest,
   encodeWithdraw,

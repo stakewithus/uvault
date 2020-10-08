@@ -71,7 +71,7 @@ module.exports = (accounts) => {
 
     // set strategy
     await vault.setNextStrategy(strategy.address, {from: admin})
-    await controller.setStrategy(vault.address, strategy.address, 0, {from: admin})
+    await controller.setStrategy(vault.address, strategy.address, {from: admin})
 
     // deposit into vault
     const amount = new BN(10).pow(new BN(UNDERLYING_DECIMALS)).mul(new BN(10))
