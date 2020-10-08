@@ -49,11 +49,9 @@ contract("integration", (accounts) => {
     }
   }
 
-  const min = new BN(0)
-
   it("should set strategy", async () => {
     const before = await snapshot()
-    await controller.setStrategy(vault.address, newStrategy.address, min, {from: admin})
+    await controller.setStrategy(vault.address, newStrategy.address, {from: admin})
     const after = await snapshot()
 
     // check strategy transferred all underlying token back to vault
@@ -72,7 +70,7 @@ contract("integration", (accounts) => {
 
   it("should reject if not authorized", async () => {
     await expect(
-      controller.setStrategy(vault.address, newStrategy.address, min, {
+      controller.setStrategy(vault.address, newStrategy.address, {
         from: accounts[1],
       })
     ).to.be.rejectedWith("!authorized")
