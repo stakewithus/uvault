@@ -4,11 +4,11 @@ import "../interfaces/curve/Minter.sol";
 
 contract MockMinter is Minter {
     // test helpers
-    bool public __mintWasCalled__;
-    address public __mintAddress__;
+    bool public _mintWasCalled_;
+    address public _mintAddress_;
 
     function mint(address addr) external {
-        __mintWasCalled__ = true;
-        __mintAddress__ = addr;
+        _mintWasCalled_ = true;
+        _mintAddress_ = addr;
     }
 }

@@ -4,13 +4,13 @@ import "../interfaces/uniswap/Uniswap.sol";
 
 contract MockUniswap is Uniswap {
     // test helpers
-    bool public __swapExactTokensForTokensWasCalled__;
-    uint public __amountIn__;
-    uint public __amountOutMin__;
-    address[] __path__;
-    address public __to__;
-    uint public __deadline__;
-    uint[] __amounts__;
+    bool public _swapExactTokensForTokensWasCalled_;
+    uint public _amountIn_;
+    uint public _amountOutMin_;
+    address[] _path_;
+    address public _to_;
+    uint public _deadline_;
+    uint[] _amounts_;
 
     function swapExactTokensForTokens(
         uint amountIn,
@@ -19,17 +19,17 @@ contract MockUniswap is Uniswap {
         address to,
         uint deadline
     ) external returns (uint[] memory amounts) {
-        __swapExactTokensForTokensWasCalled__ = true;
-        __amountIn__ = amountIn;
-        __amountOutMin__ = amountOutMin;
-        __path__ = path;
-        __to__ = to;
-        __deadline__ = deadline;
+        _swapExactTokensForTokensWasCalled_ = true;
+        _amountIn_ = amountIn;
+        _amountOutMin_ = amountOutMin;
+        _path_ = path;
+        _to_ = to;
+        _deadline_ = deadline;
 
-        return __amounts__;
+        return _amounts_;
     }
 
     function __setAmounts__(uint[] calldata _amounts) external {
-        __amounts__ = _amounts;
+        _amounts_ = _amounts;
     }
 }

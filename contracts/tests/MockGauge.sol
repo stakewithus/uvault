@@ -4,28 +4,28 @@ import "../interfaces/curve/Gauge.sol";
 
 contract MockGauge is Gauge {
     // test helpers
-    mapping(address => uint) public __balances__;
-    bool public __depositWasCalled__;
-    uint public __depositAmount__;
-    bool public __withdrawWasCalled__;
-    uint public __withdrawAmount__;
+    mapping(address => uint) public _balances_;
+    bool public _depositWasCalled_;
+    uint public _depositAmount_;
+    bool public _withdrawWasCalled_;
+    uint public _withdrawAmount_;
 
     function deposit(uint amount) external {
-        __depositWasCalled__ = true;
-        __depositAmount__ = amount;
+        _depositWasCalled_ = true;
+        _depositAmount_ = amount;
     }
 
     function balanceOf(address addr) external view returns (uint) {
-        return __balances__[addr];
+        return _balances_[addr];
     }
 
     function withdraw(uint amount) external {
-        __withdrawWasCalled__ = true;
-        __withdrawAmount__ = amount;
+        _withdrawWasCalled_ = true;
+        _withdrawAmount_ = amount;
     }
 
     // test helpers
     function __setBalance__(address addr, uint amount) external {
-        __balances__[addr] = amount;
+        _balances_[addr] = amount;
     }
 }
