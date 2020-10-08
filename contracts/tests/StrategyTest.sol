@@ -28,7 +28,8 @@ contract StrategyTest is IStrategy {
     address public _sweepToken_;
     bool public _withdrawAllWasCalled_;
     uint public _withdrawAmount_;
-    bool public _shouldTransfer_ = true; // flag to simulate failing transfer
+    // simulate strategy transferring less than requested
+    uint public _maxTransferAmount_ = uint(-1);
 
     constructor(
         address _controller,
@@ -124,13 +125,15 @@ contract StrategyTest is IStrategy {
         underlying = _token;
     }
 
-    function _setShouldTransfer_(bool _shouldTransfer) external {
-        _shouldTransfer_ = _shouldTransfer;
+    function _setMaxTransferAmount_(uint _max) external {
+        _maxTransferAmount_ = _max;
     }
 
     function _transfer(address _to, uint _amount) internal {
-        if (_shouldTransfer_) {
-            IERC20(underlying).safeTransfer(_to, _amount);
+        if (_amount > _maxTransferAmount_) {
+            _amount = _maxTransferAmount_;
         }
+
+        IERC20(underlying).safeTransfer(_to, _amount);
     }
 }
