@@ -1,10 +1,15 @@
 const bre = require("@nomiclabs/buidler")
-
-const UNDERLYING = "0x8D760CAbe956332e6021990FCCE40CBDDd5d7890"
-const controller = "0xB1fA981B43EC0D5B2C6537DBcfFc7599613d7d39"
+const config = require("./config")
+const {getAddress} = require("./lib")
 
 async function main() {
+  const network = bre.network.name
+  console.log(`Deploying Vault to ${network} network...`)
+
   try {
+    const controller = getAddress(config, network, "controller")
+    const erc20 = getAddress(config, network, "erc20")
+
     const [deployer] = await ethers.getSigners()
 
     console.log("Account:", await deployer.getAddress())
@@ -13,7 +18,7 @@ async function main() {
     const minWaitTime = 1 * 60 * 60
 
     const Vault = await ethers.getContractFactory("Vault")
-    const vault = await Vault.deploy(controller, UNDERLYING, minWaitTime)
+    const vault = await Vault.deploy(controller, erc20, minWaitTime)
 
     await vault.deployed()
 
