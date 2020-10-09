@@ -9,6 +9,7 @@ report.*
 .env.*
 !.env.sample
 .secret
+.secret.*
 node_modules
 
 #Buidler files
