@@ -19,12 +19,12 @@ npm run compile
 ### Test
 
 ```shell
-cp .env.sample .env.test
+cp .env.sample .env
 # unit test
 npm run test:unit
 
 # test mainnet fork
-source .env.test
+source .env
 
 ganache-cli \
 --fork https://mainnet.infura.io/v3/$INFURA_API_KEY \
@@ -79,7 +79,7 @@ slither . --print vars-and-auth
 ### Deploy
 
 ```shell
-env $(cat .env.test) npx buidler run scripts/script-to-run.js --network ropsten
+env $(cat .env) npx buidler run scripts/script-to-run.js --network ropsten
 ```
 
 ##### Deployed Contracts
