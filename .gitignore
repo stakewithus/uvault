@@ -11,6 +11,7 @@ report.*
 !.env.sample
 .secret
 .secret.*
+.secret*
 node_modules
 
 #Buidler files
