@@ -1,4 +1,3 @@
-const assert = require("assert")
 const bre = require("@nomiclabs/buidler")
 const config = require("./config")
 const {getAddress} = require("./lib")

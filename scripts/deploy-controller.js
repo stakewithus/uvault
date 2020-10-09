@@ -1,10 +1,15 @@
 const bre = require("@nomiclabs/buidler")
-
-const gasRelayer = "0x7e5b8bA159b326F2DF74e4357DB42D17801896c7"
-const treasury = "0xF5B0149971eAb068D2d365ac9626d94A2AedceC4"
+const config = require("./config")
+const {getAddress} = require("./lib")
 
 async function main() {
+  const network = bre.network.name
+  console.log(`Deploying Controller to ${network} network...`)
+
   try {
+    const gasRelayer = getAddress(config, network, "gasRelayer")
+    const treasury = getAddress(config, network, "treasury")
+
     const [deployer] = await ethers.getSigners()
 
     console.log("Account:", await deployer.getAddress())
