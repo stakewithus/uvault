@@ -32,17 +32,18 @@ jobs:
 
       - name: Run ethlint
         run: npm run ethlint
-  slither:
-    runs-on: ubuntu-latest
-    container:
-      image: trailofbits/eth-security-toolbox
-      # volumes:
-      #   - .:/code
-    steps:
-      - uses: actions/checkout@v2
-        with:
-          path: code
-          fetch-depth: 1
-      - name: What OS is running
-        run: uname -a
 # TODO: Add Slither Static Analyzer
+# EACCES: permission denied, mkdir '/__w/uvault/uvault/code'
+# slither:
+#   runs-on: ubuntu-latest
+#   container:
+#     image: trailofbits/eth-security-toolbox
+#     # volumes:
+#     #   - .:/code
+#   steps:
+#     - uses: actions/checkout@v2
+#       with:
+#         path: code
+#         fetch-depth: 1
+#     - name: What OS is running
+#       run: uname -a
