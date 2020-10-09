@@ -40,6 +40,8 @@ jobs:
       #   - .:/code
     steps:
       - uses: actions/checkout@v2
+        with:
+          fetch-depth: 1
       - name: What OS is running
         run: uname -a
 # TODO: Add Slither Static Analyzer
