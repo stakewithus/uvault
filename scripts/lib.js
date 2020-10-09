@@ -7,6 +7,17 @@ function getAddress(config, network, name) {
   return addr
 }
 
+async function getAccountAddress(ethers) {
+  const [account] = await ethers.getSigners()
+
+  const addr = await account.getAddress()
+  console.log("Account:", addr)
+  console.log("Balance:", (await account.getBalance()).toString())
+
+  return addr
+}
+
 module.exports = {
   getAddress,
+  getAccountAddress,
 }
