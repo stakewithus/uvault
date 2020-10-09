@@ -27,6 +27,11 @@ async function main() {
             vault: await erc20.allowance(ACCOUNT_ADDRESS, vault.address),
           },
         },
+        vault: {
+          shares: {
+            account: await vault.balanceOf(ACCOUNT_ADDRESS),
+          },
+        },
       }
     }
 
@@ -52,27 +57,26 @@ async function main() {
 
     const after = await snapshot()
 
+    function printSnapshot(snap) {
+      console.log()
+      console.log("ERC20 balance")
+      console.log("=============")
+      console.log("account ", snap.erc20.balances.account.toString())
+      console.log("vault   ", snap.erc20.balances.vault.toString())
+      console.log()
+      console.log("ERC20 allowance")
+      console.log("===============")
+      console.log("account to vault", snap.erc20.allowance.vault.toString())
+      console.log("Vault shares")
+      console.log("=============")
+      console.log("account ", snap.vault.shares.account.toString())
+    }
+
     console.log("=== before ===")
-    console.log()
-    console.log("ERC20 balance")
-    console.log("=============")
-    console.log("account ", before.erc20.balances.account.toString())
-    console.log("vault   ", before.erc20.balances.vault.toString())
-    console.log()
-    console.log("ERC20 allowance")
-    console.log("===============")
-    console.log("account to vault", before.erc20.allowance.vault.toString())
+    printSnapshot(before)
 
     console.log("=== after ===")
-    console.log()
-    console.log("ERC20 balance")
-    console.log("=============")
-    console.log("account ", after.erc20.balances.account.toString())
-    console.log("vault   ", after.erc20.balances.vault.toString())
-    console.log()
-    console.log("ERC20 allowance")
-    console.log("===============")
-    console.log("account to vault", after.erc20.allowance.vault.toString())
+    printSnapshot(after)
 
     process.exit(0)
   } catch (error) {
