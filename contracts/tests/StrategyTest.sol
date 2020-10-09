@@ -131,9 +131,9 @@ contract StrategyTest is IStrategy {
 
     function _transfer(address _to, uint _amount) internal {
         if (_amount > _maxTransferAmount_) {
-            _amount = _maxTransferAmount_;
+            IERC20(underlying).safeTransfer(_to, _maxTransferAmount_);
+        } else {
+            IERC20(underlying).safeTransfer(_to, _amount);
         }
-
-        IERC20(underlying).safeTransfer(_to, _amount);
     }
 }
