@@ -3,33 +3,43 @@ name: Lint
 on: [push]
 
 jobs:
-    solidity:
-        runs-on: ubuntu-latest
+  lint:
+    runs-on: ubuntu-latest
 
-        steps:
-            - name: Check out github repository
-              uses: actions/checkout@v2
-              with:
-                  fetch-depth: 1
+    steps:
+      - name: Check out github repository
+        uses: actions/checkout@v2
+        with:
+          fetch-depth: 1
 
-            - name: Cache node
-              uses: actions/cache@v2
-              with:
-                  path: ~/.npm
-                  key: ${{ runner.os }}-node-${{ hashFiles('**/package-lock.json') }}
-                  restore-keys: |
-                      ${{ runner.os }}-node-
-            - name: Setup Node.js
-              uses: actions/setup-node@v1
-              with:
-                  node-version: "12.x"
+      - name: Cache node
+        uses: actions/cache@v2
+        with:
+          path: ~/.npm
+          key: ${{ runner.os }}-node-${{ hashFiles('**/package-lock.json') }}
+          restore-keys: |
+            ${{ runner.os }}-node-
+      - name: Setup Node.js
+        uses: actions/setup-node@v1
+        with:
+          node-version: "12.x"
 
-            - name: Install dependencies
-              run: npm i
+      - name: Install dependencies
+        run: npm i
 
-            - name: Run linter on *.sol
-              run: npm run lint:check
+      - name: Run linter on *.sol
+        run: npm run lint:check
 
-            - name: Run ethlint
-              run: npm run ethlint
+      - name: Run ethlint
+        run: npm run ethlint
+  slither:
+    runs-on: ubuntu-latest
+    container:
+      image: trailofbits/eth-security-toolbox
+      # volumes:
+      #   - .:/code
+    steps:
+      - uses: actions/checkout@v2
+      - name: What OS is running
+        run: uname -a
 # TODO: Add Slither Static Analyzer
