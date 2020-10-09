@@ -1,5 +1,3 @@
-const ZERO_ADDRESS = "0x0000000000000000000000000000000000000000"
-
 module.exports = {
   ropsten: {
     // CHI gas token
@@ -18,11 +16,14 @@ module.exports = {
   mainnet: {
     // CHI gas token
     gasToken: "0x0000000000004946c0e9F43F4Dee607b0eF1fA1c",
-    gasRelayer: "",
+    gasRelayer: "0xe26C446fDCcD62F97a1D6bC21DD92638B0191037",
     treasury: "0x9a4c3Fc4683b95EBF11B535057B00812f6a549Bb",
-    controller: "",
+    controller: "0xE95EABc97a96dAc94fABE254E22EdD8B881b8E19",
     // vaults //
+    usdcVault: "0x51B4c5f40C24D8494Ac334470df74b753E938efF",
     // strategies //
+    strategyUsdcToCusd: "0x0dDA2b6D771789803803798cFD3C7Ea55BED7C2F",
     // others //
+    usdc: "0xA0b86991c6218b36c1d19D4a2e9Eb0cE3606eB48",
   },
 }

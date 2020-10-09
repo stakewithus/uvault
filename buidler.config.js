@@ -27,6 +27,13 @@ module.exports = {
       // gasPrice: 5000000000, // 5 gwei
       // gas: "auto",
     },
+    mainnet: {
+      url: `https://mainnet.infura.io/v3/${INFURA_API_KEY}`,
+      accounts: [`0x${PRIVATE_KEY}`],
+      gasPrice: "auto",
+      // gasPrice: 5000000000, // 5 gwei
+      // gas: "auto",
+    },
     coverage: {
       url: "http://127.0.0.1:8555", // Coverage launches its own ganache-cli client
     },
