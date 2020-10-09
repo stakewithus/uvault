@@ -1,6 +1,9 @@
 const bre = require("@nomiclabs/buidler")
 
 async function main() {
+  const network = bre.network.name
+  console.log(`Deploying ERC20Token to ${network} network...`)
+
   try {
     const [deployer] = await ethers.getSigners()
 
@@ -13,7 +16,7 @@ async function main() {
 
     await token.deployed()
 
-    console.log("Token deployed to:", token.address)
+    console.log("ERC20Token deployed to:", token.address)
     process.exit(0)
   } catch (error) {
     console.error(error)

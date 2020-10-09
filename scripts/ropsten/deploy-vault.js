@@ -1,6 +1,6 @@
 const bre = require("@nomiclabs/buidler")
-const config = require("./config")
-const {getAddress} = require("./lib")
+const config = require("../config")
+const {getAddress} = require("../lib")
 
 async function main() {
   const network = bre.network.name
