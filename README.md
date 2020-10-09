@@ -92,13 +92,9 @@ env $(cat .env.test) npx buidler run scripts/deploy-ropsten-vault.js --network r
 nv $(cat .env.test) npx buidler run scripts/deploy-ropsten-strategy-test.js --network ropsten
 ```
 
-##### Ropsten
+##### Deployed Contracts
 
-See `scripts/config.js`
-
-`ERC20` 0x8D760CAbe956332e6021990FCCE40CBDDd5d7890
-
-`StrategyTest` 0x042a9f1537d809255682B749E9F2Db6FD24505cA
+See [scripts/config.js](./scripts/config.js)
 
 ### APY
 
