@@ -1,17 +1,22 @@
+const assert = require("assert")
 const bre = require("@nomiclabs/buidler")
-
-const CHI = "0x0000000000004946c0e9F43F4Dee607b0eF1fA1c"
+const config = require("./config")
+const {getAddress} = require("./lib")
 
 async function main() {
+  const network = bre.network.name
+  console.log(`Deploying GasRelayer to ${network} network...`)
+
   try {
+    const gasToken = getAddress(config, network, "gasToken")
+
     const [deployer] = await ethers.getSigners()
 
     console.log("Account:", await deployer.getAddress())
     console.log("Balance:", (await deployer.getBalance()).toString())
 
-    // We get the contract to deploy
     const GasRelayer = await ethers.getContractFactory("GasRelayer")
-    const gasRelayer = await GasRelayer.deploy(CHI)
+    const gasRelayer = await GasRelayer.deploy(gasToken)
 
     await gasRelayer.deployed()
 

@@ -96,7 +96,7 @@ nv $(cat .env.test) npx buidler run scripts/deploy-ropsten-strategy-test.js --ne
 
 `ERC20` 0x8D760CAbe956332e6021990FCCE40CBDDd5d7890
 
-`GasRelayer` 0x7e5b8bA159b326F2DF74e4357DB42D17801896c7
+`GasRelayer` 0xD01D18440A150581A36581adD5b2bcb2DCc63333
 
 `Controller` 0xB1fA981B43EC0D5B2C6537DBcfFc7599613d7d39
 
