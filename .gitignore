@@ -6,6 +6,7 @@ reports/
 .pytest_cache
 venv
 report.*
+.env
 .env.*
 !.env.sample
 .secret
