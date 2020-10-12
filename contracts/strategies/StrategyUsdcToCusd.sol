@@ -65,21 +65,6 @@ contract StrategyUsdcToCusd is IStrategy, BaseStrategy {
         underlying = usdc;
     }
 
-    modifier onlyController() {
-        require(msg.sender == controller, "!controller");
-        _;
-    }
-
-    modifier onlyVault() {
-        require(msg.sender == vault, "!vault");
-        _;
-    }
-
-    modifier onlyVaultOrController() {
-        require(msg.sender == vault || msg.sender == controller, "!vault and !controller");
-        _;
-    }
-
     function _totalAssets() internal view returns (uint) {
         uint gaugeBal = Gauge(gauge).balanceOf(address(this));
 
@@ -145,6 +130,7 @@ contract StrategyUsdcToCusd is IStrategy, BaseStrategy {
     /*
     @notice Withdraw undelying token to vault
     @param _underlyingAmount Amount of underlying token to withdraw
+    @dev Controller and vault should implement guard agains slippage
     */
     function withdraw(uint _underlyingAmount) external onlyVaultOrController {
         require(_underlyingAmount > 0, "underlying = 0");
@@ -191,6 +177,7 @@ contract StrategyUsdcToCusd is IStrategy, BaseStrategy {
     /*
     @notice Withdraw all underlying to vault
     @dev This function does not claim CRV
+    @dev Controller and vault should implement guard agains slippage
     */
     function withdrawAll() external onlyVaultOrController {
         _withdrawAll();
@@ -246,6 +233,7 @@ contract StrategyUsdcToCusd is IStrategy, BaseStrategy {
     @notice Exit strategy by harvesting CRV to underlying token and then
             withdrawing all underlying to vault
     @dev Must return all underlying token to vault
+    @dev Controller and vault should implement guard agains slippage
     */
     function exit() external onlyVaultOrController {
         _crvToUnderlying();

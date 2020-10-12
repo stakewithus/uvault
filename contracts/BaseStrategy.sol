@@ -23,6 +23,21 @@ contract BaseStrategy {
         _;
     }
 
+    modifier onlyController() {
+        require(msg.sender == controller, "!controller");
+        _;
+    }
+
+    modifier onlyVault() {
+        require(msg.sender == vault, "!vault");
+        _;
+    }
+
+    modifier onlyVaultOrController() {
+        require(msg.sender == vault || msg.sender == controller, "!vault and !controller");
+        _;
+    }
+
     function setAdmin(address _admin) external onlyAdmin {
         require(_admin != address(0), "admin = zero address");
         admin = _admin;
