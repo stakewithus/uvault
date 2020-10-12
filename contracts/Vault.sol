@@ -72,7 +72,7 @@ contract Vault is IVault, ERC20, ERC20Detailed, ReentrancyGuard {
     )
         public
         ERC20Detailed(
-            string(abi.encodePacked("unagi_", ERC20Detailed(_token).name())),
+            string(abi.encodePacked("unagii_", ERC20Detailed(_token).name())),
             string(abi.encodePacked("u", ERC20Detailed(_token).symbol())),
             ERC20Detailed(_token).decimals()
         )

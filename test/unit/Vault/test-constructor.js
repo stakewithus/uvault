@@ -29,7 +29,7 @@ contract("Vault", (accounts) => {
       assert.equal(await vault.token(), erc20.address, "token")
       assert(eq(await vault.minWaitTime(), new BN(MIN_WAIT_TIME)), "min wait time")
 
-      assert.equal(await vault.name(), "unagi_test", "name")
+      assert.equal(await vault.name(), "unagii_test", "name")
       assert.equal(await vault.symbol(), "uTEST", "symbol")
       assert(eq(await vault.decimals(), await erc20.decimals(), "decimals"))
 
