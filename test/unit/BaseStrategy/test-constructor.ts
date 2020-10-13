@@ -1,17 +1,17 @@
-const BN = require("bn.js")
-const {assert} = require("chai")
-const {expect} = require("../../setup")
-const {ZERO_ADDRESS} = require("../../util")
-const setup = require("./setup")
+import chai from "chai"
+import {MockControllerInstance} from "../../../types/MockController"
+import {MockVaultInstance} from "../../../types/MockVault"
+import { ZERO_ADDRESS } from "../../util"
+import _setup from "./setup"
 
 const BaseStrategy = artifacts.require("BaseStrategy")
 
 contract("BaseStrategy", (accounts) => {
-  const refs = setup(accounts)
+  const refs = _setup(accounts)
   const {admin} = refs
 
-  let vault
-  let controller
+  let vault: MockVaultInstance
+  let controller:MockControllerInstance
   beforeEach(() => {
     vault = refs.vault
     controller = refs.controller
@@ -27,13 +27,13 @@ contract("BaseStrategy", (accounts) => {
     })
 
     it("should not deploy if controller is zero address", async () => {
-      await expect(BaseStrategy.new(ZERO_ADDRESS, vault.address)).to.be.rejectedWith(
+      await chai.expect(BaseStrategy.new(ZERO_ADDRESS, vault.address)).to.be.rejectedWith(
         "controller = zero address"
       )
     })
 
     it("should not deploy if vault is zero address", async () => {
-      await expect(
+      await chai.expect(
         BaseStrategy.new(controller.address, ZERO_ADDRESS)
       ).to.be.rejectedWith("vault = zero address")
     })

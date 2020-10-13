@@ -7,13 +7,16 @@
     "test": "test"
   },
   "scripts": {
+    "postinstall": "npm run compile && npm run generate-types",
     "compile": "truffle compile",
     "ethlint": "solium -d contracts --fix",
     "lint": "prettier --write contracts/*.sol contracts/**/*.sol",
     "lint:check": "prettier --check contracts/*.sol contracts/**/*.sol",
     "test": "echo \"Error: no test specified\" && exit 1",
-    "test:unit": "truffle test test/unit/**/test-*.js",
-    "test:integration": "truffle test test/integration/test-*.js"
+    "test:unit": "npm run typecheck && truffle test test/unit/**/test-*.js",
+    "test:integration": "npm run typecheck && truffle test test/integration/test-*.js",
+    "generate-types": "typechain --target=truffle-v5 --outDir types 'build/contracts/*.json'",
+    "typecheck": "tsc --noEmit"
   },
   "dependencies": {
     "@openzeppelin/contracts": "^2.5.0"
@@ -34,6 +37,13 @@
     "@nomiclabs/buidler-ethers": "^2.0.2",
     "@nomiclabs/buidler-etherscan": "^2.1.0",
     "@nomiclabs/buidler-waffle": "^2.1.0",
+    "@typechain/truffle-v5": "^2.0.2",
+    "@types/bn.js": "^4.11.6",
+    "@types/chai": "^4.2.13",
+    "@types/chai-as-promised": "^7.1.3",
+    "@types/mocha": "^8.0.3",
+    "@types/node": "^14.11.8",
+    "@types/web3": "^1.2.2",
     "bn.js": "^5.1.3",
     "chai": "^4.2.0",
     "chai-as-promised": "^7.1.1",
@@ -44,6 +54,9 @@
     "ganache-cli": "^6.11.0",
     "prettier": "^2.1.2",
     "prettier-plugin-solidity": "^1.0.0-alpha.58",
-    "truffle": "5.1.47"
+    "truffle": "5.1.47",
+    "ts-node": "^9.0.0",
+    "typechain": "^3.0.0",
+    "typescript": "^4.0.3"
   }
 }

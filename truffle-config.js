@@ -18,6 +18,10 @@
  *
  */
 
+require("ts-node").register({
+  files: true,
+});
+
 // const HDWalletProvider = require('@truffle/hdwallet-provider');
 // const infuraKey = "fj4jll3k.....";
 //

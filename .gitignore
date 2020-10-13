@@ -14,8 +14,8 @@ report.*
 .secret*
 node_modules
 
-#Buidler files
 cache
 artifacts
+types
 
 memo/*.sol
