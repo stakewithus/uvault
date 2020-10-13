@@ -34,7 +34,7 @@ contract StrategyUsdtToCusdMainnet is StrategyStableTo3Crv {
             CRV,
             UNISWAP,
             WETH,
-            0
+            2
         )
     {}
 }
