@@ -4,7 +4,7 @@ import "@openzeppelin/contracts/token/ERC20/IERC20.sol";
 import "@openzeppelin/contracts/token/ERC20/SafeERC20.sol";
 import "@openzeppelin/contracts/math/SafeMath.sol";
 
-import "../interfaces/curve/DepositCompound.sol";
+import "../interfaces/curve/ICurveFi2.sol";
 import "../interfaces/curve/Gauge.sol";
 import "../interfaces/curve/Minter.sol";
 import "../interfaces/uniswap/Uniswap.sol";
@@ -28,7 +28,7 @@ contract StrategyStableToCusd is IStrategy, BaseStrategy {
     // Curve //
     // cDAI/cUSDC
     address private cUnderlying;
-    // DepositCompound
+    // DepositCompoound
     address private pool;
     // Gauge
     address private gauge;
@@ -68,7 +68,7 @@ contract StrategyStableToCusd is IStrategy, BaseStrategy {
 
     function _totalAssets() internal view returns (uint) {
         uint gaugeBal = Gauge(gauge).balanceOf(address(this));
-        return DepositCompound(pool).calc_withdraw_one_coin(gaugeBal, int128(underlyingIndex));
+        return ICurveFi2(pool).calc_withdraw_one_coin(gaugeBal, int128(underlyingIndex));
     }
 
     /*
@@ -90,7 +90,7 @@ contract StrategyStableToCusd is IStrategy, BaseStrategy {
             // mint cUnderlying
             uint[2] memory amounts;
             amounts[underlyingIndex] = underlyingBal;
-            DepositCompound(pool).add_liquidity(amounts , 0);
+            ICurveFi2(pool).add_liquidity(amounts , 0);
         }
 
         // stake cUnderlying into Gauge
@@ -122,7 +122,7 @@ contract StrategyStableToCusd is IStrategy, BaseStrategy {
         IERC20(cUnderlying).safeApprove(pool, 0);
         IERC20(cUnderlying).safeApprove(pool, cBal);
         // NOTE: creates cUnderlying dust so we donate it
-        DepositCompound(pool).remove_liquidity_one_coin(cBal, int128(underlyingIndex), 0, true);
+        ICurveFi2(pool).remove_liquidity_one_coin(cBal, int128(underlyingIndex), 0, true);
         // Now we have underlying
     }
 
