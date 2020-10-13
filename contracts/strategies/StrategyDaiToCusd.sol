@@ -2,8 +2,8 @@ pragma solidity 0.5.17;
 
 import "./StrategyStableToCusd.sol";
 
-contract StrategyUsdcToCusdMainnet is StrategyStableToCusd {
-    address private constant USDC = 0xA0b86991c6218b36c1d19D4a2e9Eb0cE3606eB48;
+contract StrategyDaiToCusd is StrategyStableToCusd {
+    address private constant  DAI = 0x6B175474E89094C44Da98b954EedeAC495271d0F;
 
     // Curve
     // cDAI/cUSDC
@@ -19,11 +19,11 @@ contract StrategyUsdcToCusdMainnet is StrategyStableToCusd {
 
     // DEX related addresses
     address private constant UNISWAP = 0x7a250d5630B4cF539739dF2C5dAcb4c659F2488D;
-    // used for crv <> weth <> usdc route
+    // used for crv <> weth <> dai route
     address private constant WETH = 0xC02aaA39b223FE8D0A0e5C4F27eAD9083C756Cc2;
 
     constructor(address _controller, address _vault)
         public
-        StrategyStableToCusd(_controller, _vault, USDC, CUSD, POOL, GAUGE, MINTER, CRV, UNISWAP, WETH, 1)
+        StrategyStableToCusd(_controller, _vault, DAI, CUSD, POOL, GAUGE, MINTER, CRV, UNISWAP, WETH, 0)
     {}
 }

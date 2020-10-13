@@ -2,7 +2,7 @@ pragma solidity 0.5.17;
 
 import "./StrategyStableTo3Crv.sol";
 
-contract StrategyUsdcToCusdMainnet is StrategyStableTo3Crv {
+contract StrategyUsdcTo3Crv is StrategyStableTo3Crv {
     address private constant USDC = 0xA0b86991c6218b36c1d19D4a2e9Eb0cE3606eB48;
 
     // Curve

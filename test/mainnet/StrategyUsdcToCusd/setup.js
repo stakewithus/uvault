@@ -1,10 +1,10 @@
 const setup = require("../StrategyStableToCurve/setup")
 const {CUSD, CGAUGE, USDC, USDC_WHALE} = require("../../config")
-const StrategyUsdcToCusdMainnet = artifacts.require("StrategyUsdcToCusdMainnet")
+const StrategyUsdcToCusd = artifacts.require("StrategyUsdcToCusd")
 
 module.exports = (accounts) => {
   return setup(accounts, {
-    Strategy: StrategyUsdcToCusdMainnet,
+    Strategy: StrategyUsdcToCusd,
     underlying: USDC,
     cUnderlying: CUSD,
     gauge: CGAUGE,

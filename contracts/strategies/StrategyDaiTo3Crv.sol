@@ -2,7 +2,7 @@ pragma solidity 0.5.17;
 
 import "./StrategyStableTo3Crv.sol";
 
-contract StrategyDaiToCusdMainnet is StrategyStableTo3Crv {
+contract StrategyDaiTo3Crv is StrategyStableTo3Crv {
     address private constant DAI = 0x6B175474E89094C44Da98b954EedeAC495271d0F;
 
     // Curve
