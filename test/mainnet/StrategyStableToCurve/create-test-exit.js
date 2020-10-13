@@ -46,7 +46,6 @@ module.exports = (name, setup, { DECIMALS }) => {
       await strategy.exit({from: vault})
       const after = await snapshot()
 
-      assert(eq(after.strategy.totalAssets, new BN(0)), "strategy underlying balance")
       assert(eq(after.gauge.strategy, new BN(0)), "gauge strategy")
       assert(eq(after.cUnderlying.strategy, new BN(0)), "cUnderlying strategy")
       assert(eq(after.underlying.strategy, new BN(0)), "underlying strategy")
