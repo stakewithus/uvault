@@ -28,7 +28,7 @@ contract StrategyStableToCurve is IStrategy, BaseStrategy {
     // Curve //
     // cDAI/cUSDC or 3Crv
     address internal cUnderlying;
-    // ICurveFi2 or ICurvFi3
+    // ICurveFi2 or ICurveFi3
     address internal pool;
     // Gauge
     address internal gauge;
@@ -70,7 +70,6 @@ contract StrategyStableToCurve is IStrategy, BaseStrategy {
 
     function _totalAssets() private view returns (uint) {
         uint gaugeBal = Gauge(gauge).balanceOf(address(this));
-        // return ICurveFi2(pool).calc_withdraw_one_coin(gaugeBal, int128(underlyingIndex));
         return _calcWithdrawOneCoin(gaugeBal);
     }
 
@@ -94,9 +93,6 @@ contract StrategyStableToCurve is IStrategy, BaseStrategy {
             IERC20(underlying).safeApprove(pool, underlyingBal);
             // mint cUnderlying
             _addLiquidity(underlyingBal);
-            // uint[2] memory amounts;
-            // amounts[underlyingIndex] = underlyingBal;
-            // ICurveFi2(pool).add_liquidity(amounts , 0);
         }
 
         // stake cUnderlying into Gauge
@@ -131,7 +127,6 @@ contract StrategyStableToCurve is IStrategy, BaseStrategy {
         IERC20(cUnderlying).safeApprove(pool, cBal);
         // NOTE: creates cUnderlying dust so we donate it
         _removeLiquidityOneCoin(cBal);
-        // ICurveFi2(pool).remove_liquidity_one_coin(cBal, int128(underlyingIndex), 0, true);
         // Now we have underlying
     }
 
