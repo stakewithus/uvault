@@ -68,7 +68,7 @@ contract StrategyStableToCurve is IStrategy, BaseStrategy {
 
     function _calcWithdrawOneCoin(uint _gaugeAmount) internal view returns (uint);
 
-    function _totalAssets() internal view returns (uint) {
+    function _totalAssets() private view returns (uint) {
         uint gaugeBal = Gauge(gauge).balanceOf(address(this));
         // return ICurveFi2(pool).calc_withdraw_one_coin(gaugeBal, int128(underlyingIndex));
         return _calcWithdrawOneCoin(gaugeBal);
@@ -86,7 +86,7 @@ contract StrategyStableToCurve is IStrategy, BaseStrategy {
     /*
     @notice Deposits underlying to Gauge
     */
-    function _depositUnderlying() internal {
+    function _depositUnderlying() private {
         // underlying to cUnderlying
         uint underlyingBal = IERC20(underlying).balanceOf(address(this));
         if (underlyingBal > 0) {
@@ -121,7 +121,7 @@ contract StrategyStableToCurve is IStrategy, BaseStrategy {
 
     function _removeLiquidityOneCoin(uint _cAmount) internal;
 
-    function _withdrawUnderlying(uint _cUsdAmount) internal {
+    function _withdrawUnderlying(uint _cUsdAmount) private {
         // withdraw cUnderlying from  Gauge
         Gauge(gauge).withdraw(_cUsdAmount);
 
@@ -169,7 +169,7 @@ contract StrategyStableToCurve is IStrategy, BaseStrategy {
         }
     }
 
-    function _withdrawAll() internal {
+    function _withdrawAll() private {
         // gauge balance is same unit as cUnderlying
         uint gaugeBal = Gauge(gauge).balanceOf(address(this));
         if (gaugeBal > 0) {
@@ -194,7 +194,7 @@ contract StrategyStableToCurve is IStrategy, BaseStrategy {
     /*
     @notice Claim CRV and swap for underlying token
     */
-    function _crvToUnderlying() internal {
+    function _crvToUnderlying() private {
         Minter(minter).mint(gauge);
 
         uint crvBal = IERC20(crv).balanceOf(address(this));
