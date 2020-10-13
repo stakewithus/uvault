@@ -41,7 +41,7 @@ ganache-cli \
 
 # test specific file
 truffle test --network mainnet_fork test/mainnet/path/to/test.js
-# test all
+# test all (need to restart truffle after each test)
 find test/mainnet -name "test-*.js" -exec truffle test --network mainnet_fork {} \;
 ```
 
