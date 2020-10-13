@@ -4,35 +4,10 @@ import "../interfaces/curve/ICurveFi3.sol";
 import "./StrategyStableToCurve.sol";
 
 contract StrategyStableTo3Crv is StrategyStableToCurve {
-    constructor(
-        address _controller,
-        address _vault,
-        address _underlying,
-        address _cUnderlying,
-        address _pool,
-        address _gauge,
-        address _minter,
-        address _crv,
-        address _uniswap,
-        address _weth,
-        uint256 _underlyingIndex
-    ) public StrategyStableToCurve(
-        _controller,
-        _vault,
-        _underlying,
-        _cUnderlying,
-        _pool,
-        _gauge,
-        _minter,
-        _crv,
-        _uniswap,
-        _weth,
-        _underlyingIndex
-    ) {}
+    constructor(address _controller, address _vault) public StrategyStableToCurve( _controller, _vault) {}
 
     function _calcWithdrawOneCoin(uint _gaugeAmount) internal view returns (uint) {
-        // return ICurveFi3(pool).calc_withdraw_one_coin(_gaugeAmount, int128(underlyingIndex));
-        return ICurveFi3(pool).calc_withdraw_one_coin(0, int128(1));
+        return ICurveFi3(pool).calc_withdraw_one_coin(_gaugeAmount, int128(underlyingIndex));
     }
 
     function _addLiquidity(uint _underlyingAmount) internal {

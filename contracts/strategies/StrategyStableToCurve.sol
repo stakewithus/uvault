@@ -42,29 +42,7 @@ contract StrategyStableToCurve is IStrategy, BaseStrategy {
     // used for crv <> weth <> underlying route
     address internal weth;
 
-    constructor(
-        address _controller,
-        address _vault,
-        address _underlying,
-        address _cUnderlying,
-        address _pool,
-        address _gauge,
-        address _minter,
-        address _crv,
-        address _uniswap,
-        address _weth,
-        uint256 _underlyingIndex
-    ) public BaseStrategy(_controller, _vault) {
-        underlying = _underlying;
-        cUnderlying = _cUnderlying;
-        pool = _pool;
-        gauge = _gauge;
-        minter = _minter;
-        crv = _crv;
-        uniswap = _uniswap;
-        weth = _weth;
-        underlyingIndex = _underlyingIndex;
-    }
+    constructor(address _controller, address _vault) public BaseStrategy(_controller, _vault) {}
 
     function _calcWithdrawOneCoin(uint _gaugeAmount) internal view returns (uint);
 
