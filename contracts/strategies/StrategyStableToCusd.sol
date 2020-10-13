@@ -46,7 +46,7 @@ contract StrategyStableToCusd is IStrategy, BaseStrategy {
         address _controller,
         address _vault,
         address _underlying,
-        address _crvUnderlying,
+        address _cUsd,
         address _pool,
         address _gauge,
         address _minter,
@@ -56,7 +56,7 @@ contract StrategyStableToCusd is IStrategy, BaseStrategy {
         uint256 _underlyingIndex
     ) public BaseStrategy(_controller, _vault) {
         underlying = _underlying;
-        cUsd = _crvUnderlying;
+        cUsd = _cUsd;
         pool = _pool;
         gauge = _gauge;
         minter = _minter;
