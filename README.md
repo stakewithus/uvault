@@ -31,10 +31,9 @@ ganache-cli \
 --unlock $STABLE_COIN_HOLDER \
 --unlock $DAI_WHALE \
 --unlock $USDC_WHALE \
+--unlock $USDT_WHALE \
 --unlock $CHI_WHALE \
 --networkId 999
-
-npm run test:mainnet
 
 # NOTE
 # restart ganache when you see this error
@@ -42,6 +41,8 @@ npm run test:mainnet
 
 # test specific file
 truffle test --network mainnet_fork test/mainnet/path/to/test.js
+# test all
+find test/mainnet -name "test-*.js" -exec truffle test --network mainnet_fork {} \;
 ```
 
 ### Lint

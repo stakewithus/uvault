@@ -56,8 +56,8 @@ module.exports = (name, setup, { DECIMALS }) => {
 
             // check strategy does not have any underlying
             assert(eq(after.underlying.strategy, new BN(0)), "underlying strategy")
-            // check strategy does not have any cUnderlying dust
-            assert(eq(after.cUnderlying.strategy, new BN(0)), "cUnderlying strategy")
+            // check strategy dust is small
+            assert(after.cUnderlying.strategy.lte(new BN(100)), "cUnderlying strategy")
             // check strategy does not have any cUnderlying in gauge
             assert(eq(after.gauge.strategy, new BN(0)), "gauge strategy")
         })

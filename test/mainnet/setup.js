@@ -1,6 +1,6 @@
 const BN = require("bn.js")
-const {USDC, USDC_WHALE, USDC_DECIMALS, CHI} = require("../config")
-const {sendEther} = require("../util")
+const {USDC, USDC_WHALE, CHI} = require("../config")
+const {sendEther, USDC_DECIMALS} = require("../util")
 
 const IERC20 = artifacts.require("IERC20")
 const GasToken = artifacts.require("GasToken")
@@ -74,7 +74,7 @@ module.exports = (accounts) => {
     await controller.setStrategy(vault.address, strategy.address, {from: admin})
 
     // deposit into vault
-    const amount = new BN(10).pow(new BN(UNDERLYING_DECIMALS)).mul(new BN(10))
+    const amount = new BN(10).pow(UNDERLYING_DECIMALS).mul(new BN(10))
     await underlying.approve(vault.address, amount, {from: whale})
     await vault.deposit(amount, {from: whale})
   })

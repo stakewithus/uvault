@@ -7,7 +7,10 @@ contract StrategyStableToCusd is StrategyStableToCurve {
     constructor( address _controller, address _vault) public StrategyStableToCurve(_controller, _vault) {}
 
     function _calcWithdrawOneCoin(uint _gaugeAmount) internal view returns (uint) {
-        return ICurveFi2(pool).calc_withdraw_one_coin(_gaugeAmount, int128(underlyingIndex));
+        if (_gaugeAmount > 0) {
+            return ICurveFi2(pool).calc_withdraw_one_coin(_gaugeAmount, int128(underlyingIndex));
+        }
+        return 0;
     }
 
     function _addLiquidity(uint _underlyingAmount) internal {

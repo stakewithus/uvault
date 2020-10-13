@@ -47,7 +47,8 @@ module.exports = (name, setup, { DECIMALS }) => {
       const after = await snapshot()
 
       assert(eq(after.gauge.strategy, new BN(0)), "gauge strategy")
-      assert(eq(after.cUnderlying.strategy, new BN(0)), "cUnderlying strategy")
+      // check strategy dust is small
+      assert(after.cUnderlying.strategy.lte(new BN(100)), "cUnderlying strategy")
       assert(eq(after.underlying.strategy, new BN(0)), "underlying strategy")
       assert(eq(after.crv.strategy, new BN(0)), "crv strategy")
       assert(after.underlying.vault.gte(before.underlying.vault), "underlying vault")

@@ -25,10 +25,14 @@ function frac(x, n, d) {
   return x.mul(n).div(d)
 }
 
-const USDC_DECIMALS = new BN(6)
-const USDC_TO_CURVE_DECIMALS = new BN(10).pow(new BN(12))
 const DAI_DECIMALS = new BN(18)
 const DAI_TO_CURVE_DECIMALS = new BN(1)
+
+const USDC_DECIMALS = new BN(6)
+const USDC_TO_CURVE_DECIMALS = new BN(10).pow(new BN(12))
+
+const USDT_DECIMALS = new BN(6)
+const USDT_TO_CURVE_DECIMALS = new BN(10).pow(new BN(12))
 
 function sendEther(web3, from, to, amount) {
   return web3.eth.sendTransaction({
@@ -54,10 +58,12 @@ module.exports = {
   add,
   sub,
   frac,
-  USDC_DECIMALS,
-  USDC_TO_CURVE_DECIMALS,
   DAI_DECIMALS,
   DAI_TO_CURVE_DECIMALS,
+  USDC_DECIMALS,
+  USDC_TO_CURVE_DECIMALS,
+  USDT_DECIMALS,
+  USDT_TO_CURVE_DECIMALS,
   sendEther,
   getBlockTimestamp,
   timeout,
