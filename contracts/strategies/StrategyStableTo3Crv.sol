@@ -31,7 +31,8 @@ contract StrategyStableTo3Crv is StrategyStableToCurve {
     ) {}
 
     function _calcWithdrawOneCoin(uint _gaugeAmount) internal view returns (uint) {
-        return ICurveFi3(pool).calc_withdraw_one_coin(_gaugeAmount, int128(underlyingIndex));
+        // return ICurveFi3(pool).calc_withdraw_one_coin(_gaugeAmount, int128(underlyingIndex));
+        return ICurveFi3(pool).calc_withdraw_one_coin(0, int128(1));
     }
 
     function _addLiquidity(uint _underlyingAmount) internal {
