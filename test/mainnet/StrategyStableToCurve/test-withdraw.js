@@ -2,8 +2,8 @@ const BN = require("bn.js")
 const {eq, sub, frac } = require("../../util")
 const {getSnapshot} = require("./lib")
 
-module.exports = (contractName, setup, { DECIMALS }) => {
-  contract(contractName, (accounts) => {
+module.exports = (name, setup, { DECIMALS }) => {
+  contract(name, (accounts) => {
     const depositAmount = new BN(10).pow(DECIMALS)
 
     const refs = setup(accounts)
