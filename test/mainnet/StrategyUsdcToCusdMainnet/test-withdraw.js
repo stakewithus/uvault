@@ -1,11 +1,11 @@
 const BN = require("bn.js")
 const {USDC_WHALE} = require("../../config")
-const {eq} = require("../../util")
+const {eq, sub, frac} = require("../../util")
 const {getSnapshot} = require("./lib")
 const setup = require("./setup")
 
-contract("StrategyUsdcToCusd", (accounts) => {
-  const depositAmount = new BN(100).mul(new BN(10).pow(new BN(6)))
+contract("StrategyUsdcToCusdMainnet", (accounts) => {
+  const depositAmount = new BN(10).pow(new BN(6))
 
   const refs = setup(accounts)
   const {vault, treasury} = refs
@@ -32,26 +32,38 @@ contract("StrategyUsdcToCusd", (accounts) => {
     await strategy.deposit(depositAmount, {from: vault})
   })
 
-  it("should exit", async () => {
+  it("should withdraw", async () => {
     const snapshot = getSnapshot({
       usdc,
       cUsd,
-      cGauge,
       crv,
+      cGauge,
       strategy,
       treasury,
       vault,
     })
 
+    // withdraw amount may be < deposit amount
+    // so here we get the maximum redeemable amount
+    const withdrawAmount = await strategy.totalAssets()
+
     const before = await snapshot()
-    await strategy.exit({from: vault})
+    await strategy.withdraw(withdrawAmount, {from: vault})
     const after = await snapshot()
 
-    assert(eq(after.strategy.totalAssets, new BN(0)), "strategy underlying balance")
-    assert(eq(after.cGauge.strategy, new BN(0)), "cGauge strategy")
-    assert(eq(after.cUsd.strategy, new BN(0)), "cUsd strategy")
+    // minimum amount of USDC that can be withdrawn
+    const minUsdc = frac(depositAmount, new BN(99), new BN(100))
+
+    // check balance of usdc transferred to treasury and vault
+    const fee = sub(after.usdc.treasury, before.usdc.treasury)
+    const usdcDiff = sub(after.usdc.vault, before.usdc.vault)
+
+    assert(fee.gte(new BN(0)), "fee")
+    assert(usdcDiff.gte(minUsdc), "usdc diff")
+
+    // check strategy does not have any USDC
     assert(eq(after.usdc.strategy, new BN(0)), "usdc strategy")
-    assert(eq(after.crv.strategy, new BN(0)), "crv strategy")
-    assert(after.usdc.vault.gte(before.usdc.vault), "usdc vault")
+    // check strategy does not have any cUSD dust
+    assert(eq(after.cUsd.strategy, new BN(0)), "cUsd strategy")
   })
 })

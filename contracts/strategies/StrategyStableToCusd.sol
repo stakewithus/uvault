@@ -4,10 +4,10 @@ import "@openzeppelin/contracts/token/ERC20/IERC20.sol";
 import "@openzeppelin/contracts/token/ERC20/SafeERC20.sol";
 import "@openzeppelin/contracts/math/SafeMath.sol";
 
-import "../interfaces/uniswap/Uniswap.sol";
+import "../interfaces/curve/DepositCompound.sol";
 import "../interfaces/curve/Gauge.sol";
 import "../interfaces/curve/Minter.sol";
-import "../interfaces/curve/DepositCompound.sol";
+import "../interfaces/uniswap/Uniswap.sol";
 import "../IController.sol";
 import "../IStrategy.sol";
 import "../BaseStrategy.sol";
@@ -17,60 +17,58 @@ import "../BaseStrategy.sol";
 - slippage when withdrawing all from strategy
 */
 
-contract StrategyUsdcToCusd is IStrategy, BaseStrategy {
+contract StrategyStableToCusd is IStrategy, BaseStrategy {
     using SafeERC20 for IERC20;
     using SafeMath for uint;
 
-    address internal usdc;
     address public underlying;
+    // DAI = 0 | USDC = 1
+    uint8 private underlyingIndex;
 
-    // Curve
+    // Curve //
     // cDAI/cUSDC
-    address internal cUsd;
+    address private cUsd;
     // DepositCompound
-    address internal depositC;
-    // cUsd Gauge
-    address internal gauge;
+    address private pool;
+    // Gauge
+    address private gauge;
     // Minter
-    address internal minter;
+    address private minter;
     // DAO
-    address internal crv;
+    address private crv;
 
     // DEX related addresses
-    address internal uniswap;
-    // used for crv <> weth <> usdc route
-    address internal weth;
+    address private uniswap;
+    // used for crv <> weth <> underlying route
+    address private weth;
 
     constructor(
         address _controller,
         address _vault,
-        address _usdc,
-        address _cUsd,
-        address _depositC,
+        address _underlying,
+        address _crvUnderlying,
+        address _pool,
         address _gauge,
         address _minter,
         address _crv,
         address _uniswap,
-        address _weth
+        address _weth,
+        uint8 _underlyingIndex
     ) public BaseStrategy(_controller, _vault) {
-        usdc = _usdc;
-        cUsd = _cUsd;
-        depositC = _depositC;
+        underlying = _underlying;
+        cUsd = _crvUnderlying;
+        pool = _pool;
         gauge = _gauge;
         minter = _minter;
         crv = _crv;
         uniswap = _uniswap;
         weth = _weth;
-
-        underlying = usdc;
+        underlyingIndex = _underlyingIndex;
     }
 
     function _totalAssets() internal view returns (uint) {
         uint gaugeBal = Gauge(gauge).balanceOf(address(this));
-
-        // DAI  = 0
-        // usdc = 1
-        return DepositCompound(depositC).calc_withdraw_one_coin(gaugeBal, int128(1));
+        return DepositCompound(pool).calc_withdraw_one_coin(gaugeBal, int128(underlyingIndex));
     }
 
     /*
@@ -80,6 +78,10 @@ contract StrategyUsdcToCusd is IStrategy, BaseStrategy {
         return _totalAssets();
     }
 
+    function _getLiquidityAmounts(uint _amount) internal view returns (uint[2] memory amounts) {
+        amounts[underlyingIndex] = _amount;
+    }
+
     /*
     @notice Deposits underlying to Gauge
     */
@@ -87,10 +89,10 @@ contract StrategyUsdcToCusd is IStrategy, BaseStrategy {
         // underlying to cUsd
         uint underlyingBal = IERC20(underlying).balanceOf(address(this));
         if (underlyingBal > 0) {
-            IERC20(underlying).safeApprove(depositC, 0);
-            IERC20(underlying).safeApprove(depositC, underlyingBal);
+            IERC20(underlying).safeApprove(pool, 0);
+            IERC20(underlying).safeApprove(pool, underlyingBal);
             // mint cUsd
-            DepositCompound(depositC).add_liquidity([0, underlyingBal], 0);
+            DepositCompound(pool).add_liquidity(_getLiquidityAmounts(underlyingBal), 0);
         }
 
         // stake cUsd into Gauge
@@ -117,14 +119,13 @@ contract StrategyUsdcToCusd is IStrategy, BaseStrategy {
         // withdraw cUsd from  Gauge
         Gauge(gauge).withdraw(_cUsdAmount);
 
-        // withdraw dai and usdc
+        // withdraw underlying
         uint cUsdBal = IERC20(cUsd).balanceOf(address(this));
-        IERC20(cUsd).safeApprove(depositC, 0);
-        IERC20(cUsd).safeApprove(depositC, cUsdBal);
+        IERC20(cUsd).safeApprove(pool, 0);
+        IERC20(cUsd).safeApprove(pool, cUsdBal);
         // NOTE: creates cUsd dust so we donate it
-        DepositCompound(depositC).remove_liquidity_one_coin(cUsdBal, int128(1), 0, true);
-
-        // Now we have usdc
+        DepositCompound(pool).remove_liquidity_one_coin(cUsdBal, int128(underlyingIndex), 0, true);
+        // Now we have underlying
     }
 
     /*
@@ -213,15 +214,15 @@ contract StrategyUsdcToCusd is IStrategy, BaseStrategy {
     function harvest() external onlyController {
         _crvToUnderlying();
 
-        uint usdcBal = IERC20(usdc).balanceOf(address(this));
-        if (usdcBal > 0) {
+        uint underlyingBal = IERC20(underlying).balanceOf(address(this));
+        if (underlyingBal > 0) {
             // transfer fee to treasury
-            uint fee = usdcBal.mul(performanceFee).div(PERFORMANCE_FEE_MAX);
+            uint fee = underlyingBal.mul(performanceFee).div(PERFORMANCE_FEE_MAX);
             if (fee > 0) {
                 address treasury = IController(controller).treasury();
                 require(treasury != address(0), "treasury = zero address");
 
-                IERC20(usdc).safeTransfer(treasury, fee);
+                IERC20(underlying).safeTransfer(treasury, fee);
             }
 
             // deposit remaining underlying for cUsd

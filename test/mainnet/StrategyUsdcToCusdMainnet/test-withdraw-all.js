@@ -4,8 +4,8 @@ const {eq, sub, frac} = require("../../util")
 const {getSnapshot} = require("./lib")
 const setup = require("./setup")
 
-contract("StrategyUsdcToCusd", (accounts) => {
-  const depositAmount = new BN(10).pow(new BN(6))
+contract("StrategyUsdcToCusdMainnet", (accounts) => {
+  const depositAmount = new BN(100).mul(new BN(10).pow(new BN(6)))
 
   const refs = setup(accounts)
   const {vault, treasury} = refs
@@ -32,38 +32,34 @@ contract("StrategyUsdcToCusd", (accounts) => {
     await strategy.deposit(depositAmount, {from: vault})
   })
 
-  it("should withdraw", async () => {
+  it("should withdraw all", async () => {
     const snapshot = getSnapshot({
       usdc,
       cUsd,
-      crv,
       cGauge,
+      crv,
       strategy,
       treasury,
       vault,
     })
 
-    // withdraw amount may be < deposit amount
-    // so here we get the maximum redeemable amount
-    const withdrawAmount = await strategy.totalAssets()
-
     const before = await snapshot()
-    await strategy.withdraw(withdrawAmount, {from: vault})
+    await strategy.withdrawAll({from: vault})
     const after = await snapshot()
 
     // minimum amount of USDC that can be withdrawn
-    const minUsdc = frac(depositAmount, new BN(99), new BN(100))
+    const minUsdc = frac(before.strategy.totalAssets, new BN(99), new BN(100))
 
     // check balance of usdc transferred to treasury and vault
-    const fee = sub(after.usdc.treasury, before.usdc.treasury)
     const usdcDiff = sub(after.usdc.vault, before.usdc.vault)
 
-    assert(fee.gte(new BN(0)), "fee")
     assert(usdcDiff.gte(minUsdc), "usdc diff")
 
     // check strategy does not have any USDC
     assert(eq(after.usdc.strategy, new BN(0)), "usdc strategy")
     // check strategy does not have any cUSD dust
     assert(eq(after.cUsd.strategy, new BN(0)), "cUsd strategy")
+    // check strategy does not have any cUSD in cGauge
+    assert(eq(after.cGauge.strategy, new BN(0)), "cGauge strategy")
   })
 })

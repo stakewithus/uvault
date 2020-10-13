@@ -4,7 +4,7 @@ const {eq, sub, frac, USDC_TO_CUSD_DECIMALS} = require("../../util")
 const {getSnapshot} = require("./lib")
 const setup = require("./setup")
 
-contract("StrategyUsdcToCusd", (accounts) => {
+contract("StrategyUsdcToCusdMainnet", (accounts) => {
   const refs = setup(accounts)
   const {vault, treasury} = refs
 

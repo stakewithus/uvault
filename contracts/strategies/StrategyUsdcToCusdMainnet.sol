@@ -1,8 +1,8 @@
 pragma solidity 0.5.17;
 
-import "./StrategyUsdcToCusd.sol";
+import "./StrategyStableToCusd.sol";
 
-contract StrategyUsdcToCusdMainnet is StrategyUsdcToCusd {
+contract StrategyUsdcToCusdMainnet is StrategyStableToCusd {
     address private constant USDC = address(0xA0b86991c6218b36c1d19D4a2e9Eb0cE3606eB48);
     // address private constant  DAI = address(0x6B175474E89094C44Da98b954EedeAC495271d0F);
 
@@ -25,6 +25,6 @@ contract StrategyUsdcToCusdMainnet is StrategyUsdcToCusd {
 
     constructor(address _controller, address _vault)
         public
-        StrategyUsdcToCusd(_controller, _vault, USDC, CUSD, DEPOSIT_C, GAUGE, MINTER, CRV, UNISWAP, WETH)
+        StrategyStableToCusd(_controller, _vault, USDC, CUSD, DEPOSIT_C, GAUGE, MINTER, CRV, UNISWAP, WETH, 1)
     {}
 }

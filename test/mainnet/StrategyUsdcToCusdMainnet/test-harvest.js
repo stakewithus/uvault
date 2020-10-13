@@ -3,7 +3,7 @@ const {USDC_WHALE} = require("../../config")
 const {getSnapshot} = require("./lib")
 const setup = require("./setup")
 
-contract("StrategyUsdcToCusd", (accounts) => {
+contract("StrategyUsdcToCusdMainnet", (accounts) => {
   const depositAmount = new BN(100).mul(new BN(10).pow(new BN(6)))
 
   const refs = setup(accounts)

@@ -1,10 +1,10 @@
 const BN = require("bn.js")
 const {USDC_WHALE} = require("../../config")
-const {eq, sub, frac} = require("../../util")
+const {eq} = require("../../util")
 const {getSnapshot} = require("./lib")
 const setup = require("./setup")
 
-contract("StrategyUsdcToCusd", (accounts) => {
+contract("StrategyUsdcToCusdMainnet", (accounts) => {
   const depositAmount = new BN(100).mul(new BN(10).pow(new BN(6)))
 
   const refs = setup(accounts)
@@ -32,7 +32,7 @@ contract("StrategyUsdcToCusd", (accounts) => {
     await strategy.deposit(depositAmount, {from: vault})
   })
 
-  it("should withdraw all", async () => {
+  it("should exit", async () => {
     const snapshot = getSnapshot({
       usdc,
       cUsd,
@@ -44,22 +44,14 @@ contract("StrategyUsdcToCusd", (accounts) => {
     })
 
     const before = await snapshot()
-    await strategy.withdrawAll({from: vault})
+    await strategy.exit({from: vault})
     const after = await snapshot()
 
-    // minimum amount of USDC that can be withdrawn
-    const minUsdc = frac(before.strategy.totalAssets, new BN(99), new BN(100))
-
-    // check balance of usdc transferred to treasury and vault
-    const usdcDiff = sub(after.usdc.vault, before.usdc.vault)
-
-    assert(usdcDiff.gte(minUsdc), "usdc diff")
-
-    // check strategy does not have any USDC
-    assert(eq(after.usdc.strategy, new BN(0)), "usdc strategy")
-    // check strategy does not have any cUSD dust
-    assert(eq(after.cUsd.strategy, new BN(0)), "cUsd strategy")
-    // check strategy does not have any cUSD in cGauge
+    assert(eq(after.strategy.totalAssets, new BN(0)), "strategy underlying balance")
     assert(eq(after.cGauge.strategy, new BN(0)), "cGauge strategy")
+    assert(eq(after.cUsd.strategy, new BN(0)), "cUsd strategy")
+    assert(eq(after.usdc.strategy, new BN(0)), "usdc strategy")
+    assert(eq(after.crv.strategy, new BN(0)), "crv strategy")
+    assert(after.usdc.vault.gte(before.usdc.vault), "usdc vault")
   })
 })
