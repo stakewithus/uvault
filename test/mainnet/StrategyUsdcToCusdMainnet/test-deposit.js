@@ -1,6 +1,6 @@
 const BN = require("bn.js")
 const {USDC_WHALE} = require("../../config")
-const {eq, sub, frac, USDC_TO_CUSD_DECIMALS} = require("../../util")
+const {eq, sub, frac, USDC_DECIMALS, USDC_TO_CUSD_DECIMALS} = require("../../util")
 const {getSnapshot} = require("./lib")
 const setup = require("./setup")
 
@@ -24,7 +24,7 @@ contract("StrategyUsdcToCusdMainnet", (accounts) => {
   })
 
   it("should deposit", async () => {
-    const amount = new BN(10).pow(new BN(6))
+    const amount = new BN(10).pow(USDC_DECIMALS)
 
     // transfer USDC to vault
     await usdc.transfer(vault, amount, {from: USDC_WHALE})
@@ -56,7 +56,6 @@ contract("StrategyUsdcToCusdMainnet", (accounts) => {
 
     // USDC transferred from vault to strategy
     assert(eq(after.usdc.vault, sub(before.usdc.vault, amount)), "usdc vault")
-
     assert(usdcDiff.gte(minUsdc), "min usdc")
     assert(cUsdDiff.gte(minCusd), "min cUsd")
   })

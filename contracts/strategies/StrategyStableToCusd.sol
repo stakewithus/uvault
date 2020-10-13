@@ -23,7 +23,7 @@ contract StrategyStableToCusd is IStrategy, BaseStrategy {
 
     address public underlying;
     // DAI = 0 | USDC = 1
-    uint8 private underlyingIndex;
+    uint256 private underlyingIndex;
 
     // Curve //
     // cDAI/cUSDC
@@ -53,7 +53,7 @@ contract StrategyStableToCusd is IStrategy, BaseStrategy {
         address _crv,
         address _uniswap,
         address _weth,
-        uint8 _underlyingIndex
+        uint256 _underlyingIndex
     ) public BaseStrategy(_controller, _vault) {
         underlying = _underlying;
         cUsd = _crvUnderlying;
@@ -78,10 +78,6 @@ contract StrategyStableToCusd is IStrategy, BaseStrategy {
         return _totalAssets();
     }
 
-    function _getLiquidityAmounts(uint _amount) internal view returns (uint[2] memory amounts) {
-        amounts[underlyingIndex] = _amount;
-    }
-
     /*
     @notice Deposits underlying to Gauge
     */
@@ -92,7 +88,9 @@ contract StrategyStableToCusd is IStrategy, BaseStrategy {
             IERC20(underlying).safeApprove(pool, 0);
             IERC20(underlying).safeApprove(pool, underlyingBal);
             // mint cUsd
-            DepositCompound(pool).add_liquidity(_getLiquidityAmounts(underlyingBal), 0);
+            uint[2] memory amounts;
+            amounts[underlyingIndex] = underlyingBal;
+            DepositCompound(pool).add_liquidity(amounts , 0);
         }
 
         // stake cUsd into Gauge
@@ -244,6 +242,6 @@ contract StrategyStableToCusd is IStrategy, BaseStrategy {
     function sweep(address _token) external onlyAdmin {
         require(_token != underlying, "token = underlying");
         require(_token != cUsd, "token = cUsd");
-        IERC20(_token).transfer(admin, IERC20(_token).balanceOf(address(this)));
+        IERC20(_token).safeTransfer(admin, IERC20(_token).balanceOf(address(this)));
     }
 }

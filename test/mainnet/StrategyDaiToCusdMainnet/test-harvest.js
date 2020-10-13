@@ -1,40 +1,40 @@
 const BN = require("bn.js")
-const {USDC_WHALE} = require("../../config")
-const {USDC_DECIMALS} = require("../../util")
+const {DAI_WHALE} = require("../../config")
+const {DAI_DECIMALS} = require('../../util')
 const {getSnapshot} = require("./lib")
 const setup = require("./setup")
 
-contract("StrategyUsdcToCusdMainnet", (accounts) => {
-  const depositAmount = new BN(100).mul(new BN(10).pow(USDC_DECIMALS))
+contract("StrategyDaiToCusdMainnet", (accounts) => {
+  const depositAmount = new BN(100).mul(new BN(10).pow(DAI_DECIMALS))
 
   const refs = setup(accounts)
   const {admin, vault, treasury} = refs
 
-  let usdc
+  let dai
   let cUsd
   let cGauge
   let crv
   let controller
   let strategy
   beforeEach(async () => {
-    usdc = refs.usdc
+    dai = refs.dai
     cUsd = refs.cUsd
     cGauge = refs.cGauge
     crv = refs.crv
     controller = refs.controller
     strategy = refs.strategy
 
-    // deposit USDC into vault
-    await usdc.transfer(vault, depositAmount, {from: USDC_WHALE})
+    // deposit dai into vault
+    await dai.transfer(vault, depositAmount, {from: DAI_WHALE})
 
-    // deposit USDC into strategy
-    await usdc.approve(strategy.address, depositAmount, {from: vault})
+    // deposit dai into strategy
+    await dai.approve(strategy.address, depositAmount, {from: vault})
     await strategy.deposit(depositAmount, {from: vault})
   })
 
   it("should harvest", async () => {
     const snapshot = getSnapshot({
-      usdc,
+      dai,
       cUsd,
       cGauge,
       crv,
@@ -48,7 +48,7 @@ contract("StrategyUsdcToCusdMainnet", (accounts) => {
     await controller.harvest(strategy.address, {from: admin})
     const after = await snapshot()
 
-    assert(after.usdc.treasury.gte(before.usdc.treasury), "usdc treasury")
+    assert(after.dai.treasury.gte(before.dai.treasury), "dai treasury")
     assert(
       after.strategy.totalAssets.gte(before.strategy.totalAssets),
       "strategy underlying balance"

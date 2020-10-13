@@ -1,40 +1,40 @@
 const BN = require("bn.js")
-const {USDC_WHALE} = require("../../config")
-const {eq, USDC_DECIMALS} = require("../../util")
+const {DAI_WHALE} = require("../../config")
+const {eq, DAI_DECIMALS} = require("../../util")
 const {getSnapshot} = require("./lib")
 const setup = require("./setup")
 
-contract("StrategyUsdcToCusdMainnet", (accounts) => {
-  const depositAmount = new BN(100).mul(new BN(10).pow(USDC_DECIMALS))
+contract("StrategyDaiToCusdMainnet", (accounts) => {
+  const depositAmount = new BN(100).mul(new BN(10).pow(DAI_DECIMALS))
 
   const refs = setup(accounts)
   const {vault, treasury} = refs
 
-  let usdc
+  let dai
   let cUsd
   let cGauge
   let crv
   let controller
   let strategy
   beforeEach(async () => {
-    usdc = refs.usdc
+    dai = refs.dai
     cUsd = refs.cUsd
     cGauge = refs.cGauge
     crv = refs.crv
     controller = refs.controller
     strategy = refs.strategy
 
-    // deposit USDC into vault
-    await usdc.transfer(vault, depositAmount, {from: USDC_WHALE})
+    // deposit dai into vault
+    await dai.transfer(vault, depositAmount, {from: DAI_WHALE})
 
-    // deposit USDC into strategy
-    await usdc.approve(strategy.address, depositAmount, {from: vault})
+    // deposit dai into strategy
+    await dai.approve(strategy.address, depositAmount, {from: vault})
     await strategy.deposit(depositAmount, {from: vault})
   })
 
   it("should exit", async () => {
     const snapshot = getSnapshot({
-      usdc,
+      dai,
       cUsd,
       cGauge,
       crv,
@@ -50,8 +50,8 @@ contract("StrategyUsdcToCusdMainnet", (accounts) => {
     assert(eq(after.strategy.totalAssets, new BN(0)), "strategy underlying balance")
     assert(eq(after.cGauge.strategy, new BN(0)), "cGauge strategy")
     assert(eq(after.cUsd.strategy, new BN(0)), "cUsd strategy")
-    assert(eq(after.usdc.strategy, new BN(0)), "usdc strategy")
+    assert(eq(after.dai.strategy, new BN(0)), "dai strategy")
     assert(eq(after.crv.strategy, new BN(0)), "crv strategy")
-    assert(after.usdc.vault.gte(before.usdc.vault), "usdc vault")
+    assert(after.dai.vault.gte(before.dai.vault), "dai vault")
   })
 })
