@@ -27,7 +27,7 @@ contract StrategyStableToCusd is IStrategy, BaseStrategy {
 
     // Curve //
     // cDAI/cUSDC
-    address private cUsd;
+    address private cUnderlying;
     // DepositCompound
     address private pool;
     // Gauge
@@ -46,7 +46,7 @@ contract StrategyStableToCusd is IStrategy, BaseStrategy {
         address _controller,
         address _vault,
         address _underlying,
-        address _cUsd,
+        address _cUnderlying,
         address _pool,
         address _gauge,
         address _minter,
@@ -56,7 +56,7 @@ contract StrategyStableToCusd is IStrategy, BaseStrategy {
         uint256 _underlyingIndex
     ) public BaseStrategy(_controller, _vault) {
         underlying = _underlying;
-        cUsd = _cUsd;
+        cUnderlying = _cUnderlying;
         pool = _pool;
         gauge = _gauge;
         minter = _minter;
@@ -82,23 +82,23 @@ contract StrategyStableToCusd is IStrategy, BaseStrategy {
     @notice Deposits underlying to Gauge
     */
     function _depositUnderlying() internal {
-        // underlying to cUsd
+        // underlying to cUnderlying
         uint underlyingBal = IERC20(underlying).balanceOf(address(this));
         if (underlyingBal > 0) {
             IERC20(underlying).safeApprove(pool, 0);
             IERC20(underlying).safeApprove(pool, underlyingBal);
-            // mint cUsd
+            // mint cUnderlying
             uint[2] memory amounts;
             amounts[underlyingIndex] = underlyingBal;
             DepositCompound(pool).add_liquidity(amounts , 0);
         }
 
-        // stake cUsd into Gauge
-        uint cUsdBal = IERC20(cUsd).balanceOf(address(this));
-        if (cUsdBal > 0) {
-            IERC20(cUsd).safeApprove(gauge, 0);
-            IERC20(cUsd).safeApprove(gauge, cUsdBal);
-            Gauge(gauge).deposit(cUsdBal);
+        // stake cUnderlying into Gauge
+        uint cBal = IERC20(cUnderlying).balanceOf(address(this));
+        if (cBal > 0) {
+            IERC20(cUnderlying).safeApprove(gauge, 0);
+            IERC20(cUnderlying).safeApprove(gauge, cBal);
+            Gauge(gauge).deposit(cBal);
         }
     }
 
@@ -114,15 +114,15 @@ contract StrategyStableToCusd is IStrategy, BaseStrategy {
     }
 
     function _withdrawUnderlying(uint _cUsdAmount) internal {
-        // withdraw cUsd from  Gauge
+        // withdraw cUnderlying from  Gauge
         Gauge(gauge).withdraw(_cUsdAmount);
 
         // withdraw underlying
-        uint cUsdBal = IERC20(cUsd).balanceOf(address(this));
-        IERC20(cUsd).safeApprove(pool, 0);
-        IERC20(cUsd).safeApprove(pool, cUsdBal);
-        // NOTE: creates cUsd dust so we donate it
-        DepositCompound(pool).remove_liquidity_one_coin(cUsdBal, int128(underlyingIndex), 0, true);
+        uint cBal = IERC20(cUnderlying).balanceOf(address(this));
+        IERC20(cUnderlying).safeApprove(pool, 0);
+        IERC20(cUnderlying).safeApprove(pool, cBal);
+        // NOTE: creates cUnderlying dust so we donate it
+        DepositCompound(pool).remove_liquidity_one_coin(cBal, int128(underlyingIndex), 0, true);
         // Now we have underlying
     }
 
@@ -136,12 +136,12 @@ contract StrategyStableToCusd is IStrategy, BaseStrategy {
         uint totalUnderlying = _totalAssets();
         require(_underlyingAmount <= totalUnderlying, "underlying > total");
 
-        // calculate cUsd amount to withdraw from underlying
+        // calculate cUnderlying amount to withdraw from underlying
         /*
         u = amount of underlying to withdraw
-        U = total underlying redeemable from cUsd in Gauge
-        c = amount of cUsd to withdraw
-        C = total amount of cUsd in Gauge
+        U = total underlying redeemable from cUnderlying in Gauge
+        c = amount of cUnderlying to withdraw
+        C = total amount of cUnderlying in Gauge
 
         u / U = c / C
         c = u / U * C
@@ -161,7 +161,7 @@ contract StrategyStableToCusd is IStrategy, BaseStrategy {
     }
 
     function _withdrawAll() internal {
-        // gauge balance is same unit as cUsd
+        // gauge balance is same unit as cUnderlying
         uint gaugeBal = Gauge(gauge).balanceOf(address(this));
         if (gaugeBal > 0) {
             _withdrawUnderlying(gaugeBal);
@@ -223,7 +223,7 @@ contract StrategyStableToCusd is IStrategy, BaseStrategy {
                 IERC20(underlying).safeTransfer(treasury, fee);
             }
 
-            // deposit remaining underlying for cUsd
+            // deposit remaining underlying for cUnderlying
             _depositUnderlying();
         }
     }
@@ -241,7 +241,7 @@ contract StrategyStableToCusd is IStrategy, BaseStrategy {
 
     function sweep(address _token) external onlyAdmin {
         require(_token != underlying, "token = underlying");
-        require(_token != cUsd, "token = cUsd");
+        require(_token != cUnderlying, "token = cUnderlying");
         IERC20(_token).safeTransfer(admin, IERC20(_token).balanceOf(address(this)));
     }
 }
