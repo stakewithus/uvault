@@ -1,4 +1,4 @@
-import BN  from "bn.js"
+import BN from "bn.js"
 
 export const ZERO_ADDRESS = "0x0000000000000000000000000000000000000000"
 

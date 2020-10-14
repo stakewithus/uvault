@@ -43,16 +43,16 @@ contract("Vault", (accounts) => {
     })
 
     it("should reject if not admin", async () => {
-      await chai.expect(vault.sweep(erc20.address, {from: accounts[1]})).to.be.rejectedWith(
-        "!admin"
-      )
+      await chai
+        .expect(vault.sweep(erc20.address, {from: accounts[1]}))
+        .to.be.rejectedWith("!admin")
     })
 
     it("should reject if token = vault.token", async () => {
       const token = await vault.token()
-      await chai.expect(vault.sweep(token, {from: admin})).to.be.rejectedWith(
-        "token = vault.token"
-      )
+      await chai
+        .expect(vault.sweep(token, {from: admin}))
+        .to.be.rejectedWith("token = vault.token")
     })
   })
 })

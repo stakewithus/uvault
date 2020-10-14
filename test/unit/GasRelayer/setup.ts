@@ -12,10 +12,10 @@ export default (accounts: Truffle.Accounts) => {
 
   // references to return
   interface Refs {
-    admin: string,
-    gasToken: MockGasTokenInstance,
-    gasRelayer: GasRelayerInstance,
-    txReceiver: TxReceiverInstance,
+    admin: string
+    gasToken: MockGasTokenInstance
+    gasRelayer: GasRelayerInstance
+    txReceiver: TxReceiverInstance
   }
   const refs: Refs = {
     admin,

@@ -1,6 +1,6 @@
 import chai from "chai"
 import {BaseStrategyInstance} from "../../../types/BaseStrategy"
-import { ZERO_ADDRESS } from "../../util"
+import {ZERO_ADDRESS} from "../../util"
 import _setup from "./setup"
 
 contract("BaseStrategy", (accounts) => {
@@ -20,15 +20,15 @@ contract("BaseStrategy", (accounts) => {
     })
 
     it("should reject if caller not admin", async () => {
-      await chai.expect(
-        strategy.setController(accounts[1], {from: accounts[1]})
-      ).to.be.rejectedWith("!admin")
+      await chai
+        .expect(strategy.setController(accounts[1], {from: accounts[1]}))
+        .to.be.rejectedWith("!admin")
     })
 
     it("should reject zero address", async () => {
-      await chai.expect(
-        strategy.setController(ZERO_ADDRESS, {from: admin})
-      ).to.be.rejectedWith("controller = zero address")
+      await chai
+        .expect(strategy.setController(ZERO_ADDRESS, {from: admin}))
+        .to.be.rejectedWith("controller = zero address")
     })
   })
 })

@@ -1,7 +1,7 @@
 import BN from "bn.js"
-import { sendEther } from "../../util"
-import { CRV } from "../config"
-import { Refs, StrategyContract } from "./lib"
+import {sendEther} from "../../util"
+import {CRV} from "../config"
+import {Refs, StrategyContract} from "./lib"
 
 const IERC20 = artifacts.require("IERC20")
 const Gauge = artifacts.require("Gauge")
@@ -10,13 +10,14 @@ const Controller = artifacts.require("Controller")
 export default (
   accounts: Truffle.Accounts,
   params: {
-    Strategy: StrategyContract,
-    underlying: string,
-    cUnderlying: string,
-    gauge: string,
+    Strategy: StrategyContract
+    underlying: string
+    cUnderlying: string
+    gauge: string
     whale: string
-  }) => {
-  const { Strategy, underlying, cUnderlying, gauge, whale } = params
+  }
+) => {
+  const {Strategy, underlying, cUnderlying, gauge, whale} = params
 
   const admin = accounts[0]
   const vault = accounts[1]

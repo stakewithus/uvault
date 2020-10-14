@@ -1,7 +1,7 @@
 import chai from "chai"
 import {ControllerInstance} from "../../../types/Controller"
 import {StrategyTestInstance} from "../../../types/StrategyTest"
-import { ZERO_ADDRESS } from "../../util"
+import {ZERO_ADDRESS} from "../../util"
 import _setup from "./setup"
 
 contract("Controller", (accounts) => {
@@ -23,15 +23,15 @@ contract("Controller", (accounts) => {
     })
 
     it("should reject if caller not admin", async () => {
-      await chai.expect(
-        controller.setTreasury(accounts[1], {from: accounts[1]})
-      ).to.be.rejectedWith("!admin")
+      await chai
+        .expect(controller.setTreasury(accounts[1], {from: accounts[1]}))
+        .to.be.rejectedWith("!admin")
     })
 
     it("should reject zero address", async () => {
-      await chai.expect(
-        controller.setTreasury(ZERO_ADDRESS, {from: admin})
-      ).to.be.rejectedWith("treasury = zero address")
+      await chai
+        .expect(controller.setTreasury(ZERO_ADDRESS, {from: admin}))
+        .to.be.rejectedWith("treasury = zero address")
     })
   })
 })

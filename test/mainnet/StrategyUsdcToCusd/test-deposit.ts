@@ -4,5 +4,5 @@ import test from "../StrategyStableToCurve/create-test-deposit"
 
 test("StrategyUsdcToCusd", _setup, {
   DECIMALS: USDC_DECIMALS,
-  UNDERLYING_TO_CURVE_DECIMALS: USDC_TO_CURVE_DECIMALS
+  UNDERLYING_TO_CURVE_DECIMALS: USDC_TO_CURVE_DECIMALS,
 })

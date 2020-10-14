@@ -17,13 +17,13 @@ export default (accounts: Truffle.Accounts) => {
 
   // references to return
   interface Refs {
-    admin: string,
-    treasury: string,
-    underlying: Erc20TokenInstance,
-    gasRelayer: string,
-    controller: ControllerInstance,
-    vault: MockVaultInstance,
-    strategy: StrategyTestInstance,
+    admin: string
+    treasury: string
+    underlying: Erc20TokenInstance
+    gasRelayer: string
+    controller: ControllerInstance
+    vault: MockVaultInstance
+    strategy: StrategyTestInstance
   }
 
   const refs: Refs = {

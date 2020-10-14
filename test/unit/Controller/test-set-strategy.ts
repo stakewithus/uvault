@@ -33,16 +33,19 @@ contract("Controller", (accounts) => {
     })
 
     it("should reject if caller not authorized", async () => {
-      await chai.expect(
-        controller.setStrategy(vault.address, strategy.address, {
-          from: accounts[1],
-        })
-      ).to.be.rejectedWith("!authorized")
+      await chai
+        .expect(
+          controller.setStrategy(vault.address, strategy.address, {
+            from: accounts[1],
+          })
+        )
+        .to.be.rejectedWith("!authorized")
     })
 
     it("should reject if vault does not exist", async () => {
-      await chai.expect(controller.setStrategy(accounts[1], strategy.address, {from: admin}))
-        .to.be.rejected
+      await chai.expect(
+        controller.setStrategy(accounts[1], strategy.address, {from: admin})
+      ).to.be.rejected
     })
   })
 })

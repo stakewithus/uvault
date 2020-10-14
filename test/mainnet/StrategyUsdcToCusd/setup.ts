@@ -9,6 +9,6 @@ export default (accounts: Truffle.Accounts) => {
     underlying: USDC,
     cUnderlying: CUSD,
     gauge: CGAUGE,
-    whale: USDC_WHALE
+    whale: USDC_WHALE,
   })
 }

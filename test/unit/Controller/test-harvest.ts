@@ -28,9 +28,9 @@ contract("Controller", (accounts) => {
     })
 
     it("should reject if caller not authorized", async () => {
-      await chai.expect(
-        controller.harvest(strategy.address, {from: accounts[1]})
-      ).to.be.rejectedWith("!authorized")
+      await chai
+        .expect(controller.harvest(strategy.address, {from: accounts[1]}))
+        .to.be.rejectedWith("!authorized")
     })
 
     it("should reject invalid strategy address", async () => {

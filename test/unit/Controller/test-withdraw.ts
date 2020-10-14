@@ -34,20 +34,20 @@ contract("Controller", (accounts) => {
 
     it("should reject if withdraw < min", async () => {
       const min = add(amount, 1)
-      await chai.expect(
-        controller.withdraw(strategy.address, amount, min, {from: admin})
-      ).to.be.rejectedWith("withdraw < min")
+      await chai
+        .expect(controller.withdraw(strategy.address, amount, min, {from: admin}))
+        .to.be.rejectedWith("withdraw < min")
     })
 
     it("should reject if caller not authorized", async () => {
-      await chai.expect(
-        controller.withdraw(strategy.address, amount, min, {from: accounts[1]})
-      ).to.be.rejectedWith("!authorized")
+      await chai
+        .expect(controller.withdraw(strategy.address, amount, min, {from: accounts[1]}))
+        .to.be.rejectedWith("!authorized")
     })
 
     it("should reject invalid strategy address", async () => {
-      await chai.expect(controller.withdraw(accounts[1], amount, min, {from: admin})).to.be
-        .rejected
+      await chai.expect(controller.withdraw(accounts[1], amount, min, {from: admin})).to
+        .be.rejected
     })
   })
 })

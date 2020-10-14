@@ -4,5 +4,5 @@ import test from "../StrategyStableToCurve/create-test-deposit"
 
 test("StrategyDaiTo3Crv", _setup, {
   DECIMALS: DAI_DECIMALS,
-  UNDERLYING_TO_CURVE_DECIMALS: DAI_TO_CURVE_DECIMALS
+  UNDERLYING_TO_CURVE_DECIMALS: DAI_TO_CURVE_DECIMALS,
 })

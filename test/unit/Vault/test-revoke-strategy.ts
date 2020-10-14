@@ -1,7 +1,7 @@
 import chai from "chai"
 import {Erc20TokenInstance} from "../../../types/Erc20Token"
 import {VaultInstance} from "../../../types/Vault"
-import { StrategyTestInstance } from "../../../types/StrategyTest"
+import {StrategyTestInstance} from "../../../types/StrategyTest"
 import _setup from "./setup"
 
 contract("Vault", (accounts) => {
@@ -32,9 +32,9 @@ contract("Vault", (accounts) => {
     })
 
     it("should reject if not admin", async () => {
-      await chai.expect(
-        vault.revokeStrategy(strategy.address, {from: accounts[1]})
-      ).to.be.rejectedWith("!admin")
+      await chai
+        .expect(vault.revokeStrategy(strategy.address, {from: accounts[1]}))
+        .to.be.rejectedWith("!admin")
     })
   })
 })

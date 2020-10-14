@@ -3,7 +3,7 @@ import BN from "bn.js"
 import {Erc20TokenInstance} from "../../../types/Erc20Token"
 import {VaultInstance} from "../../../types/Vault"
 import {MockControllerInstance} from "../../../types/MockController"
-import { StrategyTestInstance } from "../../../types/StrategyTest"
+import {StrategyTestInstance} from "../../../types/StrategyTest"
 import {ZERO_ADDRESS, eq, pow} from "../../util"
 import _setup from "./setup"
 
@@ -78,9 +78,9 @@ contract("Vault", (accounts) => {
       const vault = await Vault.new(controller.address, erc20.address, MIN_WAIT_TIME)
       assert.equal(await vault.strategy(), ZERO_ADDRESS, "strategy")
 
-      await chai.expect(vault.invest({from: admin})).to.be.rejectedWith(
-        "strategy = zero address"
-      )
+      await chai
+        .expect(vault.invest({from: admin}))
+        .to.be.rejectedWith("strategy = zero address")
     })
   })
 })

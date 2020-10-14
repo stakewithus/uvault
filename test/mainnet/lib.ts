@@ -50,7 +50,12 @@ export function encodeHarvest(web3: Web3, strategy: string): string {
   )
 }
 
-export function encodeWithdraw(web3: Web3, strategy: string, amount: BN, min: BN): string {
+export function encodeWithdraw(
+  web3: Web3,
+  strategy: string,
+  amount: BN,
+  min: BN
+): string {
   return web3.eth.abi.encodeFunctionCall(
     {
       name: "withdraw",

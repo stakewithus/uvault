@@ -55,19 +55,23 @@ contract("GasRelayer", (accounts) => {
     })
 
     it("should reject if caller not admin", async () => {
-      await chai.expect(
-        gasRelayer.relayTx(txReceiver.address, data, maxGasToken, {
-          from: accounts[1],
-        })
-      ).to.be.rejectedWith("!admin")
+      await chai
+        .expect(
+          gasRelayer.relayTx(txReceiver.address, data, maxGasToken, {
+            from: accounts[1],
+          })
+        )
+        .to.be.rejectedWith("!admin")
     })
 
     it("should reject if tx failed", async () => {
       await txReceiver._setFail_(true)
 
-      await chai.expect(
-        gasRelayer.relayTx(txReceiver.address, data, maxGasToken, {from: admin})
-      ).to.be.rejectedWith("failed")
+      await chai
+        .expect(
+          gasRelayer.relayTx(txReceiver.address, data, maxGasToken, {from: admin})
+        )
+        .to.be.rejectedWith("failed")
     })
   })
 })

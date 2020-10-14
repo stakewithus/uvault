@@ -27,15 +27,15 @@ contract("Vault", (accounts) => {
     })
 
     it("should reject if caller not admin", async () => {
-      await chai.expect(vault.setWithdrawMin(123, {from: accounts[1]})).to.be.rejectedWith(
-        "!admin"
-      )
+      await chai
+        .expect(vault.setWithdrawMin(123, {from: accounts[1]}))
+        .to.be.rejectedWith("!admin")
     })
 
     it("should reject min > max", async () => {
-      await chai.expect(vault.setWithdrawMin(10001, {from: admin})).to.be.rejectedWith(
-        "withdraw min > max"
-      )
+      await chai
+        .expect(vault.setWithdrawMin(10001, {from: admin}))
+        .to.be.rejectedWith("withdraw min > max")
     })
   })
 })

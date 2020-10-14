@@ -1,11 +1,11 @@
 import "../setup"
 import BN from "bn.js"
-import {Ierc20Instance } from "../../types/Ierc20"
+import {Ierc20Instance} from "../../types/Ierc20"
 import {GasTokenInstance} from "../../types/GasToken"
-import {GasRelayerInstance } from "../../types/GasRelayer"
-import {ControllerInstance } from "../../types/Controller"
-import {VaultInstance } from "../../types/Vault"
-import {StrategyTestInstance } from "../../types/StrategyTest"
+import {GasRelayerInstance} from "../../types/GasRelayer"
+import {ControllerInstance} from "../../types/Controller"
+import {VaultInstance} from "../../types/Vault"
+import {StrategyTestInstance} from "../../types/StrategyTest"
 import {USDC, USDC_WHALE, CHI} from "./config"
 import {sendEther, USDC_DECIMALS, pow} from "../util"
 
@@ -27,17 +27,17 @@ export default (accounts: Truffle.Accounts) => {
 
   // references to return
   interface Refs {
-    admin: string,
-    treasury: string,
-    gasToken: GasTokenInstance,
-    gasRelayer: GasRelayerInstance,
-    controller: ControllerInstance,
-    vault: VaultInstance,
-    strategy: StrategyTestInstance,
-    underlying: Ierc20Instance,
-    whale: string,
-    UNDERLYING_DECIMALS: BN,
-    MIN_WAIT_TIME: number,
+    admin: string
+    treasury: string
+    gasToken: GasTokenInstance
+    gasRelayer: GasRelayerInstance
+    controller: ControllerInstance
+    vault: VaultInstance
+    strategy: StrategyTestInstance
+    underlying: Ierc20Instance
+    whale: string
+    UNDERLYING_DECIMALS: BN
+    MIN_WAIT_TIME: number
   }
 
   const refs: Refs = {

@@ -3,7 +3,7 @@ import BN from "bn.js"
 import {Erc20TokenInstance} from "../../../types/Erc20Token"
 import {VaultInstance} from "../../../types/Vault"
 import {MockControllerInstance} from "../../../types/MockController"
-import { StrategyTestInstance } from "../../../types/StrategyTest"
+import {StrategyTestInstance} from "../../../types/StrategyTest"
 import {ZERO_ADDRESS, eq, getBlockTimestamp} from "../../util"
 import _setup from "./setup"
 
@@ -64,23 +64,23 @@ contract("Vault", (accounts) => {
     })
 
     it("should reject if not admin", async () => {
-      await chai.expect(
-        vault.setNextStrategy(strategy.address, {from: accounts[1]})
-      ).to.be.rejectedWith("!admin")
+      await chai
+        .expect(vault.setNextStrategy(strategy.address, {from: accounts[1]}))
+        .to.be.rejectedWith("!admin")
     })
 
     it("should reject zero address", async () => {
-      await chai.expect(
-        vault.setNextStrategy(ZERO_ADDRESS, {from: accounts[1]})
-      ).to.be.rejectedWith("!admin")
+      await chai
+        .expect(vault.setNextStrategy(ZERO_ADDRESS, {from: accounts[1]}))
+        .to.be.rejectedWith("!admin")
     })
 
     it("should reject same strategy", async () => {
       await vault.setNextStrategy(strategy.address, {from: admin})
 
-      await chai.expect(
-        vault.setNextStrategy(strategy.address, {from: admin})
-      ).to.be.rejectedWith("same next strategy")
+      await chai
+        .expect(vault.setNextStrategy(strategy.address, {from: admin}))
+        .to.be.rejectedWith("same next strategy")
     })
   })
 })

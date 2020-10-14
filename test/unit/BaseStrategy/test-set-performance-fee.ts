@@ -1,7 +1,7 @@
 import chai from "chai"
 import BN from "bn.js"
 import {BaseStrategyInstance} from "../../../types/BaseStrategy"
-import { eq } from "../../util"
+import {eq} from "../../util"
 import _setup from "./setup"
 
 contract("BaseStrategy", (accounts) => {
@@ -23,15 +23,15 @@ contract("BaseStrategy", (accounts) => {
     })
 
     it("should reject if caller not admin", async () => {
-      await chai.expect(
-        strategy.setPerformanceFee(fee, {from: accounts[1]})
-      ).to.be.rejectedWith("!admin")
+      await chai
+        .expect(strategy.setPerformanceFee(fee, {from: accounts[1]}))
+        .to.be.rejectedWith("!admin")
     })
 
     it("should reject fee > max", async () => {
-      await chai.expect(strategy.setPerformanceFee(10001, {from: admin})).to.be.rejectedWith(
-        "performance fee > max"
-      )
+      await chai
+        .expect(strategy.setPerformanceFee(10001, {from: admin}))
+        .to.be.rejectedWith("performance fee > max")
     })
   })
 })

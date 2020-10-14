@@ -4,7 +4,7 @@ import {Erc20TokenInstance} from "../../types/Erc20Token"
 import {ControllerInstance} from "../../types/Controller"
 import {VaultInstance} from "../../types/Vault"
 import {StrategyTestInstance} from "../../types/StrategyTest"
-import {eq, add } from "../util"
+import {eq, add} from "../util"
 import _setup from "./setup"
 
 const StrategyTest = artifacts.require("StrategyTest")
@@ -73,10 +73,12 @@ contract("integration", (accounts) => {
   })
 
   it("should reject if not authorized", async () => {
-    await chai.expect(
-      controller.setStrategy(vault.address, newStrategy.address, {
-        from: accounts[1],
-      })
-    ).to.be.rejectedWith("!authorized")
+    await chai
+      .expect(
+        controller.setStrategy(vault.address, newStrategy.address, {
+          from: accounts[1],
+        })
+      )
+      .to.be.rejectedWith("!authorized")
   })
 })

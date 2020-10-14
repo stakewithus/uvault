@@ -3,7 +3,7 @@ import {Erc20TokenInstance} from "../../types/Erc20Token"
 import {ControllerInstance} from "../../types/Controller"
 import {VaultInstance} from "../../types/Vault"
 import {StrategyTestInstance} from "../../types/StrategyTest"
-import {eq, sub, ZERO_ADDRESS } from "../util"
+import {eq, sub, ZERO_ADDRESS} from "../util"
 import _setup from "./setup"
 
 const Vault = artifacts.require("Vault")
@@ -52,17 +52,17 @@ contract("integration", (accounts) => {
   })
 
   it("should reject if not authorized", async () => {
-    await chai.expect(
-      controller.invest(vault.address, {from: accounts[1]})
-    ).to.be.rejectedWith("!authorized")
+    await chai
+      .expect(controller.invest(vault.address, {from: accounts[1]}))
+      .to.be.rejectedWith("!authorized")
   })
 
   it("should reject if strategy not set", async () => {
     const vault = await Vault.new(controller.address, underlying.address, 0)
     assert.equal(await vault.strategy(), ZERO_ADDRESS, "strategy")
 
-    await chai.expect(controller.invest(vault.address, {from: admin})).to.be.rejectedWith(
-      "strategy = zero address"
-    )
+    await chai
+      .expect(controller.invest(vault.address, {from: admin}))
+      .to.be.rejectedWith("strategy = zero address")
   })
 })

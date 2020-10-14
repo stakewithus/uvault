@@ -64,7 +64,9 @@ contract("Vault", (accounts) => {
 
     it("should reject if paused", async () => {
       await vault.pause({from: admin})
-      await chai.expect(vault.deposit(amount, {from: sender})).to.be.rejectedWith("paused")
+      await chai
+        .expect(vault.deposit(amount, {from: sender}))
+        .to.be.rejectedWith("paused")
     })
 
     it("should deposit when total supply > 0", async () => {
@@ -102,7 +104,9 @@ contract("Vault", (accounts) => {
     })
 
     it("should reject if amount = 0", async () => {
-      await chai.expect(vault.deposit(0, {from: sender})).to.be.rejectedWith("amount = 0")
+      await chai
+        .expect(vault.deposit(0, {from: sender}))
+        .to.be.rejectedWith("amount = 0")
     })
   })
 })

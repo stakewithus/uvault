@@ -3,7 +3,6 @@ import {Erc20TokenInstance} from "../../../types/Erc20Token"
 import {VaultInstance} from "../../../types/Vault"
 import _setup from "./setup"
 
-
 contract("Vault", (accounts) => {
   const MIN_WAIT_TIME = 0
 

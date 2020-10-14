@@ -25,15 +25,15 @@ contract("Vault", (accounts) => {
     })
 
     it("should reject if caller not controller", async () => {
-      await chai.expect(
-        vault.setController(accounts[1], {from: accounts[1]})
-      ).to.be.rejectedWith("!admin")
+      await chai
+        .expect(vault.setController(accounts[1], {from: accounts[1]}))
+        .to.be.rejectedWith("!admin")
     })
 
     it("should reject zero address", async () => {
-      await chai.expect(vault.setController(ZERO_ADDRESS, {from: admin})).to.be.rejectedWith(
-        "controller = zero address"
-      )
+      await chai
+        .expect(vault.setController(ZERO_ADDRESS, {from: admin}))
+        .to.be.rejectedWith("controller = zero address")
     })
   })
 })

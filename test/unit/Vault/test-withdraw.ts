@@ -2,7 +2,7 @@ import chai from "chai"
 import BN from "bn.js"
 import {Erc20TokenInstance} from "../../../types/Erc20Token"
 import {VaultInstance} from "../../../types/Vault"
-import { StrategyTestInstance } from "../../../types/StrategyTest"
+import {StrategyTestInstance} from "../../../types/StrategyTest"
 import {eq, frac, sub, add, pow} from "../../util"
 import _setup from "./setup"
 
@@ -124,9 +124,9 @@ contract("Vault", (accounts) => {
     it("should reject if returned amount < min", async () => {
       const min = add(amount, 1)
 
-      await chai.expect(vault.withdraw(amount, min, {from: sender})).to.be.rejectedWith(
-        "withdraw < min"
-      )
+      await chai
+        .expect(vault.withdraw(amount, min, {from: sender}))
+        .to.be.rejectedWith("withdraw < min")
     })
 
     it("should reject if balance = 0", async () => {
@@ -137,9 +137,9 @@ contract("Vault", (accounts) => {
     })
 
     it("should reject if amount = 0", async () => {
-      await chai.expect(vault.withdraw(0, 0, {from: sender})).to.be.rejectedWith(
-        "shares = 0"
-      )
+      await chai
+        .expect(vault.withdraw(0, 0, {from: sender}))
+        .to.be.rejectedWith("shares = 0")
     })
   })
 })

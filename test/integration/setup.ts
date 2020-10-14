@@ -6,7 +6,7 @@ import {GasRelayerInstance} from "../../types/GasRelayer"
 import {ControllerInstance} from "../../types/Controller"
 import {VaultInstance} from "../../types/Vault"
 import {StrategyTestInstance} from "../../types/StrategyTest"
-import { pow} from "../util"
+import {pow} from "../util"
 
 const ERC20Token = artifacts.require("ERC20Token")
 const MockGasToken = artifacts.require("MockGasToken")
@@ -24,16 +24,16 @@ export default (accounts: Truffle.Accounts) => {
 
   // references to return
   interface Refs {
-    admin: string,
-    treasury: string,
-    underlying: Erc20TokenInstance,
-    gasToken: MockGasTokenInstance,
-    gasRelayer: GasRelayerInstance,
-    controller: ControllerInstance,
-    vault: VaultInstance,
-    strategy: StrategyTestInstance,
-    MIN_WAIT_TIME: number,
-    whale: string,
+    admin: string
+    treasury: string
+    underlying: Erc20TokenInstance
+    gasToken: MockGasTokenInstance
+    gasRelayer: GasRelayerInstance
+    controller: ControllerInstance
+    vault: VaultInstance
+    strategy: StrategyTestInstance
+    MIN_WAIT_TIME: number
+    whale: string
   }
 
   const refs: Refs = {

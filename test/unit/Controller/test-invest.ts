@@ -1,5 +1,5 @@
 import chai from "chai"
-import { MockVaultInstance } from "../../../types"
+import {MockVaultInstance} from "../../../types"
 import {ControllerInstance} from "../../../types/Controller"
 import _setup from "./setup"
 
@@ -28,9 +28,9 @@ contract("Controller", (accounts) => {
     })
 
     it("should reject if caller not authorized", async () => {
-      await chai.expect(
-        controller.invest(vault.address, {from: accounts[1]})
-      ).to.be.rejectedWith("!authorized")
+      await chai
+        .expect(controller.invest(vault.address, {from: accounts[1]}))
+        .to.be.rejectedWith("!authorized")
     })
 
     it("should reject invalid vault address", async () => {

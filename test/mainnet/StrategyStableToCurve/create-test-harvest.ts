@@ -1,14 +1,14 @@
 import BN from "bn.js"
-import { Ierc20Instance } from "../../../types/Ierc20"
-import { ControllerInstance } from "../../../types/Controller"
-import { GaugeInstance } from "../../../types/Gauge"
-import { StrategyInstance } from "./lib"
-import { pow } from "../../util"
+import {Ierc20Instance} from "../../../types/Ierc20"
+import {ControllerInstance} from "../../../types/Controller"
+import {GaugeInstance} from "../../../types/Gauge"
+import {StrategyInstance} from "./lib"
+import {pow} from "../../util"
 import {Setup, getSnapshot} from "./lib"
 
-export default (name: string, _setup: Setup, params: { DECIMALS: BN }) => {
+export default (name: string, _setup: Setup, params: {DECIMALS: BN}) => {
   contract(name, (accounts) => {
-    const { DECIMALS } = params
+    const {DECIMALS} = params
     const depositAmount = pow(10, DECIMALS).mul(new BN(100))
 
     const refs = _setup(accounts)
@@ -51,7 +51,10 @@ export default (name: string, _setup: Setup, params: { DECIMALS: BN }) => {
       await controller.harvest(strategy.address, {from: admin})
       const after = await snapshot()
 
-      assert(after.underlying.treasury.gte(before.underlying.treasury), "underlying treasury")
+      assert(
+        after.underlying.treasury.gte(before.underlying.treasury),
+        "underlying treasury"
+      )
       assert(
         after.strategy.totalAssets.gte(before.strategy.totalAssets),
         "strategy underlying balance"

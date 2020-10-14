@@ -1,17 +1,21 @@
 import BN from "bn.js"
-import { Ierc20Instance } from "../../../types/Ierc20"
-import { ControllerInstance } from "../../../types/Controller"
-import { GaugeInstance } from "../../../types/Gauge"
-import { StrategyInstance } from "./lib"
-import {eq, sub, frac, pow } from "../../util"
+import {Ierc20Instance} from "../../../types/Ierc20"
+import {ControllerInstance} from "../../../types/Controller"
+import {GaugeInstance} from "../../../types/Gauge"
+import {StrategyInstance} from "./lib"
+import {eq, sub, frac, pow} from "../../util"
 import {Setup, getSnapshot} from "./lib"
 
-export default (name: string, _setup: Setup, params: { DECIMALS: BN, UNDERLYING_TO_CURVE_DECIMALS: BN }) => {
+export default (
+  name: string,
+  _setup: Setup,
+  params: {DECIMALS: BN; UNDERLYING_TO_CURVE_DECIMALS: BN}
+) => {
   contract(name, (accounts) => {
     const refs = _setup(accounts)
     const {vault, treasury, whale} = refs
 
-    const { DECIMALS, UNDERLYING_TO_CURVE_DECIMALS } = params
+    const {DECIMALS, UNDERLYING_TO_CURVE_DECIMALS} = params
 
     let underlying: Ierc20Instance
     let cUnderlying: Ierc20Instance
@@ -57,10 +61,16 @@ export default (name: string, _setup: Setup, params: { DECIMALS: BN, UNDERLYING_
       const minC = frac(depositAmount.mul(UNDERLYING_TO_CURVE_DECIMALS), 95, 100)
 
       const gaugeDiff = sub(after.gauge.strategy, before.gauge.strategy)
-      const underlyingDiff = sub(after.strategy.totalAssets, before.strategy.totalAssets)
+      const underlyingDiff = sub(
+        after.strategy.totalAssets,
+        before.strategy.totalAssets
+      )
 
       // underlying transferred from vault to strategy
-      assert(eq(after.underlying.vault, sub(before.underlying.vault, depositAmount)), "underlying vault")
+      assert(
+        eq(after.underlying.vault, sub(before.underlying.vault, depositAmount)),
+        "underlying vault"
+      )
       assert(underlyingDiff.gte(minUnderlying), "min underlying")
       assert(gaugeDiff.gte(minC), "min gauge")
     })

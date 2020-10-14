@@ -32,15 +32,15 @@ contract("Controller", (accounts) => {
       const bal = await strategy.totalAssets()
       const min = add(bal, 1)
 
-      await chai.expect(
-        controller.exit(strategy.address, min, {from: admin})
-      ).to.be.rejectedWith("withdraw < min")
+      await chai
+        .expect(controller.exit(strategy.address, min, {from: admin}))
+        .to.be.rejectedWith("withdraw < min")
     })
 
     it("should reject if caller not authorized", async () => {
-      await chai.expect(
-        controller.exit(strategy.address, 0, {from: accounts[1]})
-      ).to.be.rejectedWith("!authorized")
+      await chai
+        .expect(controller.exit(strategy.address, 0, {from: accounts[1]}))
+        .to.be.rejectedWith("!authorized")
     })
 
     it("should reject invalid strategy address", async () => {

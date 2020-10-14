@@ -20,15 +20,15 @@ contract("GasRelayer", (accounts) => {
     })
 
     it("should reject if caller not admin", async () => {
-      await chai.expect(
-        gasRelayer.setGasToken(accounts[1], {from: accounts[1]})
-      ).to.be.rejectedWith("!admin")
+      await chai
+        .expect(gasRelayer.setGasToken(accounts[1], {from: accounts[1]}))
+        .to.be.rejectedWith("!admin")
     })
 
     it("should reject zero address", async () => {
-      await chai.expect(
-        gasRelayer.setGasToken(ZERO_ADDRESS, {from: admin})
-      ).to.be.rejectedWith("gas token = zero address")
+      await chai
+        .expect(gasRelayer.setGasToken(ZERO_ADDRESS, {from: admin}))
+        .to.be.rejectedWith("gas token = zero address")
     })
   })
 })

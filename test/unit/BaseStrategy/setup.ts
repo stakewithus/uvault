@@ -15,8 +15,8 @@ export default (accounts: Truffle.Accounts) => {
 
   // references to return
   interface Refs {
-    admin: string,
-    treasury: string,
+    admin: string
+    treasury: string
     erc20: Erc20TokenInstance
     controller: MockControllerInstance
     vault: MockVaultInstance
@@ -33,7 +33,7 @@ export default (accounts: Truffle.Accounts) => {
     // @ts-ignore
     vault: null,
     // @ts-ignore
-    strategy: null
+    strategy: null,
   }
 
   beforeEach(async () => {

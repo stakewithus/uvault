@@ -1,6 +1,6 @@
 import {DAI_DECIMALS} from "../../util"
 import _setup from "./setup"
-import test  from "../StrategyStableToCurve/create-test-harvest"
+import test from "../StrategyStableToCurve/create-test-harvest"
 
 test("StrategyDaiToCusd", _setup, {
   DECIMALS: DAI_DECIMALS,
