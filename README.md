@@ -80,7 +80,7 @@ slither . --print vars-and-auth
 ### Deploy
 
 ```shell
-env $(cat .env) npx buidler run scripts/script-to-run.js --network ropsten
+env $(cat .env) npx buidler run scripts/script-to-run.ts --network ropsten
 ```
 
 ##### Deployed Contracts
