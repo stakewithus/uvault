@@ -1,12 +1,14 @@
-const {expect} = require("../../setup")
-const setup = require("./setup")
+import chai from "chai"
+import {ControllerInstance} from "../../../types/Controller"
+import {StrategyTestInstance} from "../../../types/StrategyTest"
+import _setup from "./setup"
 
 contract("Controller", (accounts) => {
-  const refs = setup(accounts)
+  const refs = _setup(accounts)
   const {admin, gasRelayer} = refs
 
-  let controller
-  let strategy
+  let controller: ControllerInstance
+  let strategy: StrategyTestInstance
   beforeEach(() => {
     controller = refs.controller
     strategy = refs.strategy
@@ -26,13 +28,13 @@ contract("Controller", (accounts) => {
     })
 
     it("should reject if caller not authorized", async () => {
-      await expect(
+      await chai.expect(
         controller.harvest(strategy.address, {from: accounts[1]})
       ).to.be.rejectedWith("!authorized")
     })
 
     it("should reject invalid strategy address", async () => {
-      await expect(controller.harvest(accounts[1], {from: admin})).to.be.rejected
+      await chai.expect(controller.harvest(accounts[1], {from: admin})).to.be.rejected
     })
   })
 })

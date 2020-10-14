@@ -1,13 +1,16 @@
-const {expect} = require("../../setup")
-const {ZERO_ADDRESS} = require("../../util")
-const setup = require("./setup")
+import chai from "chai"
+import {ControllerInstance} from "../../../types/Controller"
+import {StrategyTestInstance} from "../../../types/StrategyTest"
+import {ZERO_ADDRESS} from "../../util"
+import _setup from "./setup"
+
 
 contract("Controller", (accounts) => {
-  const refs = setup(accounts)
+  const refs = _setup(accounts)
   const {admin} = refs
 
-  let controller
-  let strategy
+  let controller: ControllerInstance
+  let strategy: StrategyTestInstance
   beforeEach(() => {
     controller = refs.controller
     strategy = refs.strategy
@@ -21,13 +24,13 @@ contract("Controller", (accounts) => {
     })
 
     it("should reject if caller not admin", async () => {
-      await expect(
+      await chai.expect(
         controller.setAdmin(accounts[1], {from: accounts[1]})
       ).to.be.rejectedWith("!admin")
     })
 
     it("should reject zero address", async () => {
-      await expect(controller.setAdmin(ZERO_ADDRESS, {from: admin})).to.be.rejectedWith(
+      await chai.expect(controller.setAdmin(ZERO_ADDRESS, {from: admin})).to.be.rejectedWith(
         "admin = zero address"
       )
     })

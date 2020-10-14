@@ -1,5 +1,5 @@
 const BN = require("bn.js")
-const {expect} = require("../setup")
+const {chai.expect} = require("../setup")
 const {eq, add} = require("../util")
 const setup = require("./setup")
 
@@ -69,7 +69,7 @@ contract("integration", (accounts) => {
   })
 
   it("should reject if not authorized", async () => {
-    await expect(
+    await chai.expect(
       controller.setStrategy(vault.address, newStrategy.address, {
         from: accounts[1],
       })

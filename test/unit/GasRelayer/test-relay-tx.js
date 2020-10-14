@@ -1,6 +1,6 @@
 const setup = require("./setup")
 const BN = require("bn.js")
-const {expect} = require("../../setup")
+const {chai.expect} = require("../../setup")
 const {eq} = require("../../util")
 
 function encode(web3, data) {
@@ -52,7 +52,7 @@ contract("GasRelayer", (accounts) => {
     })
 
     it("should reject if caller not admin", async () => {
-      await expect(
+      await chai.expect(
         gasRelayer.relayTx(txReceiver.address, data, maxGasToken, {
           from: accounts[1],
         })
@@ -62,7 +62,7 @@ contract("GasRelayer", (accounts) => {
     it("should reject if tx failed", async () => {
       await txReceiver._setFail_(true)
 
-      await expect(
+      await chai.expect(
         gasRelayer.relayTx(txReceiver.address, data, maxGasToken, {from: admin})
       ).to.be.rejectedWith("failed")
     })

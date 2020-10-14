@@ -1,6 +1,6 @@
 const BN = require("bn.js")
 const {assert} = require("chai")
-const {expect} = require("../../setup")
+const {chai.expect} = require("../../setup")
 const {ZERO_ADDRESS, eq, frac} = require("../../util")
 const setup = require("./setup")
 
@@ -59,23 +59,23 @@ contract("Vault", (accounts) => {
 
     it("should reject if available = 0", async () => {
       await vault.invest({from: admin})
-      await expect(vault.invest({from: admin})).to.be.rejectedWith("available = 0")
+      await chai.expect(vault.invest({from: admin})).to.be.rejectedWith("available = 0")
     })
 
     it("should reject if not authorized", async () => {
-      await expect(vault.invest({from: user})).to.be.rejectedWith("!authorized")
+      await chai.expect(vault.invest({from: user})).to.be.rejectedWith("!authorized")
     })
 
     it("should reject if paused", async () => {
       await vault.pause({from: admin})
-      await expect(vault.invest({from: admin})).to.be.rejectedWith("paused")
+      await chai.expect(vault.invest({from: admin})).to.be.rejectedWith("paused")
     })
 
     it("should reject if strategy not set", async () => {
       const vault = await Vault.new(controller.address, erc20.address, MIN_WAIT_TIME)
       assert.equal(await vault.strategy(), ZERO_ADDRESS, "strategy")
 
-      await expect(vault.invest({from: admin})).to.be.rejectedWith(
+      await chai.expect(vault.invest({from: admin})).to.be.rejectedWith(
         "strategy = zero address"
       )
     })

@@ -1,5 +1,5 @@
 const BN = require("bn.js")
-const {expect} = require("../../setup")
+const {chai.expect} = require("../../setup")
 const {eq, add, sub, frac} = require("../../util")
 const setup = require("./setup")
 
@@ -41,14 +41,14 @@ contract("Vault", (accounts) => {
     })
 
     it("should reject if not admin", async () => {
-      await expect(vault.sweep(erc20.address, {from: accounts[1]})).to.be.rejectedWith(
+      await chai.expect(vault.sweep(erc20.address, {from: accounts[1]})).to.be.rejectedWith(
         "!admin"
       )
     })
 
     it("should reject if token = vault.token", async () => {
       const token = await vault.token()
-      await expect(vault.sweep(token, {from: admin})).to.be.rejectedWith(
+      await chai.expect(vault.sweep(token, {from: admin})).to.be.rejectedWith(
         "token = vault.token"
       )
     })

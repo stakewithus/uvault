@@ -1,14 +1,16 @@
-const {expect} = require("../../setup")
-const {eq} = require("../../util")
-const setup = require("./setup")
-const BN = require("bn.js")
+import BN from "bn.js"
+import chai from "chai"
+import {ControllerInstance} from "../../../types/Controller"
+import {StrategyTestInstance} from "../../../types/StrategyTest"
+import {eq, add} from "../../util"
+import _setup from "./setup"
 
 contract("Controller", (accounts) => {
-  const refs = setup(accounts)
+  const refs = _setup(accounts)
   const {admin, gasRelayer} = refs
 
-  let controller
-  let strategy
+  let controller: ControllerInstance
+  let strategy: StrategyTestInstance
   beforeEach(() => {
     controller = refs.controller
     strategy = refs.strategy
@@ -31,20 +33,20 @@ contract("Controller", (accounts) => {
     })
 
     it("should reject if withdraw < min", async () => {
-      const min = amount.add(new BN(1))
-      await expect(
+      const min = add(amount, 1)
+      await chai.expect(
         controller.withdraw(strategy.address, amount, min, {from: admin})
       ).to.be.rejectedWith("withdraw < min")
     })
 
     it("should reject if caller not authorized", async () => {
-      await expect(
+      await chai.expect(
         controller.withdraw(strategy.address, amount, min, {from: accounts[1]})
       ).to.be.rejectedWith("!authorized")
     })
 
     it("should reject invalid strategy address", async () => {
-      await expect(controller.withdraw(accounts[1], amount, min, {from: admin})).to.be
+      await chai.expect(controller.withdraw(accounts[1], amount, min, {from: admin})).to.be
         .rejected
     })
   })

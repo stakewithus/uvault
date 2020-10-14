@@ -1,4 +1,4 @@
-const {expect} = require("../../setup")
+const {chai.expect} = require("../../setup")
 const {ZERO_ADDRESS} = require("../../util")
 const setup = require("./setup")
 
@@ -26,12 +26,12 @@ contract("Vault", (accounts) => {
     })
 
     it("should reject if caller not admin", async () => {
-      await expect(vault.unpause({from: accounts[1]})).to.be.rejectedWith("!admin")
+      await chai.expect(vault.unpause({from: accounts[1]})).to.be.rejectedWith("!admin")
     })
 
     it("should reject if not paused", async () => {
       await vault.unpause({from: admin})
-      await expect(vault.unpause({from: admin})).to.be.rejectedWith("!paused")
+      await chai.expect(vault.unpause({from: admin})).to.be.rejectedWith("!paused")
     })
   })
 })

@@ -1,5 +1,5 @@
 const BN = require("bn.js")
-const {expect} = require("../../setup")
+const {chai.expect} = require("../../setup")
 const {eq, add, sub} = require("../../util")
 const setup = require("./setup")
 
@@ -62,7 +62,7 @@ contract("Vault", (accounts) => {
 
     it("should reject if paused", async () => {
       await vault.pause({from: admin})
-      await expect(vault.deposit(amount, {from: sender})).to.be.rejectedWith("paused")
+      await chai.expect(vault.deposit(amount, {from: sender})).to.be.rejectedWith("paused")
     })
 
     it("should deposit when total supply > 0", async () => {
@@ -100,7 +100,7 @@ contract("Vault", (accounts) => {
     })
 
     it("should reject if amount = 0", async () => {
-      await expect(vault.deposit(0, {from: sender})).to.be.rejectedWith("amount = 0")
+      await chai.expect(vault.deposit(0, {from: sender})).to.be.rejectedWith("amount = 0")
     })
   })
 })

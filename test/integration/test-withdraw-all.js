@@ -1,5 +1,5 @@
 const BN = require("bn.js")
-const {expect} = require("../setup")
+const {chai.expect} = require("../setup")
 const {eq, add} = require("../util")
 const setup = require("./setup")
 
@@ -49,7 +49,7 @@ contract("integration", (accounts) => {
     const amount = await underlying.balanceOf(strategy.address)
     const min = amount
 
-    await expect(
+    await chai.expect(
       controller.withdrawAll(strategy.address, min, {from: accounts[1]})
     ).to.be.rejectedWith("!authorized")
   })
@@ -58,7 +58,7 @@ contract("integration", (accounts) => {
     const amount = await underlying.balanceOf(strategy.address)
     const min = amount.add(new BN(1))
 
-    await expect(
+    await chai.expect(
       controller.withdrawAll(strategy.address, min, {from: accounts[1]})
     ).to.be.rejectedWith("!authorized")
   })

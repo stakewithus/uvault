@@ -1,4 +1,4 @@
-const {expect} = require("../../setup")
+const {chai.expect} = require("../../setup")
 const setup = require("./setup")
 const {assert} = require("chai")
 
@@ -30,7 +30,7 @@ contract("Vault", (accounts) => {
     })
 
     it("should reject if not admin", async () => {
-      await expect(
+      await chai.expect(
         vault.revokeStrategy(strategy.address, {from: accounts[1]})
       ).to.be.rejectedWith("!admin")
     })

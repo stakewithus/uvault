@@ -1,4 +1,4 @@
-const {expect} = require("../../setup")
+const {chai.expect} = require("../../setup")
 const setup = require("./setup")
 
 contract("Vault", (accounts) => {
@@ -22,13 +22,13 @@ contract("Vault", (accounts) => {
     })
 
     it("should reject if caller not admin", async () => {
-      await expect(vault.setWithdrawMin(123, {from: accounts[1]})).to.be.rejectedWith(
+      await chai.expect(vault.setWithdrawMin(123, {from: accounts[1]})).to.be.rejectedWith(
         "!admin"
       )
     })
 
     it("should reject min > max", async () => {
-      await expect(vault.setWithdrawMin(10001, {from: admin})).to.be.rejectedWith(
+      await chai.expect(vault.setWithdrawMin(10001, {from: admin})).to.be.rejectedWith(
         "withdraw min > max"
       )
     })

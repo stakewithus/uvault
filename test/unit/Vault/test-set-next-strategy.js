@@ -1,5 +1,5 @@
 const BN = require("bn.js")
-const {expect} = require("../../setup")
+const {chai.expect} = require("../../setup")
 const {ZERO_ADDRESS, eq, getBlockTimestamp} = require("../../util")
 const setup = require("./setup")
 
@@ -59,13 +59,13 @@ contract("Vault", (accounts) => {
     })
 
     it("should reject if not admin", async () => {
-      await expect(
+      await chai.expect(
         vault.setNextStrategy(strategy.address, {from: accounts[1]})
       ).to.be.rejectedWith("!admin")
     })
 
     it("should reject zero address", async () => {
-      await expect(
+      await chai.expect(
         vault.setNextStrategy(ZERO_ADDRESS, {from: accounts[1]})
       ).to.be.rejectedWith("!admin")
     })
@@ -73,7 +73,7 @@ contract("Vault", (accounts) => {
     it("should reject same strategy", async () => {
       await vault.setNextStrategy(strategy.address, {from: admin})
 
-      await expect(
+      await chai.expect(
         vault.setNextStrategy(strategy.address, {from: admin})
       ).to.be.rejectedWith("same next strategy")
     })

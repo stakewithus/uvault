@@ -1,12 +1,14 @@
-const {expect} = require("../../setup")
-const setup = require("./setup")
+import chai from "chai"
+import { MockVaultInstance } from "../../../types"
+import {ControllerInstance} from "../../../types/Controller"
+import _setup from "./setup"
 
 contract("Controller", (accounts) => {
-  const refs = setup(accounts)
+  const refs = _setup(accounts)
   const {admin, gasRelayer} = refs
 
-  let controller
-  let vault
+  let controller: ControllerInstance
+  let vault: MockVaultInstance
   beforeEach(() => {
     controller = refs.controller
     vault = refs.vault
@@ -26,13 +28,13 @@ contract("Controller", (accounts) => {
     })
 
     it("should reject if caller not authorized", async () => {
-      await expect(
+      await chai.expect(
         controller.invest(vault.address, {from: accounts[1]})
       ).to.be.rejectedWith("!authorized")
     })
 
     it("should reject invalid vault address", async () => {
-      await expect(controller.invest(accounts[1], {from: admin})).to.be.rejected
+      await chai.expect(controller.invest(accounts[1], {from: admin})).to.be.rejected
     })
   })
 })

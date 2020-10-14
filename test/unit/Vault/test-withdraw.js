@@ -1,5 +1,5 @@
 const BN = require("bn.js")
-const {expect} = require("../../setup")
+const {chai.expect} = require("../../setup")
 const {eq, add, sub, frac} = require("../../util")
 const setup = require("./setup")
 const {assert} = require("chai")
@@ -122,7 +122,7 @@ contract("Vault", (accounts) => {
     it("should reject if returned amount < min", async () => {
       const min = add(amount, new BN(1))
 
-      await expect(vault.withdraw(amount, min, {from: sender})).to.be.rejectedWith(
+      await chai.expect(vault.withdraw(amount, min, {from: sender})).to.be.rejectedWith(
         "withdraw < min"
       )
     })
@@ -131,11 +131,11 @@ contract("Vault", (accounts) => {
       const bal = await vault.balanceOf(sender)
       await vault.withdraw(bal, 0, {from: sender})
 
-      await expect(vault.withdraw(bal, 0, {from: sender})).to.be.rejected
+      await chai.expect(vault.withdraw(bal, 0, {from: sender})).to.be.rejected
     })
 
     it("should reject if amount = 0", async () => {
-      await expect(vault.withdraw(0, 0, {from: sender})).to.be.rejectedWith(
+      await chai.expect(vault.withdraw(0, 0, {from: sender})).to.be.rejectedWith(
         "shares = 0"
       )
     })

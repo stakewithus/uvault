@@ -1,5 +1,5 @@
 const BN = require("bn.js")
-const {expect} = require("../../setup")
+const {chai.expect} = require("../../setup")
 const {ZERO_ADDRESS, eq} = require("../../util")
 const setup = require("./setup")
 
@@ -38,11 +38,11 @@ contract("Vault", (accounts) => {
     })
 
     it("should reject if controller is zero address", async () => {
-      await expect(Vault.new(ZERO_ADDRESS, erc20.address, MIN_WAIT_TIME)).to.be.rejected
+      await chai.expect(Vault.new(ZERO_ADDRESS, erc20.address, MIN_WAIT_TIME)).to.be.rejected
     })
 
     it("should reject if token is zero address", async () => {
-      await expect(Vault.new(controller.address, ZERO_ADDRESS, MIN_WAIT_TIME)).to.be
+      await chai.expect(Vault.new(controller.address, ZERO_ADDRESS, MIN_WAIT_TIME)).to.be
         .rejected
     })
   })

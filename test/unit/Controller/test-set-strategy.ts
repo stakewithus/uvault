@@ -1,13 +1,16 @@
-const {expect} = require("../../setup")
-const setup = require("./setup")
+import chai from "chai"
+import {ControllerInstance} from "../../../types/Controller"
+import {StrategyTestInstance} from "../../../types/StrategyTest"
+import {MockVaultInstance} from "../../../types/MockVault"
+import _setup from "./setup"
 
 contract("Controller", (accounts) => {
-  const refs = setup(accounts)
+  const refs = _setup(accounts)
   const {admin, gasRelayer} = refs
 
-  let controller
-  let vault
-  let strategy
+  let controller: ControllerInstance
+  let vault: MockVaultInstance
+  let strategy: StrategyTestInstance
   beforeEach(() => {
     controller = refs.controller
     vault = refs.vault
@@ -30,7 +33,7 @@ contract("Controller", (accounts) => {
     })
 
     it("should reject if caller not authorized", async () => {
-      await expect(
+      await chai.expect(
         controller.setStrategy(vault.address, strategy.address, {
           from: accounts[1],
         })
@@ -38,7 +41,7 @@ contract("Controller", (accounts) => {
     })
 
     it("should reject if vault does not exist", async () => {
-      await expect(controller.setStrategy(accounts[1], strategy.address, {from: admin}))
+      await chai.expect(controller.setStrategy(accounts[1], strategy.address, {from: admin}))
         .to.be.rejected
     })
   })

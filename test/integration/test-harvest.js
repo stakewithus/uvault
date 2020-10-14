@@ -1,4 +1,4 @@
-const {expect} = require("../setup")
+const {chai.expect} = require("../setup")
 const setup = require("./setup")
 
 contract("mainnet integration", (accounts) => {
@@ -22,7 +22,7 @@ contract("mainnet integration", (accounts) => {
   })
 
   it("should reject if not authorized", async () => {
-    await expect(
+    await chai.expect(
       controller.harvest(strategy.address, {from: accounts[1]})
     ).to.be.rejectedWith("!authorized")
   })

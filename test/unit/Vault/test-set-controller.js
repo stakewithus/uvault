@@ -1,4 +1,4 @@
-const {expect} = require("../../setup")
+const {chai.expect} = require("../../setup")
 const {ZERO_ADDRESS} = require("../../util")
 const setup = require("./setup")
 
@@ -23,13 +23,13 @@ contract("Vault", (accounts) => {
     })
 
     it("should reject if caller not controller", async () => {
-      await expect(
+      await chai.expect(
         vault.setController(accounts[1], {from: accounts[1]})
       ).to.be.rejectedWith("!admin")
     })
 
     it("should reject zero address", async () => {
-      await expect(vault.setController(ZERO_ADDRESS, {from: admin})).to.be.rejectedWith(
+      await chai.expect(vault.setController(ZERO_ADDRESS, {from: admin})).to.be.rejectedWith(
         "controller = zero address"
       )
     })

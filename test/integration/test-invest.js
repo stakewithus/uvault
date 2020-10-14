@@ -1,4 +1,4 @@
-const {expect} = require("../setup")
+const {chai.expect} = require("../setup")
 const {eq, sub, ZERO_ADDRESS} = require("../util")
 const setup = require("./setup")
 
@@ -48,7 +48,7 @@ contract("integration", (accounts) => {
   })
 
   it("should reject if not authorized", async () => {
-    await expect(
+    await chai.expect(
       controller.invest(vault.address, {from: accounts[1]})
     ).to.be.rejectedWith("!authorized")
   })
@@ -57,7 +57,7 @@ contract("integration", (accounts) => {
     const vault = await Vault.new(controller.address, underlying.address, 0)
     assert.equal(await vault.strategy(), ZERO_ADDRESS, "strategy")
 
-    await expect(controller.invest(vault.address, {from: admin})).to.be.rejectedWith(
+    await chai.expect(controller.invest(vault.address, {from: admin})).to.be.rejectedWith(
       "strategy = zero address"
     )
   })

@@ -1,4 +1,4 @@
-const {expect} = require("../../setup")
+const {chai.expect} = require("../../setup")
 const {ZERO_ADDRESS} = require("../../util")
 const setup = require("./setup")
 
@@ -19,13 +19,13 @@ contract("GasRelayer", (accounts) => {
     })
 
     it("should reject if caller not admin", async () => {
-      await expect(
+      await chai.expect(
         gasRelayer.setAdmin(accounts[1], {from: accounts[1]})
       ).to.be.rejectedWith("!admin")
     })
 
     it("should reject zero address", async () => {
-      await expect(gasRelayer.setAdmin(ZERO_ADDRESS, {from: admin})).to.be.rejectedWith(
+      await chai.expect(gasRelayer.setAdmin(ZERO_ADDRESS, {from: admin})).to.be.rejectedWith(
         "admin = zero address"
       )
     })
