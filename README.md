@@ -85,7 +85,7 @@ env $(cat .env) npx buidler run scripts/script-to-run.js --network ropsten
 
 ##### Deployed Contracts
 
-See [scripts/mainnet/config.ts](./scripts/mainnet/config.ts)
+See [scripts/config.ts](./scripts/config.ts)
 
 ### APY
 
