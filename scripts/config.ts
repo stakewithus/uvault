@@ -13,8 +13,14 @@ export interface Config {
     gasRelayer: string
     treasury: string
     controller: string
+    daiVault: string
     usdcVault: string
+    usdtVault: string
+    strategyDaiToCusd: string
     strategyUsdcToCusd: string
+    strategyDaiTo3Crv: string
+    strategyUsdcTo3Crv: string
+    strategyUsdtTo3Crv: string
     dai: string
     usdc: string
     usdt: string
@@ -43,9 +49,15 @@ const config: Config = {
     treasury: "0x9a4c3Fc4683b95EBF11B535057B00812f6a549Bb",
     controller: "0xE95EABc97a96dAc94fABE254E22EdD8B881b8E19",
     // vaults //
+    daiVault: "0x75FCf5cd547Dd312F8c1Cf5000Ad44CF521fCF7f",
     usdcVault: "0x51B4c5f40C24D8494Ac334470df74b753E938efF",
+    usdtVault: "0x81C8254FE76bfdA31978f8E9801d0266ca82E4E5",
     // strategies //
+    strategyDaiToCusd: "0x68CefF6A5722e9FEFf3d40Ed680Eff8ABAaA9783",
     strategyUsdcToCusd: "0x0dDA2b6D771789803803798cFD3C7Ea55BED7C2F",
+    strategyDaiTo3Crv: "0xE8D868cb353c8cAa97c7B1bA2521A4Ce28893fF6",
+    strategyUsdcTo3Crv: "0x1AFF70f008aD14d7d7956632074673d5a09566B0",
+    strategyUsdtTo3Crv: "0x2328E2625A214BF7cD168Bd980f6eF9C6981c1f6",
     // others //
     dai: "0x6B175474E89094C44Da98b954EedeAC495271d0F",
     usdc: "0xA0b86991c6218b36c1d19D4a2e9Eb0cE3606eB48",
