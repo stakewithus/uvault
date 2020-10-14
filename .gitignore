@@ -18,4 +18,4 @@ cache
 artifacts
 types
 
-memo/*.sol
+memo/*
