@@ -1,18 +1,20 @@
-const BN = require("bn.js")
-const {chai.expect} = require("../../setup")
-const {eq, add, sub, frac} = require("../../util")
-const setup = require("./setup")
+import chai from "chai"
+import BN from "bn.js"
+import {Erc20TokenInstance} from "../../../types/Erc20Token"
+import {VaultInstance} from "../../../types/Vault"
+import {add, sub, eq} from "../../util"
+import _setup from "./setup"
 
 const ERC20Token = artifacts.require("ERC20Token")
 
 contract("Vault", (accounts) => {
-  const refs = setup(accounts)
+  const refs = _setup(accounts)
   const {admin} = refs
 
   const amount = new BN(123)
 
-  let vault
-  let erc20
+  let vault: VaultInstance
+  let erc20: Erc20TokenInstance
   beforeEach(async () => {
     vault = refs.vault
     // create token != vault.token

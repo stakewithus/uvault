@@ -1,14 +1,18 @@
-const {chai.expect} = require("../../setup")
-const setup = require("./setup")
+import chai from "chai"
+import BN from "bn.js"
+import {Erc20TokenInstance} from "../../../types/Erc20Token"
+import {VaultInstance} from "../../../types/Vault"
+import {eq} from "../../util"
+import _setup from "./setup"
 
 contract("Vault", (accounts) => {
   const MIN_WAIT_TIME = 0
 
-  const refs = setup(accounts, MIN_WAIT_TIME)
+  const refs = _setup(accounts, MIN_WAIT_TIME)
   const {admin} = refs
 
-  let vault
-  let erc20
+  let vault: VaultInstance
+  let erc20: Erc20TokenInstance
   beforeEach(() => {
     vault = refs.vault
     erc20 = refs.erc20
@@ -16,9 +20,10 @@ contract("Vault", (accounts) => {
 
   describe("setWithdrawMin", () => {
     it("should set min", async () => {
-      await vault.setWithdrawMin(123, {from: admin})
+      const min = new BN(123)
+      await vault.setWithdrawMin(min, {from: admin})
 
-      assert.equal(await vault.withdrawMin(), 123)
+      assert(eq(await vault.withdrawMin(), min), "withdraw min")
     })
 
     it("should reject if caller not admin", async () => {

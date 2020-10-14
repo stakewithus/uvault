@@ -17,6 +17,12 @@ export function eq(x: BN | number, y: BN | number): Boolean {
   return x.eq(y)
 }
 
+export function pow(x: BN | number, y: BN | number): BN {
+  x = cast(x)
+  y = cast(y)
+  return x.pow(y)
+}
+
 export function add(x: BN | number, y: BN | number): BN {
   x = cast(x)
   y = cast(y)
@@ -53,10 +59,9 @@ export function sendEther(web3: Web3, from: string, to: string, amount: BN) {
   })
 }
 
-// TODO tx: any
-export async function getBlockTimestamp(web3: Web3, tx: any) {
+export async function getBlockTimestamp(web3: Web3, tx: any): Promise<number> {
   const block = await web3.eth.getBlock(tx.receipt.blockHash)
-  return block.timestamp
+  return block.timestamp as number
 }
 
 export async function timeout(secs: number): Promise<void> {

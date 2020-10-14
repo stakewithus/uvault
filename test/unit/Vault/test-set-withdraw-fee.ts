@@ -1,22 +1,26 @@
-const {chai.expect} = require("../../setup")
-const setup = require("./setup")
+import chai from "chai"
+import BN from "bn.js"
+import {VaultInstance} from "../../../types/Vault"
+import {eq} from "../../util"
+import _setup from "./setup"
 
 contract("Vault", (accounts) => {
   const MIN_WAIT_TIME = 0
 
-  const refs = setup(accounts, MIN_WAIT_TIME)
+  const refs = _setup(accounts, MIN_WAIT_TIME)
   const {admin} = refs
 
-  let vault
+  let vault: VaultInstance
   beforeEach(() => {
     vault = refs.vault
   })
 
   describe("setWithdrawFee", () => {
     it("should set withdraw fee", async () => {
-      await vault.setWithdrawFee(123, {from: admin})
+      const fee = new BN(123)
+      await vault.setWithdrawFee(fee, {from: admin})
 
-      assert.equal(await vault.withdrawFee(), 123)
+      assert(eq(await vault.withdrawFee(), fee), "fee")
     })
 
     it("should reject if caller not admin", async () => {

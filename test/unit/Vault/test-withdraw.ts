@@ -1,18 +1,20 @@
-const BN = require("bn.js")
-const {chai.expect} = require("../../setup")
-const {eq, add, sub, frac} = require("../../util")
-const setup = require("./setup")
-const {assert} = require("chai")
+import chai from "chai"
+import BN from "bn.js"
+import {Erc20TokenInstance} from "../../../types/Erc20Token"
+import {VaultInstance} from "../../../types/Vault"
+import { StrategyTestInstance } from "../../../types/StrategyTest"
+import {eq, frac, sub, add, pow} from "../../util"
+import _setup from "./setup"
 
 contract("Vault", (accounts) => {
   const MIN_WAIT_TIME = 0
 
-  const refs = setup(accounts, MIN_WAIT_TIME)
+  const refs = _setup(accounts, MIN_WAIT_TIME)
   const {admin, treasury} = refs
 
-  let vault
-  let erc20
-  let strategy
+  let vault: VaultInstance
+  let erc20: Erc20TokenInstance
+  let strategy: StrategyTestInstance
   beforeEach(() => {
     vault = refs.vault
     erc20 = refs.erc20
@@ -21,8 +23,8 @@ contract("Vault", (accounts) => {
 
   describe("withdraw", () => {
     const sender = accounts[2]
-    const amount = new BN(10).pow(new BN(18)).mul(new BN(10))
-    const min = frac(amount, new BN(99), new BN(100))
+    const amount = pow(10, 18).mul(new BN(10))
+    const min = frac(amount, 99, 100)
 
     beforeEach(async () => {
       await erc20.mint(sender, amount)
@@ -74,7 +76,7 @@ contract("Vault", (accounts) => {
 
     it("should withdraw from strategy", async () => {
       // set balance in strategy, this would increate vault.totalAssets()
-      const balInStrategy = new BN(10).pow(new BN(18)).mul(new BN(40))
+      const balInStrategy = pow(10, 18).mul(new BN(40))
       await erc20.mint(strategy.address, balInStrategy)
       // vault bal = 10
       // strategy bal = 40
@@ -98,7 +100,7 @@ contract("Vault", (accounts) => {
 
     it("should withdraw from vault and strategy", async () => {
       // set balance in strategy, this would increate vault.totalAssets()
-      const balInStrategy = new BN(10).pow(new BN(18)).mul(new BN(10))
+      const balInStrategy = pow(10, 18).mul(new BN(10))
       await erc20.mint(strategy.address, balInStrategy)
       // vault bal = 10
       // strategy bal = 10
@@ -120,7 +122,7 @@ contract("Vault", (accounts) => {
     })
 
     it("should reject if returned amount < min", async () => {
-      const min = add(amount, new BN(1))
+      const min = add(amount, 1)
 
       await chai.expect(vault.withdraw(amount, min, {from: sender})).to.be.rejectedWith(
         "withdraw < min"

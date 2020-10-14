@@ -1,20 +1,24 @@
-const BN = require("bn.js")
-const {chai.expect} = require("../../setup")
-const {ZERO_ADDRESS, eq, getBlockTimestamp} = require("../../util")
-const setup = require("./setup")
+import chai from "chai"
+import BN from "bn.js"
+import {Erc20TokenInstance} from "../../../types/Erc20Token"
+import {VaultInstance} from "../../../types/Vault"
+import {MockControllerInstance} from "../../../types/MockController"
+import { StrategyTestInstance } from "../../../types/StrategyTest"
+import {ZERO_ADDRESS, eq, getBlockTimestamp} from "../../util"
+import _setup from "./setup"
 
 const StrategyTest = artifacts.require("StrategyTest")
 
 contract("Vault", (accounts) => {
   const MIN_WAIT_TIME = 100
 
-  const refs = setup(accounts, MIN_WAIT_TIME)
+  const refs = _setup(accounts, MIN_WAIT_TIME)
   const {admin} = refs
 
-  let controller
-  let vault
-  let erc20
-  let strategy
+  let controller: MockControllerInstance
+  let vault: VaultInstance
+  let erc20: Erc20TokenInstance
+  let strategy: StrategyTestInstance
   beforeEach(() => {
     controller = refs.controller
     vault = refs.vault
@@ -28,6 +32,7 @@ contract("Vault", (accounts) => {
 
       assert.equal(tx.logs[0].event, "SetNextStrategy", "event")
       assert.equal(
+        // @ts-ignore
         tx.logs[0].args.strategy,
         strategy.address,
         "event arg next strategy"

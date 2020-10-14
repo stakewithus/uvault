@@ -1,13 +1,15 @@
-const setup = require("./setup")
-const BN = require("bn.js")
-const {chai.expect} = require("../../setup")
-const {eq} = require("../../util")
+import chai from "chai"
+import BN from "bn.js"
+import {GasRelayerInstance} from "../../../types/GasRelayer"
+import {MockGasTokenInstance} from "../../../types/MockGasToken"
+import {eq} from "../../util"
+import _setup from "./setup"
 
 contract("GasRelayer", (accounts) => {
-  const refs = setup(accounts)
+  const refs = _setup(accounts)
 
-  let gasRelayer
-  let gasToken
+  let gasRelayer: GasRelayerInstance
+  let gasToken: MockGasTokenInstance
   beforeEach(() => {
     gasRelayer = refs.gasRelayer
     gasToken = refs.gasToken

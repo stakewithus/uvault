@@ -1,19 +1,22 @@
-const BN = require("bn.js")
-const {chai.expect} = require("../../setup")
-const {ZERO_ADDRESS, eq} = require("../../util")
-const setup = require("./setup")
+import chai from "chai"
+import BN from "bn.js"
+import {Erc20TokenInstance} from "../../../types/Erc20Token"
+import {VaultInstance} from "../../../types/Vault"
+import {MockControllerInstance} from "../../../types/MockController"
+import {ZERO_ADDRESS, eq} from "../../util"
+import _setup from "./setup"
 
 const Vault = artifacts.require("Vault")
 
 contract("Vault", (accounts) => {
   const MIN_WAIT_TIME = 0
 
-  const refs = setup(accounts, MIN_WAIT_TIME)
+  const refs = _setup(accounts, MIN_WAIT_TIME)
   const {admin} = refs
 
-  let controller
-  let vault
-  let erc20
+  let controller: MockControllerInstance
+  let vault: VaultInstance
+  let erc20: Erc20TokenInstance
   beforeEach(() => {
     controller = refs.controller
     vault = refs.vault
@@ -31,7 +34,7 @@ contract("Vault", (accounts) => {
 
       assert.equal(await vault.name(), "unagii_test", "name")
       assert.equal(await vault.symbol(), "uTEST", "symbol")
-      assert(eq(await vault.decimals(), await erc20.decimals(), "decimals"))
+      assert(eq(await vault.decimals(), await erc20.decimals()), "decimals")
 
       assert.equal(await vault.strategy(), ZERO_ADDRESS, "strategy")
       assert(eq(await vault.timeLock(), new BN(0)), "time lock")

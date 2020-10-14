@@ -1,19 +1,38 @@
+import "../../setup"
+import {Erc20TokenInstance} from "../../../types/Erc20Token"
+import {VaultInstance} from "../../../types/Vault"
+import {MockControllerInstance} from "../../../types/MockController"
+import {StrategyTestInstance} from "../../../types/StrategyTest"
+
 const ERC20Token = artifacts.require("ERC20Token")
 const Vault = artifacts.require("Vault")
 const MockController = artifacts.require("MockController")
 const StrategyTest = artifacts.require("StrategyTest")
 
-module.exports = (accounts, minWaitTime = 0) => {
+export default (accounts: Truffle.Accounts, minWaitTime = 0) => {
   const admin = accounts[0]
   const treasury = accounts[1]
 
   // references to return
-  const refs = {
-    erc20: null,
-    vault: null,
+  interface Refs {
+    admin: string,
+    treasury: string,
+    erc20: Erc20TokenInstance,
+    vault: VaultInstance,
+    controller: MockControllerInstance,
+    strategy: StrategyTestInstance,
+  }
+
+  const refs: Refs = {
     admin,
     treasury,
+    // @ts-ignore
+    erc20: null,
+    // @ts-ignore
+    vault: null,
+    // @ts-ignore
     controller: null,
+    // @ts-ignore
     strategy: null,
   }
 

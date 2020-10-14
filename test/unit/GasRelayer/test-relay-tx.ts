@@ -1,9 +1,12 @@
-const setup = require("./setup")
-const BN = require("bn.js")
-const {chai.expect} = require("../../setup")
-const {eq} = require("../../util")
+import chai from "chai"
+import BN from "bn.js"
+import {TxReceiverInstance} from "../../../types"
+import {GasRelayerInstance} from "../../../types/GasRelayer"
+import {MockGasTokenInstance} from "../../../types/MockGasToken"
+import {eq} from "../../util"
+import _setup from "./setup"
 
-function encode(web3, data) {
+function encode(web3: Web3, data: string) {
   return web3.eth.abi.encodeFunctionCall(
     {
       name: "callMe",
@@ -20,12 +23,12 @@ function encode(web3, data) {
 }
 
 contract("GasRelayer", (accounts) => {
-  const refs = setup(accounts)
+  const refs = _setup(accounts)
   const {admin} = refs
 
-  let gasRelayer
-  let gasToken
-  let txReceiver
+  let gasRelayer: GasRelayerInstance
+  let gasToken: MockGasTokenInstance
+  let txReceiver: TxReceiverInstance
   beforeEach(async () => {
     gasRelayer = refs.gasRelayer
     gasToken = refs.gasToken

@@ -1,21 +1,24 @@
-const BN = require("bn.js")
-const {assert} = require("chai")
-const {chai.expect} = require("../../setup")
-const {ZERO_ADDRESS, eq, frac} = require("../../util")
-const setup = require("./setup")
+import chai from "chai"
+import BN from "bn.js"
+import {Erc20TokenInstance} from "../../../types/Erc20Token"
+import {VaultInstance} from "../../../types/Vault"
+import {MockControllerInstance} from "../../../types/MockController"
+import { StrategyTestInstance } from "../../../types/StrategyTest"
+import {ZERO_ADDRESS, eq, pow} from "../../util"
+import _setup from "./setup"
 
 const Vault = artifacts.require("Vault")
 
 contract("Vault", (accounts) => {
   const MIN_WAIT_TIME = 0
 
-  const refs = setup(accounts, MIN_WAIT_TIME)
+  const refs = _setup(accounts, MIN_WAIT_TIME)
   const {admin} = refs
 
-  let controller
-  let vault
-  let erc20
-  let strategy
+  let controller: MockControllerInstance
+  let vault: VaultInstance
+  let erc20: Erc20TokenInstance
+  let strategy: StrategyTestInstance
   beforeEach(() => {
     controller = refs.controller
     vault = refs.vault
@@ -25,7 +28,7 @@ contract("Vault", (accounts) => {
 
   describe("invest", () => {
     const user = accounts[1]
-    const amount = new BN(10).pow(new BN(18))
+    const amount = pow(10, 18)
 
     beforeEach(async () => {
       await erc20.mint(user, amount)

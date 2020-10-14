@@ -1,12 +1,13 @@
-const {chai.expect} = require("../../setup")
-const {ZERO_ADDRESS} = require("../../util")
-const setup = require("./setup")
+import chai from "chai"
+import {GasRelayerInstance} from "../../../types/GasRelayer"
+import {ZERO_ADDRESS} from "../../util"
+import _setup from "./setup"
 
 contract("GasRelayer", (accounts) => {
-  const refs = setup(accounts)
+  const refs = _setup(accounts)
   const {admin} = refs
 
-  let gasRelayer
+  let gasRelayer: GasRelayerInstance
   beforeEach(() => {
     gasRelayer = refs.gasRelayer
   })
