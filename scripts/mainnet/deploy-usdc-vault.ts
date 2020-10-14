@@ -1,30 +1,21 @@
-import bre, {ethers} from "@nomiclabs/buidler"
+import {ethers} from "@nomiclabs/buidler"
 import config from "../config"
-import {getAccount, getAddress} from "../lib"
+import {deploy, getAddress} from "../lib"
+
+const MIN_WAIT_TIME = 1 * 60 * 60
 
 async function main() {
-  const network = bre.network.name
-  console.log(`Deploying USDC Vault to ${network} network...`)
-
-  try {
+  await deploy("USDC Vault", async (_account, network) => {
     const controller = getAddress(config, network, "controller")
     const usdc = getAddress(config, network, "usdc")
 
-    await getAccount(ethers)
-
-    const minWaitTime = 1 * 60 * 60
-
     const Vault = await ethers.getContractFactory("Vault")
-    const vault = await Vault.deploy(controller, usdc, minWaitTime)
+    const vault = await Vault.deploy(controller, usdc, MIN_WAIT_TIME)
 
     await vault.deployed()
 
-    console.log("USDC Vault deployed to:", vault.address)
-    process.exit(0)
-  } catch (error) {
-    console.error(error)
-    process.exit(1)
-  }
+    return vault
+  })
 }
 
 main()
