@@ -13,8 +13,8 @@
     "lint": "prettier --write contracts/*.sol contracts/**/*.sol",
     "lint:check": "prettier --check contracts/*.sol contracts/**/*.sol",
     "test": "echo \"Error: no test specified\" && exit 1",
-    "test:unit": "npm run typecheck && truffle test test/unit/**/test-*.js",
-    "test:integration": "npm run typecheck && truffle test test/integration/test-*.js",
+    "test:unit": "npm run typecheck && truffle test test/unit/**/test-*.ts",
+    "test:integration": "npm run typecheck && truffle test test/integration/test-*.ts",
     "generate-types": "typechain --target=truffle-v5 --outDir types 'build/contracts/*.json'",
     "typecheck": "tsc --noEmit"
   },
