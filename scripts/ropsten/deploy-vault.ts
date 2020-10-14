@@ -1,6 +1,6 @@
-const bre = require("@nomiclabs/buidler")
-const config = require("../config")
-const {getAddress} = require("../lib")
+import bre, {ethers} from "@nomiclabs/buidler"
+import config from "../config"
+import {getAccount, getAddress} from "../lib"
 
 async function main() {
   const network = bre.network.name
@@ -10,10 +10,7 @@ async function main() {
     const controller = getAddress(config, network, "controller")
     const erc20 = getAddress(config, network, "erc20")
 
-    const [deployer] = await ethers.getSigners()
-
-    console.log("Account:", await deployer.getAddress())
-    console.log("Balance:", (await deployer.getBalance()).toString())
+    await getAccount(ethers)
 
     const minWaitTime = 1 * 60 * 60
 

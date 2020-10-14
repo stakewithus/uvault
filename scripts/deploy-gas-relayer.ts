@@ -1,6 +1,6 @@
-const bre = require("@nomiclabs/buidler")
-const config = require("./config")
-const {getAddress} = require("./lib")
+import bre, {ethers} from "@nomiclabs/buidler"
+import config from "./config"
+import {getAccount, getAddress} from "./lib"
 
 async function main() {
   const network = bre.network.name
@@ -9,10 +9,7 @@ async function main() {
   try {
     const gasToken = getAddress(config, network, "gasToken")
 
-    const [deployer] = await ethers.getSigners()
-
-    console.log("Account:", await deployer.getAddress())
-    console.log("Balance:", (await deployer.getBalance()).toString())
+    await getAccount(ethers)
 
     const GasRelayer = await ethers.getContractFactory("GasRelayer")
     const gasRelayer = await GasRelayer.deploy(gasToken)

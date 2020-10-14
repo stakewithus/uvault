@@ -1,19 +1,14 @@
-usePlugin("@nomiclabs/buidler-waffle")
-usePlugin("@nomiclabs/buidler-etherscan")
-// usePlugin("buidler-typechain")
-// usePlugin("solidity-coverage")
+import fs from "fs"
+import {BuidlerConfig, usePlugin} from "@nomiclabs/buidler/config"
 
-const fs = require("fs")
+usePlugin("@nomiclabs/buidler-ethers")
+
 const PRIVATE_KEY = fs.readFileSync(".secret").toString().trim()
 
 const INFURA_API_KEY = process.env.INFURA_API_KEY
-const ETHERSCAN_API_KEY = process.env.ETHERSCAN_API_KEY
+// const ETHERSCAN_API_KEY = process.env.ETHERSCAN_API_KEY
 
-// You have to export an object to set up your config
-// This object can have the following optional entries:
-// defaultNetwork, networks, solc, and paths.
-// Go to https://buidler.dev/config/ to learn more
-module.exports = {
+const config: BuidlerConfig = {
   defaultNetwork: "buidlerevm",
   solc: {
     version: "0.5.17",
@@ -38,12 +33,10 @@ module.exports = {
       url: "http://127.0.0.1:8555", // Coverage launches its own ganache-cli client
     },
   },
-  etherscan: {
-    url: "https://api-ropsten.etherscan.io/api",
-    apiKey: ETHERSCAN_API_KEY,
-  },
-  // typechain: {
-  //   outDir: "typechain",
-  //   target: "ethers-v4",
+  // etherscan: {
+  //   url: "https://api-ropsten.etherscan.io/api",
+  //   apiKey: ETHERSCAN_API_KEY,
   // },
 }
+
+export default config

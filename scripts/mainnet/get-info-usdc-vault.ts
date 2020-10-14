@@ -1,7 +1,7 @@
-const BN = require("bn.js")
-const bre = require("@nomiclabs/buidler")
-const config = require("../config")
-const {getAddress} = require("../lib")
+import BN from "bn.js"
+import bre, {ethers} from "@nomiclabs/buidler"
+import config from "../config"
+import {getAccount, getAddress} from "../lib"
 
 async function main() {
   const network = bre.network.name
@@ -12,6 +12,7 @@ async function main() {
 
     const vault = await ethers.getContractAt("Vault", USDC_VAULT_ADDRESS)
 
+    // @ts-ignore
     async function snapshot() {
       return {
         vault: {

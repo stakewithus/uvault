@@ -1,30 +1,31 @@
-const assert = require("assert")
-const bre = require("@nomiclabs/buidler")
-const config = require("../config")
-const {getAccountAddress, getAddress} = require("../lib")
+import assert from "assert"
+import bre, {ethers} from "@nomiclabs/buidler"
+import config from "../config"
+import {getAccount, getAddress} from "../lib"
 
 async function main() {
   const network = bre.network.name
-  console.log(`Depositing into vault on ${network} network...`)
+  console.log(`Depositing into USDC vault on ${network} network...`)
 
   try {
-    const ERC20_ADDRESS = getAddress(config, network, "erc20")
-    const VAULT_ADDRESS = getAddress(config, network, "vault")
+    const USDC_ADDRESS = getAddress(config, network, "usdc")
+    const VAULT_ADDRESS = getAddress(config, network, "usdcVault")
 
-    const ACCOUNT_ADDRESS = await getAccountAddress(ethers)
+    const ACCOUNT_ADDRESS = await getAccount(ethers)
 
-    const erc20 = await ethers.getContractAt("ERC20Token", ERC20_ADDRESS)
+    const usdc = await ethers.getContractAt("IERC20", USDC_ADDRESS)
     const vault = await ethers.getContractAt("Vault", VAULT_ADDRESS)
 
+    // @ts-ignore
     async function snapshot() {
       return {
-        erc20: {
+        usdc: {
           balances: {
-            account: await erc20.balanceOf(ACCOUNT_ADDRESS),
-            vault: await erc20.balanceOf(vault.address),
+            account: await usdc.balanceOf(ACCOUNT_ADDRESS),
+            vault: await usdc.balanceOf(vault.address),
           },
           allowance: {
-            vault: await erc20.allowance(ACCOUNT_ADDRESS, vault.address),
+            vault: await usdc.allowance(ACCOUNT_ADDRESS, vault.address),
           },
         },
         vault: {
@@ -35,7 +36,7 @@ async function main() {
       }
     }
 
-    const DECIMALS = 18
+    const DECIMALS = 6
     const MAX_DEPOSIT = ethers.utils.parseUnits("10", DECIMALS)
     const amount = ethers.utils.parseUnits("10", DECIMALS)
 
@@ -43,13 +44,16 @@ async function main() {
 
     const before = await snapshot()
 
-    assert(amount.lte(before.erc20.balances.account), "balance < amount")
+    // Check USDC balance >= deposit amount
+    assert(amount.lte(before.usdc.balances.account), "balance < amount")
 
+    // Approve vault to spend USDC
     console.log("Approve vault...")
-    const approveTx = await erc20.approve(vault.address, amount)
+    const approveTx = await usdc.approve(vault.address, amount)
     console.log(`tx hash: ${approveTx.hash}`)
     await approveTx.wait()
 
+    // Deposit into vault
     console.log("Deposit into vault...")
     const depositTx = await vault.deposit(amount)
     console.log(`tx hash ${depositTx.hash}`)
@@ -57,16 +61,17 @@ async function main() {
 
     const after = await snapshot()
 
+    // @ts-ignore
     function printSnapshot(snap) {
       console.log()
-      console.log("ERC20 balance")
+      console.log("USDC balance")
       console.log("=============")
-      console.log("account ", snap.erc20.balances.account.toString())
-      console.log("vault   ", snap.erc20.balances.vault.toString())
+      console.log("account ", snap.usdc.balances.account.toString())
+      console.log("vault   ", snap.usdc.balances.vault.toString())
       console.log()
-      console.log("ERC20 allowance")
+      console.log("USDC allowance")
       console.log("===============")
-      console.log("account to vault", snap.erc20.allowance.vault.toString())
+      console.log("account to vault", snap.usdc.allowance.vault.toString())
       console.log("Vault shares")
       console.log("=============")
       console.log("account ", snap.vault.shares.account.toString())

@@ -1,16 +1,13 @@
-const bre = require("@nomiclabs/buidler")
+import bre, {ethers} from "@nomiclabs/buidler"
+import {getAccount} from "../lib"
 
 async function main() {
   const network = bre.network.name
   console.log(`Deploying ERC20Token to ${network} network...`)
 
   try {
-    const [deployer] = await ethers.getSigners()
+    await getAccount(ethers)
 
-    console.log("Account:", await deployer.getAddress())
-    console.log("Balance:", (await deployer.getBalance()).toString())
-
-    // We get the contract to deploy
     const ERC20Token = await ethers.getContractFactory("ERC20Token")
     const token = await ERC20Token.deploy()
 

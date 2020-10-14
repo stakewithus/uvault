@@ -1,4 +1,25 @@
-module.exports = {
+export interface Config {
+  ropsten: {
+    gasToken: string
+    gasRelayer: string
+    treasury: string
+    controller: string
+    vault: string
+    strategyTest: string
+    erc20: string
+  }
+  mainnet: {
+    gasToken: string
+    gasRelayer: string
+    treasury: string
+    controller: string
+    usdcVault: string
+    strategyUsdcToCusd: string
+    usdc: string
+  }
+}
+
+const config: Config = {
   ropsten: {
     // CHI gas token
     gasToken: "0x063f83affbcf64d7d84d306f5b85ed65c865dca4",
@@ -27,3 +48,5 @@ module.exports = {
     usdc: "0xA0b86991c6218b36c1d19D4a2e9Eb0cE3606eB48",
   },
 }
+
+export default config

@@ -1,13 +1,15 @@
-const assert = require("assert")
+import assert from "assert"
+import {Config} from "./config"
 
-function getAddress(config, network, name) {
+export function getAddress(config: Config, network: string, name: string): string {
+  // @ts-ignore
   const addr = config[network][name]
   assert(addr, `${network}.${name} is undefined`)
 
   return addr
 }
 
-async function getAccountAddress(ethers) {
+export async function getAccount(ethers: any): Promise<string> {
   const [account] = await ethers.getSigners()
 
   const addr = await account.getAddress()
@@ -15,9 +17,4 @@ async function getAccountAddress(ethers) {
   console.log("Balance:", (await account.getBalance()).toString())
 
   return addr
-}
-
-module.exports = {
-  getAddress,
-  getAccountAddress,
 }

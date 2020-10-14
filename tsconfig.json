@@ -1,11 +1,15 @@
 {
   "compilerOptions": {
-    "lib": ["ES2018", "DOM"],
+    "target": "es5",
     "module": "commonjs",
-    "moduleResolution": "node",
     "strict": true,
-    "target": "ES2018",
-    "sourceMap": true,
-    "esModuleInterop": true
-  }
+    "esModuleInterop": true,
+    "outDir": "dist",
+    "resolveJsonModule": true
+  },
+  "include": ["scripts"],
+  "files": [
+    "./buidler.config.ts",
+    "node_modules/@nomiclabs/buidler-ethers/src/type-extensions.d.ts"
+  ]
 }
