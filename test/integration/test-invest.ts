@@ -1,17 +1,21 @@
-const {chai.expect} = require("../setup")
-const {eq, sub, ZERO_ADDRESS} = require("../util")
-const setup = require("./setup")
+import chai from "chai"
+import {Erc20TokenInstance} from "../../types/Erc20Token"
+import {ControllerInstance} from "../../types/Controller"
+import {VaultInstance} from "../../types/Vault"
+import {StrategyTestInstance} from "../../types/StrategyTest"
+import {eq, sub, ZERO_ADDRESS } from "../util"
+import _setup from "./setup"
 
 const Vault = artifacts.require("Vault")
 
 contract("integration", (accounts) => {
-  const refs = setup(accounts)
+  const refs = _setup(accounts)
   const {admin} = refs
 
-  let underlying
-  let controller
-  let vault
-  let strategy
+  let controller: ControllerInstance
+  let vault: VaultInstance
+  let strategy: StrategyTestInstance
+  let underlying: Erc20TokenInstance
   beforeEach(() => {
     underlying = refs.underlying
     controller = refs.controller

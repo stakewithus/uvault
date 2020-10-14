@@ -1,16 +1,20 @@
-const BN = require("bn.js")
-const {eq, add} = require("../util")
-const {chai.expect} = require("../setup")
-const setup = require("./setup")
+import chai from "chai"
+import BN from "bn.js"
+import {Erc20TokenInstance} from "../../types/Erc20Token"
+import {ControllerInstance} from "../../types/Controller"
+import {VaultInstance} from "../../types/Vault"
+import {StrategyTestInstance} from "../../types/StrategyTest"
+import {eq, add } from "../util"
+import _setup from "./setup"
 
 contract("integration", (accounts) => {
-  const refs = setup(accounts)
+  const refs = _setup(accounts)
   const {admin} = refs
 
-  let controller
-  let vault
-  let strategy
-  let underlying
+  let controller: ControllerInstance
+  let vault: VaultInstance
+  let strategy: StrategyTestInstance
+  let underlying: Erc20TokenInstance
   beforeEach(async () => {
     controller = refs.controller
     vault = refs.vault
@@ -60,7 +64,7 @@ contract("integration", (accounts) => {
 
   it("should reject if transferred amount < min", async () => {
     const amount = await underlying.balanceOf(strategy.address)
-    const min = amount.add(new BN(1))
+    const min = add(amount, 1)
 
     await chai.expect(
       controller.exit(strategy.address, min, {from: accounts[1]})

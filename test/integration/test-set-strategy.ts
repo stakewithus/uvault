@@ -1,19 +1,23 @@
-const BN = require("bn.js")
-const {chai.expect} = require("../setup")
-const {eq, add} = require("../util")
-const setup = require("./setup")
+import chai from "chai"
+import BN from "bn.js"
+import {Erc20TokenInstance} from "../../types/Erc20Token"
+import {ControllerInstance} from "../../types/Controller"
+import {VaultInstance} from "../../types/Vault"
+import {StrategyTestInstance} from "../../types/StrategyTest"
+import {eq, add } from "../util"
+import _setup from "./setup"
 
 const StrategyTest = artifacts.require("StrategyTest")
 
 contract("integration", (accounts) => {
-  const refs = setup(accounts)
+  const refs = _setup(accounts)
   const {admin} = refs
 
-  let controller
-  let vault
-  let strategy
-  let underlying
-  let newStrategy
+  let controller: ControllerInstance
+  let vault: VaultInstance
+  let strategy: StrategyTestInstance
+  let underlying: Erc20TokenInstance
+  let newStrategy: StrategyTestInstance
   beforeEach(async () => {
     controller = refs.controller
     vault = refs.vault

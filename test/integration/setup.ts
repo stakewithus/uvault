@@ -1,4 +1,12 @@
-const BN = require("bn.js")
+import "../setup"
+import BN from "bn.js"
+import {Erc20TokenInstance} from "../../types/Erc20Token"
+import {MockGasTokenInstance} from "../../types/MockGasToken"
+import {GasRelayerInstance} from "../../types/GasRelayer"
+import {ControllerInstance} from "../../types/Controller"
+import {VaultInstance} from "../../types/Vault"
+import {StrategyTestInstance} from "../../types/StrategyTest"
+import { pow} from "../util"
 
 const ERC20Token = artifacts.require("ERC20Token")
 const MockGasToken = artifacts.require("MockGasToken")
@@ -7,7 +15,7 @@ const Controller = artifacts.require("Controller")
 const Vault = artifacts.require("Vault")
 const StrategyTest = artifacts.require("StrategyTest")
 
-module.exports = (accounts) => {
+export default (accounts: Truffle.Accounts) => {
   const admin = accounts[0]
   const treasury = accounts[1]
   const whale = accounts[2]
@@ -15,14 +23,33 @@ module.exports = (accounts) => {
   const MIN_WAIT_TIME = 0
 
   // references to return
-  const refs = {
+  interface Refs {
+    admin: string,
+    treasury: string,
+    underlying: Erc20TokenInstance,
+    gasToken: MockGasTokenInstance,
+    gasRelayer: GasRelayerInstance,
+    controller: ControllerInstance,
+    vault: VaultInstance,
+    strategy: StrategyTestInstance,
+    MIN_WAIT_TIME: number,
+    whale: string,
+  }
+
+  const refs: Refs = {
     admin,
     treasury,
+    // @ts-ignore
     underlying: null,
+    // @ts-ignore
     gasToken: null,
+    // @ts-ignore
     gasRelayer: null,
-    contoller: null,
+    // @ts-ignore
+    controller: null,
+    // @ts-ignore
     vault: null,
+    // @ts-ignore
     strategy: null,
     MIN_WAIT_TIME,
     whale,
@@ -62,7 +89,7 @@ module.exports = (accounts) => {
     refs.strategy = strategy
 
     // deposit into vault
-    const amount = new BN(10).pow(new BN(18)).mul(new BN(100))
+    const amount = pow(10, 18).mul(new BN(100))
     await underlying.mint(whale, amount)
     await underlying.approve(vault.address, amount, {from: whale})
     await vault.deposit(amount, {from: whale})
