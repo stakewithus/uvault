@@ -40,9 +40,9 @@ ganache-cli \
 # Error: Returned error: Returned error: project ID does not have access to archive state
 
 # test specific file
-truffle test --network mainnet_fork test/mainnet/path/to/test.js
+truffle test --network mainnet_fork test/mainnet/path/to/test.ts
 # test all (need to restart truffle after each test)
-find test/mainnet -name "test-*.js" -exec truffle test --network mainnet_fork {} \;
+find test/mainnet -name "test-*.ts" -exec truffle test --network mainnet_fork {} \;
 ```
 
 ### Lint
@@ -85,7 +85,7 @@ env $(cat .env) npx buidler run scripts/script-to-run.js --network ropsten
 
 ##### Deployed Contracts
 
-See [scripts/config.js](./scripts/config.js)
+See [scripts/mainnet/config.ts](./scripts/mainnet/config.ts)
 
 ### APY
 
