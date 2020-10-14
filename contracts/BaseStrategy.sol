@@ -34,7 +34,10 @@ contract BaseStrategy {
     }
 
     modifier onlyVaultOrController() {
-        require(msg.sender == vault || msg.sender == controller, "!vault and !controller");
+        require(
+            msg.sender == vault || msg.sender == controller,
+            "!vault and !controller"
+        );
         _;
     }
 

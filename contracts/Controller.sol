@@ -81,12 +81,20 @@ contract Controller is IController {
     }
 
     // @dev Warning: withdrawAll can be called on strategy that is not set to any vault
-    function withdrawAll(address _strategy, uint _min) external onlyAuthorized checkWithdraw(_strategy, _min) {
+    function withdrawAll(address _strategy, uint _min)
+        external
+        onlyAuthorized
+        checkWithdraw(_strategy, _min)
+    {
         IStrategy(_strategy).withdrawAll();
     }
 
     // @dev Warning: exit can be called on strategy that is not set to any vault
-    function exit(address _strategy, uint _min) external onlyAuthorized checkWithdraw(_strategy, _min) {
+    function exit(address _strategy, uint _min)
+        external
+        onlyAuthorized
+        checkWithdraw(_strategy, _min)
+    {
         IStrategy(_strategy).exit();
     }
 }

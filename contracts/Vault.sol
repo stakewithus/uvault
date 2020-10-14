@@ -221,8 +221,14 @@ contract Vault is IVault, ERC20, ERC20Detailed, ReentrancyGuard {
     function setStrategy(address _strategy) external onlyAuthorized {
         require(_strategy != address(0), "strategy = zero address");
         require(_strategy != strategy, "new strategy = current strategy");
-        require(IStrategy(_strategy).underlying() == token, "strategy.token != vault.token");
-        require(IStrategy(_strategy).vault() == address(this), "strategy.vault != vault");
+        require(
+            IStrategy(_strategy).underlying() == token,
+            "strategy.token != vault.token"
+        );
+        require(
+            IStrategy(_strategy).vault() == address(this),
+            "strategy.vault != vault"
+        );
 
         if (_strategy == nextStrategy) {
             require(block.timestamp >= timeLock, "timestamp < time lock");

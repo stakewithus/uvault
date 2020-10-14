@@ -3,7 +3,10 @@ pragma solidity 0.5.17;
 import "./StrategyStableTo3Crv.sol";
 
 contract StrategyDaiTo3Crv is StrategyStableTo3Crv {
-    constructor(address _controller, address _vault) public StrategyStableTo3Crv( _controller, _vault) {
+    constructor(address _controller, address _vault)
+        public
+        StrategyStableTo3Crv(_controller, _vault)
+    {
         // dai
         underlying = 0x6B175474E89094C44Da98b954EedeAC495271d0F;
         underlyingIndex = 0;

@@ -23,7 +23,7 @@ contract StrategyStableToCurve is IStrategy, BaseStrategy {
 
     address public underlying;
     // DAI = 0 | USDC = 1 | USDT = 2
-    uint256 internal underlyingIndex;
+    uint internal underlyingIndex;
 
     // Curve //
     // cDAI/cUSDC or 3Crv
@@ -42,7 +42,10 @@ contract StrategyStableToCurve is IStrategy, BaseStrategy {
     // used for crv <> weth <> underlying route
     address internal weth;
 
-    constructor(address _controller, address _vault) public BaseStrategy(_controller, _vault) {}
+    constructor(address _controller, address _vault)
+        public
+        BaseStrategy(_controller, _vault)
+    {}
 
     function _calcWithdrawOneCoin(uint _gaugeAmount) internal view returns (uint);
 
@@ -182,7 +185,13 @@ contract StrategyStableToCurve is IStrategy, BaseStrategy {
             path[1] = weth;
             path[2] = underlying;
 
-            Uniswap(uniswap).swapExactTokensForTokens(crvBal, uint(0), path, address(this), now.add(1800));
+            Uniswap(uniswap).swapExactTokensForTokens(
+                crvBal,
+                uint(0),
+                path,
+                address(this),
+                now.add(1800)
+            );
             // NOTE: Now this contract has underlying token
         }
     }

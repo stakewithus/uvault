@@ -3,7 +3,10 @@ pragma solidity 0.5.17;
 import "./StrategyStableToCusd.sol";
 
 contract StrategyUsdcToCusd is StrategyStableToCusd {
-    constructor(address _controller, address _vault) public StrategyStableToCusd(_controller, _vault) {
+    constructor(address _controller, address _vault)
+        public
+        StrategyStableToCusd(_controller, _vault)
+    {
         // usdc
         underlying = 0xA0b86991c6218b36c1d19D4a2e9Eb0cE3606eB48;
         underlyingIndex = 1;

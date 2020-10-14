@@ -3,7 +3,10 @@ pragma solidity 0.5.17;
 import "./StrategyStableTo3Crv.sol";
 
 contract StrategyUsdtTo3Crv is StrategyStableTo3Crv {
-    constructor(address _controller, address _vault) public StrategyStableTo3Crv( _controller, _vault) {
+    constructor(address _controller, address _vault)
+        public
+        StrategyStableTo3Crv(_controller, _vault)
+    {
         // usdt
         underlying = 0xdAC17F958D2ee523a2206206994597C13D831ec7;
         underlyingIndex = 2;

@@ -3,7 +3,10 @@ pragma solidity 0.5.17;
 import "./StrategyStableToCusd.sol";
 
 contract StrategyDaiToCusd is StrategyStableToCusd {
-    constructor(address _controller, address _vault) public StrategyStableToCusd(_controller, _vault) {
+    constructor(address _controller, address _vault)
+        public
+        StrategyStableToCusd(_controller, _vault)
+    {
         // dai
         underlying = 0x6B175474E89094C44Da98b954EedeAC495271d0F;
         underlyingIndex = 0;
