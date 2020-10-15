@@ -33,7 +33,7 @@ const config: Config = {
     gasToken: "0x063f83affbcf64d7d84d306f5b85ed65c865dca4",
     gasRelayer: "0xD01D18440A150581A36581adD5b2bcb2DCc63333",
     treasury: "0x9a4c3Fc4683b95EBF11B535057B00812f6a549Bb",
-    controller: "0xE6aFde27f7c76f8a2C74Cf25056Ae74785db2693",
+    controller: "0x809209c5bb52b5a32A1998eFA12B3c430Af77298",
     // vaults //
     vault: "0x9D5363c03b6B22a097B86e9204870Fedbb977f81",
     // strategies //
@@ -47,7 +47,7 @@ const config: Config = {
     gasToken: "0x0000000000004946c0e9F43F4Dee607b0eF1fA1c",
     gasRelayer: "0xe26C446fDCcD62F97a1D6bC21DD92638B0191037",
     treasury: "0x9a4c3Fc4683b95EBF11B535057B00812f6a549Bb",
-    controller: "0xE95EABc97a96dAc94fABE254E22EdD8B881b8E19",
+    controller: "0x29F7e5e34bCdAcC9451068a14D56a3C9c94aB567",
     // vaults //
     daiVault: "0x75FCf5cd547Dd312F8c1Cf5000Ad44CF521fCF7f",
     usdcVault: "0x51B4c5f40C24D8494Ac334470df74b753E938efF",
