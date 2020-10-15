@@ -88,7 +88,8 @@ export default (accounts: Truffle.Accounts) => {
     refs.vault = vault
     refs.strategy = strategy
 
-    await controller.authorize(gasRelayer.address, {from: admin})
+    const adminRole = await controller.ADMIN_ROLE()
+    await controller.grantRole(adminRole, gasRelayer.address, {from: admin})
 
     // deposit into vault
     const amount = pow(10, 18).mul(new BN(100))

@@ -5,6 +5,10 @@ import "./interfaces/GasToken.sol";
 import "./AccessControl.sol";
 
 contract GasRelayer is AccessControl {
+    bytes32 public constant GAS_TOKEN_USER_ROLE = keccak256(
+        abi.encodePacked("GAS_TOKEN_USER")
+    );
+
     address public admin;
     address public gasToken;
 
@@ -14,7 +18,7 @@ contract GasRelayer is AccessControl {
         admin = msg.sender;
         gasToken = _gasToken;
 
-        _authorize(admin);
+        _grantRole(GAS_TOKEN_USER_ROLE, admin);
     }
 
     modifier onlyAdmin() {
@@ -39,12 +43,16 @@ contract GasRelayer is AccessControl {
         admin = _admin;
     }
 
+    function authorized(address _addr) external view returns (bool) {
+        return hasRole[GAS_TOKEN_USER_ROLE][_addr];
+    }
+
     function authorize(address _addr) external onlyAdmin {
-        _authorize(_addr);
+        _grantRole(GAS_TOKEN_USER_ROLE, _addr);
     }
 
     function unauthorize(address _addr) external onlyAdmin {
-        _unauthorize(_addr);
+        _revokeRole(GAS_TOKEN_USER_ROLE, _addr);
     }
 
     function setGasToken(address _gasToken) external onlyAdmin {
@@ -64,7 +72,7 @@ contract GasRelayer is AccessControl {
         address _to,
         bytes calldata _data,
         uint _maxGasToken
-    ) external onlyAuthorized useChi(_maxGasToken) {
+    ) external onlyAuthorized(GAS_TOKEN_USER_ROLE) useChi(_maxGasToken) {
         (bool success, ) = _to.call(_data);
         require(success, "relay failed");
     }

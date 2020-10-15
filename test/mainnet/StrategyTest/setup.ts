@@ -93,7 +93,11 @@ export default (accounts: Truffle.Accounts) => {
     refs.strategy = strategy
     refs.underlying = underlying
 
-    await controller.authorize(gasRelayer.address, {from: admin})
+    const adminRole = await controller.ADMIN_ROLE()
+    await controller.grantRole(adminRole, gasRelayer.address, {from: admin})
+
+    const harvesterRole = await controller.HARVESTER_ROLE()
+    await controller.grantRole(harvesterRole, gasRelayer.address, {from: admin})
 
     // Mint gas token
     await gasRelayer.mintGasToken(10)

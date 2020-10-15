@@ -1,25 +1,29 @@
 pragma solidity ^0.5.17;
 
 contract AccessControl {
-    event Authorize(address addr);
-    event Unauthorize(address addr);
+    event GrantRole(bytes32 indexed role, address indexed addr);
+    event RevokeRole(bytes32 indexed role, address indexed addr);
 
-    mapping(address => bool) public authorized;
+    mapping(bytes32 => mapping(address => bool)) public hasRole;
 
-    modifier onlyAuthorized() {
-        require(authorized[msg.sender], "!authorized");
+    modifier onlyAuthorized(bytes32 _role) {
+        require(hasRole[_role][msg.sender], "!authorized");
         _;
     }
 
-    function _authorize(address _addr) internal {
-        authorized[_addr] = true;
+    function _grantRole(bytes32 _role, address _addr) internal {
+        require(_addr != address(0), "address = zero");
 
-        emit Authorize(_addr);
+        hasRole[_role][_addr] = true;
+
+        emit GrantRole(_role, _addr);
     }
 
-    function _unauthorize(address _addr) internal {
-        authorized[_addr] = false;
+    function _revokeRole(bytes32 _role, address _addr) internal {
+        require(_addr != address(0), "address = zero");
 
-        emit Unauthorize(_addr);
+        hasRole[_role][_addr] = false;
+
+        emit RevokeRole(_role, _addr);
     }
 }

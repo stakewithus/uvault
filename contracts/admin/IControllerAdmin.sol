@@ -7,11 +7,15 @@ interface IControllerAdmin {
 
     function setTreasury(address _treasury) external;
 
-    function authorize(address _addr) external;
+    function ADMIN_ROLE() external view returns (bytes32);
 
-    function unauthorize(address _addr) external;
+    function HARVESTER_ROLE() external view returns (bytes32);
 
-    function authorized(address _addr) external view returns (bool);
+    function grantRole(bytes32 _role, address _addr) external;
+
+    function revokeRole(bytes32 _role, address _addr) external view returns (bool);
+
+    function hasRole(bytes32 _role, address _addr) external view returns (bool);
 
     // IController //
     function admin() external view returns (address);
