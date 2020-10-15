@@ -14,7 +14,12 @@ export function encodeInvest(web3: Web3, vault: string): string {
   )
 }
 
-export function encodeSetStrategy(web3: Web3, vault: string, strategy: string): string {
+export function encodeSetStrategy(
+  web3: Web3,
+  vault: string,
+  strategy: string,
+  min: BN
+): string {
   return web3.eth.abi.encodeFunctionCall(
     {
       name: "setStrategy",
@@ -28,9 +33,13 @@ export function encodeSetStrategy(web3: Web3, vault: string, strategy: string): 
           type: "address",
           name: "strategy",
         },
+        {
+          type: "uint256",
+          name: "min",
+        },
       ],
     },
-    [vault, strategy]
+    [vault, strategy, min.toString()]
   )
 }
 

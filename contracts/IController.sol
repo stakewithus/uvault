@@ -5,7 +5,17 @@ interface IController {
 
     function treasury() external view returns (address);
 
-    function setStrategy(address _vault, address _strategy) external;
+    /*
+    @notice Set strategy for vault
+    @param _vault Address of vault
+    @param _strategy Address of strategy
+    @param _min Minimum undelying token current strategy must return. Prevents slippage
+    */
+    function setStrategy(
+        address _vault,
+        address _strategy,
+        uint _min
+    ) external;
 
     // calls to strategy
     /*

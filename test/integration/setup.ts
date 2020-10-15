@@ -98,7 +98,9 @@ export default (accounts: Truffle.Accounts) => {
 
     // set strategy
     await vault.setNextStrategy(strategy.address, {from: admin})
-    await controller.setStrategy(vault.address, strategy.address, {from: admin})
+    await controller.setStrategy(vault.address, strategy.address, new BN(0), {
+      from: admin,
+    })
   })
 
   return refs

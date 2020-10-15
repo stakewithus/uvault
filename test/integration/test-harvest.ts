@@ -6,7 +6,7 @@ import {StrategyTestInstance} from "../../types/StrategyTest"
 import {eq, add} from "../util"
 import _setup from "./setup"
 
-contract("mainnet integration", (accounts) => {
+contract("integration", (accounts) => {
   const refs = _setup(accounts)
   const {admin} = refs
 

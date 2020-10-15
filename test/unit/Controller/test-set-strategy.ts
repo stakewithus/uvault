@@ -1,4 +1,5 @@
 import chai from "chai"
+import BN from "bn.js"
 import {ControllerInstance} from "../../../types/Controller"
 import {StrategyTestInstance} from "../../../types/StrategyTest"
 import {MockVaultInstance} from "../../../types/MockVault"
@@ -19,7 +20,9 @@ contract("Controller", (accounts) => {
 
   describe("setStrategy", () => {
     it("should set strategy admin", async () => {
-      await controller.setStrategy(vault.address, strategy.address, {from: admin})
+      await controller.setStrategy(vault.address, strategy.address, new BN(0), {
+        from: admin,
+      })
 
       assert.equal(await vault.strategy(), strategy.address, "strategy")
     })
@@ -27,7 +30,7 @@ contract("Controller", (accounts) => {
     it("should reject if caller not authorized", async () => {
       await chai
         .expect(
-          controller.setStrategy(vault.address, strategy.address, {
+          controller.setStrategy(vault.address, strategy.address, new BN(0), {
             from: accounts[1],
           })
         )
@@ -36,7 +39,7 @@ contract("Controller", (accounts) => {
 
     it("should reject if vault does not exist", async () => {
       await chai.expect(
-        controller.setStrategy(accounts[1], strategy.address, {from: admin})
+        controller.setStrategy(accounts[1], strategy.address, new BN(0), {from: admin})
       ).to.be.rejected
     })
   })

@@ -18,7 +18,11 @@ interface IControllerAdmin {
 
     function treasury() external view returns (address);
 
-    function setStrategy(address _vault, address _strategy) external;
+    function setStrategy(
+        address _vault,
+        address _strategy,
+        uint _min
+    ) external;
 
     // calls to strategy
     /*

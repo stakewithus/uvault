@@ -63,8 +63,9 @@ contract("mainnet integration", (accounts) => {
     // set next strategy
     await vault.setNextStrategy(newStrategy.address, {from: admin})
 
+    const min = await vault.balanceInStrategy()
     const gasTokenBal = await gasToken.balanceOf(gasRelayer.address)
-    const txData = encodeSetStrategy(web3, vault.address, newStrategy.address)
+    const txData = encodeSetStrategy(web3, vault.address, newStrategy.address, min)
 
     const before = await snapshot()
     await gasRelayer.relayTx(controller.address, txData, gasTokenBal)

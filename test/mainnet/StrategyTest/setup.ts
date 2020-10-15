@@ -100,7 +100,9 @@ export default (accounts: Truffle.Accounts) => {
 
     // set strategy
     await vault.setNextStrategy(strategy.address, {from: admin})
-    await controller.setStrategy(vault.address, strategy.address, {from: admin})
+    await controller.setStrategy(vault.address, strategy.address, new BN(0), {
+      from: admin,
+    })
 
     // deposit into vault
     const amount = pow(10, UNDERLYING_DECIMALS).mul(new BN(10))
