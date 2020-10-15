@@ -1,13 +1,13 @@
-import "../setup"
+import "../../setup"
 import BN from "bn.js"
-import {Ierc20Instance} from "../../types/Ierc20"
-import {GasTokenInstance} from "../../types/GasToken"
-import {GasRelayerInstance} from "../../types/GasRelayer"
-import {ControllerInstance} from "../../types/Controller"
-import {VaultInstance} from "../../types/Vault"
-import {StrategyTestInstance} from "../../types/StrategyTest"
-import {USDC, USDC_WHALE, CHI} from "./config"
-import {sendEther, USDC_DECIMALS, pow} from "../util"
+import {Ierc20Instance} from "../../../types/Ierc20"
+import {GasTokenInstance} from "../../../types/GasToken"
+import {GasRelayerInstance} from "../../../types/GasRelayer"
+import {ControllerInstance} from "../../../types/Controller"
+import {VaultInstance} from "../../../types/Vault"
+import {StrategyTestInstance} from "../../../types/StrategyTest"
+import {sendEther, USDC_DECIMALS, pow} from "../../util"
+import {USDC, USDC_WHALE, CHI} from "../config"
 
 const IERC20 = artifacts.require("IERC20")
 const GasToken = artifacts.require("GasToken")
