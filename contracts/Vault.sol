@@ -86,7 +86,7 @@ contract Vault is IVault, ERC20, ERC20Detailed, ReentrancyGuard {
         _;
     }
 
-    modifier onlyAuthorized() {
+    modifier onlyAdminOrController() {
         require(msg.sender == admin || msg.sender == controller, "!authorized");
         _;
     }
@@ -210,7 +210,7 @@ contract Vault is IVault, ERC20, ERC20Detailed, ReentrancyGuard {
     @param _strategy Address of strategy used
     @param _min Minimum undelying token current strategy must return. Prevents slippage
     */
-    function setStrategy(address _strategy, uint _min) external onlyAuthorized {
+    function setStrategy(address _strategy, uint _min) external onlyAdminOrController {
         require(_strategy != address(0), "strategy = zero address");
         require(_strategy != strategy, "new strategy = current strategy");
         require(
@@ -285,7 +285,7 @@ contract Vault is IVault, ERC20, ERC20Detailed, ReentrancyGuard {
     @notice Invest token from vault into strategy.
             Some token are kept in vault for cheap withdraw.
     */
-    function invest() external whenStrategyDefined whenNotPaused onlyAuthorized {
+    function invest() external whenStrategyDefined whenNotPaused onlyAdminOrController {
         uint amount = _availableToInvest();
         require(amount > 0, "available = 0");
 
