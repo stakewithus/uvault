@@ -6,18 +6,11 @@ import "@openzeppelin/contracts/math/SafeMath.sol";
 
 import "../IController.sol";
 import "../IStrategy.sol";
+import "../BaseStrategy.sol";
 
-contract StrategyTest is IStrategy {
+contract StrategyTest is IStrategy, BaseStrategy {
     using SafeERC20 for IERC20;
     using SafeMath for uint;
-
-    address public admin;
-    address public controller;
-    address public vault;
-
-    // performance fee sent to treasury when harvest() generates profit
-    uint public performanceFee = 50;
-    uint public constant PERFORMANCE_FEE_MAX = 10000;
 
     address public underlying;
 
@@ -35,38 +28,10 @@ contract StrategyTest is IStrategy {
         address _controller,
         address _vault,
         address _underlying
-    ) public {
-        require(_controller != address(0), "controller = zero address");
-        require(_vault != address(0), "vault = zero address");
+    ) public BaseStrategy(_controller, _vault) {
         require(_underlying != address(0), "underlying = zero address");
 
-        admin = msg.sender;
-        controller = _controller;
-        vault = _vault;
         underlying = _underlying;
-    }
-
-    modifier onlyAdmin() {
-        require(msg.sender == admin, "!admin");
-        _;
-    }
-
-    modifier onlyController() {
-        require(msg.sender == controller, "!controller");
-        _;
-    }
-
-    modifier onlyVault() {
-        require(msg.sender == vault, "!vault");
-        _;
-    }
-
-    modifier onlyVaultOrController() {
-        require(
-            msg.sender == vault || msg.sender == controller,
-            "!vault and !controller"
-        );
-        _;
     }
 
     function _totalAssets() internal view returns (uint) {
