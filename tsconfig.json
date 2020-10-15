@@ -7,9 +7,10 @@
     "outDir": "dist",
     "resolveJsonModule": true
   },
-  "include": ["scripts"],
+  "include": ["scripts", "test"],
   "files": [
     "./buidler.config.ts",
-    "node_modules/@nomiclabs/buidler-ethers/src/type-extensions.d.ts"
+    "node_modules/@nomiclabs/buidler-ethers/src/type-extensions.d.ts",
+    "./types/types.d.ts"
   ]
 }
