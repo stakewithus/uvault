@@ -53,7 +53,7 @@ export default (
     refs.cUnderlying = await IERC20.at(cUnderlying)
     refs.gauge = await Gauge.at(gauge)
     refs.crv = await IERC20.at(CRV)
-    refs.controller = await Controller.new(treasury, gasRelayer)
+    refs.controller = await Controller.new(treasury)
     refs.strategy = await Strategy.new(refs.controller.address, vault)
   })
 

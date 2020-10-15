@@ -5,7 +5,7 @@ import _setup from "./setup"
 
 contract("Controller", (accounts) => {
   const refs = _setup(accounts)
-  const {admin, gasRelayer} = refs
+  const {admin} = refs
 
   let controller: ControllerInstance
   let strategy: StrategyTestInstance

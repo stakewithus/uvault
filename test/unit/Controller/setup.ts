@@ -12,15 +12,12 @@ const MockVault = artifacts.require("MockVault")
 export default (accounts: Truffle.Accounts) => {
   const admin = accounts[0]
   const treasury = accounts[1]
-  // mock contract addresses
-  const gasRelayer = accounts[2]
 
   // references to return
   interface Refs {
     admin: string
     treasury: string
     underlying: Erc20TokenInstance
-    gasRelayer: string
     controller: ControllerInstance
     vault: MockVaultInstance
     strategy: StrategyTestInstance
@@ -31,7 +28,6 @@ export default (accounts: Truffle.Accounts) => {
     treasury,
     // @ts-ignore
     underlying: null,
-    gasRelayer,
     // @ts-ignore
     controller: null,
     // @ts-ignore
@@ -42,7 +38,7 @@ export default (accounts: Truffle.Accounts) => {
 
   beforeEach(async () => {
     refs.underlying = await ERC20Token.new()
-    refs.controller = await Controller.new(treasury, gasRelayer, {
+    refs.controller = await Controller.new(treasury, {
       from: admin,
     })
     refs.vault = await MockVault.new(refs.controller.address, refs.underlying.address)

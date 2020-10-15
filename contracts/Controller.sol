@@ -12,18 +12,14 @@ contract Controller is IController, AccessControl {
 
     address public admin;
     address public treasury;
-    address public gasRelayer;
 
-    constructor(address _treasury, address _gasRelayer) public {
+    constructor(address _treasury) public {
         require(_treasury != address(0), "treasury = zero address");
-        require(_gasRelayer != address(0), "gas relayer = zero address");
 
         admin = msg.sender;
         treasury = _treasury;
-        gasRelayer = _gasRelayer;
 
         _authorize(admin);
-        _authorize(gasRelayer);
     }
 
     modifier onlyAdmin() {
@@ -47,11 +43,6 @@ contract Controller is IController, AccessControl {
 
     function unauthorize(address _addr) external onlyAdmin {
         _unauthorize(_addr);
-    }
-
-    function setGasRelayer(address _gasRelayer) external onlyAdmin {
-        require(_gasRelayer != address(0), "gas relayer = zero address");
-        gasRelayer = _gasRelayer;
     }
 
     function setStrategy(address _vault, address _strategy) external onlyAuthorized {

@@ -70,7 +70,7 @@ export default (accounts: Truffle.Accounts) => {
     const gasRelayer = await GasRelayer.new(gasToken.address, {
       from: admin,
     })
-    const controller = await Controller.new(treasury, gasRelayer.address, {
+    const controller = await Controller.new(treasury, {
       from: admin,
     })
     const vault = await Vault.new(controller.address, UNDERLYING, MIN_WAIT_TIME, {
@@ -92,6 +92,8 @@ export default (accounts: Truffle.Accounts) => {
     refs.vault = vault
     refs.strategy = strategy
     refs.underlying = underlying
+
+    await controller.authorize(gasRelayer.address, {from: admin})
 
     // Mint gas token
     await gasRelayer.mintGasToken(10)

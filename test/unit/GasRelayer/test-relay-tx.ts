@@ -54,14 +54,14 @@ contract("GasRelayer", (accounts) => {
       assert.equal(await txReceiver._data_(), "0x1212", "tx data")
     })
 
-    it("should reject if caller not admin", async () => {
+    it("should reject if caller not authorized", async () => {
       await chai
         .expect(
           gasRelayer.relayTx(txReceiver.address, data, maxGasToken, {
             from: accounts[1],
           })
         )
-        .to.be.rejectedWith("!admin")
+        .to.be.rejectedWith("!authorized")
     })
 
     it("should reject if tx failed", async () => {

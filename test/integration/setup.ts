@@ -61,7 +61,7 @@ export default (accounts: Truffle.Accounts) => {
     const gasRelayer = await GasRelayer.new(gasToken.address, {
       from: admin,
     })
-    const controller = await Controller.new(treasury, gasRelayer.address, {
+    const controller = await Controller.new(treasury, {
       from: admin,
     })
     const vault = await Vault.new(
@@ -87,6 +87,8 @@ export default (accounts: Truffle.Accounts) => {
     refs.controller = controller
     refs.vault = vault
     refs.strategy = strategy
+
+    await controller.authorize(gasRelayer.address, {from: admin})
 
     // deposit into vault
     const amount = pow(10, 18).mul(new BN(100))

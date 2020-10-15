@@ -6,7 +6,7 @@ import _setup from "./setup"
 
 contract("Controller", (accounts) => {
   const refs = _setup(accounts)
-  const {admin, gasRelayer} = refs
+  const {admin} = refs
 
   let controller: ControllerInstance
   let vault: MockVaultInstance
@@ -20,14 +20,6 @@ contract("Controller", (accounts) => {
   describe("setStrategy", () => {
     it("should set strategy admin", async () => {
       await controller.setStrategy(vault.address, strategy.address, {from: admin})
-
-      assert.equal(await vault.strategy(), strategy.address, "strategy")
-    })
-
-    it("should set strategy gas relayer", async () => {
-      await controller.setStrategy(vault.address, strategy.address, {
-        from: gasRelayer,
-      })
 
       assert.equal(await vault.strategy(), strategy.address, "strategy")
     })
