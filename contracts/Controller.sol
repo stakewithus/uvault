@@ -5,8 +5,9 @@ import "@openzeppelin/contracts/token/ERC20/IERC20.sol";
 import "./IController.sol";
 import "./IVault.sol";
 import "./IStrategy.sol";
+import "./AccessControl.sol";
 
-contract Controller is IController {
+contract Controller is IController, AccessControl {
     using SafeMath for uint;
 
     address public admin;
@@ -20,15 +21,13 @@ contract Controller is IController {
         admin = msg.sender;
         treasury = _treasury;
         gasRelayer = _gasRelayer;
+
+        _authorize(admin);
+        _authorize(gasRelayer);
     }
 
     modifier onlyAdmin() {
         require(msg.sender == admin, "!admin");
-        _;
-    }
-
-    modifier onlyAuthorized() {
-        require(msg.sender == admin || msg.sender == gasRelayer, "!authorized");
         _;
     }
 
@@ -40,6 +39,14 @@ contract Controller is IController {
     function setTreasury(address _treasury) external onlyAdmin {
         require(_treasury != address(0), "treasury = zero address");
         treasury = _treasury;
+    }
+
+    function authorize(address _addr) external onlyAdmin {
+        _authorize(_addr);
+    }
+
+    function unauthorize(address _addr) external onlyAdmin {
+        _unauthorize(_addr);
     }
 
     function setGasRelayer(address _gasRelayer) external onlyAdmin {

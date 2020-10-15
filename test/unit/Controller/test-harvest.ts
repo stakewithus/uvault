@@ -21,12 +21,6 @@ contract("Controller", (accounts) => {
       assert(await strategy._harvestWasCalled_(), "harvest")
     })
 
-    it("should harvest gas relayer", async () => {
-      await controller.harvest(strategy.address, {from: gasRelayer})
-
-      assert(await strategy._harvestWasCalled_(), "harvest")
-    })
-
     it("should reject if caller not authorized", async () => {
       await chai
         .expect(controller.harvest(strategy.address, {from: accounts[1]}))

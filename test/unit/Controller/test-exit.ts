@@ -22,12 +22,6 @@ contract("Controller", (accounts) => {
       assert(await strategy._exitWasCalled_(), "exit")
     })
 
-    it("should exit gas relayer", async () => {
-      await controller.exit(strategy.address, 0, {from: gasRelayer})
-
-      assert(await strategy._exitWasCalled_(), "exit")
-    })
-
     it("should reject if withdraw < min", async () => {
       const bal = await strategy.totalAssets()
       const min = add(bal, 1)

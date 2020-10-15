@@ -21,12 +21,6 @@ contract("Controller", (accounts) => {
       assert(await vault._investWasCalled_(), "invest")
     })
 
-    it("should invest gas relayer", async () => {
-      await controller.invest(vault.address, {from: gasRelayer})
-
-      assert(await vault._investWasCalled_(), "invest")
-    })
-
     it("should reject if caller not authorized", async () => {
       await chai
         .expect(controller.invest(vault.address, {from: accounts[1]}))
