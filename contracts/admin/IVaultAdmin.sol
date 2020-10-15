@@ -9,8 +9,6 @@ interface IVaultAdmin {
 
     function reserveMin() external view returns (uint);
 
-    function withdrawMin() external view returns (uint);
-
     function withdrawFee() external view returns (uint);
 
     function paused() external view returns (uint);
@@ -20,8 +18,6 @@ interface IVaultAdmin {
     function setController(address _controller) external;
 
     function setReserveMin(address _reserveMin) external;
-
-    function setWithdrawMin(address _withdrawMin) external;
 
     function setWithdrawFee(address _fee) external;
 

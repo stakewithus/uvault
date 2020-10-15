@@ -40,10 +40,6 @@ contract Vault is IVault, ERC20, ERC20Detailed, ReentrancyGuard {
     uint public reserveMin = 500;
     uint private constant RESERVE_MAX = 10000;
 
-    // percentage of undelying tokens that must be transferred back from strategy
-    uint public withdrawMin = 10000;
-    uint private constant WITHDRAW_MAX = 10000;
-
     // Denominator used to calculate fees
     uint private constant FEE_MAX = 10000;
 
@@ -123,11 +119,6 @@ contract Vault is IVault, ERC20, ERC20Detailed, ReentrancyGuard {
     function setReserveMin(uint _reserveMin) external onlyAdmin {
         require(_reserveMin <= RESERVE_MAX, "reserve min > max");
         reserveMin = _reserveMin;
-    }
-
-    function setWithdrawMin(uint _withdrawMin) external onlyAdmin {
-        require(_withdrawMin <= WITHDRAW_MAX, "withdraw min > max");
-        withdrawMin = _withdrawMin;
     }
 
     function setWithdrawFee(uint _fee) external onlyAdmin {
