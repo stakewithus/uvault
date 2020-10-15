@@ -33,7 +33,7 @@ contract("Vault", (accounts) => {
 
     describe("next strategy", () => {
       it("should set new strategy", async () => {
-        const tx = await vault.setStrategy(strategy.address, {
+        const tx = await vault.setStrategy(strategy.address, new BN(0), {
           from: admin,
         })
 
@@ -66,7 +66,8 @@ contract("Vault", (accounts) => {
             {from: admin}
           )
 
-          await vault.setStrategy(oldStrategy.address, {from: admin})
+          const min = await vault.balanceInStrategy()
+          await vault.setStrategy(oldStrategy.address, min, {from: admin})
           await vault.setNextStrategy(newStrategy.address, {from: admin})
         })
 
@@ -95,7 +96,8 @@ contract("Vault", (accounts) => {
           await timeout(MIN_WAIT_TIME)
 
           const before = await snapshot()
-          await vault.setStrategy(newStrategy.address, {from: admin})
+          const min = await vault.balanceInStrategy()
+          await vault.setStrategy(newStrategy.address, min, {from: admin})
           const after = await snapshot()
 
           // check state
@@ -123,13 +125,13 @@ contract("Vault", (accounts) => {
           await timeout(MIN_WAIT_TIME)
 
           await chai
-            .expect(vault.setStrategy(newStrategy.address, {from: admin}))
+            .expect(vault.setStrategy(newStrategy.address, new BN(2), {from: admin}))
             .to.be.rejectedWith("exit < min")
         })
 
         it("should reject if timestamp < time lock", async () => {
           await chai
-            .expect(vault.setStrategy(newStrategy.address, {from: admin}))
+            .expect(vault.setStrategy(newStrategy.address, new BN(0), {from: admin}))
             .to.be.rejectedWith("timestamp < time lock")
         })
       })
@@ -149,38 +151,38 @@ contract("Vault", (accounts) => {
           }
         )
 
-        await vault.setStrategy(oldStrategy.address, {from: admin})
+        await vault.setStrategy(oldStrategy.address, new BN(0), {from: admin})
         await vault.setNextStrategy(newStrategy.address, {from: admin})
         await timeout(MIN_WAIT_TIME)
-        await vault.setStrategy(newStrategy.address, {from: admin})
+        await vault.setStrategy(newStrategy.address, new BN(0), {from: admin})
       })
 
       it("should update strategy", async () => {
-        await vault.setStrategy(oldStrategy.address, {from: admin})
+        await vault.setStrategy(oldStrategy.address, new BN(0), {from: admin})
         assert.equal(await vault.strategy(), oldStrategy.address, "old strategy")
 
-        await vault.setStrategy(newStrategy.address, {from: admin})
+        await vault.setStrategy(newStrategy.address, new BN(0), {from: admin})
         assert.equal(await vault.strategy(), newStrategy.address, "new strategy")
       })
     })
 
     it("should reject if not authorized", async () => {
       await chai
-        .expect(vault.setStrategy(strategy.address, {from: accounts[1]}))
+        .expect(vault.setStrategy(strategy.address, new BN(0), {from: accounts[1]}))
         .to.be.rejectedWith("!authorized")
     })
 
     it("should reject if strategy is zero address", async () => {
       await chai
-        .expect(vault.setStrategy(ZERO_ADDRESS, {from: admin}))
+        .expect(vault.setStrategy(ZERO_ADDRESS, new BN(0), {from: admin}))
         .to.be.rejectedWith("strategy = zero address")
     })
 
     it("should reject if strategy is equal to current strategy", async () => {
-      await vault.setStrategy(strategy.address, {from: admin})
+      await vault.setStrategy(strategy.address, new BN(0), {from: admin})
 
       await chai
-        .expect(vault.setStrategy(strategy.address, {from: admin}))
+        .expect(vault.setStrategy(strategy.address, new BN(0), {from: admin}))
         .to.be.rejectedWith("new strategy = current strategy")
     })
 
@@ -188,7 +190,7 @@ contract("Vault", (accounts) => {
       await strategy._setUnderlying_(accounts[0])
 
       await chai
-        .expect(vault.setStrategy(strategy.address, {from: admin}))
+        .expect(vault.setStrategy(strategy.address, new BN(0), {from: admin}))
         .to.be.rejectedWith("strategy.token != vault.token")
     })
 
@@ -196,7 +198,7 @@ contract("Vault", (accounts) => {
       await strategy._setVault_(accounts[0])
 
       await chai
-        .expect(vault.setStrategy(strategy.address, {from: admin}))
+        .expect(vault.setStrategy(strategy.address, new BN(0), {from: admin}))
         .to.be.rejectedWith("strategy.vault != vault")
     })
 
@@ -211,7 +213,7 @@ contract("Vault", (accounts) => {
       )
 
       await chai
-        .expect(vault.setStrategy(strategy.address, {from: admin}))
+        .expect(vault.setStrategy(strategy.address, new BN(0), {from: admin}))
         .to.be.rejectedWith("!approved strategy")
     })
   })

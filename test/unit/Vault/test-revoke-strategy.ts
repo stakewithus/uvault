@@ -1,4 +1,5 @@
 import chai from "chai"
+import BN from "bn.js"
 import {Erc20TokenInstance} from "../../../types/Erc20Token"
 import {VaultInstance} from "../../../types/Vault"
 import {StrategyTestInstance} from "../../../types/StrategyTest"
@@ -22,7 +23,7 @@ contract("Vault", (accounts) => {
   describe("revokeStrategy", () => {
     beforeEach(async () => {
       await vault.setNextStrategy(strategy.address, {from: admin})
-      await vault.setStrategy(strategy.address, {from: admin})
+      await vault.setStrategy(strategy.address, new BN(0), {from: admin})
     })
 
     it("should revoke", async () => {

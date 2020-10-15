@@ -11,6 +11,7 @@ contract MockVault is IVault {
     uint public timeLock;
 
     // test helpers
+    uint public _setStrategyMin_;
     bool public _investWasCalled_;
     uint public _depositAmount_;
     uint public _withdrawAmount_;
@@ -26,8 +27,9 @@ contract MockVault is IVault {
         nextStrategy = _strategy;
     }
 
-    function setStrategy(address _strategy) external {
+    function setStrategy(address _strategy, uint _min) external {
         strategy = _strategy;
+        _setStrategyMin_ = _min;
     }
 
     function balanceInVault() external view returns (uint) {

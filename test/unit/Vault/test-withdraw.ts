@@ -32,7 +32,7 @@ contract("Vault", (accounts) => {
       await vault.deposit(amount, {from: sender})
 
       await vault.setNextStrategy(strategy.address, {from: admin})
-      await vault.setStrategy(strategy.address, {from: admin})
+      await vault.setStrategy(strategy.address, new BN(0), {from: admin})
       await vault.setWithdrawFee(100, {from: admin})
     })
 

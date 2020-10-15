@@ -46,7 +46,7 @@ contract Controller is IController, AccessControl {
     }
 
     function setStrategy(address _vault, address _strategy) external onlyAuthorized {
-        IVault(_vault).setStrategy(_strategy);
+        IVault(_vault).setStrategy(_strategy, 0);
     }
 
     function invest(address _vault) external onlyAuthorized {

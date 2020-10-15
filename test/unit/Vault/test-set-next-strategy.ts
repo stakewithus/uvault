@@ -42,8 +42,9 @@ contract("Vault", (accounts) => {
     })
 
     it("should set next strategy when current strategy is set", async () => {
+      const min = await vault.balanceInStrategy()
       await vault.setNextStrategy(strategy.address, {from: admin})
-      await vault.setStrategy(strategy.address, {from: admin})
+      await vault.setStrategy(strategy.address, min, {from: admin})
 
       assert.equal(await vault.strategy(), strategy.address, "strategy")
 

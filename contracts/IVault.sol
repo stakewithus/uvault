@@ -17,8 +17,9 @@ interface IVault {
 
     /*
     @notice Set strategy
+    @param _min Minimum undelying token current strategy must return. Prevents slippage
     */
-    function setStrategy(address _strategy) external;
+    function setStrategy(address _strategy, uint _min) external;
 
     /*
     @notice Returns the amount of token in the vault

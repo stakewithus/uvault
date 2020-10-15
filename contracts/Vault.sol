@@ -217,8 +217,9 @@ contract Vault is IVault, ERC20, ERC20Detailed, ReentrancyGuard {
     /*
     @notice Set strategy either to next strategy or back to previously approved strategy
     @param _strategy Address of strategy used
+    @param _min Minimum undelying token current strategy must return. Prevents slippage
     */
-    function setStrategy(address _strategy) external onlyAuthorized {
+    function setStrategy(address _strategy, uint _min) external onlyAuthorized {
         require(_strategy != address(0), "strategy = zero address");
         require(_strategy != strategy, "new strategy = current strategy");
         require(
@@ -237,7 +238,6 @@ contract Vault is IVault, ERC20, ERC20Detailed, ReentrancyGuard {
             require(strategies[_strategy], "!approved strategy");
         }
 
-        uint balInOldStrat = _balanceInStrategy();
         address oldStrategy = strategy;
         strategy = _strategy;
 
@@ -249,8 +249,7 @@ contract Vault is IVault, ERC20, ERC20Detailed, ReentrancyGuard {
             IStrategy(oldStrategy).exit();
             uint balAfter = _balanceInVault();
 
-            uint min = balInOldStrat.mul(withdrawMin).div(WITHDRAW_MAX);
-            require(balAfter.sub(balBefore) >= min, "exit < min");
+            require(balAfter.sub(balBefore) >= _min, "exit < min");
         }
 
         IERC20(token).safeApprove(strategy, 0);

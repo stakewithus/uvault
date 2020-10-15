@@ -36,7 +36,7 @@ contract("Vault", (accounts) => {
       await vault.deposit(amount, {from: user})
 
       await vault.setNextStrategy(strategy.address, {from: admin})
-      await vault.setStrategy(strategy.address, {from: admin})
+      await vault.setStrategy(strategy.address, new BN(0), {from: admin})
     })
 
     it("should invest", async () => {
