@@ -3,13 +3,15 @@ pragma solidity 0.5.17;
 // Interface to use on Remix by admin
 interface IControllerAdmin {
     // Admin helpers //
-    function gasRelayer() external view returns (address);
-
     function setAdmin(address _admin) external;
 
     function setTreasury(address _treasury) external;
 
-    function setGasRelayer(address _gasRelayer) external;
+    function authorize(address _addr) external;
+
+    function unauthorize(address _addr) external;
+
+    function authorized(address _addr) external view returns (bool);
 
     // IController //
     function admin() external view returns (address);
