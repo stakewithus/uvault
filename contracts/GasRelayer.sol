@@ -2,8 +2,9 @@ pragma solidity 0.5.17;
 
 import "@openzeppelin/contracts/math/Math.sol";
 import "./interfaces/GasToken.sol";
+import "./AccessControl.sol";
 
-contract GasRelayer {
+contract GasRelayer is AccessControl {
     address public admin;
     address public gasToken;
 
@@ -12,6 +13,8 @@ contract GasRelayer {
 
         admin = msg.sender;
         gasToken = _gasToken;
+
+        _authorize(admin);
     }
 
     modifier onlyAdmin() {
@@ -36,6 +39,14 @@ contract GasRelayer {
         admin = _admin;
     }
 
+    function authorize(address _addr) external onlyAdmin {
+        _authorize(_addr);
+    }
+
+    function unauthorize(address _addr) external onlyAdmin {
+        _unauthorize(_addr);
+    }
+
     function setGasToken(address _gasToken) external onlyAdmin {
         require(_gasToken != address(0), "gas token = zero address");
         gasToken = _gasToken;
@@ -53,7 +64,7 @@ contract GasRelayer {
         address _to,
         bytes calldata _data,
         uint _maxGasToken
-    ) external onlyAdmin useChi(_maxGasToken) {
+    ) external onlyAuthorized useChi(_maxGasToken) {
         (bool success, ) = _to.call(_data);
         require(success, "relay failed");
     }
