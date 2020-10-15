@@ -17,8 +17,8 @@ export interface Config {
     usdcVault: string
     usdtVault: string
     strategyDaiToCusd: string
-    strategyUsdcToCusd: string
     strategyDaiTo3Crv: string
+    strategyUsdcToCusd: string
     strategyUsdcTo3Crv: string
     strategyUsdtTo3Crv: string
     dai: string
@@ -54,8 +54,8 @@ const config: Config = {
     usdtVault: "0x81C8254FE76bfdA31978f8E9801d0266ca82E4E5",
     // strategies //
     strategyDaiToCusd: "0x68CefF6A5722e9FEFf3d40Ed680Eff8ABAaA9783",
-    strategyUsdcToCusd: "0x0dDA2b6D771789803803798cFD3C7Ea55BED7C2F",
     strategyDaiTo3Crv: "0xE8D868cb353c8cAa97c7B1bA2521A4Ce28893fF6",
+    strategyUsdcToCusd: "0x0dDA2b6D771789803803798cFD3C7Ea55BED7C2F",
     strategyUsdcTo3Crv: "0x1AFF70f008aD14d7d7956632074673d5a09566B0",
     strategyUsdtTo3Crv: "0x2328E2625A214BF7cD168Bd980f6eF9C6981c1f6",
     // others //
