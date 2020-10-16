@@ -26,19 +26,16 @@ jobs:
         #   run: npm install
 
       - name: Test mainnet fork
-        # run: |
-        #     ganache-cli \
-        #     --fork https://mainnet.infura.io/v3/$INFURA_API_KEY \
-        #     --unlock $STABLE_COIN_HOLDER \
-        #     --unlock $DAI_WHALE \
-        #     --unlock $USDC_WHALE \
-        #     --unlock $USDT_WHALE \
-        #     --unlock $CHI_WHALE \
-        #     --networkId 999 &
-        #     sleep 10
-        #     echo HERE
         run: |
-          echo HERE
+          ganache-cli \
+          --fork https://mainnet.infura.io/v3/$INFURA_API_KEY \
+          --unlock $STABLE_COIN_HOLDER \
+          --unlock $DAI_WHALE \
+          --unlock $USDC_WHALE \
+          --unlock $USDT_WHALE \
+          --unlock $CHI_WHALE \
+          --networkId 999 &
+          sleep 10
           echo HERE
         env:
           INFURA_API_KEY: $${{ secrets.INFURA_API_KEY }}
@@ -48,6 +45,3 @@ jobs:
           USDC_WHALE: "0x8cee3eeab46774c1CDe4F6368E3ae68BcCd760Bf"
           USDT_WHALE: "0xBE0eB53F46cd790Cd13851d5EFf43D12404d33E8"
           CHI_WHALE: "0x5B1fC2435B1f7C16c206e7968C0e8524eC29b786"
-
-    #   - name: Run unit test
-    #     run: npm run test:unit
