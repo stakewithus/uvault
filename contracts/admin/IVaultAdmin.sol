@@ -43,7 +43,7 @@ interface IVaultAdmin {
     /*
     @notice Set strategy
     */
-    function setStrategy(address _strategy) external;
+    function setStrategy(address _strategy, uint _min) external;
 
     /*
     @notice Returns the amount of token in the vault
