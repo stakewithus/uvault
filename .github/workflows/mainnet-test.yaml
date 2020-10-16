@@ -35,7 +35,7 @@ jobs:
           --unlock $USDC_WHALE \
           --unlock $USDT_WHALE \
           --unlock $CHI_WHALE \
-          --networkId 999 &
+          --networkId 999  > /dev/null 2>&1 &
           sleep 10
           find test/mainnet -name "test-*.ts" -exec npx truffle test --network mainnet_fork {} \;
         env:
