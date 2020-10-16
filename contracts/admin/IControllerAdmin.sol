@@ -13,7 +13,7 @@ interface IControllerAdmin {
 
     function grantRole(bytes32 _role, address _addr) external;
 
-    function revokeRole(bytes32 _role, address _addr) external view returns (bool);
+    function revokeRole(bytes32 _role, address _addr) external;
 
     function hasRole(bytes32 _role, address _addr) external view returns (bool);
 
