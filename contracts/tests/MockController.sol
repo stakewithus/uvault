@@ -2,6 +2,7 @@ pragma solidity 0.5.17;
 
 import "../IController.sol";
 
+/* solium-disable */
 contract MockController is IController {
     address public admin;
     address public treasury;

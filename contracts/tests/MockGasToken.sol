@@ -2,6 +2,7 @@ pragma solidity 0.5.17;
 
 import "../interfaces/GasToken.sol";
 
+/* solium-disable */
 contract MockGasToken is GasToken {
     // test helpers
     uint public _mintAmount_;
