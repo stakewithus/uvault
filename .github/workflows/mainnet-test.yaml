@@ -1,0 +1,29 @@
+on:
+  push:
+  schedule:
+    # run this workflow every Saturday at 8AM UTC
+    - cron: "* 8 * * 6"
+
+name: mainnet workflow
+
+env:
+  GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+
+jobs:
+  tests:
+    runs-on: ubuntu-latest
+
+    steps:
+      - uses: actions/checkout@v1
+
+      - name: Setup Node.js
+        uses: actions/setup-node@v1
+
+      - name: Install Ganache
+        run: npm install -g ganache-cli@6.8.2
+
+      - name: Npm install
+        run: npm install
+
+      - name: Run unit test
+        run: npm run test:unit
