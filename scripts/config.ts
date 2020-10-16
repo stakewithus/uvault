@@ -33,11 +33,11 @@ const config: Config = {
     gasToken: "0x063f83affbcf64d7d84d306f5b85ed65c865dca4",
     gasRelayer: "0xD01D18440A150581A36581adD5b2bcb2DCc63333",
     treasury: "0x9a4c3Fc4683b95EBF11B535057B00812f6a549Bb",
-    controller: "0x809209c5bb52b5a32A1998eFA12B3c430Af77298",
+    controller: "0xd8a66AC84E1fAb8e0383DED05662132430c4a4D8",
     // vaults //
-    vault: "0x9D5363c03b6B22a097B86e9204870Fedbb977f81",
+    vault: "0x59f49CF5e35417e3a5d14B261253500a2f108154",
     // strategies //
-    strategyTest: "0x72E473964554BacFE7fEFD98B302f25D21541956",
+    strategyTest: "0x074A8b5c382a1327Dd3D12bfF30D0Cd5E57969B1",
     // others //
     // used for testinng
     erc20: "0x8D760CAbe956332e6021990FCCE40CBDDd5d7890",
