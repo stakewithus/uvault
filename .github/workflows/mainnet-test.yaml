@@ -39,8 +39,8 @@ jobs:
           sleep 10
           echo HERE
         env:
-          INFURA_API_KEY: $${{ secrets.INFURA_API_KEY }}
-          ETHERSCAN_API_KEY: $${{ secrets.ETHERSCAN_API_KEY }}
+          INFURA_API_KEY: ${{ secrets.INFURA_API_KEY }}
+          ETHERSCAN_API_KEY: ${{ secrets.ETHERSCAN_API_KEY }}
           STABLE_COIN_HOLDER: "0x86d10751B18F3fE331C146546868a07224A8598B"
           DAI_WHALE: "0x6DCb8492B5De636fD9e0a32413514647D00eF8D0"
           USDC_WHALE: "0x8cee3eeab46774c1CDe4F6368E3ae68BcCd760Bf"
