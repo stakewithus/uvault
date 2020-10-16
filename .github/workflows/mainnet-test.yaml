@@ -1,5 +1,4 @@
 on:
-  push:
   schedule:
     # run this workflow every Saturday at 8AM UTC
     - cron: "* 8 * * 6"
