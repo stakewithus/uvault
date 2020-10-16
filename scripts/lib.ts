@@ -1,5 +1,6 @@
 import assert from "assert"
-import bre, {ethers} from "@nomiclabs/buidler"
+import bre from "@nomiclabs/buidler"
+import {BuidlerRuntimeEnvironment} from "@nomiclabs/buidler/types"
 import {Contract} from "ethers"
 import {Config} from "./config"
 
@@ -11,12 +12,16 @@ export function getAddress(config: Config, network: string, name: string): strin
   return addr
 }
 
-export async function getAccount(ethers: any): Promise<string> {
-  const [account] = await ethers.getSigners()
+export async function getAccountAddress(
+  bre: BuidlerRuntimeEnvironment
+): Promise<string> {
+  const [account] = await bre.ethers.getSigners()
 
   const addr = await account.getAddress()
+  const balance = await account.getBalance()
+
   console.log("Account:", addr)
-  console.log("Balance:", (await account.getBalance()).toString())
+  console.log("Balance:", bre.ethers.utils.formatEther(balance), "ETH")
 
   return addr
 }
@@ -30,11 +35,11 @@ export async function deploy(
   console.log(`Contract: ${name}`)
 
   try {
-    const account = await getAccount(ethers)
+    const account = await getAccountAddress(bre)
 
     const contract = await _deploy(account, network)
 
-    console.log("TX: ", contract.deployTransaction.hash)
+    console.log("TX:", contract.deployTransaction.hash)
 
     // Wait for tx to be mined
     await contract.deployed()
