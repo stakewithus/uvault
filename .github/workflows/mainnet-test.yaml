@@ -19,8 +19,8 @@ jobs:
       - name: Setup Node.js
         uses: actions/setup-node@v1
 
-        - name: Install Ganache
-          run: npm install -g ganache-cli@6.8.2
+      - name: Install Ganache
+        run: npm install -g ganache-cli@6.8.2
 
         # - name: Npm install
         #   run: npm install
@@ -38,8 +38,8 @@ jobs:
         #     sleep 10
         #     echo HERE
         run: |
-            echo HERE
-            echo HERE
+          echo HERE
+          echo HERE
         env:
           INFURA_API_KEY: $${{ secrets.INFURA_API_KEY }}
           ETHERSCAN_API_KEY: $${{ secrets.ETHERSCAN_API_KEY }}
