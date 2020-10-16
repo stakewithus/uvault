@@ -22,8 +22,8 @@ jobs:
       - name: Install Ganache
         run: npm install -g ganache-cli@6.8.2
 
-        # - name: Npm install
-        #   run: npm install
+      - name: Npm install
+        run: npm install
 
       - name: Test mainnet fork
         run: |
@@ -37,7 +37,7 @@ jobs:
           --unlock $CHI_WHALE \
           --networkId 999 &
           sleep 10
-          echo HERE
+          find test/mainnet -name "test-*.ts" -exec npx truffle test --network mainnet_fork {} \;
         env:
           INFURA_API_KEY: ${{ secrets.INFURA_API_KEY }}
           ETHERSCAN_API_KEY: ${{ secrets.ETHERSCAN_API_KEY }}
