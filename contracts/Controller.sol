@@ -31,6 +31,10 @@ contract Controller is IController, AccessControl {
         _;
     }
 
+    /*
+    @dev Please revoke ADMIN_ROLE and HARVESTER_ROLE for old admin
+    @dev Please grant ADMIN_ROLE and HARVESTER_ROLE for new admin
+    */
     function setAdmin(address _admin) external onlyAdmin {
         require(_admin != address(0), "admin = zero address");
         admin = _admin;
