@@ -4,7 +4,7 @@ on:
     # run this workflow every Saturday at 8AM UTC
     - cron: "* 8 * * 6"
 
-name: mainnet workflow
+name: mainnet test workflow
 
 env:
   GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
@@ -19,11 +19,18 @@ jobs:
       - name: Setup Node.js
         uses: actions/setup-node@v1
 
-      - name: Install Ganache
-        run: npm install -g ganache-cli@6.8.2
+      #   - name: Install Ganache
+      #     run: npm install -g ganache-cli@6.8.2
 
-      - name: Npm install
-        run: npm install
+      #   - name: Npm install
+      #     run: npm install
 
-      - name: Run unit test
-        run: npm run test:unit
+      - name: Test env
+        run: echo Hello world $FIRST_NAME $Last_Name ${SUPER_SECRET}!
+        env:
+          FIRST_NAME: Mona
+          Last_Name: Octocat
+          SUPER_SECRET: ${{ secrets.TEST_SECRET }}
+
+    #   - name: Run unit test
+    #     run: npm run test:unit
