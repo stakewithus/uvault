@@ -10,11 +10,7 @@ async function main() {
     const usdt = config.mainnet.usdt
 
     const Vault = await ethers.getContractFactory("Vault")
-    const vault = await Vault.deploy(controller, usdt, MIN_WAIT_TIME)
-
-    await vault.deployed()
-
-    return vault
+    return Vault.deploy(controller, usdt, MIN_WAIT_TIME)
   })
 }
 

@@ -7,12 +7,8 @@ async function main() {
     const controller = config.mainnet.controller
     const usdcVault = config.mainnet.usdcVault
 
-    const Strategy = await ethers.getContractFactory("StrategyUsdcToCusdMainnet")
-    const strategy = await Strategy.deploy(controller, usdcVault)
-
-    await strategy.deployed()
-
-    return strategy
+    const Strategy = await ethers.getContractFactory("StrategyUsdcToCusd")
+    return Strategy.deploy(controller, usdcVault)
   })
 }
 

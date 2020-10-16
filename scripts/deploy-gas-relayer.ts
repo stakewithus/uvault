@@ -7,11 +7,7 @@ async function main() {
     const gasToken = getAddress(config, network, "gasToken")
 
     const GasRelayer = await ethers.getContractFactory("GasRelayer")
-    const gasRelayer = await GasRelayer.deploy(gasToken)
-
-    await gasRelayer.deployed()
-
-    return gasRelayer
+    return GasRelayer.deploy(gasToken)
   })
 }
 

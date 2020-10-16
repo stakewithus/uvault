@@ -8,11 +8,7 @@ async function main() {
     const usdcVault = config.mainnet.usdcVault
 
     const Strategy = await ethers.getContractFactory("StrategyUsdcTo3Crv")
-    const strategy = await Strategy.deploy(controller, usdcVault)
-
-    await strategy.deployed()
-
-    return strategy
+    return Strategy.deploy(controller, usdcVault)
   })
 }
 

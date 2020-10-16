@@ -10,11 +10,7 @@ async function main() {
     const dai = config.mainnet.dai
 
     const Vault = await ethers.getContractFactory("Vault")
-    const vault = await Vault.deploy(controller, dai, MIN_WAIT_TIME)
-
-    await vault.deployed()
-
-    return vault
+    return Vault.deploy(controller, dai, MIN_WAIT_TIME)
   })
 }
 

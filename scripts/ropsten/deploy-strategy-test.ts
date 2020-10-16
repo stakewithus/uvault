@@ -7,11 +7,7 @@ async function main() {
     const {erc20, controller, vault} = config.ropsten
 
     const Strategy = await ethers.getContractFactory("StrategyTest")
-    const strategy = await Strategy.deploy(controller, vault, erc20)
-
-    await strategy.deployed()
-
-    return strategy
+    return Strategy.deploy(controller, vault, erc20)
   })
 }
 

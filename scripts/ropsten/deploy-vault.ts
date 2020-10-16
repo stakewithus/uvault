@@ -9,11 +9,7 @@ async function main() {
     const {controller, erc20} = config.ropsten
 
     const Vault = await ethers.getContractFactory("Vault")
-    const vault = await Vault.deploy(controller, erc20, MIN_WAIT_TIME)
-
-    await vault.deployed()
-
-    return vault
+    return Vault.deploy(controller, erc20, MIN_WAIT_TIME)
   })
 }
 

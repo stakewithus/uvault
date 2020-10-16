@@ -34,6 +34,11 @@ export async function deploy(
 
     const contract = await _deploy(account, network)
 
+    console.log("TX: ", contract.deployTransaction.hash)
+
+    // Wait for tx to be mined
+    await contract.deployed()
+
     console.log("Deployed to:", contract.address)
     process.exit(0)
   } catch (error) {

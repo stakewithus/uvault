@@ -8,11 +8,7 @@ async function main() {
     const daiVault = config.mainnet.daiVault
 
     const Strategy = await ethers.getContractFactory("StrategyDaiTo3Crv")
-    const strategy = await Strategy.deploy(controller, daiVault)
-
-    await strategy.deployed()
-
-    return strategy
+    return Strategy.deploy(controller, daiVault)
   })
 }
 

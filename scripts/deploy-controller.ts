@@ -7,11 +7,7 @@ async function main() {
     const treasury = getAddress(config, network, "treasury")
 
     const Controller = await ethers.getContractFactory("Controller")
-    const controller = await Controller.deploy(treasury)
-
-    await controller.deployed()
-
-    return controller
+    return Controller.deploy(treasury)
   })
 }
 
