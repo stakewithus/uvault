@@ -121,15 +121,15 @@ contract StrategyStableToCurve is IStrategy, BaseStrategy {
         uint totalUnderlying = _totalAssets();
         require(_underlyingAmount <= totalUnderlying, "underlying > total");
 
-        // calculate cUnderlying amount to withdraw from underlying
+        // calculate shares to withdraw
         /*
-        u = amount of underlying to withdraw
-        U = total underlying redeemable from cUnderlying in Gauge
-        c = amount of cUnderlying to withdraw
-        C = total amount of cUnderlying in Gauge
+        w = amount of underlying to withdraw
+        U = total underlying redeemable in Curve
+        s = shares to withdraw
+        T = total shares in Gauge
 
-        u / U = c / C
-        c = u / U * C
+        w / U = s / T
+        s = w / U * T
         */
         uint gaugeBal = Gauge(gauge).balanceOf(address(this));
         uint cUsdAmount = _underlyingAmount.mul(gaugeBal).div(totalUnderlying);
