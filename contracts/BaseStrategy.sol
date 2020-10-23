@@ -1,6 +1,13 @@
 pragma solidity ^0.5.17;
 
+import "@openzeppelin/contracts/token/ERC20/IERC20.sol";
+import "@openzeppelin/contracts/token/ERC20/SafeERC20.sol";
+import "@openzeppelin/contracts/math/SafeMath.sol";
+
 contract BaseStrategy {
+    using SafeERC20 for IERC20;
+    using SafeMath for uint;
+
     address public admin;
     address public controller;
     address public vault;
@@ -8,6 +15,9 @@ contract BaseStrategy {
     // performance fee sent to treasury when harvest() generates profit
     uint public performanceFee = 100;
     uint internal constant PERFORMANCE_FEE_MAX = 10000;
+
+    // valuable tokens that cannot be swept
+    mapping(address => bool) internal assets;
 
     constructor(address _controller, address _vault) public {
         require(_controller != address(0), "controller = zero address");
@@ -54,5 +64,11 @@ contract BaseStrategy {
     function setPerformanceFee(uint _fee) external onlyAdmin {
         require(_fee <= PERFORMANCE_FEE_MAX, "performance fee > max");
         performanceFee = _fee;
+    }
+
+    function sweep(address _token) external onlyAdmin {
+        require(!assets[_token], "asset");
+
+        IERC20(_token).safeTransfer(admin, IERC20(_token).balanceOf(address(this)));
     }
 }

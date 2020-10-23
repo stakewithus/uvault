@@ -1,9 +1,5 @@
 pragma solidity 0.5.17;
 
-import "@openzeppelin/contracts/token/ERC20/IERC20.sol";
-import "@openzeppelin/contracts/token/ERC20/SafeERC20.sol";
-import "@openzeppelin/contracts/math/SafeMath.sol";
-
 import "../interfaces/curve/Gauge.sol";
 import "../interfaces/curve/Minter.sol";
 import "../interfaces/uniswap/Uniswap.sol";
@@ -18,9 +14,6 @@ import "../BaseStrategy.sol";
 
 // @dev This is an abstract contract
 contract StrategyStableToCurve is IStrategy, BaseStrategy {
-    using SafeERC20 for IERC20;
-    using SafeMath for uint;
-
     address public underlying;
     // DAI = 0 | USDC = 1 | USDT = 2
     uint internal underlyingIndex;
@@ -45,7 +38,10 @@ contract StrategyStableToCurve is IStrategy, BaseStrategy {
     constructor(address _controller, address _vault)
         public
         BaseStrategy(_controller, _vault)
-    {}
+    {
+        assets[underlying] = true;
+        assets[cUnderlying] = true;
+    }
 
     function _calcWithdrawOneCoin(uint _gaugeAmount) internal view returns (uint);
 
@@ -228,11 +224,5 @@ contract StrategyStableToCurve is IStrategy, BaseStrategy {
     function exit() external onlyVaultOrController {
         _crvToUnderlying();
         _withdrawAll();
-    }
-
-    function sweep(address _token) external onlyAdmin {
-        require(_token != underlying, "token = underlying");
-        require(_token != cUnderlying, "token = cUnderlying");
-        IERC20(_token).safeTransfer(admin, IERC20(_token).balanceOf(address(this)));
     }
 }
