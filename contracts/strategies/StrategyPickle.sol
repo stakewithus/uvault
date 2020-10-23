@@ -10,7 +10,7 @@ import "../IController.sol";
 import "../IStrategy.sol";
 import "../BaseStrategy.sol";
 
-contract StrategyStableToPickle is IStrategy, BaseStrategy {
+contract StrategyPickle is IStrategy, BaseStrategy {
     using SafeERC20 for IERC20;
     using SafeMath for uint;
 
