@@ -39,6 +39,7 @@ contract StrategyStableToCurve is IStrategy, BaseStrategy {
         public
         BaseStrategy(_controller, _vault)
     {
+        // TODO fix
         assets[underlying] = true;
         assets[cUnderlying] = true;
     }
