@@ -110,6 +110,7 @@ contract StrategyStableToCurve is BaseStrategy {
     */
     function withdraw(uint _underlyingAmount) external onlyVaultOrController {
         require(_underlyingAmount > 0, "underlying = 0");
+        // TODO vulnerable to price manipulation
         uint totalUnderlying = _totalAssets();
         require(_underlyingAmount <= totalUnderlying, "underlying > total");
 
