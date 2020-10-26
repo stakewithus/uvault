@@ -6,10 +6,9 @@ import "../interfaces/pickle/PickleJar.sol";
 import "../interfaces/pickle/MasterChef.sol";
 
 import "../IController.sol";
-import "../IStrategy.sol";
 import "../BaseStrategy.sol";
 
-contract StrategyStableTo3CrvPickle is IStrategy, BaseStrategy {
+contract StrategyStableTo3CrvPickle is BaseStrategy {
     address public underlying;
     // DAI = 0 | USDC = 1 | USDT = 2
     uint internal underlyingIndex;

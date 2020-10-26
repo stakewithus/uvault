@@ -1,5 +1,5 @@
 import chai from "chai"
-import {BaseStrategyInstance} from "../../../types/BaseStrategy"
+import {TestBaseStrategyInstance} from "../../../types/TestBaseStrategy"
 import {ZERO_ADDRESS} from "../../util"
 import _setup from "./setup"
 
@@ -7,7 +7,7 @@ contract("BaseStrategy", (accounts) => {
   const refs = _setup(accounts)
   const {admin} = refs
 
-  let strategy: BaseStrategyInstance
+  let strategy: TestBaseStrategyInstance
   beforeEach(() => {
     strategy = refs.strategy
   })

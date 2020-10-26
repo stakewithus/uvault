@@ -4,7 +4,9 @@ import "@openzeppelin/contracts/token/ERC20/IERC20.sol";
 import "@openzeppelin/contracts/token/ERC20/SafeERC20.sol";
 import "@openzeppelin/contracts/math/SafeMath.sol";
 
-contract BaseStrategy {
+import "./IStrategy.sol";
+
+contract BaseStrategy is IStrategy {
     using SafeERC20 for IERC20;
     using SafeMath for uint;
 

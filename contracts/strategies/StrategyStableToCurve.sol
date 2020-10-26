@@ -4,7 +4,6 @@ import "../interfaces/curve/Gauge.sol";
 import "../interfaces/curve/Minter.sol";
 import "../interfaces/uniswap/Uniswap.sol";
 import "../IController.sol";
-import "../IStrategy.sol";
 import "../BaseStrategy.sol";
 
 /* potential hacks?
@@ -13,7 +12,7 @@ import "../BaseStrategy.sol";
 */
 
 // @dev This is an abstract contract
-contract StrategyStableToCurve is IStrategy, BaseStrategy {
+contract StrategyStableToCurve is BaseStrategy {
     address public underlying;
     // DAI = 0 | USDC = 1 | USDT = 2
     uint internal underlyingIndex;
