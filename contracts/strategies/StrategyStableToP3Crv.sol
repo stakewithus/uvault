@@ -36,6 +36,7 @@ contract StrategyStableToP3Crv is BaseStrategy {
         BaseStrategy(_controller, _vault)
     {}
 
+    // TODO vulnerable to price manipulation
     function _totalAssets() private view returns (uint) {
         uint pricePerShare = PickleJar(jar).getRatio().div(1e18);
         (uint shares, ) = MasterChef(chef).userInfo(POOL_ID, address(this));
@@ -69,11 +70,11 @@ contract StrategyStableToP3Crv is BaseStrategy {
         }
 
         // stake p3crv
-        uint pickleBal = IERC20(jar).balanceOf(address(this));
-        if (pickleBal > 0) {
+        uint p3crvBal = IERC20(jar).balanceOf(address(this));
+        if (p3crvBal > 0) {
             IERC20(jar).safeApprove(chef, 0);
-            IERC20(jar).safeApprove(chef, pickleBal);
-            MasterChef(chef).deposit(POOL_ID, pickleBal);
+            IERC20(jar).safeApprove(chef, p3crvBal);
+            MasterChef(chef).deposit(POOL_ID, p3crvBal);
         }
     }
 
