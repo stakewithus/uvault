@@ -22,8 +22,6 @@ export default (
   const admin = accounts[0]
   const vault = accounts[1]
   const treasury = accounts[2]
-  // mock contract addresses
-  const gasRelayer = accounts[3]
 
   before(async () => {
     await sendEther(web3, accounts[0], whale, new BN(1))
