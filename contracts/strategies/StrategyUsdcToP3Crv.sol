@@ -1,11 +1,11 @@
 pragma solidity 0.5.17;
 
-import "./StrategyStableTo3CrvPickle.sol";
+import "./StrategyStableToP3Crv.sol";
 
-contract StrategyUsdcTo3CrvPickle is StrategyStableTo3CrvPickle {
+contract StrategyUsdcToP3Crv is StrategyStableToP3Crv {
     constructor(address _controller, address _vault)
         public
-        StrategyStableTo3CrvPickle(_controller, _vault)
+        StrategyStableToP3Crv(_controller, _vault)
     {
         // usdc
         underlying = 0xA0b86991c6218b36c1d19D4a2e9Eb0cE3606eB48;
