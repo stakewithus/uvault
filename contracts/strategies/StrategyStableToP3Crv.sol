@@ -8,7 +8,7 @@ import "../interfaces/pickle/MasterChef.sol";
 import "../IController.sol";
 import "../BaseStrategy.sol";
 
-contract StrategyStableToP3crv is BaseStrategy {
+contract StrategyStableToP3Crv is BaseStrategy {
     address public underlying;
     // DAI = 0 | USDC = 1 | USDT = 2
     uint internal underlyingIndex;
