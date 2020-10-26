@@ -58,11 +58,9 @@ export default (name: string, _setup: Setup, params: {DECIMALS: BN}) => {
       // minimum amount of underlying that can be withdrawn
       const minUnderlying = frac(depositAmount, 99, 100)
 
-      // check balance of underlying transferred to treasury and vault
-      const fee = sub(after.underlying.treasury, before.underlying.treasury)
+      // check balance of underlying transferred to vault
       const underlyingDiff = sub(after.underlying.vault, before.underlying.vault)
 
-      assert(fee.gte(new BN(0)), "fee")
       assert(underlyingDiff.gte(minUnderlying), "underlying diff")
 
       // check strategy does not have any underlying
