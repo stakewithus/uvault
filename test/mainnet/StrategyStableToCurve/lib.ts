@@ -31,7 +31,7 @@ export type StrategyContract =
 
 export type StrategyInstance =
   | StrategyUsdcToCusdInstance
-  | StrategyUsdcToCusdInstance
+  | StrategyDaiToCusdInstance
   | StrategyDaiTo3CrvInstance
   | StrategyUsdcTo3CrvInstance
   | StrategyUsdtTo3CrvInstance
