@@ -38,11 +38,7 @@ contract StrategyStableToCurve is IStrategy, BaseStrategy {
     constructor(address _controller, address _vault)
         public
         BaseStrategy(_controller, _vault)
-    {
-        // TODO fix
-        assets[underlying] = true;
-        assets[cUnderlying] = true;
-    }
+    {}
 
     function _calcWithdrawOneCoin(uint _gaugeAmount) internal view returns (uint);
 
