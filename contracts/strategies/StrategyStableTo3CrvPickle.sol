@@ -9,7 +9,7 @@ import "../IController.sol";
 import "../IStrategy.sol";
 import "../BaseStrategy.sol";
 
-contract StrategyStableToPickle is IStrategy, BaseStrategy {
+contract StrategyStableTo3CrvPickle is IStrategy, BaseStrategy {
     address public underlying;
     // DAI = 0 | USDC = 1 | USDT = 2
     uint internal underlyingIndex;
@@ -18,14 +18,11 @@ contract StrategyStableToPickle is IStrategy, BaseStrategy {
     // 3Crv
     address internal threeCrv;
     // ICurveFi3
-    address internal pool;
+    address internal curve;
 
     // Pickle //
-    // 0x1bb74b5ddc1f4fc91d6f9e7906cf68bc93538e33
     address internal jar;
-    // 0xbd17b1ce622d73bd438b9e658aca5996dc394b0d
     address internal chef;
-    // 0x429881672B9AE42b8EbA0E26cD9C73711b891Ca5
     address internal pickle;
     // POOL ID for 3Crv jar
     uint private constant POOL_ID = 14;
@@ -38,12 +35,7 @@ contract StrategyStableToPickle is IStrategy, BaseStrategy {
     constructor(address _controller, address _vault)
         public
         BaseStrategy(_controller, _vault)
-    {
-        // TODO fix
-        assets[underlying] = true;
-        assets[threeCrv] = true;
-        assets[jar] = true;
-    }
+    {}
 
     function _totalAssets() private view returns (uint) {
         uint pricePerShare = PickleJar(jar).getRatio().div(1e18);
@@ -60,12 +52,12 @@ contract StrategyStableToPickle is IStrategy, BaseStrategy {
         // underlying to threeCrv
         uint underlyingBal = IERC20(underlying).balanceOf(address(this));
         if (underlyingBal > 0) {
-            IERC20(underlying).safeApprove(pool, 0);
-            IERC20(underlying).safeApprove(pool, underlyingBal);
+            IERC20(underlying).safeApprove(curve, 0);
+            IERC20(underlying).safeApprove(curve, underlyingBal);
             // mint threeCrv
             uint[3] memory amounts;
             amounts[underlyingIndex] = underlyingBal;
-            ICurveFi3(pool).add_liquidity(amounts, 0);
+            ICurveFi3(curve).add_liquidity(amounts, 0);
             // Now we have 3Crv
         }
 
@@ -102,10 +94,14 @@ contract StrategyStableToPickle is IStrategy, BaseStrategy {
 
         // withdraw underlying
         uint threeBal = IERC20(threeCrv).balanceOf(address(this));
-        // IERC20(threeCrv).safeApprove(pool, 0);
-        // IERC20(threeCrv).safeApprove(pool, threeBal);
+        // IERC20(threeCrv).safeApprove(curve, 0);
+        // IERC20(threeCrv).safeApprove(curve, threeBal);
         // NOTE: creates threeCrv dust
-        ICurveFi3(pool).remove_liquidity_one_coin(threeBal, int128(underlyingIndex), 0);
+        ICurveFi3(curve).remove_liquidity_one_coin(
+            threeBal,
+            int128(underlyingIndex),
+            0
+        );
         // Now we have underlying
     }
 
