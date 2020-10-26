@@ -1,8 +1,6 @@
 pragma solidity 0.5.17;
 
 interface PickleJar {
-    function balanceOf(address _shares) external view returns (uint);
-
     /*
     @notice returns price of token / share
     @dev ratio is multiplied by 10 ** 18
