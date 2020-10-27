@@ -97,9 +97,7 @@ contract StrategyStableToP3Crv is BaseStrategy {
 
         // withdraw underlying
         uint threeBal = IERC20(threeCrv).balanceOf(address(this));
-        // IERC20(threeCrv).safeApprove(curve, 0);
-        // IERC20(threeCrv).safeApprove(curve, threeBal);
-        // NOTE: creates threeCrv dust
+        // creates threeCrv dust
         ICurveFi3(curve).remove_liquidity_one_coin(
             threeBal,
             int128(underlyingIndex),

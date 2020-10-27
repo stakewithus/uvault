@@ -64,9 +64,9 @@ export default (name: string, _setup: Setup, params: {DECIMALS: BN}) => {
 
       // check strategy does not have any underlying
       assert(eq(after.underlying.strategy, new BN(0)), "underlying strategy")
-      // check strategy does not have any underlying
-      assert(eq(after.underlying.strategy, new BN(0)), "underlying strategy")
-      // check strategy dust is small
+      // check jar balance of strategy
+      assert(eq(after.jar.strategy, new BN(0)), "jar strategy")
+      // check 3Crv dust in strategy is small
       assert(after.threeCrv.strategy.lte(new BN(100)), "3crv strategy")
       // check Pickle was minted
       assert(after.pickle.strategy.gt(before.pickle.strategy), "pickle strategy")

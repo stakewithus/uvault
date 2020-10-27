@@ -53,22 +53,20 @@ export default (name: string, _setup: Setup, params: {DECIMALS: BN}) => {
       const before = await snapshot()
       // withdraw to claim Pickles
       await strategy.withdrawAll({from: vault})
-      // await controller.harvest(strategy.address, {from: admin})
+      await controller.harvest(strategy.address, {from: admin})
       const after = await snapshot()
 
-      console.log(before.pickle.strategy.toString(), after.pickle.strategy.toString())
-
-      // // Check fee transfer
-      // assert(
-      //   after.underlying.treasury.gte(before.underlying.treasury),
-      //   "underlying treasury"
-      // )
-      // // Check vault balance after withdraw
-      // assert(after.underlying.vault.gt(before.underlying.vault), "underlying vault")
-      // // Check strategy total assets > 0 from withdrawing and then selling Pickle
-      // assert(after.strategy.totalAssets.gte(new BN(0)), "underlying strategy")
-      // // Check Pickle was liquidated
-      // assert(eq(after.pickle.strategy, new BN(0)), "pickle strategy")
+      // Check fee transfer
+      assert(
+        after.underlying.treasury.gte(before.underlying.treasury),
+        "underlying treasury"
+      )
+      // Check vault balance after withdraw
+      assert(after.underlying.vault.gt(before.underlying.vault), "underlying vault")
+      // Check strategy total assets > 0 from withdrawing and then selling Pickle
+      assert(after.strategy.totalAssets.gte(new BN(0)), "underlying strategy")
+      // Check Pickle was liquidated
+      assert(eq(after.pickle.strategy, new BN(0)), "pickle strategy")
     })
   })
 }

@@ -3,19 +3,15 @@ import {Ierc20Instance} from "../../../types/Ierc20"
 import {ControllerInstance} from "../../../types/Controller"
 import {MasterChefInstance} from "../../../types/MasterChef"
 import {StrategyInstance} from "./lib"
-import {eq, sub, frac, pow, add} from "../../util"
+import {eq, sub, frac, pow} from "../../util"
 import {Setup, getSnapshot} from "./lib"
 
-export default (
-  name: string,
-  _setup: Setup,
-  params: {DECIMALS: BN; UNDERLYING_TO_CURVE_DECIMALS: BN}
-) => {
+export default (name: string, _setup: Setup, params: {DECIMALS: BN}) => {
   contract(name, (accounts) => {
     const refs = _setup(accounts)
     const {vault, treasury, whale} = refs
 
-    const {DECIMALS, UNDERLYING_TO_CURVE_DECIMALS} = params
+    const {DECIMALS} = params
 
     let underlying: Ierc20Instance
     let jar: Ierc20Instance
