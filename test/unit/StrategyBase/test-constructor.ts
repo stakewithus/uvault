@@ -4,7 +4,7 @@ import {MockVaultInstance} from "../../../types/MockVault"
 import {ZERO_ADDRESS} from "../../util"
 import _setup from "./setup"
 
-const TestBaseStrategy = artifacts.require("TestBaseStrategy")
+const TestStrategyBase = artifacts.require("TestStrategyBase")
 
 contract("BaseStrategy", (accounts) => {
   const refs = _setup(accounts)
@@ -19,7 +19,7 @@ contract("BaseStrategy", (accounts) => {
 
   describe("constructor", () => {
     it("should deploy", async () => {
-      const strategy = await TestBaseStrategy.new(controller.address, vault.address)
+      const strategy = await TestStrategyBase.new(controller.address, vault.address)
 
       assert.equal(await strategy.admin(), admin, "admin")
       assert.equal(await strategy.controller(), controller.address, "controller")
@@ -28,13 +28,13 @@ contract("BaseStrategy", (accounts) => {
 
     it("should not deploy if controller is zero address", async () => {
       await chai
-        .expect(TestBaseStrategy.new(ZERO_ADDRESS, vault.address))
+        .expect(TestStrategyBase.new(ZERO_ADDRESS, vault.address))
         .to.be.rejectedWith("controller = zero address")
     })
 
     it("should not deploy if vault is zero address", async () => {
       await chai
-        .expect(TestBaseStrategy.new(controller.address, ZERO_ADDRESS))
+        .expect(TestStrategyBase.new(controller.address, ZERO_ADDRESS))
         .to.be.rejectedWith("vault = zero address")
     })
   })

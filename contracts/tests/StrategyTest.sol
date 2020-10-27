@@ -1,17 +1,9 @@
 pragma solidity 0.5.17;
 
-import "@openzeppelin/contracts/token/ERC20/IERC20.sol";
-import "@openzeppelin/contracts/token/ERC20/SafeERC20.sol";
-import "@openzeppelin/contracts/math/SafeMath.sol";
-
 import "../IController.sol";
-import "../IStrategy.sol";
-import "../BaseStrategy.sol";
+import "../StrategyBase.sol";
 
-contract StrategyTest is IStrategy, BaseStrategy {
-    using SafeERC20 for IERC20;
-    using SafeMath for uint;
-
+contract StrategyTest is StrategyBase {
     address public underlying;
 
     // test helper
@@ -28,7 +20,7 @@ contract StrategyTest is IStrategy, BaseStrategy {
         address _controller,
         address _vault,
         address _underlying
-    ) public BaseStrategy(_controller, _vault) {
+    ) public StrategyBase(_controller, _vault) {
         require(_underlying != address(0), "underlying = zero address");
 
         underlying = _underlying;

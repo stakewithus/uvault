@@ -6,7 +6,7 @@ import "@openzeppelin/contracts/math/SafeMath.sol";
 
 import "./IStrategy.sol";
 
-contract BaseStrategy is IStrategy {
+contract StrategyBase is IStrategy {
     using SafeERC20 for IERC20;
     using SafeMath for uint;
 

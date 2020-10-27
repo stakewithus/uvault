@@ -1,12 +1,12 @@
 pragma solidity 0.5.17;
 
-import "../BaseStrategy.sol";
+import "../StrategyBase.sol";
 
 /* solium-disable */
-contract TestBaseStrategy is BaseStrategy {
+contract TestStrategyBase is StrategyBase {
     constructor(address _controller, address _vault)
         public
-        BaseStrategy(_controller, _vault)
+        StrategyBase(_controller, _vault)
     {}
 
     // IStrategy implementations

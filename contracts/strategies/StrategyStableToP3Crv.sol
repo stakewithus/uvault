@@ -6,9 +6,9 @@ import "../interfaces/pickle/PickleJar.sol";
 import "../interfaces/pickle/MasterChef.sol";
 
 import "../IController.sol";
-import "../BaseStrategy.sol";
+import "../StrategyBase.sol";
 
-contract StrategyStableToP3Crv is BaseStrategy {
+contract StrategyStableToP3Crv is StrategyBase {
     address public underlying;
     // DAI = 0 | USDC = 1 | USDT = 2
     uint internal underlyingIndex;
@@ -35,7 +35,7 @@ contract StrategyStableToP3Crv is BaseStrategy {
 
     constructor(address _controller, address _vault)
         public
-        BaseStrategy(_controller, _vault)
+        StrategyBase(_controller, _vault)
     {}
 
     // TODO vulnerable to price manipulation

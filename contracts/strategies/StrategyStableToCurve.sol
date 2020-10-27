@@ -4,7 +4,7 @@ import "../interfaces/curve/Gauge.sol";
 import "../interfaces/curve/Minter.sol";
 import "../interfaces/uniswap/Uniswap.sol";
 import "../IController.sol";
-import "../BaseStrategy.sol";
+import "../StrategyBase.sol";
 
 /* potential hacks?
 - front running?
@@ -12,7 +12,7 @@ import "../BaseStrategy.sol";
 */
 
 // @dev This is an abstract contract
-contract StrategyStableToCurve is BaseStrategy {
+contract StrategyStableToCurve is StrategyBase {
     address public underlying;
     // DAI = 0 | USDC = 1 | USDT = 2
     uint internal underlyingIndex;
@@ -36,7 +36,7 @@ contract StrategyStableToCurve is BaseStrategy {
 
     constructor(address _controller, address _vault)
         public
-        BaseStrategy(_controller, _vault)
+        StrategyBase(_controller, _vault)
     {}
 
     function _calcWithdrawOneCoin(uint _gaugeAmount) internal view returns (uint);
