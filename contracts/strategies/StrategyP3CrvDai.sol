@@ -30,8 +30,6 @@ contract StrategyP3CrvDai is StrategyP3Crv {
 
         // Assets that cannot be swept by admin
         assets[underlying] = true;
-        assets[threeCrv] = true;
-        assets[jar] = true;
         assets[pickle] = true;
     }
 }

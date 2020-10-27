@@ -28,6 +28,5 @@ contract StrategyCusdDai is StrategyCusd {
 
         // Assets that cannot be swept by admin
         assets[underlying] = true;
-        assets[cUnderlying] = true;
     }
 }

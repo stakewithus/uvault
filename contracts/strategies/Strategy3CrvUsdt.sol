@@ -28,6 +28,5 @@ contract Strategy3CrvUsdt is Strategy3Crv {
 
         // Assets that cannot be swept by admin
         assets[underlying] = true;
-        assets[cUnderlying] = true;
     }
 }
