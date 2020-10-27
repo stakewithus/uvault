@@ -12,6 +12,8 @@ contract StrategyStableToP3Crv is BaseStrategy {
     address public underlying;
     // DAI = 0 | USDC = 1 | USDT = 2
     uint internal underlyingIndex;
+    // precision to convert 10 ** 18  to underlying decimals
+    uint internal precisionDiv = 1;
 
     // Curve //
     // 3Crv
@@ -38,10 +40,11 @@ contract StrategyStableToP3Crv is BaseStrategy {
 
     // TODO vulnerable to price manipulation
     function _totalAssets() private view returns (uint) {
-        uint pricePerShare = PickleJar(jar).getRatio().div(1e18);
+        // multiplied by 10 ** 18
+        uint pricePerShare = PickleJar(jar).getRatio();
         (uint shares, ) = MasterChef(chef).userInfo(POOL_ID, address(this));
 
-        return shares.mul(pricePerShare);
+        return shares.mul(pricePerShare).div(1e18).div(precisionDiv);
     }
 
     function totalAssets() external view returns (uint) {
