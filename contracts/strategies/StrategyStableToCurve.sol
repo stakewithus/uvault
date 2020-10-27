@@ -96,9 +96,7 @@ contract StrategyStableToCurve is BaseStrategy {
 
         // withdraw underlying
         uint cBal = IERC20(cUnderlying).balanceOf(address(this));
-        IERC20(cUnderlying).safeApprove(pool, 0);
-        IERC20(cUnderlying).safeApprove(pool, cBal);
-        // NOTE: creates cUnderlying dust
+        // creates cUnderlying dust
         _removeLiquidityOneCoin(cBal);
         // Now we have underlying
     }
