@@ -2,6 +2,7 @@ pragma solidity 0.5.17;
 
 import "../BaseStrategy.sol";
 
+/* solium-disable */
 contract TestBaseStrategy is BaseStrategy {
     constructor(address _controller, address _vault)
         public
