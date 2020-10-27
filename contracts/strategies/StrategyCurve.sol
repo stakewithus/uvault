@@ -101,7 +101,7 @@ contract StrategyCurve is StrategyBase, UseUniswap {
     @param _underlyingAmount Amount of underlying token to withdraw
     @dev Controller and vault should implement guard agains slippage
     */
-    function withdraw(uint _underlyingAmount) external onlyVaultOrController {
+    function withdraw(uint _underlyingAmount) external onlyAuthorized {
         require(_underlyingAmount > 0, "underlying = 0");
         // TODO vulnerable to price manipulation
         uint totalUnderlying = _totalAssets();
@@ -149,7 +149,7 @@ contract StrategyCurve is StrategyBase, UseUniswap {
     @dev This function does not claim CRV
     @dev Controller and vault should implement guard agains slippage
     */
-    function withdrawAll() external onlyVaultOrController {
+    function withdrawAll() external onlyAuthorized {
         _withdrawAll();
     }
 
@@ -170,7 +170,7 @@ contract StrategyCurve is StrategyBase, UseUniswap {
     @notice Claim CRV, swap for underlying, transfer performance fee to treasury,
             deposit remaning underlying
     */
-    function harvest() external onlyController {
+    function harvest() external onlyAuthorized {
         _crvToUnderlying();
 
         uint underlyingBal = IERC20(underlying).balanceOf(address(this));
@@ -195,7 +195,7 @@ contract StrategyCurve is StrategyBase, UseUniswap {
     @dev Must return all underlying token to vault
     @dev Controller and vault should implement guard agains slippage
     */
-    function exit() external onlyVaultOrController {
+    function exit() external onlyAuthorized {
         _crvToUnderlying();
         _withdrawAll();
     }

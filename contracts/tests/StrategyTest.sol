@@ -34,7 +34,7 @@ contract StrategyTest is StrategyBase {
         IERC20(underlying).safeTransferFrom(vault, address(this), _underlyingAmount);
     }
 
-    function withdraw(uint _underlyingAmount) external onlyVaultOrController {
+    function withdraw(uint _underlyingAmount) external onlyAuthorized {
         require(_underlyingAmount > 0, "underlying = 0");
 
         _withdrawAmount_ = _underlyingAmount;
@@ -52,15 +52,15 @@ contract StrategyTest is StrategyBase {
         }
     }
 
-    function withdrawAll() external onlyVaultOrController {
+    function withdrawAll() external onlyAuthorized {
         _withdrawAll();
     }
 
-    function harvest() external onlyController {
+    function harvest() external onlyAuthorized {
         _harvestWasCalled_ = true;
     }
 
-    function exit() external onlyVaultOrController {
+    function exit() external onlyAuthorized {
         _exitWasCalled_ = true;
         _withdrawAll();
     }
