@@ -90,9 +90,9 @@ contract StrategyStableToCurve is StrategyBase {
 
     function _removeLiquidityOneCoin(uint _cAmount) internal;
 
-    function _withdrawUnderlying(uint _cUsdAmount) private {
+    function _withdrawUnderlying(uint _cUnderlyingAmount) private {
         // withdraw cUnderlying from  Gauge
-        Gauge(gauge).withdraw(_cUsdAmount);
+        Gauge(gauge).withdraw(_cUnderlyingAmount);
 
         // withdraw underlying
         uint cBal = IERC20(cUnderlying).balanceOf(address(this));
@@ -123,10 +123,10 @@ contract StrategyStableToCurve is StrategyBase {
         s = w / U * T
         */
         uint gaugeBal = Gauge(gauge).balanceOf(address(this));
-        uint cUsdAmount = _underlyingAmount.mul(gaugeBal).div(totalUnderlying);
+        uint cUnderlyingAmount = _underlyingAmount.mul(gaugeBal).div(totalUnderlying);
 
-        if (cUsdAmount > 0) {
-            _withdrawUnderlying(cUsdAmount);
+        if (cUnderlyingAmount > 0) {
+            _withdrawUnderlying(cUnderlyingAmount);
         }
 
         // transfer underlying token to vault
