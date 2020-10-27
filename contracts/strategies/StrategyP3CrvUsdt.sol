@@ -3,12 +3,13 @@ pragma solidity 0.5.17;
 import "./StrategyP3Crv.sol";
 
 contract StrategyP3CrvUsdt is StrategyP3Crv {
+    address private constant USDT = 0xdAC17F958D2ee523a2206206994597C13D831ec7;
+
     constructor(address _controller, address _vault)
         public
-        StrategyP3Crv(_controller, _vault)
+        StrategyP3Crv(_controller, _vault, USDT)
     {
         // usdt
-        underlying = 0xdAC17F958D2ee523a2206206994597C13D831ec7;
         underlyingIndex = 2;
 
         precisionDiv = 1e12;
@@ -29,7 +30,6 @@ contract StrategyP3CrvUsdt is StrategyP3Crv {
         weth = 0xC02aaA39b223FE8D0A0e5C4F27eAD9083C756Cc2;
 
         // Assets that cannot be swept by admin
-        assets[underlying] = true;
         assets[pickle] = true;
     }
 }

@@ -17,7 +17,7 @@ export default (accounts: Truffle.Accounts) => {
   interface Refs {
     admin: string
     treasury: string
-    erc20: Erc20TokenInstance
+    underlying: Erc20TokenInstance
     controller: MockControllerInstance
     vault: MockVaultInstance
     strategy: TestStrategyBaseInstance
@@ -27,7 +27,7 @@ export default (accounts: Truffle.Accounts) => {
     admin,
     treasury,
     // @ts-ignore
-    erc20: null,
+    underlying: null,
     // @ts-ignore
     controller: null,
     // @ts-ignore
@@ -37,12 +37,13 @@ export default (accounts: Truffle.Accounts) => {
   }
 
   beforeEach(async () => {
-    refs.erc20 = await ERC20Token.new()
+    refs.underlying = await ERC20Token.new()
     refs.controller = await MockController.new(treasury)
-    refs.vault = await MockVault.new(refs.controller.address, refs.erc20.address)
+    refs.vault = await MockVault.new(refs.controller.address, refs.underlying.address)
     refs.strategy = await TestStrategyBase.new(
       refs.controller.address,
       refs.vault.address,
+      refs.underlying.address,
       {from: admin}
     )
   })

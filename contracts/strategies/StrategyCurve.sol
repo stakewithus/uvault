@@ -13,7 +13,6 @@ import "../StrategyBase.sol";
 
 // @dev This is an abstract contract
 contract StrategyCurve is StrategyBase {
-    address public underlying;
     // DAI = 0 | USDC = 1 | USDT = 2
     uint internal underlyingIndex;
 
@@ -34,10 +33,11 @@ contract StrategyCurve is StrategyBase {
     // used for crv <> weth <> underlying route
     address internal weth;
 
-    constructor(address _controller, address _vault)
-        public
-        StrategyBase(_controller, _vault)
-    {}
+    constructor(
+        address _controller,
+        address _vault,
+        address _underlying
+    ) public StrategyBase(_controller, _vault, _underlying) {}
 
     function _calcWithdrawOneCoin(uint _gaugeAmount) internal view returns (uint);
 

@@ -4,8 +4,6 @@ import "../IController.sol";
 import "../StrategyBase.sol";
 
 contract StrategyTest is StrategyBase {
-    address public underlying;
-
     // test helper
     bool public _harvestWasCalled_;
     bool public _exitWasCalled_;
@@ -20,11 +18,7 @@ contract StrategyTest is StrategyBase {
         address _controller,
         address _vault,
         address _underlying
-    ) public StrategyBase(_controller, _vault) {
-        require(_underlying != address(0), "underlying = zero address");
-
-        underlying = _underlying;
-    }
+    ) public StrategyBase(_controller, _vault, _underlying) {}
 
     function _totalAssets() internal view returns (uint) {
         return IERC20(underlying).balanceOf(address(this));

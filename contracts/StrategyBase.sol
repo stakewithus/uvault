@@ -10,6 +10,8 @@ contract StrategyBase is IStrategy {
     using SafeERC20 for IERC20;
     using SafeMath for uint;
 
+    address public underlying;
+
     address public admin;
     address public controller;
     address public vault;
@@ -19,15 +21,23 @@ contract StrategyBase is IStrategy {
     uint internal constant PERFORMANCE_FEE_MAX = 10000;
 
     // valuable tokens that cannot be swept
-    mapping(address => bool) internal assets;
+    mapping(address => bool) public assets;
 
-    constructor(address _controller, address _vault) public {
+    constructor(
+        address _controller,
+        address _vault,
+        address _underlying
+    ) public {
         require(_controller != address(0), "controller = zero address");
         require(_vault != address(0), "vault = zero address");
+        require(_underlying != address(0), "underlying = zero address");
 
         admin = msg.sender;
         controller = _controller;
         vault = _vault;
+        underlying = _underlying;
+
+        assets[underlying] = true;
     }
 
     modifier onlyAdmin() {

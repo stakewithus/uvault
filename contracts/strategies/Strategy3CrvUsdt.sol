@@ -3,12 +3,13 @@ pragma solidity 0.5.17;
 import "./Strategy3Crv.sol";
 
 contract Strategy3CrvUsdt is Strategy3Crv {
+    address private constant USDT = 0xdAC17F958D2ee523a2206206994597C13D831ec7;
+
     constructor(address _controller, address _vault)
         public
-        Strategy3Crv(_controller, _vault)
+        Strategy3Crv(_controller, _vault, USDT)
     {
         // usdt
-        underlying = 0xdAC17F958D2ee523a2206206994597C13D831ec7;
         underlyingIndex = 2;
 
         // Curve
@@ -25,8 +26,5 @@ contract Strategy3CrvUsdt is Strategy3Crv {
 
         uniswap = 0x7a250d5630B4cF539739dF2C5dAcb4c659F2488D;
         weth = 0xC02aaA39b223FE8D0A0e5C4F27eAD9083C756Cc2;
-
-        // Assets that cannot be swept by admin
-        assets[underlying] = true;
     }
 }

@@ -4,10 +4,11 @@ import "../interfaces/curve/ICurveFi2.sol";
 import "./StrategyCurve.sol";
 
 contract StrategyCusd is StrategyCurve {
-    constructor(address _controller, address _vault)
-        public
-        StrategyCurve(_controller, _vault)
-    {}
+    constructor(
+        address _controller,
+        address _vault,
+        address _underlying
+    ) public StrategyCurve(_controller, _vault, _underlying) {}
 
     function _calcWithdrawOneCoin(uint _gaugeAmount) internal view returns (uint) {
         if (_gaugeAmount > 0) {

@@ -4,16 +4,13 @@ import "../StrategyBase.sol";
 
 /* solium-disable */
 contract TestStrategyBase is StrategyBase {
-    constructor(address _controller, address _vault)
-        public
-        StrategyBase(_controller, _vault)
-    {}
+    constructor(
+        address _controller,
+        address _vault,
+        address _underlying
+    ) public StrategyBase(_controller, _vault, _underlying) {}
 
     // IStrategy implementations
-    function underlying() external view returns (address) {
-        return address(0);
-    }
-
     function totalAssets() external view returns (uint) {
         return 0;
     }

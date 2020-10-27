@@ -4,7 +4,7 @@ import {TestStrategyBaseInstance} from "../../../types/TestStrategyBase"
 import {eq} from "../../util"
 import _setup from "./setup"
 
-contract("BaseStrategy", (accounts) => {
+contract("StrategyBase", (accounts) => {
   const refs = _setup(accounts)
   const {admin} = refs
 

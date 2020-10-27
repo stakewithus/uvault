@@ -9,7 +9,6 @@ import "../IController.sol";
 import "../StrategyBase.sol";
 
 contract StrategyP3Crv is StrategyBase {
-    address public underlying;
     // DAI = 0 | USDC = 1 | USDT = 2
     uint internal underlyingIndex;
     // precision to convert 10 ** 18  to underlying decimals
@@ -33,10 +32,11 @@ contract StrategyP3Crv is StrategyBase {
     // used for pickle <> weth <> underlying route
     address internal weth;
 
-    constructor(address _controller, address _vault)
-        public
-        StrategyBase(_controller, _vault)
-    {}
+    constructor(
+        address _controller,
+        address _vault,
+        address _underlying
+    ) public StrategyBase(_controller, _vault, _underlying) {}
 
     // TODO vulnerable to price manipulation
     function _totalAssets() private view returns (uint) {
