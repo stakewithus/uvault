@@ -2,13 +2,27 @@ import {Ierc20Instance} from "../../../types/Ierc20"
 import {MasterChefInstance} from "../../../types/MasterChef"
 import {ControllerInstance} from "../../../types/Controller"
 import {
+  StrategyDaiToP3CrvContract,
+  StrategyDaiToP3CrvInstance,
+} from "../../../types/StrategyDaiToP3Crv"
+import {
   StrategyUsdcToP3CrvContract,
   StrategyUsdcToP3CrvInstance,
 } from "../../../types/StrategyUsdcToP3Crv"
+import {
+  StrategyUsdtToP3CrvContract,
+  StrategyUsdtToP3CrvInstance,
+} from "../../../types/StrategyUsdtToP3Crv"
 
-export type StrategyContract = StrategyUsdcToP3CrvContract
+export type StrategyContract =
+  | StrategyDaiToP3CrvContract
+  | StrategyUsdcToP3CrvContract
+  | StrategyUsdtToP3CrvContract
 
-export type StrategyInstance = StrategyUsdcToP3CrvInstance
+export type StrategyInstance =
+  | StrategyDaiToP3CrvInstance
+  | StrategyUsdcToP3CrvInstance
+  | StrategyUsdtToP3CrvInstance
 
 // references to return
 export interface Refs {
