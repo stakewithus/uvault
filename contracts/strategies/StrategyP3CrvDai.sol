@@ -25,10 +25,6 @@ contract StrategyP3CrvDai is StrategyP3Crv {
         chef = 0xbD17B1ce622d73bD438b9E658acA5996dc394b0d;
         pickle = 0x429881672B9AE42b8EbA0E26cD9C73711b891Ca5;
 
-        // uniswap //
-        uniswap = 0x7a250d5630B4cF539739dF2C5dAcb4c659F2488D;
-        weth = 0xC02aaA39b223FE8D0A0e5C4F27eAD9083C756Cc2;
-
         // Assets that cannot be swept by admin
         assets[pickle] = true;
     }

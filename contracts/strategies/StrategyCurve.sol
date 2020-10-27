@@ -2,9 +2,9 @@ pragma solidity 0.5.17;
 
 import "../interfaces/curve/Gauge.sol";
 import "../interfaces/curve/Minter.sol";
-import "../interfaces/uniswap/Uniswap.sol";
 import "../IController.sol";
 import "../StrategyBase.sol";
+import "../UseUniswap.sol";
 
 /* potential hacks?
 - front running?
@@ -12,7 +12,7 @@ import "../StrategyBase.sol";
 */
 
 // @dev This is an abstract contract
-contract StrategyCurve is StrategyBase {
+contract StrategyCurve is StrategyBase, UseUniswap {
     // DAI = 0 | USDC = 1 | USDT = 2
     uint internal underlyingIndex;
 
@@ -27,11 +27,6 @@ contract StrategyCurve is StrategyBase {
     address internal minter;
     // DAO
     address internal crv;
-
-    // DEX related addresses
-    address internal uniswap;
-    // used for crv <> weth <> underlying route
-    address internal weth;
 
     constructor(
         address _controller,
@@ -166,24 +161,8 @@ contract StrategyCurve is StrategyBase {
 
         uint crvBal = IERC20(crv).balanceOf(address(this));
         if (crvBal > 0) {
-            // use Uniswap to exchange CRV for underlying
-            IERC20(crv).safeApprove(uniswap, 0);
-            IERC20(crv).safeApprove(uniswap, crvBal);
-
-            // route crv > weth > underlying
-            address[] memory path = new address[](3);
-            path[0] = crv;
-            path[1] = weth;
-            path[2] = underlying;
-
-            Uniswap(uniswap).swapExactTokensForTokens(
-                crvBal,
-                uint(0),
-                path,
-                address(this),
-                now.add(1800)
-            );
-            // NOTE: Now this contract has underlying token
+            _swap(crv, underlying, crvBal);
+            // Now this contract has underlying token
         }
     }
 

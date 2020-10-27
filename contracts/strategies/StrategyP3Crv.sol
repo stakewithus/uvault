@@ -1,14 +1,14 @@
 pragma solidity 0.5.17;
 
 import "../interfaces/curve/ICurveFi3.sol";
-import "../interfaces/uniswap/Uniswap.sol";
 import "../interfaces/pickle/PickleJar.sol";
 import "../interfaces/pickle/MasterChef.sol";
 
 import "../IController.sol";
 import "../StrategyBase.sol";
+import "../UseUniswap.sol";
 
-contract StrategyP3Crv is StrategyBase {
+contract StrategyP3Crv is StrategyBase, UseUniswap {
     // DAI = 0 | USDC = 1 | USDT = 2
     uint internal underlyingIndex;
     // precision to convert 10 ** 18  to underlying decimals
@@ -26,11 +26,6 @@ contract StrategyP3Crv is StrategyBase {
     address internal pickle;
     // POOL ID for 3Crv jar
     uint private constant POOL_ID = 14;
-
-    // DEX related addresses
-    address internal uniswap;
-    // used for pickle <> weth <> underlying route
-    address internal weth;
 
     constructor(
         address _controller,
@@ -150,21 +145,7 @@ contract StrategyP3Crv is StrategyBase {
     function _pickleToUnderlying() private {
         uint pickleBal = IERC20(pickle).balanceOf(address(this));
         if (pickleBal > 0) {
-            // use Uniswap to exchange Pickle for underlying
-            IERC20(pickle).safeApprove(uniswap, 0);
-            IERC20(pickle).safeApprove(uniswap, pickleBal);
-            // route pickle > weth > underlying
-            address[] memory path = new address[](3);
-            path[0] = pickle;
-            path[1] = weth;
-            path[2] = underlying;
-            Uniswap(uniswap).swapExactTokensForTokens(
-                pickleBal,
-                uint(0),
-                path,
-                address(this),
-                now.add(1800)
-            );
+            _swap(pickle, underlying, pickleBal);
             // Now this contract has underlying token
         }
     }
