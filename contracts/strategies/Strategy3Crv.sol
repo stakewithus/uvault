@@ -10,15 +10,8 @@ contract Strategy3Crv is StrategyCurve {
         address _underlying
     ) public StrategyCurve(_controller, _vault, _underlying) {}
 
-    function _calcWithdrawOneCoin(uint _gaugeAmount) internal view returns (uint) {
-        if (_gaugeAmount > 0) {
-            return
-                ICurveFi3(pool).calc_withdraw_one_coin(
-                    _gaugeAmount,
-                    int128(underlyingIndex)
-                );
-        }
-        return 0;
+    function _getVirtualPrice() internal view returns (uint) {
+        return ICurveFi3(pool).get_virtual_price();
     }
 
     function _addLiquidity(uint _underlyingAmount) internal {

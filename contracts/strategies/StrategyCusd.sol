@@ -10,15 +10,11 @@ contract StrategyCusd is StrategyCurve {
         address _underlying
     ) public StrategyCurve(_controller, _vault, _underlying) {}
 
-    function _calcWithdrawOneCoin(uint _gaugeAmount) internal view returns (uint) {
-        if (_gaugeAmount > 0) {
-            return
-                ICurveFi2(pool).calc_withdraw_one_coin(
-                    _gaugeAmount,
-                    int128(underlyingIndex)
-                );
-        }
-        return 0;
+    /*
+    @dev Returns USD price of 1 Curve Compound LP token
+    */
+    function _getVirtualPrice() internal view returns (uint) {
+        return ICurveFi2(pool).get_virtual_price();
     }
 
     function _addLiquidity(uint _underlyingAmount) internal {

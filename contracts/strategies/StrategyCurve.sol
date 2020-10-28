@@ -34,11 +34,11 @@ contract StrategyCurve is StrategyBase, UseUniswap {
         address _underlying
     ) public StrategyBase(_controller, _vault, _underlying) {}
 
-    function _calcWithdrawOneCoin(uint _gaugeAmount) internal view returns (uint);
+    function _getVirtualPrice() internal view returns (uint);
 
     function _totalAssets() private view returns (uint) {
-        uint gaugeBal = Gauge(gauge).balanceOf(address(this));
-        return _calcWithdrawOneCoin(gaugeBal);
+        uint cUnderlyingBal = Gauge(gauge).balanceOf(address(this));
+        return cUnderlyingBal.mul(_getVirtualPrice()).div(1e18);
     }
 
     /*
@@ -103,7 +103,6 @@ contract StrategyCurve is StrategyBase, UseUniswap {
     */
     function withdraw(uint _underlyingAmount) external onlyAuthorized {
         require(_underlyingAmount > 0, "underlying = 0");
-        // TODO vulnerable to price manipulation
         uint totalUnderlying = _totalAssets();
         require(_underlyingAmount <= totalUnderlying, "underlying > total");
 
@@ -117,8 +116,10 @@ contract StrategyCurve is StrategyBase, UseUniswap {
         w / U = s / T
         s = w / U * T
         */
-        uint gaugeBal = Gauge(gauge).balanceOf(address(this));
-        uint cUnderlyingAmount = _underlyingAmount.mul(gaugeBal).div(totalUnderlying);
+        uint cUnderlyingBal = Gauge(gauge).balanceOf(address(this));
+        uint cUnderlyingAmount = _underlyingAmount.mul(cUnderlyingBal).div(
+            totalUnderlying
+        );
 
         if (cUnderlyingAmount > 0) {
             _withdrawUnderlying(cUnderlyingAmount);
@@ -133,9 +134,9 @@ contract StrategyCurve is StrategyBase, UseUniswap {
 
     function _withdrawAll() private {
         // gauge balance is same unit as cUnderlying
-        uint gaugeBal = Gauge(gauge).balanceOf(address(this));
-        if (gaugeBal > 0) {
-            _withdrawUnderlying(gaugeBal);
+        uint cUnderlyingBal = Gauge(gauge).balanceOf(address(this));
+        if (cUnderlyingBal > 0) {
+            _withdrawUnderlying(cUnderlyingBal);
         }
 
         uint underlyingBal = IERC20(underlying).balanceOf(address(this));
