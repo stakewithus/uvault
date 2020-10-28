@@ -23,9 +23,9 @@ contract StrategyCusd is StrategyCurve {
         ICurveFi2(pool).add_liquidity(amounts, 0);
     }
 
-    function _removeLiquidityOneCoin(uint _cAmount) internal {
+    function _removeLiquidityOneCoin(uint _lpAmount) internal {
         ICurveFi2(pool).remove_liquidity_one_coin(
-            _cAmount,
+            _lpAmount,
             int128(underlyingIndex),
             0,
             true

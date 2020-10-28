@@ -14,7 +14,7 @@ contract Strategy3CrvUsdt is Strategy3Crv {
 
         // Curve
         // 3Crv
-        cUnderlying = 0x6c3F90f043a72FA612cbac8115EE7e52BDe6E490;
+        lp = 0x6c3F90f043a72FA612cbac8115EE7e52BDe6E490;
         // 3 Pool
         pool = 0xbEbc44782C7dB0a1A60Cb6fe97d0b483032FF1C7;
         // Gauge

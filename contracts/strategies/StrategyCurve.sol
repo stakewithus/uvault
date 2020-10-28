@@ -17,8 +17,8 @@ contract StrategyCurve is StrategyBase, UseUniswap {
     uint internal underlyingIndex;
 
     // Curve //
-    // cDAI/cUSDC or 3Crv
-    address internal cUnderlying;
+    // liquidity provider token (cDAI/cUSDC or 3Crv)
+    address internal lp;
     // ICurveFi2 or ICurveFi3
     address internal pool;
     // Gauge
@@ -37,8 +37,10 @@ contract StrategyCurve is StrategyBase, UseUniswap {
     function _getVirtualPrice() internal view returns (uint);
 
     function _totalAssets() private view returns (uint) {
-        uint cUnderlyingBal = Gauge(gauge).balanceOf(address(this));
-        return cUnderlyingBal.mul(_getVirtualPrice()).div(1e18);
+        uint lpBal = Gauge(gauge).balanceOf(address(this));
+        uint pricePerShare = _getVirtualPrice();
+
+        return lpBal.mul(pricePerShare).div(1e18);
     }
 
     /*
@@ -54,21 +56,21 @@ contract StrategyCurve is StrategyBase, UseUniswap {
     @notice Deposits underlying to Gauge
     */
     function _depositUnderlying() private {
-        // underlying to cUnderlying
+        // underlying to lp
         uint underlyingBal = IERC20(underlying).balanceOf(address(this));
         if (underlyingBal > 0) {
             IERC20(underlying).safeApprove(pool, 0);
             IERC20(underlying).safeApprove(pool, underlyingBal);
-            // mint cUnderlying
+            // mint lp
             _addLiquidity(underlyingBal);
         }
 
-        // stake cUnderlying into Gauge
-        uint cBal = IERC20(cUnderlying).balanceOf(address(this));
-        if (cBal > 0) {
-            IERC20(cUnderlying).safeApprove(gauge, 0);
-            IERC20(cUnderlying).safeApprove(gauge, cBal);
-            Gauge(gauge).deposit(cBal);
+        // stake lp into Gauge
+        uint lpBal = IERC20(lp).balanceOf(address(this));
+        if (lpBal > 0) {
+            IERC20(lp).safeApprove(gauge, 0);
+            IERC20(lp).safeApprove(gauge, lpBal);
+            Gauge(gauge).deposit(lpBal);
         }
     }
 
@@ -83,16 +85,16 @@ contract StrategyCurve is StrategyBase, UseUniswap {
         _depositUnderlying();
     }
 
-    function _removeLiquidityOneCoin(uint _cAmount) internal;
+    function _removeLiquidityOneCoin(uint _lpAmount) internal;
 
-    function _withdrawUnderlying(uint _cUnderlyingAmount) private {
-        // withdraw cUnderlying from  Gauge
-        Gauge(gauge).withdraw(_cUnderlyingAmount);
+    function _withdrawUnderlying(uint _lpAmount) private {
+        // withdraw lp from  Gauge
+        Gauge(gauge).withdraw(_lpAmount);
 
         // withdraw underlying
-        uint cBal = IERC20(cUnderlying).balanceOf(address(this));
-        // creates cUnderlying dust
-        _removeLiquidityOneCoin(cBal);
+        uint lpBal = IERC20(lp).balanceOf(address(this));
+        // creates lp dust
+        _removeLiquidityOneCoin(lpBal);
         // Now we have underlying
     }
 
@@ -111,18 +113,16 @@ contract StrategyCurve is StrategyBase, UseUniswap {
         w = amount of underlying to withdraw
         U = total underlying redeemable in Curve
         s = shares to withdraw
-        T = total shares in Gauge
+        T = total shares staked in Gauge
 
         w / U = s / T
         s = w / U * T
         */
-        uint cUnderlyingBal = Gauge(gauge).balanceOf(address(this));
-        uint cUnderlyingAmount = _underlyingAmount.mul(cUnderlyingBal).div(
-            totalUnderlying
-        );
+        uint lpBal = Gauge(gauge).balanceOf(address(this));
+        uint lpAmount = _underlyingAmount.mul(lpBal).div(totalUnderlying);
 
-        if (cUnderlyingAmount > 0) {
-            _withdrawUnderlying(cUnderlyingAmount);
+        if (lpAmount > 0) {
+            _withdrawUnderlying(lpAmount);
         }
 
         // transfer underlying token to vault
@@ -133,10 +133,10 @@ contract StrategyCurve is StrategyBase, UseUniswap {
     }
 
     function _withdrawAll() private {
-        // gauge balance is same unit as cUnderlying
-        uint cUnderlyingBal = Gauge(gauge).balanceOf(address(this));
-        if (cUnderlyingBal > 0) {
-            _withdrawUnderlying(cUnderlyingBal);
+        // gauge balance is same unit as lp
+        uint lpBal = Gauge(gauge).balanceOf(address(this));
+        if (lpBal > 0) {
+            _withdrawUnderlying(lpBal);
         }
 
         uint underlyingBal = IERC20(underlying).balanceOf(address(this));
@@ -185,7 +185,7 @@ contract StrategyCurve is StrategyBase, UseUniswap {
                 IERC20(underlying).safeTransfer(treasury, fee);
             }
 
-            // deposit remaining underlying for cUnderlying
+            // deposit remaining underlying for lp
             _depositUnderlying();
         }
     }

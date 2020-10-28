@@ -20,7 +20,11 @@ contract Strategy3Crv is StrategyCurve {
         ICurveFi3(pool).add_liquidity(amounts, 0);
     }
 
-    function _removeLiquidityOneCoin(uint _cAmount) internal {
-        ICurveFi3(pool).remove_liquidity_one_coin(_cAmount, int128(underlyingIndex), 0);
+    function _removeLiquidityOneCoin(uint _lpAmount) internal {
+        ICurveFi3(pool).remove_liquidity_one_coin(
+            _lpAmount,
+            int128(underlyingIndex),
+            0
+        );
     }
 }
