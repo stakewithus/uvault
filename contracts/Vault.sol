@@ -135,7 +135,7 @@ contract Vault is IVault, ERC20, ERC20Detailed, ReentrancyGuard {
         paused = false;
     }
 
-    function _balanceInVault() internal view returns (uint) {
+    function _balanceInVault() private view returns (uint) {
         return IERC20(token).balanceOf(address(this));
     }
 
@@ -147,7 +147,7 @@ contract Vault is IVault, ERC20, ERC20Detailed, ReentrancyGuard {
         return _balanceInVault();
     }
 
-    function _balanceInStrategy() internal view returns (uint) {
+    function _balanceInStrategy() private view returns (uint) {
         if (strategy == address(0)) {
             return 0;
         }
@@ -164,7 +164,7 @@ contract Vault is IVault, ERC20, ERC20Detailed, ReentrancyGuard {
         return _balanceInStrategy();
     }
 
-    function _totalAssets() internal view returns (uint) {
+    function _totalAssets() private view returns (uint) {
         return _balanceInVault().add(totalDebt);
     }
 
@@ -176,7 +176,7 @@ contract Vault is IVault, ERC20, ERC20Detailed, ReentrancyGuard {
         return _totalAssets();
     }
 
-    function _minReserve() internal view returns (uint) {
+    function _minReserve() private view returns (uint) {
         return _totalAssets().mul(reserveMin).div(RESERVE_MAX);
     }
 
@@ -189,7 +189,7 @@ contract Vault is IVault, ERC20, ERC20Detailed, ReentrancyGuard {
         return _minReserve();
     }
 
-    function _availableToInvest() internal view returns (uint) {
+    function _availableToInvest() private view returns (uint) {
         if (strategy == address(0)) {
             return 0;
         }
@@ -332,7 +332,7 @@ contract Vault is IVault, ERC20, ERC20Detailed, ReentrancyGuard {
         uint _shares,
         uint _balInVault,
         uint _balInStrat
-    ) internal view returns (uint) {
+    ) private view returns (uint) {
         /*
         s = shares
         T = total supply of shares
