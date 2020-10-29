@@ -27,9 +27,21 @@ interface IVault {
     function balanceInVault() external view returns (uint);
 
     /*
-    @notice Returns the amount of token in the strategy
+    @notice Returns the estimate amount of token in strategy
+    @dev Output may vary depending on price of liquidity provider token
+         where the underlying token is invested
     */
     function balanceInStrategy() external view returns (uint);
+
+    /*
+    @notice Returns the amount of token invested in strategy
+    */
+    function totalDebt() external view returns (uint);
+
+    /*
+    @notice Returns the total amount of token in vault + total debt
+    */
+    function totalAssets() external view returns (uint);
 
     /*
     @notice Returns minimum amount of tokens that should be kept in vault for
@@ -37,11 +49,6 @@ interface IVault {
     @return Reserve amount
     */
     function minReserve() external view returns (uint);
-
-    /*
-    @notice Returns the total amount of token in vault + strategy
-    */
-    function totalAssets() external view returns (uint);
 
     /*
     @notice Returns the amount of tokens available to be invested
@@ -53,28 +60,30 @@ interface IVault {
     */
     function invest() external;
 
+    /*
+    @notice Deposit undelying token into this vault
+    @param _amount Amount of token to deposit
+    */
     function deposit(uint _amount) external;
 
     /*
-    @notice Calculate amount of underlying token that can be withdrawn
+    @notice Calculate amount of token that can be withdrawn
     @param _shares Amount of shares
-    @return Amount of underlying token that can be withdrawn
+    @return Amount of token that can be withdrawn
     */
     function calcWithdraw(uint _shares) external view returns (uint);
 
     /*
-    @notice Withdraw underlying token
+    @notice Withdraw token
     @param _shares Amount of shares to burn
-    @param _min Minimum amount of underlying token expected to return
+    @param _min Minimum amount of token expected to return
     */
     function withdraw(uint _shares, uint _min) external;
 
     /*
-    @notice Transfer token != underlying token in vault to admin
+    @notice Transfer token in vault to admin
     @param _token Address of token to transfer
-    @dev Must transfer token to admin
-    @dev _token must not be equal to underlying token
-    @dev Used to transfer token that was accidentally sent to this vault
+    @dev _token must not be equal to vault token
     */
     function sweep(address _token) external;
 }
