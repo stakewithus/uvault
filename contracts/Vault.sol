@@ -156,8 +156,9 @@ contract Vault is IVault, ERC20, ERC20Detailed, ReentrancyGuard {
     }
 
     /*
-    @notice Returns balance of underlying token in strategy
-    @return Amount of token in strategy
+    @notice Returns the estimate amount of token in strategy
+    @dev Output may vary depending on price of liquidity provider token
+         where the underlying token is invested
     */
     function balanceInStrategy() external view returns (uint) {
         return _balanceInStrategy();
@@ -168,8 +169,8 @@ contract Vault is IVault, ERC20, ERC20Detailed, ReentrancyGuard {
     }
 
     /*
-    @notice Returns the total amount of tokens in vault + strategy
-    @return Total amount of tokens in vault + strategy
+    @notice Returns the total amount of tokens in vault + total debt
+    @return Total amount of tokens in vault + total debt
     */
     function totalAssets() external view returns (uint) {
         return _totalAssets();
@@ -186,6 +187,29 @@ contract Vault is IVault, ERC20, ERC20Detailed, ReentrancyGuard {
     */
     function minReserve() external view returns (uint) {
         return _minReserve();
+    }
+
+    function _availableToInvest() internal view returns (uint) {
+        if (strategy == address(0)) {
+            return 0;
+        }
+
+        uint balInVault = _balanceInVault();
+        uint reserve = _minReserve();
+
+        if (balInVault <= reserve) {
+            return 0;
+        }
+
+        return balInVault.sub(reserve);
+    }
+
+    /*
+    @notice Returns amount of token available to be invested into strategy
+    @return Amount of token available to be invested into strategy
+    */
+    function availableToInvest() external view returns (uint) {
+        return _availableToInvest();
     }
 
     /*
@@ -256,30 +280,6 @@ contract Vault is IVault, ERC20, ERC20Detailed, ReentrancyGuard {
     */
     function revokeStrategy(address _strategy) external onlyAdmin {
         strategies[_strategy] = false;
-    }
-
-    function _availableToInvest() internal view returns (uint) {
-        if (strategy == address(0)) {
-            return 0;
-        }
-
-        uint balInVault = _balanceInVault();
-        uint reserve = _minReserve();
-
-        if (balInVault <= reserve) {
-            return 0;
-        }
-
-        // balInVault > reserve
-        return balInVault - reserve;
-    }
-
-    /*
-    @notice Returns amount of token available to be invested into strategy
-    @return Amount of token available to be invested into strategy
-    */
-    function availableToInvest() external view returns (uint) {
-        return _availableToInvest();
     }
 
     /*
