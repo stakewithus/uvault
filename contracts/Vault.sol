@@ -328,17 +328,34 @@ contract Vault is IVault, ERC20, ERC20Detailed, ReentrancyGuard {
         IERC20(token).safeTransferFrom(msg.sender, address(this), _amount);
     }
 
-    function _calcWithdraw(uint _shares) internal view returns (uint) {
+    function _getExpectedReturn(
+        uint _shares,
+        uint _balInVault,
+        uint _balInStrat
+    ) internal view returns (uint) {
         /*
         s = shares
         T = total supply of shares
         w = amount of underlying token to withdraw
-        P = total amount of underlying token in vault + strategy
+        U = total amount of redeemable underlying token in vault + strategy
 
-        s / T = w / P
-        w = s / T * P
+        s / T = w / U
+        w = s / T * U
         */
-        return _shares.mul(_totalAssets()).div(totalSupply());
+
+        /*
+        total underlying = bal in vault + min(total debt, bal in strat)
+        if bal in strat > total debt, redeemable = total debt
+        else redeemable <= bal in strat
+        */
+        uint totalUnderlying;
+        if (_balInStrat > totalDebt) {
+            totalUnderlying = _balInVault.add(totalDebt);
+        } else {
+            totalUnderlying = _balInVault.add(_balInStrat);
+        }
+
+        return _shares.mul(totalUnderlying).div(totalSupply());
     }
 
     /*
@@ -346,8 +363,11 @@ contract Vault is IVault, ERC20, ERC20Detailed, ReentrancyGuard {
     @param _shares Amount of shares
     @return Amount of underlying token that can be withdrawn
     */
-    function calcWithdraw(uint _shares) external view returns (uint) {
-        return _calcWithdraw(_shares);
+    function getExpectedReturn(uint _shares) external view returns (uint) {
+        uint balInVault = _balanceInVault();
+        uint balInStrat = _balanceInStrategy();
+
+        return _getExpectedReturn(_shares, balInVault, balInStrat);
     }
 
     /*
@@ -358,13 +378,15 @@ contract Vault is IVault, ERC20, ERC20Detailed, ReentrancyGuard {
     function withdraw(uint _shares, uint _min) external nonReentrant {
         require(_shares > 0, "shares = 0");
 
-        uint withdrawAmount = _calcWithdraw(_shares);
+        uint balInVault = _balanceInVault();
+        uint balInStrat = _balanceInStrategy();
+        uint withdrawAmount = _getExpectedReturn(_shares, balInVault, balInStrat);
+
+        // Must burn after calculating withdraw amount
         _burn(msg.sender, _shares);
 
-        uint balInVault = _balanceInVault();
         if (balInVault < withdrawAmount) {
             // maximize withdraw amount from strategy
-            uint balInStrat = _balanceInStrategy();
             uint amountFromStrat = withdrawAmount;
             if (balInStrat < withdrawAmount) {
                 amountFromStrat = balInStrat;
@@ -374,11 +396,14 @@ contract Vault is IVault, ERC20, ERC20Detailed, ReentrancyGuard {
 
             uint balAfter = _balanceInVault();
             uint diff = balAfter.sub(balInVault);
+
             if (diff < amountFromStrat) {
                 // withdraw amount - withdraw amount from strat = amount to withdraw from vault
                 // diff = actual amount returned from strategy
                 withdrawAmount = withdrawAmount.sub(amountFromStrat).add(diff);
             }
+
+            totalDebt = totalDebt.sub(diff);
 
             // transfer to treasury
             uint fee = withdrawAmount.mul(withdrawFee).div(FEE_MAX);
