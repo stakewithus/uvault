@@ -56,6 +56,9 @@ contract Vault is IVault, ERC20, ERC20Detailed, ReentrancyGuard {
     // mapping of approved strategies
     mapping(address => bool) public strategies;
 
+    // total amount of underlying in strategy
+    uint public totalDebt;
+
     bool public paused;
 
     /*
@@ -163,7 +166,7 @@ contract Vault is IVault, ERC20, ERC20Detailed, ReentrancyGuard {
     }
 
     function _totalAssets() internal view returns (uint) {
-        return _balanceInVault().add(_balanceInStrategy());
+        return _balanceInVault().add(totalDebt);
     }
 
     /*
@@ -289,8 +292,12 @@ contract Vault is IVault, ERC20, ERC20Detailed, ReentrancyGuard {
         uint amount = _availableToInvest();
         require(amount > 0, "available = 0");
 
+        uint balBefore = _balanceInVault();
         // infinite approval is set when this strategy was set
         IStrategy(strategy).deposit(amount);
+        uint balAfter = _balanceInVault();
+
+        totalDebt = totalDebt.add(balBefore.sub(balAfter));
     }
 
     /*

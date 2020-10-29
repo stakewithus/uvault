@@ -44,6 +44,7 @@ contract("Vault", (accounts) => {
         return {
           vault: {
             availableToInvest: await vault.availableToInvest(),
+            totalDebt: await vault.totalDebt(),
           },
           erc20: {
             admin: await erc20.balanceOf(admin),
@@ -58,6 +59,13 @@ contract("Vault", (accounts) => {
 
       // check token transfer to strategy
       assert(eq(after.erc20.strategy, before.vault.availableToInvest), "deposit")
+      assert(
+        eq(
+          after.vault.totalDebt,
+          before.vault.totalDebt.add(before.vault.availableToInvest)
+        ),
+        "total debt"
+      )
     })
 
     it("should reject if available = 0", async () => {
