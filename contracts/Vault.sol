@@ -97,11 +97,6 @@ contract Vault is IVault, ERC20, ERC20Detailed, ReentrancyGuard {
         _;
     }
 
-    modifier whenPaused() {
-        require(paused, "!paused");
-        _;
-    }
-
     modifier whenNotPaused() {
         require(!paused, "paused");
         _;
@@ -127,12 +122,8 @@ contract Vault is IVault, ERC20, ERC20Detailed, ReentrancyGuard {
         withdrawFee = _fee;
     }
 
-    function pause() external onlyAdmin whenNotPaused {
-        paused = true;
-    }
-
-    function unpause() external onlyAdmin whenPaused {
-        paused = false;
+    function setPause(bool _paused) external onlyAdmin {
+        paused = _paused;
     }
 
     function _balanceInVault() private view returns (uint) {
