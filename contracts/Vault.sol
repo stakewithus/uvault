@@ -422,6 +422,68 @@ contract Vault is IVault, ERC20, ERC20Detailed, ReentrancyGuard {
     }
 
     /*
+    @notice Withdraw underlying token from strategy back to vault
+    @param _amount Amount of tokens to withdraw
+    @param _min Minimum amount of underlying token to return
+    */
+    function withdrawFromStrategy(uint _amount, uint _min)
+        external
+        whenStrategyDefined
+        onlyAdminOrController
+    {
+        uint balBefore = _balanceInVault();
+        IStrategy(strategy).withdraw(_amount);
+        uint balAfter = _balanceInVault();
+
+        uint diff = balAfter.sub(balBefore);
+        require(diff >= _min, "withdraw < min");
+
+        if (diff > totalDebt) {
+            totalDebt = 0;
+        } else {
+            totalDebt = totalDebt.sub(diff);
+        }
+    }
+
+    /*
+    @notice Withdraw all underlying token from strategy back to vault
+    @param _min Minimum amount of underlying token to return
+    */
+    function withdrawAllFromStrategy(uint _min)
+        external
+        whenStrategyDefined
+        onlyAdminOrController
+    {
+        uint balBefore = _balanceInVault();
+        IStrategy(strategy).withdrawAll();
+        uint balAfter = _balanceInVault();
+
+        require(balAfter.sub(balBefore) >= _min, "withdraw < min");
+
+        totalDebt = 0;
+    }
+
+    /*
+    @notice Withdraw all underlying token from strategy back to vault and
+            deactivate current strategy
+    @param _min Minimum amount of underlying token to return
+    */
+    function exitStrategy(uint _min)
+        external
+        whenStrategyDefined
+        onlyAdminOrController
+    {
+        uint balBefore = _balanceInVault();
+        IStrategy(strategy).exit();
+        uint balAfter = _balanceInVault();
+
+        require(balAfter.sub(balBefore) >= _min, "withdraw < min");
+
+        totalDebt = 0;
+        strategy = address(0);
+    }
+
+    /*
     @notice Transfer token != underlying token in vault to admin
     @param _token Address of token to transfer
     @dev Must transfer token to admin
