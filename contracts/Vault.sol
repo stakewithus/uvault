@@ -11,17 +11,15 @@ import "./IStrategy.sol";
 import "./IVault.sol";
 import "./IController.sol";
 
-// TODO: batch deposit and batch withdraw
-
 /* potential hacks?
-- directly send underlying token to this vault
+- directly send underlying token to this vault or strategy
 - flash loan
+    - flashloan make undelying token less valuable
     - vault deposit
-    - use loan and make underlying token more valuable
+    - flashloan make underlying token more valuable
     - vault withdraw
     - return loan
 - front running?
-- slippage when withdrawing all from strategy
 */
 
 contract Vault is IVault, ERC20, ERC20Detailed, ReentrancyGuard {
