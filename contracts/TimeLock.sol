@@ -1,7 +1,7 @@
 pragma solidity 0.5.17;
 import "@openzeppelin/contracts/math/SafeMath.sol";
 
-contract Timelock {
+contract TimeLock {
     using SafeMath for uint;
 
     event NewAdmin(address admin);
