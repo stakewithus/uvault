@@ -16,23 +16,21 @@ contract("Vault", (accounts) => {
     erc20 = refs.erc20
   })
 
-  describe("unpause", () => {
-    beforeEach(async () => {
-      await vault.pause({from: admin})
+  describe("setPause", () => {
+    it("should pause", async () => {
+      await vault.setPause(true, {from: admin})
+      assert(await vault.paused(), "paused")
     })
 
     it("should unpause", async () => {
-      await vault.unpause({from: admin})
-      assert.isFalse(await vault.paused(), "!paused")
+      await vault.setPause(false, {from: admin})
+      assert.equal(await vault.paused(), false, "not paused")
     })
 
     it("should reject if caller not admin", async () => {
-      await chai.expect(vault.unpause({from: accounts[1]})).to.be.rejectedWith("!admin")
-    })
-
-    it("should reject if not paused", async () => {
-      await vault.unpause({from: admin})
-      await chai.expect(vault.unpause({from: admin})).to.be.rejectedWith("!paused")
+      await chai
+        .expect(vault.setPause(true, {from: accounts[1]}))
+        .to.be.rejectedWith("!admin")
     })
   })
 })
