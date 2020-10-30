@@ -78,7 +78,7 @@ contract("Vault", (accounts) => {
     })
 
     it("should reject if paused", async () => {
-      await vault.pause({from: admin})
+      await vault.setPause(true, {from: admin})
       await chai.expect(vault.invest({from: admin})).to.be.rejectedWith("paused")
     })
 
