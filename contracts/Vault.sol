@@ -346,7 +346,11 @@ contract Vault is IVault, ERC20, ERC20Detailed, ReentrancyGuard {
             totalUnderlying = _balInVault.add(_balInStrat);
         }
 
-        return _shares.mul(totalUnderlying).div(totalSupply());
+        uint totalShares = totalSupply();
+        if (totalShares > 0) {
+            return _shares.mul(totalUnderlying).div(totalShares);
+        }
+        return 0;
     }
 
     /*
