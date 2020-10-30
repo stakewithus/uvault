@@ -50,11 +50,8 @@ contract StrategyBase is IStrategy {
         _;
     }
 
-    modifier onlyAuthorized() {
-        require(
-            msg.sender == admin || msg.sender == controller || msg.sender == vault,
-            "!authorized"
-        );
+    modifier onlyAdminOrController() {
+        require(msg.sender == admin || msg.sender == controller, "!authorized");
         _;
     }
 

@@ -174,7 +174,7 @@ contract StrategyCurve is StrategyBase, UseUniswap {
     @notice Claim CRV, swap for underlying, transfer performance fee to treasury,
             deposit remaning underlying
     */
-    function harvest() external onlyAuthorized {
+    function harvest() external onlyAdminOrController {
         _crvToUnderlying();
 
         uint underlyingBal = IERC20(underlying).balanceOf(address(this));

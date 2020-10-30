@@ -159,7 +159,7 @@ contract StrategyP3Crv is StrategyBase, UseUniswap {
         }
     }
 
-    function harvest() external onlyAuthorized {
+    function harvest() external onlyAdminOrController {
         _pickleToUnderlying();
 
         uint underlyingBal = IERC20(underlying).balanceOf(address(this));
