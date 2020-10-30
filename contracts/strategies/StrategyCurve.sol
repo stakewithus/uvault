@@ -77,6 +77,7 @@ contract StrategyCurve is StrategyBase, UseUniswap {
     /*
     @notice Deposit underlying token into this strategy
     @param _underlyingAmount Amount of underlying token to deposit
+    @dev Only vault must call in order to correctly update vault.totalDebt
     */
     function deposit(uint _underlyingAmount) external onlyVault {
         require(_underlyingAmount > 0, "underlying = 0");
@@ -101,9 +102,10 @@ contract StrategyCurve is StrategyBase, UseUniswap {
     /*
     @notice Withdraw undelying token to vault
     @param _underlyingAmount Amount of underlying token to withdraw
-    @dev Controller and vault should implement guard agains slippage
+    @dev Vault should implement guard agains slippage
+    @dev Only vault must call in order to correctly update vault.totalDebt
     */
-    function withdraw(uint _underlyingAmount) external onlyAuthorized {
+    function withdraw(uint _underlyingAmount) external onlyVault {
         require(_underlyingAmount > 0, "underlying = 0");
         uint totalUnderlying = _totalAssets();
         require(_underlyingAmount <= totalUnderlying, "underlying > total");
@@ -148,9 +150,10 @@ contract StrategyCurve is StrategyBase, UseUniswap {
     /*
     @notice Withdraw all underlying to vault
     @dev This function does not claim CRV
-    @dev Controller and vault should implement guard agains slippage
+    @dev Vault should implement guard agains slippage
+    @dev Only vault must call in order to correctly update vault.totalDebt
     */
-    function withdrawAll() external onlyAuthorized {
+    function withdrawAll() external onlyVault {
         _withdrawAll();
     }
 
@@ -194,9 +197,10 @@ contract StrategyCurve is StrategyBase, UseUniswap {
     @notice Exit strategy by harvesting CRV to underlying token and then
             withdrawing all underlying to vault
     @dev Must return all underlying token to vault
-    @dev Controller and vault should implement guard agains slippage
+    @dev Vault should implement guard agains slippage
+    @dev Only vault must call in order to correctly update vault.totalDebt
     */
-    function exit() external onlyAuthorized {
+    function exit() external onlyVault {
         _crvToUnderlying();
         _withdrawAll();
     }

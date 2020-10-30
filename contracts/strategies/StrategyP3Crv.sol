@@ -76,6 +76,9 @@ contract StrategyP3Crv is StrategyBase, UseUniswap {
         }
     }
 
+    /*
+    @dev Only vault must call in order to correctly update vault.totalDebt
+    */
     function deposit(uint _underlyingAmount) external onlyVault {
         require(_underlyingAmount > 0, "underlying = 0");
 
@@ -101,7 +104,10 @@ contract StrategyP3Crv is StrategyBase, UseUniswap {
         // Now we have underlying
     }
 
-    function withdraw(uint _underlyingAmount) external onlyAuthorized {
+    /*
+    @dev Only vault must call in order to correctly update vault.totalDebt
+    */
+    function withdraw(uint _underlyingAmount) external onlyVault {
         require(_underlyingAmount > 0, "underlying = 0");
         uint totalUnderlying = _totalAssets();
         require(_underlyingAmount <= totalUnderlying, "underlying > total");
@@ -130,7 +136,10 @@ contract StrategyP3Crv is StrategyBase, UseUniswap {
         }
     }
 
-    function withdrawAll() external onlyAuthorized {
+    /*
+    @dev Only vault must call in order to correctly update vault.totalDebt
+    */
+    function withdrawAll() external onlyVault {
         (uint p3CrvBal, ) = MasterChef(chef).userInfo(POOL_ID, address(this));
         if (p3CrvBal > 0) {
             _withdrawUnderlying(p3CrvBal);
@@ -168,7 +177,10 @@ contract StrategyP3Crv is StrategyBase, UseUniswap {
         }
     }
 
-    function exit() external onlyAuthorized {
+    /*
+    @dev Only vault must call in order to correctly update vault.totalDebt
+    */
+    function exit() external onlyVault {
         // Pickle is minted on withdraw so here we
         // 1. Withdraw from MasterChef
         // 2. Sell Pickle
