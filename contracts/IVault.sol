@@ -71,7 +71,7 @@ interface IVault {
     @param _shares Amount of shares
     @return Amount of token that can be withdrawn
     */
-    function calcWithdraw(uint _shares) external view returns (uint);
+    function getExpectedReturn(uint _shares) external view returns (uint);
 
     /*
     @notice Withdraw token
@@ -79,6 +79,26 @@ interface IVault {
     @param _min Minimum amount of token expected to return
     */
     function withdraw(uint _shares, uint _min) external;
+
+    /*
+    @notice Withdraw underlying token from strategy back to vault
+    @param _amount Amount of tokens to withdraw
+    @param _min Minimum amount of underlying token to return
+    */
+    function withdrawFromStrategy(uint _amount, uint _min) external;
+
+    /*
+    @notice Withdraw all underlying token from strategy back to vault
+    @param _min Minimum amount of underlying token to return
+    */
+    function withdrawAllFromStrategy(uint _min) external;
+
+    /*
+    @notice Withdraw all underlying token from strategy back to vault and
+            deactivate current strategy
+    @param _min Minimum amount of underlying token to return
+    */
+    function exitStrategy(uint _min) external;
 
     /*
     @notice Transfer token in vault to admin

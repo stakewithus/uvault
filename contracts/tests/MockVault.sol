@@ -10,6 +10,7 @@ contract MockVault is IVault {
     address public strategy;
     address public nextStrategy;
     uint public timeLock;
+    uint totalDebt;
 
     // test helpers
     uint public _setStrategyMin_;
@@ -61,7 +62,7 @@ contract MockVault is IVault {
         _depositAmount_ = _amount;
     }
 
-    function calcWithdraw(uint _shares) external view returns (uint) {
+    function getExpectedReturn(uint _shares) external view returns (uint) {
         return 0;
     }
 
@@ -69,6 +70,12 @@ contract MockVault is IVault {
         _withdrawAmount_ = _shares;
         _withdrawMin_ = _min;
     }
+
+    function withdrawFromStrategy(uint _amount, uint _min) external {}
+
+    function withdrawAllFromStrategy(uint _min) external {}
+
+    function exitStrategy(uint _min) external {}
 
     function sweep(address _token) external {}
 }
