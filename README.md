@@ -60,7 +60,7 @@ docker run -it -v $PWD:/code trailofbits/eth-security-toolbox
 solc-select 0.5.17
 cd /code
 # slither analysis
-slither .
+slither --exclude-dependencies .
 
 # quick review
 slither . --print human-summary
