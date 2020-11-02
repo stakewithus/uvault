@@ -31,6 +31,7 @@ contract Vault is IVault, ERC20, ERC20Detailed, ReentrancyGuard {
 
     address public admin;
     address public controller;
+    address public timeLock;
     address public token;
     address public strategy;
 
@@ -43,13 +44,6 @@ contract Vault is IVault, ERC20, ERC20Detailed, ReentrancyGuard {
 
     uint public withdrawFee;
     uint private constant WITHDRAW_FEE_CAP = 500; // upper limit to withdrawFee
-
-    // address of next strategy to be used
-    address public nextStrategy;
-    // timestamp of when the next strategy can be used
-    uint public timeLock;
-    // Minimum time that must pass before new strategy can be used
-    uint public minWaitTime;
 
     // mapping of approved strategies
     mapping(address => bool) public strategies;
@@ -64,8 +58,8 @@ contract Vault is IVault, ERC20, ERC20Detailed, ReentrancyGuard {
     */
     constructor(
         address _controller,
-        address _token,
-        uint _minWaitTime
+        address _timeLock,
+        address _token
     )
         public
         ERC20Detailed(
@@ -75,11 +69,12 @@ contract Vault is IVault, ERC20, ERC20Detailed, ReentrancyGuard {
         )
     {
         require(_controller != address(0), "controller = zero address");
+        require(_timeLock != address(0), "time lock = zero address");
 
         admin = msg.sender;
         controller = _controller;
         token = _token;
-        minWaitTime = _minWaitTime;
+        timeLock = _timeLock;
     }
 
     modifier onlyAdmin() {
@@ -110,6 +105,16 @@ contract Vault is IVault, ERC20, ERC20Detailed, ReentrancyGuard {
     function setController(address _controller) external onlyAdmin {
         require(_controller != address(0), "controller = zero address");
         controller = _controller;
+    }
+
+    modifier onlyTimeLock() {
+        require(msg.sender == timeLock, "!time lock");
+        _;
+    }
+
+    function setTimeLock(address _timeLock) external onlyTimeLock {
+        require(_timeLock != address(0), "time lock = zero address");
+        timeLock = _timeLock;
     }
 
     function setReserveMin(uint _reserveMin) external onlyAdmin {
@@ -204,30 +209,43 @@ contract Vault is IVault, ERC20, ERC20Detailed, ReentrancyGuard {
     }
 
     /*
-    @notice Set next strategy
-    @param _nextStrategy Address of next strategy
+    @notice Approve strategy
+    @param _strategy Address of strategy to revoke
     */
-    function setNextStrategy(address _nextStrategy) external onlyAdmin {
-        require(_nextStrategy != address(0), "strategy = zero address");
-        require(_nextStrategy != nextStrategy, "same next strategy");
-        require(_nextStrategy != strategy, "next strategy = current strategy");
-
-        nextStrategy = _nextStrategy;
-        // set time lock if current strategy is set
-        if (strategy != address(0)) {
-            timeLock = block.timestamp.add(minWaitTime);
-        }
-
-        emit SetNextStrategy(_nextStrategy);
+    function approveStrategy(address _strategy) external onlyTimeLock {
+        require(_strategy != address(0), "strategy = zero address");
+        strategies[_strategy] = true;
     }
 
     /*
-    @notice Set strategy either to next strategy or back to previously approved strategy
+    @notice Revoke strategy
+    @param _strategy Address of strategy to revoke
+    */
+    function revokeStrategy(address _strategy) external onlyAdmin {
+        require(_strategy != address(0), "strategy = zero address");
+        strategies[_strategy] = false;
+    }
+
+    function _exitStrategy(uint _min) internal whenStrategyDefined {
+        IERC20(token).safeApprove(strategy, 0);
+
+        uint balBefore = _balanceInVault();
+        IStrategy(strategy).exit();
+        uint balAfter = _balanceInVault();
+
+        require(balAfter.sub(balBefore) >= _min, "withdraw < min");
+
+        totalDebt = 0;
+        strategy = address(0);
+    }
+
+    /*
+    @notice Set strategy to approved strategy
     @param _strategy Address of strategy used
     @param _min Minimum undelying token current strategy must return. Prevents slippage
     */
     function setStrategy(address _strategy, uint _min) external onlyAdminOrController {
-        require(_strategy != address(0), "strategy = zero address");
+        require(strategies[_strategy], "!approved");
         require(_strategy != strategy, "new strategy = current strategy");
         require(
             IStrategy(_strategy).underlying() == token,
@@ -238,39 +256,14 @@ contract Vault is IVault, ERC20, ERC20Detailed, ReentrancyGuard {
             "strategy.vault != vault"
         );
 
-        if (_strategy == nextStrategy) {
-            require(block.timestamp >= timeLock, "timestamp < time lock");
-            strategies[_strategy] = true;
-        } else {
-            require(strategies[_strategy], "!approved strategy");
+        // withdraw from current strategy
+        if (strategy != address(0)) {
+            _exitStrategy(_min);
         }
 
-        address oldStrategy = strategy;
         strategy = _strategy;
 
-        // withdraw from current strategy
-        if (oldStrategy != address(0)) {
-            IERC20(token).safeApprove(oldStrategy, 0);
-
-            uint balBefore = _balanceInVault();
-            IStrategy(oldStrategy).exit();
-            uint balAfter = _balanceInVault();
-
-            require(balAfter.sub(balBefore) >= _min, "exit < min");
-        }
-
-        IERC20(token).safeApprove(strategy, 0);
-        IERC20(token).safeApprove(strategy, uint(-1));
-
         emit SetStrategy(strategy);
-    }
-
-    /*
-    @notice Revoke strategy
-    @param _strategy Address of strategy to revoke
-    */
-    function revokeStrategy(address _strategy) external onlyAdmin {
-        strategies[_strategy] = false;
     }
 
     /*
@@ -281,10 +274,14 @@ contract Vault is IVault, ERC20, ERC20Detailed, ReentrancyGuard {
         uint amount = _availableToInvest();
         require(amount > 0, "available = 0");
 
+        IERC20(token).safeApprove(strategy, 0);
+        IERC20(token).safeApprove(strategy, amount);
+
         uint balBefore = _balanceInVault();
-        // infinite approval is set when this strategy was set
         IStrategy(strategy).deposit(amount);
         uint balAfter = _balanceInVault();
+
+        IERC20(token).safeApprove(strategy, 0);
 
         totalDebt = totalDebt.add(balBefore.sub(balAfter));
     }
@@ -468,14 +465,7 @@ contract Vault is IVault, ERC20, ERC20Detailed, ReentrancyGuard {
         whenStrategyDefined
         onlyAdminOrController
     {
-        uint balBefore = _balanceInVault();
-        IStrategy(strategy).exit();
-        uint balAfter = _balanceInVault();
-
-        require(balAfter.sub(balBefore) >= _min, "withdraw < min");
-
-        totalDebt = 0;
-        strategy = address(0);
+        _exitStrategy(_min);
     }
 
     /*
