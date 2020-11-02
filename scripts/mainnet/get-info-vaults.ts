@@ -11,9 +11,6 @@ interface Snapshot {
     admin: string
     controller: string
     strategy: string
-    nextStrategy: string
-    timeLock: BN
-    minWaitTime: BN
     reserveMin: BN
     withdrawFee: BN
     paused: boolean
@@ -31,9 +28,6 @@ async function snapshot(vaultAddr: string): Promise<Snapshot> {
   const admin = await vault.admin()
   const controller = await vault.controller()
   const strategy = await vault.strategy()
-  const nextStrategy = await vault.nextStrategy()
-  const timeLock = await vault.timeLock()
-  const minWaitTime = await vault.minWaitTime()
   const reserveMin = await vault.reserveMin()
   const withdrawFee = await vault.withdrawFee()
   const paused = await vault.paused()
@@ -48,9 +42,6 @@ async function snapshot(vaultAddr: string): Promise<Snapshot> {
       admin,
       controller,
       strategy,
-      nextStrategy,
-      timeLock,
-      minWaitTime,
       reserveMin,
       withdrawFee,
       paused,
@@ -83,15 +74,11 @@ function formatPercent(x: BN, max: number): string {
 
 function printSnapshot(snap: Snapshot, decimals: number, addrToStrat: any) {
   const currentStratName = addrToStrat[snap.vault.strategy]
-  const nextStratName = addrToStrat[snap.vault.nextStrategy]
 
   console.log(`Vault ${snap.vault.address}`)
   console.log(`admin: ${snap.vault.admin}`)
   console.log(`controller: ${snap.vault.controller}`)
   console.log(`strategy: ${currentStratName} ${snap.vault.strategy}`)
-  console.log(`next strategy: ${nextStratName} ${snap.vault.nextStrategy}`)
-  console.log(`time lock: ${formatDate(snap.vault.timeLock)}`)
-  console.log(`min wait time: ${snap.vault.minWaitTime.toLocaleString()}`)
   console.log(`withdraw fee: ${formatPercent(snap.vault.withdrawFee, FEE_MAX)}`)
   console.log(`reserve min: ${formatPercent(snap.vault.reserveMin, RESERVE_MAX)}`)
   console.log(`paused: ${snap.vault.paused}`)
