@@ -53,6 +53,10 @@ contract Vault is IVault, ERC20, ERC20Detailed, ReentrancyGuard {
 
     bool public paused;
 
+    // mapping from tx.origin to block number
+    // used to prevent flash loah attacks
+    mapping(address => uint) public blockNumberLast;
+
     /*
     @dev vault decimals must be equal to token decimals
     */
@@ -94,6 +98,19 @@ contract Vault is IVault, ERC20, ERC20Detailed, ReentrancyGuard {
 
     modifier whenNotPaused() {
         require(!paused, "paused");
+        _;
+    }
+
+    /*
+    @dev modifier to prevent flash loan
+    @dev caller is restricted to one tx per block
+    */
+    modifier noFlashLoan() {
+        require(
+            blockNumberLast[tx.origin] < block.number,
+            "last block number >= block.number"
+        );
+        blockNumberLast[tx.origin] = block.number;
         _;
     }
 
@@ -290,7 +307,7 @@ contract Vault is IVault, ERC20, ERC20Detailed, ReentrancyGuard {
     @notice Deposit token into vault
     @param _amount Amount of token to transfer from `msg.sender`
     */
-    function deposit(uint _amount) external whenNotPaused nonReentrant {
+    function deposit(uint _amount) external whenNotPaused nonReentrant noFlashLoan {
         require(_amount > 0, "amount = 0");
 
         uint totalUnderlying = _totalAssets();
@@ -367,7 +384,7 @@ contract Vault is IVault, ERC20, ERC20Detailed, ReentrancyGuard {
     @param _shares Amount of shares to burn
     @param _min Minimum amount of underlying token to return
     */
-    function withdraw(uint _shares, uint _min) external nonReentrant {
+    function withdraw(uint _shares, uint _min) external nonReentrant noFlashLoan {
         require(_shares > 0, "shares = 0");
 
         uint balInVault = _balanceInVault();
