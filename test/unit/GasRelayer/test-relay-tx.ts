@@ -3,24 +3,9 @@ import BN from "bn.js"
 import {TxReceiverInstance} from "../../../types"
 import {GasRelayerInstance} from "../../../types/GasRelayer"
 import {MockGasTokenInstance} from "../../../types/MockGasToken"
+import {encodeCallMe} from "../../lib"
 import {eq} from "../../util"
 import _setup from "./setup"
-
-function encode(web3: Web3, data: string) {
-  return web3.eth.abi.encodeFunctionCall(
-    {
-      name: "callMe",
-      type: "function",
-      inputs: [
-        {
-          type: "bytes",
-          name: "data",
-        },
-      ],
-    },
-    [data]
-  )
-}
 
 contract("GasRelayer", (accounts) => {
   const refs = _setup(accounts)
@@ -37,7 +22,7 @@ contract("GasRelayer", (accounts) => {
 
   describe("relayTx", () => {
     const maxGasToken = new BN(1000)
-    const data = encode(web3, "0x1212")
+    const data = encodeCallMe(web3, "0x1212")
 
     it("should relay tx use gas token = max", async () => {
       const maxGasToken = new BN(1)

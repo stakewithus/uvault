@@ -6,21 +6,21 @@ contract TimeLock {
 
     event NewAdmin(address admin);
     event NewDelay(uint delay);
-    event QueueTransaction(
+    event Queue(
         bytes32 indexed txHash,
         address indexed target,
         uint value,
         bytes data,
         uint eta
     );
-    event ExecuteTransaction(
+    event Execute(
         bytes32 indexed txHash,
         address indexed target,
         uint value,
         bytes data,
         uint eta
     );
-    event CancelTransaction(
+    event Cancel(
         bytes32 indexed txHash,
         address indexed target,
         uint value,
@@ -45,12 +45,12 @@ contract TimeLock {
         delay = _delay;
     }
 
+    function() external payable {}
+
     modifier onlyAdmin() {
         require(msg.sender == admin, "!admin");
         _;
     }
-
-    function() external payable {}
 
     function setAdmin(address _admin) external onlyAdmin {
         require(_admin != address(0), "admin = zero address");
@@ -58,6 +58,9 @@ contract TimeLock {
         emit NewAdmin(_admin);
     }
 
+    /*
+    @dev Only this contract can execute this function
+    */
     function setDelay(uint _delay) external {
         require(msg.sender == address(this), "!timelock");
         require(_delay >= MIN_DELAY, "delay < min");
@@ -67,18 +70,43 @@ contract TimeLock {
         emit NewDelay(delay);
     }
 
+    function _getTxHash(
+        address target,
+        uint value,
+        bytes memory data,
+        uint eta
+    ) private pure returns (bytes32) {
+        return keccak256(abi.encode(target, value, data, eta));
+    }
+
+    function getTxHash(
+        address target,
+        uint value,
+        bytes calldata data,
+        uint eta
+    ) external pure returns (bytes32) {
+        return _getTxHash(target, value, data, eta);
+    }
+
+    /*
+    @notice Queue transaction
+    @param target Address of contract or account to call
+    @param value Ether value to send
+    @param data Data to send to `target`
+    @eta Execute Tx After. Time after which transaction can be executed.
+    */
     function queue(
         address target,
         uint value,
         bytes calldata data,
         uint eta
     ) external onlyAdmin returns (bytes32) {
-        require(eta >= block.timestamp.add(delay), "eta < timestamp + delay");
+        require(eta >= block.timestamp.add(delay), "eta < now + delay");
 
-        bytes32 txHash = keccak256(abi.encode(target, value, data, eta));
+        bytes32 txHash = _getTxHash(target, value, data, eta);
         queued[txHash] = true;
 
-        emit QueueTransaction(txHash, target, value, data, eta);
+        emit Queue(txHash, target, value, data, eta);
 
         return txHash;
     }
@@ -89,9 +117,9 @@ contract TimeLock {
         bytes calldata data,
         uint eta
     ) external payable onlyAdmin returns (bytes memory) {
-        bytes32 txHash = keccak256(abi.encode(target, value, data, eta));
+        bytes32 txHash = _getTxHash(target, value, data, eta);
         require(queued[txHash], "!queued");
-        require(block.timestamp >= eta, "eta < timestamp");
+        require(block.timestamp >= eta, "eta < now");
         require(block.timestamp <= eta.add(GRACE_PERIOD), "eta expired");
 
         queued[txHash] = false;
@@ -100,7 +128,7 @@ contract TimeLock {
         (bool success, bytes memory returnData) = target.call.value(value)(data);
         require(success, "tx failed");
 
-        emit ExecuteTransaction(txHash, target, value, data, eta);
+        emit Execute(txHash, target, value, data, eta);
 
         return returnData;
     }
@@ -111,11 +139,11 @@ contract TimeLock {
         bytes calldata data,
         uint eta
     ) external onlyAdmin {
-        bytes32 txHash = keccak256(abi.encode(target, value, data, eta));
+        bytes32 txHash = _getTxHash(target, value, data, eta);
         require(queued[txHash], "!queued");
 
         queued[txHash] = false;
 
-        emit CancelTransaction(txHash, target, value, data, eta);
+        emit Cancel(txHash, target, value, data, eta);
     }
 }
