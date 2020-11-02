@@ -14,37 +14,37 @@ contract("Vault", (accounts) => {
   const amount = new BN(123)
 
   let vault: VaultInstance
-  let erc20: Erc20TokenInstance
+  let token: Erc20TokenInstance
   beforeEach(async () => {
     vault = refs.vault
     // create token != vault.token
-    erc20 = await ERC20Token.new()
-    await erc20.mint(vault.address, amount)
+    token = await ERC20Token.new()
+    await token.mint(vault.address, amount)
   })
 
   describe("sweep", () => {
     it("should withdraw token from vault", async () => {
       const snapshot = async () => {
         return {
-          erc20: {
-            admin: await erc20.balanceOf(admin),
-            vault: await erc20.balanceOf(vault.address),
+          token: {
+            admin: await token.balanceOf(admin),
+            vault: await token.balanceOf(vault.address),
           },
         }
       }
 
       const before = await snapshot()
-      await vault.sweep(erc20.address, {from: admin})
+      await vault.sweep(token.address, {from: admin})
       const after = await snapshot()
 
-      // check erc20 balance
-      assert(eq(after.erc20.admin, add(before.erc20.admin, amount)), "erc20 admin")
-      assert(eq(after.erc20.vault, sub(before.erc20.vault, amount)), "erc20 vault")
+      // check token balance
+      assert(eq(after.token.admin, add(before.token.admin, amount)), "token admin")
+      assert(eq(after.token.vault, sub(before.token.vault, amount)), "token vault")
     })
 
     it("should reject if not admin", async () => {
       await chai
-        .expect(vault.sweep(erc20.address, {from: accounts[1]}))
+        .expect(vault.sweep(token.address, {from: accounts[1]}))
         .to.be.rejectedWith("!admin")
     })
 

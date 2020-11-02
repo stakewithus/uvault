@@ -1,5 +1,6 @@
 import chai from "chai"
 import BN from "bn.js"
+import {MockTimeLockInstance} from "../../../types"
 import {Erc20TokenInstance} from "../../../types/Erc20Token"
 import {VaultInstance} from "../../../types/Vault"
 import {MockControllerInstance} from "../../../types/MockController"
@@ -10,134 +11,47 @@ import _setup from "./setup"
 const StrategyTest = artifacts.require("StrategyTest")
 
 contract("Vault", (accounts) => {
-  const MIN_WAIT_TIME = 2
-
-  const refs = _setup(accounts, MIN_WAIT_TIME)
+  const refs = _setup(accounts)
   const {admin} = refs
 
   let controller: MockControllerInstance
+  let timeLock: MockTimeLockInstance
   let vault: VaultInstance
-  let erc20: Erc20TokenInstance
+  let token: Erc20TokenInstance
   let strategy: StrategyTestInstance
   beforeEach(() => {
     controller = refs.controller
+    timeLock = refs.timeLock
     vault = refs.vault
-    erc20 = refs.erc20
+    token = refs.token
     strategy = refs.strategy
   })
 
   describe("setStrategy", () => {
     beforeEach(async () => {
-      await vault.setNextStrategy(strategy.address, {from: admin})
+      await timeLock._approveStrategy_(vault.address, strategy.address)
     })
 
-    describe("next strategy", () => {
-      it("should set new strategy", async () => {
-        const tx = await vault.setStrategy(strategy.address, new BN(0), {
-          from: admin,
-        })
-
-        // check log
-        assert.equal(tx.logs[2].event, "SetStrategy", "event")
-        assert.equal(
-          // @ts-ignore
-          tx.logs[2].args.strategy,
-          strategy.address,
-          "event arg set strategy"
-        )
-        // check state
-        assert.equal(await vault.strategy(), strategy.address, "strategy")
-        assert.equal(await vault.nextStrategy(), strategy.address, "next strategy")
-        assert.isTrue(await vault.strategies(strategy.address), "approved strategy")
-        // check external calls
-        assert(eq(await erc20.allowance(vault.address, strategy.address), MAX_UINT))
-        assert.isFalse(await strategy._exitWasCalled_(), "exit")
+    it("should set new strategy", async () => {
+      const tx = await vault.setStrategy(strategy.address, new BN(0), {
+        from: admin,
       })
 
-      describe("update", () => {
-        let oldStrategy: StrategyTestInstance
-        let newStrategy: StrategyTestInstance
-        beforeEach(async () => {
-          oldStrategy = strategy
-          newStrategy = await StrategyTest.new(
-            controller.address,
-            vault.address,
-            erc20.address,
-            {from: admin}
-          )
-
-          const min = await vault.balanceInStrategy()
-          await vault.setStrategy(oldStrategy.address, min, {from: admin})
-          await vault.setNextStrategy(newStrategy.address, {from: admin})
-        })
-
-        it("should update to next strategy", async () => {
-          const snapshot = async () => {
-            return {
-              erc20: {
-                allowance: {
-                  oldStrategy: await erc20.allowance(
-                    vault.address,
-                    oldStrategy.address
-                  ),
-                  newStrategy: await erc20.allowance(
-                    vault.address,
-                    newStrategy.address
-                  ),
-                },
-              },
-              vault: {
-                timeLock: await vault.timeLock(),
-                strategy: await vault.strategy(),
-              },
-            }
-          }
-
-          await timeout(MIN_WAIT_TIME)
-
-          const before = await snapshot()
-          const min = await vault.balanceInStrategy()
-          await vault.setStrategy(newStrategy.address, min, {from: admin})
-          const after = await snapshot()
-
-          // check state
-          assert(before.vault.timeLock.gt(new BN(0)), "time lock")
-          assert.equal(before.vault.strategy, oldStrategy.address, "old strategy")
-          assert.equal(after.vault.strategy, newStrategy.address, "new strategy")
-          // check external calls
-          assert(
-            eq(after.erc20.allowance.newStrategy, MAX_UINT),
-            "allowance new strategy"
-          )
-          assert(
-            eq(after.erc20.allowance.oldStrategy, new BN(0)),
-            "allowance old strategy"
-          )
-          assert(await oldStrategy._exitWasCalled_(), "exit")
-        })
-
-        it("should reject if exit amount < min", async () => {
-          // simulate token in vault
-          await erc20.mint(oldStrategy.address, 123)
-          // simulate transfer < balance of strategy
-          await oldStrategy._setMaxTransferAmount_(1)
-
-          await timeout(MIN_WAIT_TIME)
-
-          await chai
-            .expect(vault.setStrategy(newStrategy.address, new BN(2), {from: admin}))
-            .to.be.rejectedWith("exit < min")
-        })
-
-        it("should reject if timestamp < time lock", async () => {
-          await chai
-            .expect(vault.setStrategy(newStrategy.address, new BN(0), {from: admin}))
-            .to.be.rejectedWith("timestamp < time lock")
-        })
-      })
+      // check log
+      assert.equal(tx.logs[0].event, "SetStrategy", "event")
+      assert.equal(
+        // @ts-ignore
+        tx.logs[0].args.strategy,
+        strategy.address,
+        "log strategy"
+      )
+      // check state
+      assert.equal(await vault.strategy(), strategy.address, "strategy")
+      // check external calls
+      assert.equal(await strategy._exitWasCalled_(), false, "exit")
     })
 
-    describe("approved strategy", () => {
+    describe("update", () => {
       let oldStrategy: StrategyTestInstance
       let newStrategy: StrategyTestInstance
       beforeEach(async () => {
@@ -145,24 +59,47 @@ contract("Vault", (accounts) => {
         newStrategy = await StrategyTest.new(
           controller.address,
           vault.address,
-          erc20.address,
-          {
-            from: admin,
-          }
+          token.address,
+          {from: admin}
         )
 
-        await vault.setStrategy(oldStrategy.address, new BN(0), {from: admin})
-        await vault.setNextStrategy(newStrategy.address, {from: admin})
-        await timeout(MIN_WAIT_TIME)
-        await vault.setStrategy(newStrategy.address, new BN(0), {from: admin})
+        const min = await vault.balanceInStrategy()
+        await vault.setStrategy(oldStrategy.address, min, {from: admin})
+        await timeLock._approveStrategy_(vault.address, newStrategy.address)
       })
 
       it("should update strategy", async () => {
-        await vault.setStrategy(oldStrategy.address, new BN(0), {from: admin})
-        assert.equal(await vault.strategy(), oldStrategy.address, "old strategy")
+        const min = await vault.balanceInStrategy()
+        await vault.setStrategy(newStrategy.address, min, {from: admin})
 
+        // check state
+        assert.equal(await vault.strategy(), newStrategy.address, "new strategy")
+        assert(eq(await vault.totalDebt(), new BN(0)), "total debt")
+        // check external calls
+        assert(
+          eq(await token.allowance(vault.address, oldStrategy.address), new BN(0)),
+          "allowance"
+        )
+        assert.equal(await oldStrategy._exitWasCalled_(), true, "exit")
+      })
+
+      it("should switch to approved strategy", async () => {
         await vault.setStrategy(newStrategy.address, new BN(0), {from: admin})
         assert.equal(await vault.strategy(), newStrategy.address, "new strategy")
+
+        await vault.setStrategy(oldStrategy.address, new BN(0), {from: admin})
+        assert.equal(await vault.strategy(), oldStrategy.address, "old strategy")
+      })
+
+      it("should reject if exit amount < min", async () => {
+        // simulate token in vault
+        await token.mint(oldStrategy.address, 123)
+        // simulate transfer < balance of strategy
+        await oldStrategy._setMaxTransferAmount_(1)
+
+        await chai
+          .expect(vault.setStrategy(newStrategy.address, new BN(2), {from: admin}))
+          .to.be.rejectedWith("withdraw < min")
       })
     })
 
@@ -170,12 +107,6 @@ contract("Vault", (accounts) => {
       await chai
         .expect(vault.setStrategy(strategy.address, new BN(0), {from: accounts[1]}))
         .to.be.rejectedWith("!authorized")
-    })
-
-    it("should reject if strategy is zero address", async () => {
-      await chai
-        .expect(vault.setStrategy(ZERO_ADDRESS, new BN(0), {from: admin}))
-        .to.be.rejectedWith("strategy = zero address")
     })
 
     it("should reject if strategy is equal to current strategy", async () => {
@@ -202,11 +133,11 @@ contract("Vault", (accounts) => {
         .to.be.rejectedWith("strategy.vault != vault")
     })
 
-    it("should reject if not next strategy or approved strategy", async () => {
+    it("should reject if strategy not approved", async () => {
       const strategy = await StrategyTest.new(
         controller.address,
         vault.address,
-        erc20.address,
+        token.address,
         {
           from: admin,
         }
@@ -214,7 +145,7 @@ contract("Vault", (accounts) => {
 
       await chai
         .expect(vault.setStrategy(strategy.address, new BN(0), {from: admin}))
-        .to.be.rejectedWith("!approved strategy")
+        .to.be.rejectedWith("!approved")
     })
   })
 })

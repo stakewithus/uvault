@@ -1,19 +1,14 @@
 import chai from "chai"
-import {Erc20TokenInstance} from "../../../types/Erc20Token"
 import {VaultInstance} from "../../../types/Vault"
 import _setup from "./setup"
 
 contract("Vault", (accounts) => {
-  const MIN_WAIT_TIME = 0
-
-  const refs = _setup(accounts, MIN_WAIT_TIME)
+  const refs = _setup(accounts)
   const {admin} = refs
 
   let vault: VaultInstance
-  let erc20: Erc20TokenInstance
   beforeEach(() => {
     vault = refs.vault
-    erc20 = refs.erc20
   })
 
   describe("setPause", () => {

@@ -5,9 +5,7 @@ import {eq} from "../../util"
 import _setup from "./setup"
 
 contract("Vault", (accounts) => {
-  const MIN_WAIT_TIME = 0
-
-  const refs = _setup(accounts, MIN_WAIT_TIME)
+  const refs = _setup(accounts)
   const {admin} = refs
 
   let vault: VaultInstance

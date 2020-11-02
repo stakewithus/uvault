@@ -300,10 +300,10 @@ contract Vault is IVault, ERC20, ERC20Detailed, ReentrancyGuard {
         s = shares to mint
         T = total shares before mint
         d = deposit amount
-        P = total in vault + strategy before deposit
+        A = total assets in vault + strategy before deposit
 
-        s / (T + s) = d / (P + d)
-        s = d / P * T
+        s / (T + s) = d / (A + d)
+        s = d / A * T
         */
         uint shares;
         if (totalShares == 0) {

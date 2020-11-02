@@ -1,21 +1,18 @@
 import chai from "chai"
-import BN from "bn.js"
 import {Erc20TokenInstance} from "../../../types/Erc20Token"
 import {VaultInstance} from "../../../types/Vault"
 import {eq, add, sub, pow} from "../../util"
 import _setup from "./setup"
 
 contract("Vault", (accounts) => {
-  const MIN_WAIT_TIME = 0
-
-  const refs = _setup(accounts, MIN_WAIT_TIME)
+  const refs = _setup(accounts)
   const {admin} = refs
 
   let vault: VaultInstance
-  let erc20: Erc20TokenInstance
+  let token: Erc20TokenInstance
   beforeEach(() => {
     vault = refs.vault
-    erc20 = refs.erc20
+    token = refs.token
   })
 
   describe("deposit", () => {
@@ -23,16 +20,16 @@ contract("Vault", (accounts) => {
     const amount = pow(10, 18)
 
     beforeEach(async () => {
-      await erc20.mint(sender, amount)
-      await erc20.approve(vault.address, amount, {from: sender})
+      await token.mint(sender, amount)
+      await token.approve(vault.address, amount, {from: sender})
     })
 
     it("should deposit when total supply is 0", async () => {
       const snapshot = async () => {
         return {
-          erc20: {
-            sender: await erc20.balanceOf(sender),
-            vault: await erc20.balanceOf(vault.address),
+          token: {
+            sender: await token.balanceOf(sender),
+            vault: await token.balanceOf(vault.address),
           },
           vault: {
             balanceOf: {
@@ -47,9 +44,9 @@ contract("Vault", (accounts) => {
       await vault.deposit(amount, {from: sender})
       const after = await snapshot()
 
-      // check erc20 balance
-      assert(eq(after.erc20.sender, sub(before.erc20.sender, amount)), "erc20 sender")
-      assert(eq(after.erc20.vault, add(before.erc20.vault, amount)), "erc20 vault")
+      // check token balance
+      assert(eq(after.token.sender, sub(before.token.sender, amount)), "token sender")
+      assert(eq(after.token.vault, add(before.token.vault, amount)), "token vault")
 
       // check vault balance
       assert(
@@ -60,13 +57,6 @@ contract("Vault", (accounts) => {
         eq(after.vault.totalSupply, add(before.vault.totalSupply, amount)),
         "total supply"
       )
-    })
-
-    it("should reject if paused", async () => {
-      await vault.setPause(true, {from: admin})
-      await chai
-        .expect(vault.deposit(amount, {from: sender}))
-        .to.be.rejectedWith("paused")
     })
 
     it("should deposit when total supply > 0", async () => {
@@ -84,8 +74,8 @@ contract("Vault", (accounts) => {
 
       await vault.deposit(amount, {from: sender})
 
-      await erc20.mint(sender, amount)
-      await erc20.approve(vault.address, amount, {from: sender})
+      await token.mint(sender, amount)
+      await token.approve(vault.address, amount, {from: sender})
 
       const before = await snapshot()
       await vault.deposit(amount, {from: sender})
@@ -101,6 +91,14 @@ contract("Vault", (accounts) => {
         eq(after.vault.totalSupply, add(before.vault.totalSupply, shares)),
         "total supply"
       )
+    })
+
+    it("should reject if paused", async () => {
+      await vault.setPause(true, {from: admin})
+
+      await chai
+        .expect(vault.deposit(amount, {from: sender}))
+        .to.be.rejectedWith("paused")
     })
 
     it("should reject if amount = 0", async () => {

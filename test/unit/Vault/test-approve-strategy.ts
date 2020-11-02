@@ -1,5 +1,4 @@
 import chai from "chai"
-import BN from "bn.js"
 import {MockTimeLockInstance} from "../../../types/MockTimeLock"
 import {VaultInstance} from "../../../types/Vault"
 import {StrategyTestInstance} from "../../../types/StrategyTest"
@@ -8,7 +7,6 @@ import _setup from "./setup"
 
 contract("Vault", (accounts) => {
   const refs = _setup(accounts)
-  const {admin} = refs
 
   let timeLock: MockTimeLockInstance
   let vault: VaultInstance
@@ -19,26 +17,22 @@ contract("Vault", (accounts) => {
     strategy = refs.strategy
   })
 
-  describe("revokeStrategy", () => {
-    beforeEach(async () => {
+  describe("approveStrategy", () => {
+    it("should approve", async () => {
       await timeLock._approveStrategy_(vault.address, strategy.address)
+
+      assert.equal(await vault.strategies(strategy.address), true, "strategy")
     })
 
-    it("should revoke", async () => {
-      await vault.revokeStrategy(strategy.address, {from: admin})
-
-      assert.equal(await vault.strategies(strategy.address), false, "strategy")
-    })
-
-    it("should reject if not admin", async () => {
+    it("should reject if not time lock", async () => {
       await chai
-        .expect(vault.revokeStrategy(strategy.address, {from: accounts[1]}))
-        .to.be.rejectedWith("!admin")
+        .expect(vault.approveStrategy(strategy.address, {from: accounts[1]}))
+        .to.be.rejectedWith("!time lock")
     })
 
     it("should reject if zero address", async () => {
       await chai
-        .expect(vault.revokeStrategy(ZERO_ADDRESS, {from: admin}))
+        .expect(timeLock._approveStrategy_(vault.address, ZERO_ADDRESS))
         .to.be.rejectedWith("strategy = zero address")
     })
   })

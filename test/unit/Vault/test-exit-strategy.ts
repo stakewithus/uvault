@@ -3,21 +3,22 @@ import BN from "bn.js"
 import {Erc20TokenInstance} from "../../../types/Erc20Token"
 import {VaultInstance} from "../../../types/Vault"
 import {StrategyTestInstance} from "../../../types/StrategyTest"
-import {eq, add, pow, ZERO_ADDRESS} from "../../util"
+import {add, pow, ZERO_ADDRESS} from "../../util"
 import _setup from "./setup"
+import {MockTimeLockInstance} from "../../../types"
 
 contract("Vault", (accounts) => {
-  const MIN_WAIT_TIME = 0
-
-  const refs = _setup(accounts, MIN_WAIT_TIME)
+  const refs = _setup(accounts)
   const {admin} = refs
 
+  let timeLock: MockTimeLockInstance
   let vault: VaultInstance
-  let erc20: Erc20TokenInstance
+  let token: Erc20TokenInstance
   let strategy: StrategyTestInstance
   beforeEach(() => {
+    timeLock = refs.timeLock
     vault = refs.vault
-    erc20 = refs.erc20
+    token = refs.token
     strategy = refs.strategy
   })
 
@@ -26,9 +27,9 @@ contract("Vault", (accounts) => {
 
     const snapshot = async () => {
       return {
-        erc20: {
-          vault: await erc20.balanceOf(vault.address),
-          strategy: await erc20.balanceOf(strategy.address),
+        token: {
+          vault: await token.balanceOf(vault.address),
+          strategy: await token.balanceOf(strategy.address),
         },
         vault: {
           balanceInStrategy: await vault.balanceInStrategy(),
@@ -40,32 +41,36 @@ contract("Vault", (accounts) => {
 
     describe("strategy is set", () => {
       beforeEach(async () => {
-        await erc20.mint(vault.address, amount)
-        await vault.setNextStrategy(strategy.address, {from: admin})
+        await token.mint(vault.address, amount)
+        await timeLock._approveStrategy_(vault.address, strategy.address)
         await vault.setStrategy(strategy.address, new BN(0), {from: admin})
         await vault.invest({from: admin})
       })
 
       it("should exit vault", async () => {
-        const amount = await vault.balanceInStrategy()
-        const min = amount
+        const balInStrat = await vault.balanceInStrategy()
+        const min = balInStrat
 
         const before = await snapshot()
         await vault.exitStrategy(min, {from: admin})
         const after = await snapshot()
 
-        // check erc20 balance
-        assert(after.erc20.vault.gte(before.erc20.vault.add(min)), "erc20 vault")
-        assert(eq(after.erc20.strategy, new BN(0)), "erc20 strategy")
+        // check token balance
+        assert.equal(
+          after.token.vault.gte(before.token.vault.add(min)),
+          true,
+          "token vault"
+        )
+        assert.equal(after.token.strategy.eq(new BN(0)), true, "token strategy")
 
         // check vault balance
-        assert(eq(after.vault.totalDebt, new BN(0)), "total debt")
+        assert.equal(after.vault.totalDebt.eq(new BN(0)), true, "total debt")
         assert.equal(await vault.strategy(), ZERO_ADDRESS, "strategy")
       })
 
       it("should reject if not authorized", async () => {
-        const amount = await vault.balanceInStrategy()
-        const min = amount
+        const balInStrat = await vault.balanceInStrategy()
+        const min = balInStrat
 
         await chai
           .expect(vault.exitStrategy(min, {from: accounts[1]}))
@@ -73,8 +78,8 @@ contract("Vault", (accounts) => {
       })
 
       it("should reject if returned amount < min", async () => {
-        const amount = await vault.balanceInStrategy()
-        const min = add(amount, 1)
+        const balInStrat = await vault.balanceInStrategy()
+        const min = add(balInStrat, 1)
 
         await chai
           .expect(vault.exitStrategy(min, {from: admin}))
@@ -83,8 +88,8 @@ contract("Vault", (accounts) => {
     })
 
     it("should reject if strategy not defined", async () => {
-      const amount = await vault.balanceInStrategy()
-      const min = amount
+      const balInStrat = await vault.balanceInStrategy()
+      const min = balInStrat
 
       await chai
         .expect(vault.exitStrategy(min, {from: admin}))

@@ -5,16 +5,14 @@ import {ZERO_ADDRESS} from "../../util"
 import _setup from "./setup"
 
 contract("Vault", (accounts) => {
-  const MIN_WAIT_TIME = 0
-
-  const refs = _setup(accounts, MIN_WAIT_TIME)
+  const refs = _setup(accounts)
   const {admin} = refs
 
   let vault: VaultInstance
-  let erc20: Erc20TokenInstance
+  let token: Erc20TokenInstance
   beforeEach(() => {
     vault = refs.vault
-    erc20 = refs.erc20
+    token = refs.token
   })
 
   describe("setController", () => {
