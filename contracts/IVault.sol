@@ -5,21 +5,34 @@ interface IVault {
 
     function controller() external view returns (address);
 
+    function timeLock() external view returns (uint);
+
     function token() external view returns (address);
 
     function strategy() external view returns (address);
 
-    function nextStrategy() external view returns (address);
+    /*
+    @notice Approve strategy
+    @param _strategy Address of strategy
+    */
+    function approveStrategy(address _strategy) external;
 
-    function timeLock() external view returns (uint);
-
-    function setNextStrategy(address _strategy) external;
+    /*
+    @notice Revoke strategy
+    @param _strategy Address of strategy
+    */
+    function revokeStrategy(address _strategy) external;
 
     /*
     @notice Set strategy
     @param _min Minimum undelying token current strategy must return. Prevents slippage
     */
     function setStrategy(address _strategy, uint _min) external;
+
+    /*
+    @notice Returns the amount of token invested in strategy
+    */
+    function totalDebt() external view returns (uint);
 
     /*
     @notice Returns the amount of token in the vault
@@ -32,11 +45,6 @@ interface IVault {
          where the underlying token is invested
     */
     function balanceInStrategy() external view returns (uint);
-
-    /*
-    @notice Returns the amount of token invested in strategy
-    */
-    function totalDebt() external view returns (uint);
 
     /*
     @notice Returns the total amount of token in vault + total debt
