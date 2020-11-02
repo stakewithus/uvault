@@ -5,11 +5,29 @@ interface IVault {
 
     function controller() external view returns (address);
 
-    function timeLock() external view returns (uint);
+    function timeLock() external view returns (address);
 
     function token() external view returns (address);
 
     function strategy() external view returns (address);
+
+    function reserveMin() external view returns (uint);
+
+    function withdrawFee() external view returns (uint);
+
+    function paused() external view returns (bool);
+
+    function setAdmin(address _admin) external;
+
+    function setController(address _controller) external;
+
+    function setTimeLock(address _timeLock) external;
+
+    function setPause(bool _paused) external;
+
+    function setReserveMin(uint _reserveMin) external;
+
+    function setWithdrawFee(uint _fee) external;
 
     /*
     @notice Approve strategy

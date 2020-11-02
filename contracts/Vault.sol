@@ -117,6 +117,10 @@ contract Vault is IVault, ERC20, ERC20Detailed, ReentrancyGuard {
         timeLock = _timeLock;
     }
 
+    function setPause(bool _paused) external onlyAdmin {
+        paused = _paused;
+    }
+
     function setReserveMin(uint _reserveMin) external onlyAdmin {
         require(_reserveMin <= RESERVE_MAX, "reserve min > max");
         reserveMin = _reserveMin;
@@ -125,10 +129,6 @@ contract Vault is IVault, ERC20, ERC20Detailed, ReentrancyGuard {
     function setWithdrawFee(uint _fee) external onlyAdmin {
         require(_fee <= WITHDRAW_FEE_CAP, "withdraw fee > cap");
         withdrawFee = _fee;
-    }
-
-    function setPause(bool _paused) external onlyAdmin {
-        paused = _paused;
     }
 
     function _balanceInVault() private view returns (uint) {
