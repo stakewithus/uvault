@@ -28,12 +28,12 @@ contract StrategyTest is StrategyBase {
         return _totalAssets();
     }
 
-    function deposit(uint _underlyingAmount) external onlyVault {
+    function deposit(uint _underlyingAmount) external onlyAuthorized {
         require(_underlyingAmount > 0, "underlying = 0");
         _increaseDebt(_underlyingAmount);
     }
 
-    function withdraw(uint _underlyingAmount) external onlyVault {
+    function withdraw(uint _underlyingAmount) external onlyAuthorized {
         require(_underlyingAmount > 0, "underlying = 0");
 
         _withdrawAmount_ = _underlyingAmount;
@@ -51,15 +51,15 @@ contract StrategyTest is StrategyBase {
         }
     }
 
-    function withdrawAll() external onlyVault {
+    function withdrawAll() external onlyAuthorized {
         _withdrawAll();
     }
 
-    function harvest() external onlyAdminOrController {
+    function harvest() external onlyAuthorized {
         _harvestWasCalled_ = true;
     }
 
-    function exit() external onlyVault {
+    function exit() external onlyAuthorized {
         _exitWasCalled_ = true;
         _withdrawAll();
     }

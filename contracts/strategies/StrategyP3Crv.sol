@@ -79,7 +79,7 @@ contract StrategyP3Crv is StrategyBase, UseUniswap {
     /*
     @dev Only vault must call in order to correctly update vault.totalDebt
     */
-    function deposit(uint _underlyingAmount) external onlyVault {
+    function deposit(uint _underlyingAmount) external onlyAuthorized {
         require(_underlyingAmount > 0, "underlying = 0");
 
         _increaseDebt(_underlyingAmount);
@@ -107,7 +107,7 @@ contract StrategyP3Crv is StrategyBase, UseUniswap {
     /*
     @dev Only vault must call in order to correctly update vault.totalDebt
     */
-    function withdraw(uint _underlyingAmount) external onlyVault {
+    function withdraw(uint _underlyingAmount) external onlyAuthorized {
         require(_underlyingAmount > 0, "underlying = 0");
         uint totalUnderlying = _totalAssets();
         require(_underlyingAmount <= totalUnderlying, "underlying > total");
@@ -152,7 +152,7 @@ contract StrategyP3Crv is StrategyBase, UseUniswap {
     /*
     @dev Only vault must call in order to correctly update vault.totalDebt
     */
-    function withdrawAll() external onlyVault {
+    function withdrawAll() external onlyAuthorized {
         _withdrawAll();
     }
 
@@ -164,7 +164,7 @@ contract StrategyP3Crv is StrategyBase, UseUniswap {
         }
     }
 
-    function harvest() external onlyAdminOrController {
+    function harvest() external onlyAuthorized {
         _pickleToUnderlying();
 
         uint underlyingBal = IERC20(underlying).balanceOf(address(this));
@@ -192,7 +192,7 @@ contract StrategyP3Crv is StrategyBase, UseUniswap {
     /*
     @dev Only vault must call in order to correctly update vault.totalDebt
     */
-    function exit() external onlyVault {
+    function exit() external onlyAuthorized {
         // Pickle is minted on withdraw so here we
         // 1. Withdraw from MasterChef
         // 2. Sell Pickle

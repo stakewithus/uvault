@@ -15,9 +15,13 @@ contract TestStrategyBase is StrategyBase {
         return 0;
     }
 
-    function deposit(uint _amount) external {}
+    function deposit(uint _amount) external {
+        _increaseDebt(_amount);
+    }
 
-    function withdraw(uint _amount) external {}
+    function withdraw(uint _amount) external {
+        _decreaseDebt(_amount);
+    }
 
     function withdrawAll() external {}
 

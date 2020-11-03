@@ -79,7 +79,7 @@ contract StrategyCurve is StrategyBase, UseUniswap {
     @param _underlyingAmount Amount of underlying token to deposit
     @dev Only vault must call in order to correctly update vault.totalDebt
     */
-    function deposit(uint _underlyingAmount) external onlyVault {
+    function deposit(uint _underlyingAmount) external onlyAuthorized {
         require(_underlyingAmount > 0, "underlying = 0");
 
         _increaseDebt(_underlyingAmount);
@@ -105,7 +105,7 @@ contract StrategyCurve is StrategyBase, UseUniswap {
     @dev Vault should implement guard agains slippage
     @dev Only vault must call in order to correctly update vault.totalDebt
     */
-    function withdraw(uint _underlyingAmount) external onlyVault {
+    function withdraw(uint _underlyingAmount) external onlyAuthorized {
         require(_underlyingAmount > 0, "underlying = 0");
         uint totalUnderlying = _totalAssets();
         require(_underlyingAmount <= totalUnderlying, "underlying > total");
@@ -154,7 +154,7 @@ contract StrategyCurve is StrategyBase, UseUniswap {
     @dev Vault should implement guard agains slippage
     @dev Only vault must call in order to correctly update vault.totalDebt
     */
-    function withdrawAll() external onlyVault {
+    function withdrawAll() external onlyAuthorized {
         _withdrawAll();
     }
 
@@ -175,7 +175,7 @@ contract StrategyCurve is StrategyBase, UseUniswap {
     @notice Claim CRV, swap for underlying, transfer performance fee to treasury,
             deposit remaning underlying
     */
-    function harvest() external onlyAdminOrController {
+    function harvest() external onlyAuthorized {
         _crvToUnderlying();
 
         uint underlyingBal = IERC20(underlying).balanceOf(address(this));
@@ -207,7 +207,7 @@ contract StrategyCurve is StrategyBase, UseUniswap {
     @dev Vault should implement guard agains slippage
     @dev Only vault must call in order to correctly update vault.totalDebt
     */
-    function exit() external onlyVault {
+    function exit() external onlyAuthorized {
         _crvToUnderlying();
         _withdrawAll();
     }
