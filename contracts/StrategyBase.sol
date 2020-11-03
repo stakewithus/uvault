@@ -16,6 +16,8 @@ contract StrategyBase is IStrategy {
     address public controller;
     address public vault;
 
+    uint public totalDebt;
+
     // performance fee sent to treasury when harvest() generates profit
     uint public performanceFee = 100;
     uint internal constant PERFORMANCE_FEE_MAX = 10000;
