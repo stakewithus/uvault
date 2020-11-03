@@ -1,7 +1,7 @@
 import chai from "chai"
 import {Erc20TokenInstance} from "../../../types/Erc20Token"
 import {VaultInstance} from "../../../types/Vault"
-import {eq, add, sub, pow} from "../../util"
+import {pow} from "../../util"
 import _setup from "./setup"
 
 contract("Vault", (accounts) => {
