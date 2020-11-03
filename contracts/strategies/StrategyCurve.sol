@@ -82,7 +82,7 @@ contract StrategyCurve is StrategyBase, UseUniswap {
     function deposit(uint _underlyingAmount) external onlyVault {
         require(_underlyingAmount > 0, "underlying = 0");
 
-        IERC20(underlying).safeTransferFrom(vault, address(this), _underlyingAmount);
+        _increaseDebt(_underlyingAmount);
         _depositUnderlying();
     }
 
@@ -130,7 +130,7 @@ contract StrategyCurve is StrategyBase, UseUniswap {
         // transfer underlying token to vault
         uint underlyingBal = IERC20(underlying).balanceOf(address(this));
         if (underlyingBal > 0) {
-            IERC20(underlying).safeTransfer(vault, underlyingBal);
+            _decreaseDebt(underlyingBal);
         }
     }
 
@@ -143,7 +143,8 @@ contract StrategyCurve is StrategyBase, UseUniswap {
 
         uint underlyingBal = IERC20(underlying).balanceOf(address(this));
         if (underlyingBal > 0) {
-            IERC20(underlying).safeTransfer(vault, underlyingBal);
+            _decreaseDebt(underlyingBal);
+            totalDebt = 0;
         }
     }
 
@@ -188,8 +189,14 @@ contract StrategyCurve is StrategyBase, UseUniswap {
                 IERC20(underlying).safeTransfer(treasury, fee);
             }
 
-            // deposit remaining underlying for lp
-            _depositUnderlying();
+            uint totalUnderlying = _totalAssets();
+            if (totalUnderlying >= totalDebt) {
+                // transfer to Vault and increase debt upon strategy.deposit
+                IERC20(underlying).safeTransfer(vault, underlyingBal.sub(fee));
+            } else {
+                // deposit remaining underlying for lp
+                _depositUnderlying();
+            }
         }
     }
 

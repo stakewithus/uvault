@@ -16,6 +16,7 @@ contract StrategyBase is IStrategy {
     address public controller;
     address public vault;
 
+    // total amount of underlying transferred from vault
     uint public totalDebt;
 
     // performance fee sent to treasury when harvest() generates profit
@@ -70,6 +71,27 @@ contract StrategyBase is IStrategy {
     function setPerformanceFee(uint _fee) external onlyAdmin {
         require(_fee <= PERFORMANCE_FEE_MAX, "performance fee > max");
         performanceFee = _fee;
+    }
+
+    function _increaseDebt(uint _underlyingAmount) internal {
+        uint balBefore = IERC20(underlying).balanceOf(address(this));
+        IERC20(underlying).safeTransferFrom(vault, address(this), _underlyingAmount);
+        uint balAfter = IERC20(underlying).balanceOf(address(this));
+
+        totalDebt = totalDebt.add(balAfter.sub(balBefore));
+    }
+
+    function _decreaseDebt(uint _underlyingAmount) internal {
+        uint balBefore = IERC20(underlying).balanceOf(address(this));
+        IERC20(underlying).safeTransfer(vault, _underlyingAmount);
+        uint balAfter = IERC20(underlying).balanceOf(address(this));
+
+        uint diff = balBefore.sub(balAfter);
+        if (diff > totalDebt) {
+            totalDebt = 0;
+        } else {
+            totalDebt = totalDebt.sub(diff);
+        }
     }
 
     function sweep(address _token) external onlyAdmin {

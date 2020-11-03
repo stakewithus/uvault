@@ -82,7 +82,7 @@ contract StrategyP3Crv is StrategyBase, UseUniswap {
     function deposit(uint _underlyingAmount) external onlyVault {
         require(_underlyingAmount > 0, "underlying = 0");
 
-        IERC20(underlying).safeTransferFrom(vault, address(this), _underlyingAmount);
+        _increaseDebt(_underlyingAmount);
         _depositUnderlying();
     }
 
@@ -132,14 +132,11 @@ contract StrategyP3Crv is StrategyBase, UseUniswap {
         // transfer underlying token to vault
         uint underlyingBal = IERC20(underlying).balanceOf(address(this));
         if (underlyingBal > 0) {
-            IERC20(underlying).safeTransfer(vault, underlyingBal);
+            _decreaseDebt(underlyingBal);
         }
     }
 
-    /*
-    @dev Only vault must call in order to correctly update vault.totalDebt
-    */
-    function withdrawAll() external onlyVault {
+    function _withdrawAll() private {
         (uint p3CrvBal, ) = MasterChef(chef).userInfo(POOL_ID, address(this));
         if (p3CrvBal > 0) {
             _withdrawUnderlying(p3CrvBal);
@@ -147,8 +144,16 @@ contract StrategyP3Crv is StrategyBase, UseUniswap {
 
         uint underlyingBal = IERC20(underlying).balanceOf(address(this));
         if (underlyingBal > 0) {
-            IERC20(underlying).safeTransfer(vault, underlyingBal);
+            _decreaseDebt(underlyingBal);
+            totalDebt = 0;
         }
+    }
+
+    /*
+    @dev Only vault must call in order to correctly update vault.totalDebt
+    */
+    function withdrawAll() external onlyVault {
+        _withdrawAll();
     }
 
     function _pickleToUnderlying() private {
@@ -173,7 +178,14 @@ contract StrategyP3Crv is StrategyBase, UseUniswap {
                 IERC20(underlying).safeTransfer(treasury, fee);
             }
 
-            _depositUnderlying();
+            uint totalUnderlying = _totalAssets();
+            if (totalUnderlying >= totalDebt) {
+                // transfer to Vault and increase debt upon strategy.deposit
+                IERC20(underlying).safeTransfer(vault, underlyingBal.sub(fee));
+            } else {
+                // deposit remaining underlying for lp
+                _depositUnderlying();
+            }
         }
     }
 
@@ -185,10 +197,7 @@ contract StrategyP3Crv is StrategyBase, UseUniswap {
         // 1. Withdraw from MasterChef
         // 2. Sell Pickle
         // 3. Transfer underlying to vault
-        (uint p3CrvBal, ) = MasterChef(chef).userInfo(POOL_ID, address(this));
-        if (p3CrvBal > 0) {
-            _withdrawUnderlying(p3CrvBal);
-        }
+        _withdrawAll();
 
         _pickleToUnderlying();
 
