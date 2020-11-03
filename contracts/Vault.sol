@@ -106,6 +106,7 @@ contract Vault is IVault, ERC20, ERC20Detailed, ReentrancyGuard {
     @dev caller is restricted to one tx per block
     */
     modifier noFlashLoan() {
+        // TODO tx.origin any security risk?
         require(
             blockNumberLast[tx.origin] < block.number,
             "last block number >= block.number"
