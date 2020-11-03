@@ -13,7 +13,14 @@ interface IStrategy {
     function underlying() external view returns (address);
 
     /*
-    @notice Returns balance of underlying token
+    @notice Returns total amount of underlying transferred from vault
+    */
+    function totalDebt() external view returns (uint);
+
+    /*
+    @notice Returns amount of underlying stable coin locked in this contract
+    @dev Output may vary depending on price of liquidity provider token
+         where the underlying token is invested
     */
     function totalAssets() external view returns (uint);
 

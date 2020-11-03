@@ -77,7 +77,6 @@ contract StrategyCurve is StrategyBase, UseUniswap {
     /*
     @notice Deposit underlying token into this strategy
     @param _underlyingAmount Amount of underlying token to deposit
-    @dev Only vault must call in order to correctly update vault.totalDebt
     */
     function deposit(uint _underlyingAmount) external onlyAuthorized {
         require(_underlyingAmount > 0, "underlying = 0");
@@ -102,8 +101,7 @@ contract StrategyCurve is StrategyBase, UseUniswap {
     /*
     @notice Withdraw undelying token to vault
     @param _underlyingAmount Amount of underlying token to withdraw
-    @dev Vault should implement guard agains slippage
-    @dev Only vault must call in order to correctly update vault.totalDebt
+    @dev Caller should implement guard agains slippage
     */
     function withdraw(uint _underlyingAmount) external onlyAuthorized {
         require(_underlyingAmount > 0, "underlying = 0");
@@ -151,8 +149,7 @@ contract StrategyCurve is StrategyBase, UseUniswap {
     /*
     @notice Withdraw all underlying to vault
     @dev This function does not claim CRV
-    @dev Vault should implement guard agains slippage
-    @dev Only vault must call in order to correctly update vault.totalDebt
+    @dev Caller should implement guard agains slippage
     */
     function withdrawAll() external onlyAuthorized {
         _withdrawAll();
@@ -191,7 +188,7 @@ contract StrategyCurve is StrategyBase, UseUniswap {
 
             uint totalUnderlying = _totalAssets();
             if (totalUnderlying >= totalDebt) {
-                // transfer to Vault and increase debt upon strategy.deposit
+                // transfer to vault and increase debt upon strategy.deposit
                 IERC20(underlying).safeTransfer(vault, underlyingBal.sub(fee));
             } else {
                 // deposit remaining underlying for lp
@@ -204,8 +201,7 @@ contract StrategyCurve is StrategyBase, UseUniswap {
     @notice Exit strategy by harvesting CRV to underlying token and then
             withdrawing all underlying to vault
     @dev Must return all underlying token to vault
-    @dev Vault should implement guard agains slippage
-    @dev Only vault must call in order to correctly update vault.totalDebt
+    @dev Caller should implement guard agains slippage
     */
     function exit() external onlyAuthorized {
         _crvToUnderlying();

@@ -76,9 +76,6 @@ contract StrategyP3Crv is StrategyBase, UseUniswap {
         }
     }
 
-    /*
-    @dev Only vault must call in order to correctly update vault.totalDebt
-    */
     function deposit(uint _underlyingAmount) external onlyAuthorized {
         require(_underlyingAmount > 0, "underlying = 0");
 
@@ -105,7 +102,7 @@ contract StrategyP3Crv is StrategyBase, UseUniswap {
     }
 
     /*
-    @dev Only vault must call in order to correctly update vault.totalDebt
+    @dev Caller should implement guard agains slippage
     */
     function withdraw(uint _underlyingAmount) external onlyAuthorized {
         require(_underlyingAmount > 0, "underlying = 0");
@@ -150,7 +147,7 @@ contract StrategyP3Crv is StrategyBase, UseUniswap {
     }
 
     /*
-    @dev Only vault must call in order to correctly update vault.totalDebt
+    @dev Caller should implement guard agains slippage
     */
     function withdrawAll() external onlyAuthorized {
         _withdrawAll();
@@ -190,7 +187,7 @@ contract StrategyP3Crv is StrategyBase, UseUniswap {
     }
 
     /*
-    @dev Only vault must call in order to correctly update vault.totalDebt
+    @dev Caller should implement guard agains slippage
     */
     function exit() external onlyAuthorized {
         // Pickle is minted on withdraw so here we
