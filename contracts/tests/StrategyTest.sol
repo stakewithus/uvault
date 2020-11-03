@@ -30,16 +30,14 @@ contract StrategyTest is StrategyBase {
 
     function deposit(uint _underlyingAmount) external onlyVault {
         require(_underlyingAmount > 0, "underlying = 0");
-
-        IERC20(underlying).safeTransferFrom(vault, address(this), _underlyingAmount);
+        _increaseDebt(_underlyingAmount);
     }
 
     function withdraw(uint _underlyingAmount) external onlyVault {
         require(_underlyingAmount > 0, "underlying = 0");
 
         _withdrawAmount_ = _underlyingAmount;
-        // transfer to vault
-        _transfer(vault, _underlyingAmount);
+        _withdraw(_underlyingAmount);
     }
 
     function _withdrawAll() internal {
@@ -48,7 +46,7 @@ contract StrategyTest is StrategyBase {
         uint underlyingBal = IERC20(underlying).balanceOf(address(this));
         if (underlyingBal > 0) {
             _withdrawAmount_ = underlyingBal;
-            _transfer(vault, underlyingBal);
+            _withdraw(underlyingBal);
         }
     }
 
@@ -83,11 +81,11 @@ contract StrategyTest is StrategyBase {
         _maxTransferAmount_ = _max;
     }
 
-    function _transfer(address _to, uint _amount) internal {
+    function _withdraw(uint _amount) internal {
+        uint withdrawAmount = _amount;
         if (_amount > _maxTransferAmount_) {
-            IERC20(underlying).safeTransfer(_to, _maxTransferAmount_);
-        } else {
-            IERC20(underlying).safeTransfer(_to, _amount);
+            withdrawAmount = _maxTransferAmount_;
         }
+        _decreaseDebt(withdrawAmount);
     }
 }
