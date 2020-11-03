@@ -20,7 +20,7 @@ contract("Vault", (accounts) => {
     const amount = pow(10, 18)
 
     beforeEach(async () => {
-      await token.mint(sender, amount)
+      await token._mint_(sender, amount)
       await token.approve(vault.address, amount, {from: sender})
     })
 
@@ -45,16 +45,26 @@ contract("Vault", (accounts) => {
       const after = await snapshot()
 
       // check token balance
-      assert(eq(after.token.sender, sub(before.token.sender, amount)), "token sender")
-      assert(eq(after.token.vault, add(before.token.vault, amount)), "token vault")
+      assert.equal(
+        after.token.sender.eq(before.token.sender.sub(amount)),
+        true,
+        "token sender"
+      )
+      assert.equal(
+        after.token.vault.eq(before.token.vault.add(amount)),
+        true,
+        "token vault"
+      )
 
       // check vault balance
-      assert(
-        eq(after.vault.balanceOf.sender, add(before.vault.balanceOf.sender, amount)),
+      assert.equal(
+        after.vault.balanceOf.sender.eq(before.vault.balanceOf.sender.add(amount)),
+        true,
         "vault sender"
       )
-      assert(
-        eq(after.vault.totalSupply, add(before.vault.totalSupply, amount)),
+      assert.equal(
+        after.vault.totalSupply.eq(before.vault.totalSupply.add(amount)),
+        true,
         "total supply"
       )
     })
@@ -74,7 +84,7 @@ contract("Vault", (accounts) => {
 
       await vault.deposit(amount, {from: sender})
 
-      await token.mint(sender, amount)
+      await token._mint_(sender, amount)
       await token.approve(vault.address, amount, {from: sender})
 
       const before = await snapshot()
@@ -83,12 +93,14 @@ contract("Vault", (accounts) => {
 
       // check vault balance
       const shares = amount.mul(before.vault.totalSupply).div(before.vault.totalAssets)
-      assert(
-        eq(after.vault.balanceOf.sender, add(before.vault.balanceOf.sender, shares)),
+      assert.equal(
+        after.vault.balanceOf.sender.eq(before.vault.balanceOf.sender.add(shares)),
+        true,
         "vault sender"
       )
-      assert(
-        eq(after.vault.totalSupply, add(before.vault.totalSupply, shares)),
+      assert.equal(
+        after.vault.totalSupply.eq(before.vault.totalSupply.add(shares)),
+        true,
         "total supply"
       )
     })
