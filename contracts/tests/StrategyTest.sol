@@ -11,8 +11,8 @@ contract StrategyTest is StrategyBase {
     address public _sweepToken_;
     bool public _withdrawAllWasCalled_;
     uint public _withdrawAmount_;
-    // simulate strategy transferring less than requested
-    uint public _maxTransferAmount_ = uint(-1);
+    // simulate strategy withdrawing less than requested
+    uint public _maxWithdrawAmount_ = uint(-1);
 
     constructor(
         address _controller,
@@ -47,6 +47,7 @@ contract StrategyTest is StrategyBase {
         if (underlyingBal > 0) {
             _withdrawAmount_ = underlyingBal;
             _withdraw(underlyingBal);
+            totalDebt = 0;
         }
     }
 
@@ -77,14 +78,14 @@ contract StrategyTest is StrategyBase {
         underlying = _token;
     }
 
-    function _setMaxTransferAmount_(uint _max) external {
-        _maxTransferAmount_ = _max;
+    function _setMaxWithdrawAmount_(uint _max) external {
+        _maxWithdrawAmount_ = _max;
     }
 
     function _withdraw(uint _amount) internal {
         uint withdrawAmount = _amount;
-        if (_amount > _maxTransferAmount_) {
-            withdrawAmount = _maxTransferAmount_;
+        if (_amount > _maxWithdrawAmount_) {
+            withdrawAmount = _maxWithdrawAmount_;
         }
         _decreaseDebt(withdrawAmount);
     }

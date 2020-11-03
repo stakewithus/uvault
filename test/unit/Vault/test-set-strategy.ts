@@ -95,7 +95,7 @@ contract("Vault", (accounts) => {
         // simulate token in vault
         await token.mint(oldStrategy.address, 123)
         // simulate transfer < balance of strategy
-        await oldStrategy._setMaxTransferAmount_(1)
+        await oldStrategy._setMaxWithdrawAmount_(1)
 
         await chai
           .expect(vault.setStrategy(newStrategy.address, new BN(2), {from: admin}))
