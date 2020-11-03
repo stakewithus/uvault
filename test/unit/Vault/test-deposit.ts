@@ -20,7 +20,7 @@ contract("Vault", (accounts) => {
     const amount = pow(10, 18)
 
     beforeEach(async () => {
-      await token._mint_(sender, amount)
+      await token.__mint__(sender, amount)
       await token.approve(vault.address, amount, {from: sender})
     })
 
@@ -84,7 +84,7 @@ contract("Vault", (accounts) => {
 
       await vault.deposit(amount, {from: sender})
 
-      await token._mint_(sender, amount)
+      await token.__mint__(sender, amount)
       await token.approve(vault.address, amount, {from: sender})
 
       const before = await snapshot()

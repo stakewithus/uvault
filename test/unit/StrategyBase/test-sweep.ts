@@ -23,7 +23,7 @@ contract("StrategyBase", (accounts) => {
 
   describe("setController", () => {
     beforeEach(async () => {
-      await token.mint(strategy.address, 123)
+      await token._mint_(strategy.address, 123)
     })
 
     it("should sweep", async () => {

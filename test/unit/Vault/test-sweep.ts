@@ -19,7 +19,7 @@ contract("Vault", (accounts) => {
     vault = refs.vault
     // create token != vault.token
     token = await ERC20Token.new()
-    await token.mint(vault.address, amount)
+    await token._mint_(vault.address, amount)
   })
 
   describe("sweep", () => {

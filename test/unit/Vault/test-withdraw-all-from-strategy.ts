@@ -41,7 +41,7 @@ contract("Vault", (accounts) => {
 
     describe("strategy is set", () => {
       beforeEach(async () => {
-        await token.mint(vault.address, amount)
+        await token._mint_(vault.address, amount)
         await timeLock._approveStrategy_(vault.address, strategy.address)
         await vault.setStrategy(strategy.address, new BN(0), {from: admin})
         await vault.invest({from: admin})

@@ -28,7 +28,7 @@ contract("Vault", (accounts) => {
     const min = frac(amount, 99, 100)
 
     beforeEach(async () => {
-      await token.mint(sender, amount)
+      await token.__mint__(sender, amount)
       await token.approve(vault.address, amount, {from: sender})
       await vault.deposit(amount, {from: sender})
 

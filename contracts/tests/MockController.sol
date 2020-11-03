@@ -31,4 +31,9 @@ contract MockController is IController {
     function withdrawAll(address _strategy, uint _min) external {}
 
     function exit(address _strategy, uint _min) external {}
+
+    /* test helper */
+    function _setTreasury_(address _treasury) external {
+        treasury = _treasury;
+    }
 }

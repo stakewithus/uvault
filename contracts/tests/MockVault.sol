@@ -3,7 +3,8 @@ pragma solidity 0.5.17;
 import "../IVault.sol";
 
 /* solium-disable */
-contract MockVault is IVault {
+// contract MockVault is IVault {
+contract MockVault {
     address public admin;
     address public controller;
     address public token;

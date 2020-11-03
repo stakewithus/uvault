@@ -93,7 +93,7 @@ contract("Vault", (accounts) => {
 
       it("should reject if exit amount < min", async () => {
         // simulate token in vault
-        await token.mint(oldStrategy.address, 123)
+        await token._mint_(oldStrategy.address, 123)
         // simulate transfer < balance of strategy
         await oldStrategy._setMaxWithdrawAmount_(1)
 

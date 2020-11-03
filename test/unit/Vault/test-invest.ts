@@ -31,7 +31,7 @@ contract("Vault", (accounts) => {
       const amount = pow(10, 18)
 
       beforeEach(async () => {
-        await token.mint(user, amount)
+        await token._mint_(user, amount)
         await token.approve(vault.address, amount, {from: user})
         await vault.deposit(amount, {from: user})
 
