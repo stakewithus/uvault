@@ -4,7 +4,6 @@ import "../interfaces/curve/ICurveFi3.sol";
 import "../interfaces/pickle/PickleJar.sol";
 import "../interfaces/pickle/MasterChef.sol";
 
-import "../IController.sol";
 import "../StrategyBase.sol";
 import "../UseUniswap.sol";
 
@@ -34,7 +33,7 @@ contract StrategyP3Crv is StrategyBase, UseUniswap {
     ) public StrategyBase(_controller, _vault, _underlying) {}
 
     // TODO vulnerable to price manipulation
-    function _totalAssets() private view returns (uint) {
+    function _totalAssets() internal view returns (uint) {
         // multiplied by 10 ** 18
         uint pricePerShare = PickleJar(jar).getRatio();
         (uint shares, ) = MasterChef(chef).userInfo(POOL_ID, address(this));
@@ -42,11 +41,7 @@ contract StrategyP3Crv is StrategyBase, UseUniswap {
         return shares.mul(pricePerShare).div(1e18).div(precisionDiv);
     }
 
-    function totalAssets() external view returns (uint) {
-        return _totalAssets();
-    }
-
-    function _depositUnderlying() private {
+    function _depositUnderlying() internal {
         // underlying to threeCrv
         uint underlyingBal = IERC20(underlying).balanceOf(address(this));
         if (underlyingBal > 0) {
@@ -76,14 +71,12 @@ contract StrategyP3Crv is StrategyBase, UseUniswap {
         }
     }
 
-    function deposit(uint _underlyingAmount) external onlyAuthorized {
-        require(_underlyingAmount > 0, "underlying = 0");
-
-        _increaseDebt(_underlyingAmount);
-        _depositUnderlying();
+    function _getTotalShares() internal view returns (uint) {
+        (uint p3CrvBal, ) = MasterChef(chef).userInfo(POOL_ID, address(this));
+        return p3CrvBal;
     }
 
-    function _withdrawUnderlying(uint _p3CrvAmount) private {
+    function _withdrawUnderlying(uint _p3CrvAmount) internal {
         // unstake
         MasterChef(chef).withdraw(POOL_ID, _p3CrvAmount);
 
@@ -101,88 +94,11 @@ contract StrategyP3Crv is StrategyBase, UseUniswap {
         // Now we have underlying
     }
 
-    /*
-    @dev Caller should implement guard agains slippage
-    */
-    function withdraw(uint _underlyingAmount) external onlyAuthorized {
-        require(_underlyingAmount > 0, "underlying = 0");
-        uint totalUnderlying = _totalAssets();
-        require(_underlyingAmount <= totalUnderlying, "underlying > total");
-
-        // calculate shares to withdraw
-        /*
-        w = amount of underlying to withdraw
-        U = total underlying redeemable in Curve
-        s = shares to withdraw
-        T = total shares
-
-        w / U = s / T
-        s = w / U * T
-        */
-        (uint p3CrvBal, ) = MasterChef(chef).userInfo(POOL_ID, address(this));
-        uint p3CrvAmount = _underlyingAmount.mul(p3CrvBal).div(totalUnderlying);
-
-        if (p3CrvAmount > 0) {
-            _withdrawUnderlying(p3CrvAmount);
-        }
-
-        // transfer underlying token to vault
-        uint underlyingBal = IERC20(underlying).balanceOf(address(this));
-        if (underlyingBal > 0) {
-            _decreaseDebt(underlyingBal);
-        }
-    }
-
-    function _withdrawAll() private {
-        (uint p3CrvBal, ) = MasterChef(chef).userInfo(POOL_ID, address(this));
-        if (p3CrvBal > 0) {
-            _withdrawUnderlying(p3CrvBal);
-        }
-
-        uint underlyingBal = IERC20(underlying).balanceOf(address(this));
-        if (underlyingBal > 0) {
-            _decreaseDebt(underlyingBal);
-            totalDebt = 0;
-        }
-    }
-
-    /*
-    @dev Caller should implement guard agains slippage
-    */
-    function withdrawAll() external onlyAuthorized {
-        _withdrawAll();
-    }
-
-    function _pickleToUnderlying() private {
+    function _harvest() internal {
         uint pickleBal = IERC20(pickle).balanceOf(address(this));
         if (pickleBal > 0) {
             _swap(pickle, underlying, pickleBal);
             // Now this contract has underlying token
-        }
-    }
-
-    function harvest() external onlyAuthorized {
-        _pickleToUnderlying();
-
-        uint underlyingBal = IERC20(underlying).balanceOf(address(this));
-        if (underlyingBal > 0) {
-            // transfer fee to treasury
-            uint fee = underlyingBal.mul(performanceFee).div(PERFORMANCE_FEE_MAX);
-            if (fee > 0) {
-                address treasury = IController(controller).treasury();
-                require(treasury != address(0), "treasury = zero address");
-
-                IERC20(underlying).safeTransfer(treasury, fee);
-            }
-
-            uint totalUnderlying = _totalAssets();
-            if (totalUnderlying >= totalDebt) {
-                // transfer to Vault and increase debt upon strategy.deposit
-                IERC20(underlying).safeTransfer(vault, underlyingBal.sub(fee));
-            } else {
-                // deposit remaining underlying for lp
-                _depositUnderlying();
-            }
         }
     }
 
@@ -195,8 +111,7 @@ contract StrategyP3Crv is StrategyBase, UseUniswap {
         // 2. Sell Pickle
         // 3. Transfer underlying to vault
         _withdrawAll();
-
-        _pickleToUnderlying();
+        _harvest();
 
         uint underlyingBal = IERC20(underlying).balanceOf(address(this));
         if (underlyingBal > 0) {

@@ -48,9 +48,6 @@ contract Vault is IVault, ERC20, ERC20Detailed, ReentrancyGuard {
     // mapping of approved strategies
     mapping(address => bool) public strategies;
 
-    // total amount of underlying in strategy
-    uint public totalDebt;
-
     bool public paused;
 
     // mapping from tx.origin to block number
@@ -154,7 +151,7 @@ contract Vault is IVault, ERC20, ERC20Detailed, ReentrancyGuard {
     }
 
     /*
-    @notice Returns balance of token  s in vault
+    @notice Returns balance of tokens in vault
     @return Amount of token in vault
     */
     function balanceInVault() external view returns (uint) {
@@ -178,8 +175,22 @@ contract Vault is IVault, ERC20, ERC20Detailed, ReentrancyGuard {
         return _balanceInStrategy();
     }
 
+    function _totalDebtInStrategy() private view returns (uint) {
+        if (strategy == address(0)) {
+            return 0;
+        }
+        return IStrategy(strategy).totalDebt();
+    }
+
+    /*
+    @notice Returns amount of tokens in strategy
+    */
+    function totalDebtInStrategy() external view returns (uint) {
+        return _totalDebtInStrategy();
+    }
+
     function _totalAssets() private view returns (uint) {
-        return _balanceInVault().add(totalDebt);
+        return _balanceInVault().add(_totalDebtInStrategy());
     }
 
     /*
@@ -244,19 +255,6 @@ contract Vault is IVault, ERC20, ERC20Detailed, ReentrancyGuard {
         strategies[_strategy] = false;
     }
 
-    function _exitStrategy(uint _min) internal whenStrategyDefined {
-        IERC20(token).safeApprove(strategy, 0);
-
-        uint balBefore = _balanceInVault();
-        IStrategy(strategy).exit();
-        uint balAfter = _balanceInVault();
-
-        require(balAfter.sub(balBefore) >= _min, "withdraw < min");
-
-        totalDebt = 0;
-        strategy = address(0);
-    }
-
     /*
     @notice Set strategy to approved strategy
     @param _strategy Address of strategy used
@@ -276,7 +274,13 @@ contract Vault is IVault, ERC20, ERC20Detailed, ReentrancyGuard {
 
         // withdraw from current strategy
         if (strategy != address(0)) {
-            _exitStrategy(_min);
+            IERC20(token).safeApprove(strategy, 0);
+
+            uint balBefore = _balanceInVault();
+            IStrategy(strategy).exit();
+            uint balAfter = _balanceInVault();
+
+            require(balAfter.sub(balBefore) >= _min, "withdraw < min");
         }
 
         strategy = _strategy;
@@ -295,13 +299,9 @@ contract Vault is IVault, ERC20, ERC20Detailed, ReentrancyGuard {
         IERC20(token).safeApprove(strategy, 0);
         IERC20(token).safeApprove(strategy, amount);
 
-        uint balBefore = _balanceInVault();
         IStrategy(strategy).deposit(amount);
-        uint balAfter = _balanceInVault();
 
         IERC20(token).safeApprove(strategy, 0);
-
-        totalDebt = totalDebt.add(balBefore.sub(balAfter));
     }
 
     /*
@@ -352,8 +352,9 @@ contract Vault is IVault, ERC20, ERC20Detailed, ReentrancyGuard {
         /*
         total underlying = bal in vault + min(total debt, bal in strat)
         if bal in strat > total debt, redeemable = total debt
-        else redeemable <= bal in strat
+        else redeemable = bal in strat
         */
+        uint totalDebt = _totalDebtInStrategy();
         uint totalUnderlying;
         if (_balInStrat > totalDebt) {
             totalUnderlying = _balInVault.add(totalDebt);
@@ -413,8 +414,6 @@ contract Vault is IVault, ERC20, ERC20Detailed, ReentrancyGuard {
                 withdrawAmount = withdrawAmount.sub(amountFromStrat).add(diff);
             }
 
-            totalDebt = totalDebt.sub(diff);
-
             // transfer to treasury
             uint fee = withdrawAmount.mul(withdrawFee).div(FEE_MAX);
             if (fee > 0) {
@@ -429,61 +428,6 @@ contract Vault is IVault, ERC20, ERC20Detailed, ReentrancyGuard {
         require(withdrawAmount >= _min, "withdraw < min");
 
         IERC20(token).safeTransfer(msg.sender, withdrawAmount);
-    }
-
-    /*
-    @notice Withdraw underlying token from strategy back to vault
-    @param _amount Amount of tokens to withdraw
-    @param _min Minimum amount of underlying token to return
-    */
-    function withdrawFromStrategy(uint _amount, uint _min)
-        external
-        whenStrategyDefined
-        onlyAdminOrController
-    {
-        uint balBefore = _balanceInVault();
-        IStrategy(strategy).withdraw(_amount);
-        uint balAfter = _balanceInVault();
-
-        uint diff = balAfter.sub(balBefore);
-        require(diff >= _min, "withdraw < min");
-
-        if (diff > totalDebt) {
-            totalDebt = 0;
-        } else {
-            totalDebt = totalDebt.sub(diff);
-        }
-    }
-
-    /*
-    @notice Withdraw all underlying token from strategy back to vault
-    @param _min Minimum amount of underlying token to return
-    */
-    function withdrawAllFromStrategy(uint _min)
-        external
-        whenStrategyDefined
-        onlyAdminOrController
-    {
-        uint balBefore = _balanceInVault();
-        IStrategy(strategy).withdrawAll();
-        uint balAfter = _balanceInVault();
-
-        require(balAfter.sub(balBefore) >= _min, "withdraw < min");
-
-        totalDebt = 0;
-    }
-
-    /*
-    @notice Withdraw all underlying token from strategy back to vault and
-            deactivate current strategy
-    @param _min Minimum amount of underlying token to return
-    */
-    function exitStrategy(uint _min)
-        external
-        whenStrategyDefined
-        onlyAdminOrController
-    {
-        _exitStrategy(_min);
     }
 
     /*

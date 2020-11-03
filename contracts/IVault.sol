@@ -48,11 +48,6 @@ interface IVault {
     function setStrategy(address _strategy, uint _min) external;
 
     /*
-    @notice Returns the amount of token invested in strategy
-    */
-    function totalDebt() external view returns (uint);
-
-    /*
     @notice Returns the amount of token in the vault
     */
     function balanceInVault() external view returns (uint);
@@ -63,6 +58,11 @@ interface IVault {
          where the underlying token is invested
     */
     function balanceInStrategy() external view returns (uint);
+
+    /*
+    @notice Returns amount of tokens in strategy
+    */
+    function totalDebtInStrategy() external view returns (uint);
 
     /*
     @notice Returns the total amount of token in vault + total debt
@@ -105,26 +105,6 @@ interface IVault {
     @param _min Minimum amount of token expected to return
     */
     function withdraw(uint _shares, uint _min) external;
-
-    /*
-    @notice Withdraw underlying token from strategy back to vault
-    @param _amount Amount of tokens to withdraw
-    @param _min Minimum amount of underlying token to return
-    */
-    function withdrawFromStrategy(uint _amount, uint _min) external;
-
-    /*
-    @notice Withdraw all underlying token from strategy back to vault
-    @param _min Minimum amount of underlying token to return
-    */
-    function withdrawAllFromStrategy(uint _min) external;
-
-    /*
-    @notice Withdraw all underlying token from strategy back to vault and
-            deactivate current strategy
-    @param _min Minimum amount of underlying token to return
-    */
-    function exitStrategy(uint _min) external;
 
     /*
     @notice Transfer token in vault to admin

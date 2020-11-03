@@ -2,7 +2,6 @@ pragma solidity 0.5.17;
 
 import "../interfaces/curve/Gauge.sol";
 import "../interfaces/curve/Minter.sol";
-import "../IController.sol";
 import "../StrategyBase.sol";
 import "../UseUniswap.sol";
 
@@ -36,18 +35,11 @@ contract StrategyCurve is StrategyBase, UseUniswap {
 
     function _getVirtualPrice() internal view returns (uint);
 
-    function _totalAssets() private view returns (uint) {
+    function _totalAssets() internal view returns (uint) {
         uint lpBal = Gauge(gauge).balanceOf(address(this));
         uint pricePerShare = _getVirtualPrice();
 
         return lpBal.mul(pricePerShare).div(1e18);
-    }
-
-    /*
-    @notice Returns amount of underlying stable coin locked in this contract
-    */
-    function totalAssets() external view returns (uint) {
-        return _totalAssets();
     }
 
     function _addLiquidity(uint _underlyingAmount) internal;
@@ -55,7 +47,7 @@ contract StrategyCurve is StrategyBase, UseUniswap {
     /*
     @notice Deposits underlying to Gauge
     */
-    function _depositUnderlying() private {
+    function _depositUnderlying() internal {
         // underlying to lp
         uint underlyingBal = IERC20(underlying).balanceOf(address(this));
         if (underlyingBal > 0) {
@@ -65,7 +57,7 @@ contract StrategyCurve is StrategyBase, UseUniswap {
             _addLiquidity(underlyingBal);
         }
 
-        // stake lp into Gauge
+        // stake into Gauge
         uint lpBal = IERC20(lp).balanceOf(address(this));
         if (lpBal > 0) {
             IERC20(lp).safeApprove(gauge, 0);
@@ -74,20 +66,13 @@ contract StrategyCurve is StrategyBase, UseUniswap {
         }
     }
 
-    /*
-    @notice Deposit underlying token into this strategy
-    @param _underlyingAmount Amount of underlying token to deposit
-    */
-    function deposit(uint _underlyingAmount) external onlyAuthorized {
-        require(_underlyingAmount > 0, "underlying = 0");
-
-        _increaseDebt(_underlyingAmount);
-        _depositUnderlying();
-    }
-
     function _removeLiquidityOneCoin(uint _lpAmount) internal;
 
-    function _withdrawUnderlying(uint _lpAmount) private {
+    function _getTotalShares() internal view returns (uint) {
+        return Gauge(gauge).balanceOf(address(this));
+    }
+
+    function _withdrawUnderlying(uint _lpAmount) internal {
         // withdraw lp from  Gauge
         Gauge(gauge).withdraw(_lpAmount);
 
@@ -99,66 +84,9 @@ contract StrategyCurve is StrategyBase, UseUniswap {
     }
 
     /*
-    @notice Withdraw undelying token to vault
-    @param _underlyingAmount Amount of underlying token to withdraw
-    @dev Caller should implement guard agains slippage
-    */
-    function withdraw(uint _underlyingAmount) external onlyAuthorized {
-        require(_underlyingAmount > 0, "underlying = 0");
-        uint totalUnderlying = _totalAssets();
-        require(_underlyingAmount <= totalUnderlying, "underlying > total");
-
-        // calculate shares to withdraw
-        /*
-        w = amount of underlying to withdraw
-        U = total underlying redeemable in Curve
-        s = shares to withdraw
-        T = total shares staked in Gauge
-
-        w / U = s / T
-        s = w / U * T
-        */
-        uint lpBal = Gauge(gauge).balanceOf(address(this));
-        uint lpAmount = _underlyingAmount.mul(lpBal).div(totalUnderlying);
-
-        if (lpAmount > 0) {
-            _withdrawUnderlying(lpAmount);
-        }
-
-        // transfer underlying token to vault
-        uint underlyingBal = IERC20(underlying).balanceOf(address(this));
-        if (underlyingBal > 0) {
-            _decreaseDebt(underlyingBal);
-        }
-    }
-
-    function _withdrawAll() private {
-        // gauge balance is same unit as lp
-        uint lpBal = Gauge(gauge).balanceOf(address(this));
-        if (lpBal > 0) {
-            _withdrawUnderlying(lpBal);
-        }
-
-        uint underlyingBal = IERC20(underlying).balanceOf(address(this));
-        if (underlyingBal > 0) {
-            _decreaseDebt(underlyingBal);
-            totalDebt = 0;
-        }
-    }
-
-    /*
-    @notice Withdraw all underlying to vault
-    @dev This function does not claim CRV
-    @dev Caller should implement guard agains slippage
-    */
-    function withdrawAll() external onlyAuthorized {
-        _withdrawAll();
-    }
-
-    /*
     @notice Claim CRV and swap for underlying token
     */
-    function _crvToUnderlying() private {
+    function _harvest() internal {
         Minter(minter).mint(gauge);
 
         uint crvBal = IERC20(crv).balanceOf(address(this));
@@ -169,42 +97,13 @@ contract StrategyCurve is StrategyBase, UseUniswap {
     }
 
     /*
-    @notice Claim CRV, swap for underlying, transfer performance fee to treasury,
-            deposit remaning underlying
-    */
-    function harvest() external onlyAuthorized {
-        _crvToUnderlying();
-
-        uint underlyingBal = IERC20(underlying).balanceOf(address(this));
-        if (underlyingBal > 0) {
-            // transfer fee to treasury
-            uint fee = underlyingBal.mul(performanceFee).div(PERFORMANCE_FEE_MAX);
-            if (fee > 0) {
-                address treasury = IController(controller).treasury();
-                require(treasury != address(0), "treasury = zero address");
-
-                IERC20(underlying).safeTransfer(treasury, fee);
-            }
-
-            uint totalUnderlying = _totalAssets();
-            if (totalUnderlying >= totalDebt) {
-                // transfer to vault and increase debt upon strategy.deposit
-                IERC20(underlying).safeTransfer(vault, underlyingBal.sub(fee));
-            } else {
-                // deposit remaining underlying for lp
-                _depositUnderlying();
-            }
-        }
-    }
-
-    /*
     @notice Exit strategy by harvesting CRV to underlying token and then
             withdrawing all underlying to vault
     @dev Must return all underlying token to vault
     @dev Caller should implement guard agains slippage
     */
     function exit() external onlyAuthorized {
-        _crvToUnderlying();
+        _harvest();
         _withdrawAll();
     }
 }

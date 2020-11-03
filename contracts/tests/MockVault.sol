@@ -3,8 +3,7 @@ pragma solidity 0.5.17;
 import "../IVault.sol";
 
 /* solium-disable */
-// contract MockVault is IVault {
-contract MockVault {
+contract MockVault is IVault {
     address public admin;
     address public controller;
     address public token;
@@ -43,6 +42,10 @@ contract MockVault {
         return 0;
     }
 
+    function totalDebtInStrategy() external view returns (uint) {
+        return 0;
+    }
+
     function minReserve() external view returns (uint) {
         return 0;
     }
@@ -71,12 +74,4 @@ contract MockVault {
         _withdrawAmount_ = _shares;
         _withdrawMin_ = _min;
     }
-
-    function withdrawFromStrategy(uint _amount, uint _min) external {}
-
-    function withdrawAllFromStrategy(uint _min) external {}
-
-    function exitStrategy(uint _min) external {}
-
-    function sweep(address _token) external {}
 }
