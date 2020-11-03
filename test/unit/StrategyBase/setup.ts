@@ -2,12 +2,12 @@ import "../../setup"
 import {Erc20TokenInstance} from "../../../types/Erc20Token"
 import {MockControllerInstance} from "../../../types/MockController"
 import {MockVaultInstance} from "../../../types/MockVault"
-import {TestStrategyBaseInstance} from "../../../types/TestStrategyBase"
+import {StrategyTestInstance} from "../../../types/StrategyTest"
 
 const ERC20Token = artifacts.require("ERC20Token")
 const MockController = artifacts.require("MockController")
 const MockVault = artifacts.require("MockVault")
-const TestStrategyBase = artifacts.require("TestStrategyBase")
+const StrategyTest = artifacts.require("StrategyTest")
 
 export default (accounts: Truffle.Accounts) => {
   const admin = accounts[0]
@@ -20,7 +20,7 @@ export default (accounts: Truffle.Accounts) => {
     underlying: Erc20TokenInstance
     controller: MockControllerInstance
     vault: MockVaultInstance
-    strategy: TestStrategyBaseInstance
+    strategy: StrategyTestInstance
   }
 
   const refs: Refs = {
@@ -40,7 +40,7 @@ export default (accounts: Truffle.Accounts) => {
     refs.underlying = await ERC20Token.new()
     refs.controller = await MockController.new(treasury)
     refs.vault = await MockVault.new(refs.controller.address, refs.underlying.address)
-    refs.strategy = await TestStrategyBase.new(
+    refs.strategy = await StrategyTest.new(
       refs.controller.address,
       refs.vault.address,
       refs.underlying.address,

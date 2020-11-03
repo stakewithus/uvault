@@ -5,7 +5,7 @@ import {Erc20TokenInstance} from "../../../types/Erc20Token"
 import {ZERO_ADDRESS} from "../../util"
 import _setup from "./setup"
 
-const TestStrategyBase = artifacts.require("TestStrategyBase")
+const StrategyTest = artifacts.require("StrategyTest")
 
 contract("StrategyBase", (accounts) => {
   const refs = _setup(accounts)
@@ -22,7 +22,7 @@ contract("StrategyBase", (accounts) => {
 
   describe("constructor", () => {
     it("should deploy", async () => {
-      const strategy = await TestStrategyBase.new(
+      const strategy = await StrategyTest.new(
         controller.address,
         vault.address,
         underlying.address
@@ -37,21 +37,19 @@ contract("StrategyBase", (accounts) => {
 
     it("should not deploy if controller is zero address", async () => {
       await chai
-        .expect(TestStrategyBase.new(ZERO_ADDRESS, vault.address, underlying.address))
+        .expect(StrategyTest.new(ZERO_ADDRESS, vault.address, underlying.address))
         .to.be.rejectedWith("controller = zero address")
     })
 
     it("should not deploy if vault is zero address", async () => {
       await chai
-        .expect(
-          TestStrategyBase.new(controller.address, ZERO_ADDRESS, underlying.address)
-        )
+        .expect(StrategyTest.new(controller.address, ZERO_ADDRESS, underlying.address))
         .to.be.rejectedWith("vault = zero address")
     })
 
     it("should not deploy if underlying is zero address", async () => {
       await chai
-        .expect(TestStrategyBase.new(controller.address, vault.address, ZERO_ADDRESS))
+        .expect(StrategyTest.new(controller.address, vault.address, ZERO_ADDRESS))
         .to.be.rejectedWith("underlying = zero address")
     })
   })

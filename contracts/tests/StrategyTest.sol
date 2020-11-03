@@ -1,16 +1,13 @@
 pragma solidity 0.5.17;
 
-import "../IController.sol";
 import "../StrategyBase.sol";
 
+/* solium-disable */
 contract StrategyTest is StrategyBase {
     // test helper
+    uint public _withdrawAmount_;
     bool public _harvestWasCalled_;
     bool public _exitWasCalled_;
-    bool public _sweepWasCalled_;
-    address public _sweepToken_;
-    bool public _withdrawAllWasCalled_;
-    uint public _withdrawAmount_;
     // simulate strategy withdrawing less than requested
     uint public _maxWithdrawAmount_ = uint(-1);
 
@@ -24,49 +21,28 @@ contract StrategyTest is StrategyBase {
         return IERC20(underlying).balanceOf(address(this));
     }
 
-    function totalAssets() external view returns (uint) {
-        return _totalAssets();
+    function _depositUnderlying() internal {}
+
+    function _getTotalShares() internal view returns (uint) {
+        return IERC20(underlying).balanceOf(address(this));
     }
 
-    function deposit(uint _underlyingAmount) external onlyAuthorized {
-        require(_underlyingAmount > 0, "underlying = 0");
-        _increaseDebt(_underlyingAmount);
-    }
+    function _withdrawUnderlying(uint _shares) internal {
+        _withdrawAmount_ = _shares;
 
-    function withdraw(uint _underlyingAmount) external onlyAuthorized {
-        require(_underlyingAmount > 0, "underlying = 0");
-
-        _withdrawAmount_ = _underlyingAmount;
-        _withdraw(_underlyingAmount);
-    }
-
-    function _withdrawAll() internal {
-        _withdrawAllWasCalled_ = true;
-
-        uint underlyingBal = IERC20(underlying).balanceOf(address(this));
-        if (underlyingBal > 0) {
-            _withdrawAmount_ = underlyingBal;
-            _withdraw(underlyingBal);
-            totalDebt = 0;
+        // burn token to simulate withdraw less than requested
+        if (_shares > _maxWithdrawAmount_) {
+            IERC20(underlying).transfer(address(1), _shares.sub(_maxWithdrawAmount_));
         }
     }
 
-    function withdrawAll() external onlyAuthorized {
-        _withdrawAll();
-    }
-
-    function harvest() external onlyAuthorized {
+    function _harvest() internal {
         _harvestWasCalled_ = true;
     }
 
     function exit() external onlyAuthorized {
         _exitWasCalled_ = true;
         _withdrawAll();
-    }
-
-    function sweep(address _token) external {
-        _sweepWasCalled_ = true;
-        _sweepToken_ = _token;
     }
 
     // test helpers
@@ -78,15 +54,15 @@ contract StrategyTest is StrategyBase {
         underlying = _token;
     }
 
-    function _setMaxWithdrawAmount_(uint _max) external {
-        _maxWithdrawAmount_ = _max;
+    function _setAsset_(address _token) external {
+        assets[_token] = true;
     }
 
-    function _withdraw(uint _amount) internal {
-        uint withdrawAmount = _amount;
-        if (_amount > _maxWithdrawAmount_) {
-            withdrawAmount = _maxWithdrawAmount_;
-        }
-        _decreaseDebt(withdrawAmount);
+    function _setTotalDebt_(uint _debt) external {
+        totalDebt = _debt;
+    }
+
+    function _setMaxWithdrawAmount_(uint _max) external {
+        _maxWithdrawAmount_ = _max;
     }
 }

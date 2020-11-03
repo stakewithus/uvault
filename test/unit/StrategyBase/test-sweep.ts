@@ -1,5 +1,5 @@
 import chai from "chai"
-import {TestStrategyBaseInstance} from "../../../types/TestStrategyBase"
+import {StrategyTestInstance} from "../../../types/StrategyTest"
 import {Erc20TokenInstance} from "../../../types/Erc20Token"
 import {eq, add} from "../../util"
 import _setup from "./setup"
@@ -11,7 +11,7 @@ contract("StrategyBase", (accounts) => {
   const refs = _setup(accounts)
   const {admin} = refs
 
-  let strategy: TestStrategyBaseInstance
+  let strategy: StrategyTestInstance
   let underlying: Erc20TokenInstance
   // not asset
   let token: Erc20TokenInstance
