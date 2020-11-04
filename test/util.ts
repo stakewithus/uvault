@@ -63,7 +63,3 @@ export async function getBlockTimestamp(web3: Web3, tx: any): Promise<number> {
   const block = await web3.eth.getBlock(tx.receipt.blockHash)
   return block.timestamp as number
 }
-
-export async function timeout(secs: number): Promise<void> {
-  return new Promise((resolve) => setTimeout(resolve, secs * 1000))
-}
