@@ -48,7 +48,7 @@ find test/mainnet -name "test-*.ts" -exec truffle test --network mainnet_fork {}
 ### Lint
 
 ```shell
-npm run ethlint
+npm run solhint
 npm run lint
 ```
 
