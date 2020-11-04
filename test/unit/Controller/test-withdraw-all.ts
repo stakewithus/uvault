@@ -1,7 +1,8 @@
+import BN from "bn.js"
 import chai from "chai"
 import {ControllerInstance} from "../../../types/Controller"
 import {StrategyTestInstance} from "../../../types/StrategyTest"
-import {add} from "../../util"
+import {add, eq} from "../../util"
 import _setup from "./setup"
 
 contract("Controller", (accounts) => {
@@ -16,10 +17,11 @@ contract("Controller", (accounts) => {
   })
 
   describe("withdrawAll", () => {
-    it("should withdrawAll admin", async () => {
+    it("should withdrawAll", async () => {
       await controller.withdrawAll(strategy.address, 0, {from: admin})
 
-      assert(await strategy._withdrawAllWasCalled_(), "withdraw")
+      // check that strategy withdraw was called
+      assert(eq(await strategy.totalAssets(), new BN(0)), "withdraw")
     })
 
     it("should reject if withdraw < min", async () => {

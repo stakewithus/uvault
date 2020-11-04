@@ -2,6 +2,10 @@
 pragma solidity 0.6.11;
 
 interface IController {
+    function ADMIN_ROLE() external view returns (bytes32);
+
+    function HARVESTER_ROLE() external view returns (bytes32);
+
     function admin() external view returns (address);
 
     function treasury() external view returns (address);

@@ -12,8 +12,10 @@ import "./AccessControl.sol";
 contract Controller is IController, AccessControl {
     using SafeMath for uint;
 
-    bytes32 public constant ADMIN_ROLE = keccak256(abi.encodePacked("ADMIN"));
-    bytes32 public constant HARVESTER_ROLE = keccak256(abi.encodePacked("HARVESTER"));
+    bytes32 public constant override ADMIN_ROLE = keccak256(abi.encodePacked("ADMIN"));
+    bytes32 public constant override HARVESTER_ROLE = keccak256(
+        abi.encodePacked("HARVESTER")
+    );
 
     address public override admin;
     address public override treasury;
@@ -34,8 +36,8 @@ contract Controller is IController, AccessControl {
     }
 
     /*
-    @dev Please revoke ADMIN_ROLE and HARVESTER_ROLE for old admin
-    @dev Please grant ADMIN_ROLE and HARVESTER_ROLE for new admin
+    @dev Dont forget to revoke ADMIN_ROLE and HARVESTER_ROLE for old admin
+    @dev Dont forget to grant ADMIN_ROLE and HARVESTER_ROLE for new admin
     */
     function setAdmin(address _admin) external override onlyAdmin {
         require(_admin != address(0), "admin = zero address");
