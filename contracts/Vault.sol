@@ -32,7 +32,7 @@ contract Vault is IVault, ERC20, ReentrancyGuard {
     address public override admin;
     address public override controller;
     address public override timeLock;
-    address public override token;
+    address public immutable override token;
     address public override strategy;
 
     // mapping of approved strategies
@@ -156,7 +156,7 @@ contract Vault is IVault, ERC20, ReentrancyGuard {
     @notice Returns balance of tokens in vault
     @return Amount of token in vault
     */
-    function balanceInVault() external override view returns (uint) {
+    function balanceInVault() external view override returns (uint) {
         return _balanceInVault();
     }
 
@@ -173,7 +173,7 @@ contract Vault is IVault, ERC20, ReentrancyGuard {
     @dev Output may vary depending on price of liquidity provider token
          where the underlying token is invested
     */
-    function balanceInStrategy() external override view returns (uint) {
+    function balanceInStrategy() external view override returns (uint) {
         return _balanceInStrategy();
     }
 
@@ -187,7 +187,7 @@ contract Vault is IVault, ERC20, ReentrancyGuard {
     /*
     @notice Returns amount of tokens invested strategy
     */
-    function totalDebtInStrategy() external override view returns (uint) {
+    function totalDebtInStrategy() external view override returns (uint) {
         return _totalDebtInStrategy();
     }
 
@@ -199,7 +199,7 @@ contract Vault is IVault, ERC20, ReentrancyGuard {
     @notice Returns the total amount of tokens in vault + total debt
     @return Total amount of tokens in vault + total debt
     */
-    function totalAssets() external override view returns (uint) {
+    function totalAssets() external view override returns (uint) {
         return _totalAssets();
     }
 
@@ -212,7 +212,7 @@ contract Vault is IVault, ERC20, ReentrancyGuard {
             cheap withdraw
     @return Reserve amount
     */
-    function minReserve() external override view returns (uint) {
+    function minReserve() external view override returns (uint) {
         return _minReserve();
     }
 
@@ -235,7 +235,7 @@ contract Vault is IVault, ERC20, ReentrancyGuard {
     @notice Returns amount of token available to be invested into strategy
     @return Amount of token available to be invested into strategy
     */
-    function availableToInvest() external override view returns (uint) {
+    function availableToInvest() external view override returns (uint) {
         return _availableToInvest();
     }
 
@@ -392,7 +392,7 @@ contract Vault is IVault, ERC20, ReentrancyGuard {
     @param _shares Amount of shares
     @return Amount of underlying token that can be withdrawn
     */
-    function getExpectedReturn(uint _shares) external override view returns (uint) {
+    function getExpectedReturn(uint _shares) external view override returns (uint) {
         uint balInVault = _balanceInVault();
         uint balInStrat = _balanceInStrategy();
 

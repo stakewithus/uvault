@@ -93,12 +93,12 @@ abstract contract StrategyBase is IStrategy {
         }
     }
 
-    function _totalAssets() internal virtual view returns (uint);
+    function _totalAssets() internal view virtual returns (uint);
 
     /*
     @notice Returns amount of underlying tokens locked in this contract
     */
-    function totalAssets() external override view returns (uint) {
+    function totalAssets() external view override returns (uint) {
         return _totalAssets();
     }
 
@@ -119,7 +119,7 @@ abstract contract StrategyBase is IStrategy {
     @notice Returns total shares owned by this contract for depositing underlying
             into external Defi
     */
-    function _getTotalShares() internal virtual view returns (uint);
+    function _getTotalShares() internal view virtual returns (uint);
 
     function _withdrawUnderlying(uint _shares) internal virtual;
 

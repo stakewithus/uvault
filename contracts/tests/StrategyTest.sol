@@ -25,7 +25,7 @@ contract StrategyTest is StrategyBase {
         TestToken(underlying)._approve_(_POOL_, address(this), uint(-1));
     }
 
-    function _totalAssets() internal override view returns (uint) {
+    function _totalAssets() internal view override returns (uint) {
         return
             IERC20(underlying).balanceOf(address(this)).add(
                 IERC20(underlying).balanceOf(_POOL_)
@@ -38,7 +38,7 @@ contract StrategyTest is StrategyBase {
         IERC20(underlying).transfer(_POOL_, bal);
     }
 
-    function _getTotalShares() internal override view returns (uint) {
+    function _getTotalShares() internal view override returns (uint) {
         return IERC20(underlying).balanceOf(_POOL_);
     }
 
