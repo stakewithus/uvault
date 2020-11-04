@@ -12,11 +12,10 @@ abstract contract StrategyBase is IStrategy {
     using SafeERC20 for IERC20;
     using SafeMath for uint;
 
-    address public override underlying;
-
     address public override admin;
     address public override controller;
     address public override vault;
+    address public override underlying;
 
     // total amount of underlying transferred from vault
     uint public override totalDebt;
@@ -58,17 +57,17 @@ abstract contract StrategyBase is IStrategy {
         _;
     }
 
-    function setAdmin(address _admin) external onlyAdmin {
+    function setAdmin(address _admin) external override onlyAdmin {
         require(_admin != address(0), "admin = zero address");
         admin = _admin;
     }
 
-    function setController(address _controller) external onlyAdmin {
+    function setController(address _controller) external override onlyAdmin {
         require(_controller != address(0), "controller = zero address");
         controller = _controller;
     }
 
-    function setPerformanceFee(uint _fee) external onlyAdmin {
+    function setPerformanceFee(uint _fee) external override onlyAdmin {
         require(_fee <= PERFORMANCE_FEE_MAX, "performance fee > max");
         performanceFee = _fee;
     }
@@ -212,6 +211,8 @@ abstract contract StrategyBase is IStrategy {
             }
         }
     }
+
+    function exit() external virtual override;
 
     function sweep(address _token) external override onlyAdmin {
         require(!assets[_token], "asset");

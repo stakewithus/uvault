@@ -35,6 +35,9 @@ contract Vault is IVault, ERC20, ReentrancyGuard {
     address public override token;
     address public override strategy;
 
+    // mapping of approved strategies
+    mapping(address => bool) public override strategies;
+
     // percentange of token reserved in vault for cheap withdraw
     uint public override reserveMin = 500;
     uint private constant RESERVE_MAX = 10000;
@@ -44,9 +47,6 @@ contract Vault is IVault, ERC20, ReentrancyGuard {
 
     uint public override withdrawFee;
     uint private constant WITHDRAW_FEE_CAP = 500; // upper limit to withdrawFee
-
-    // mapping of approved strategies
-    mapping(address => bool) public override strategies;
 
     bool public override paused;
 

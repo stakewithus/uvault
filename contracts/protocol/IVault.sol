@@ -33,24 +33,6 @@ interface IVault {
     function setWithdrawFee(uint _fee) external;
 
     /*
-    @notice Approve strategy
-    @param _strategy Address of strategy
-    */
-    function approveStrategy(address _strategy) external;
-
-    /*
-    @notice Revoke strategy
-    @param _strategy Address of strategy
-    */
-    function revokeStrategy(address _strategy) external;
-
-    /*
-    @notice Set strategy
-    @param _min Minimum undelying token current strategy must return. Prevents slippage
-    */
-    function setStrategy(address _strategy, uint _min) external;
-
-    /*
     @notice Returns the amount of token in the vault
     */
     function balanceInVault() external view returns (uint);
@@ -83,6 +65,24 @@ interface IVault {
     @notice Returns the amount of tokens available to be invested
     */
     function availableToInvest() external view returns (uint);
+
+    /*
+    @notice Approve strategy
+    @param _strategy Address of strategy
+    */
+    function approveStrategy(address _strategy) external;
+
+    /*
+    @notice Revoke strategy
+    @param _strategy Address of strategy
+    */
+    function revokeStrategy(address _strategy) external;
+
+    /*
+    @notice Set strategy
+    @param _min Minimum undelying token current strategy must return. Prevents slippage
+    */
+    function setStrategy(address _strategy, uint _min) external;
 
     /*
     @notice Transfers token in vault to strategy
