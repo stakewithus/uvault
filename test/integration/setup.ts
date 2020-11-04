@@ -1,6 +1,6 @@
 import "../setup"
 import BN from "bn.js"
-import {Erc20TokenInstance} from "../../types/Erc20Token"
+import {TestTokenInstance} from "../../types/TestToken"
 import {MockGasTokenInstance} from "../../types/MockGasToken"
 import {GasRelayerInstance} from "../../types/GasRelayer"
 import {ControllerInstance} from "../../types/Controller"
@@ -26,7 +26,7 @@ export default (accounts: Truffle.Accounts) => {
   interface Refs {
     admin: string
     treasury: string
-    underlying: Erc20TokenInstance
+    underlying: TestTokenInstance
     gasToken: MockGasTokenInstance
     gasRelayer: GasRelayerInstance
     controller: ControllerInstance

@@ -1,6 +1,6 @@
 import chai from "chai"
 import {
-  Erc20TokenInstance,
+  TestTokenInstance,
   MockControllerInstance,
   MockVaultInstance,
 } from "../../../types"
@@ -13,7 +13,7 @@ contract("StrategyBase", (accounts) => {
   const {admin, treasury} = refs
 
   let strategy: StrategyTestInstance
-  let underlying: Erc20TokenInstance
+  let underlying: TestTokenInstance
   let vault: MockVaultInstance
   let controller: MockControllerInstance
   beforeEach(() => {

@@ -1,7 +1,7 @@
 import chai from "chai"
 import {MockControllerInstance} from "../../../types/MockController"
 import {MockVaultInstance} from "../../../types/MockVault"
-import {Erc20TokenInstance} from "../../../types/Erc20Token"
+import {TestTokenInstance} from "../../../types/TestToken"
 import {ZERO_ADDRESS} from "../../util"
 import _setup from "./setup"
 
@@ -13,7 +13,7 @@ contract("StrategyBase", (accounts) => {
 
   let vault: MockVaultInstance
   let controller: MockControllerInstance
-  let underlying: Erc20TokenInstance
+  let underlying: TestTokenInstance
   beforeEach(() => {
     vault = refs.vault
     controller = refs.controller

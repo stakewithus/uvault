@@ -1,5 +1,5 @@
 import chai from "chai"
-import {Erc20TokenInstance} from "../../../types/Erc20Token"
+import {TestTokenInstance} from "../../../types/TestToken"
 import {VaultInstance} from "../../../types/Vault"
 import {pow} from "../../util"
 import _setup from "./setup"
@@ -9,7 +9,7 @@ contract("Vault", (accounts) => {
   const {admin} = refs
 
   let vault: VaultInstance
-  let token: Erc20TokenInstance
+  let token: TestTokenInstance
   beforeEach(() => {
     vault = refs.vault
     token = refs.token

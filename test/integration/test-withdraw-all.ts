@@ -1,6 +1,6 @@
 import chai from "chai"
 import BN from "bn.js"
-import {Erc20TokenInstance} from "../../types/Erc20Token"
+import {TestTokenInstance} from "../../types/TestToken"
 import {ControllerInstance} from "../../types/Controller"
 import {VaultInstance} from "../../types/Vault"
 import {StrategyTestInstance} from "../../types/StrategyTest"
@@ -14,7 +14,7 @@ contract("integration", (accounts) => {
   let controller: ControllerInstance
   let vault: VaultInstance
   let strategy: StrategyTestInstance
-  let underlying: Erc20TokenInstance
+  let underlying: TestTokenInstance
   beforeEach(async () => {
     controller = refs.controller
     vault = refs.vault

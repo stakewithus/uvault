@@ -1,6 +1,6 @@
 import BN from "bn.js"
 import chai from "chai"
-import {Erc20TokenInstance, MockVaultInstance} from "../../../types"
+import {TestTokenInstance, MockVaultInstance} from "../../../types"
 import {StrategyTestInstance} from "../../../types/StrategyTest"
 import {pow} from "../../util"
 import _setup from "./setup"
@@ -10,7 +10,7 @@ contract("StrategyBase", (accounts) => {
   const {admin} = refs
 
   let strategy: StrategyTestInstance
-  let underlying: Erc20TokenInstance
+  let underlying: TestTokenInstance
   let vault: MockVaultInstance
   beforeEach(() => {
     strategy = refs.strategy

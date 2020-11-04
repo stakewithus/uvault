@@ -1,5 +1,5 @@
 import "../../setup"
-import {Erc20TokenInstance} from "../../../types/Erc20Token"
+import {TestTokenInstance} from "../../../types/TestToken"
 import {ControllerInstance} from "../../../types/Controller"
 import {StrategyTestInstance} from "../../../types/StrategyTest"
 import {MockVaultInstance} from "../../../types/MockVault"
@@ -17,7 +17,7 @@ export default (accounts: Truffle.Accounts) => {
   interface Refs {
     admin: string
     treasury: string
-    underlying: Erc20TokenInstance
+    underlying: TestTokenInstance
     controller: ControllerInstance
     vault: MockVaultInstance
     strategy: StrategyTestInstance

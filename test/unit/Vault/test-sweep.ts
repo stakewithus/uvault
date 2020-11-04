@@ -1,6 +1,6 @@
 import chai from "chai"
 import BN from "bn.js"
-import {Erc20TokenInstance} from "../../../types/Erc20Token"
+import {TestTokenInstance} from "../../../types/TestToken"
 import {VaultInstance} from "../../../types/Vault"
 import _setup from "./setup"
 
@@ -13,7 +13,7 @@ contract("Vault", (accounts) => {
   const amount = new BN(123)
 
   let vault: VaultInstance
-  let token: Erc20TokenInstance
+  let token: TestTokenInstance
   beforeEach(async () => {
     vault = refs.vault
     // create token != vault.token

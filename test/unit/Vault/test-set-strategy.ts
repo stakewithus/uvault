@@ -1,7 +1,7 @@
 import chai from "chai"
 import BN from "bn.js"
 import {MockTimeLockInstance} from "../../../types"
-import {Erc20TokenInstance} from "../../../types/Erc20Token"
+import {TestTokenInstance} from "../../../types/TestToken"
 import {VaultInstance} from "../../../types/Vault"
 import {MockControllerInstance} from "../../../types/MockController"
 import {StrategyTestInstance} from "../../../types/StrategyTest"
@@ -17,7 +17,7 @@ contract("Vault", (accounts) => {
   let controller: MockControllerInstance
   let timeLock: MockTimeLockInstance
   let vault: VaultInstance
-  let token: Erc20TokenInstance
+  let token: TestTokenInstance
   let strategy: StrategyTestInstance
   beforeEach(() => {
     controller = refs.controller
