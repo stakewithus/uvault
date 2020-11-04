@@ -1,17 +1,7 @@
-pragma solidity 0.5.17;
+// SPDX-License-Identifier: UNLICENSED
+pragma solidity 0.6.11;
 
-// Interface to use on Remix by admin
-interface IStrategyAdmin {
-    // admin helpers //
-    function setAdmin(address _admin) external;
-
-    function setController(address _controller) external;
-
-    function setPerformanceFee(uint _fee) external;
-
-    function performanceFee() external view returns (uint);
-
-    // IStrategy //
+interface IStrategy {
     function admin() external view returns (address);
 
     function controller() external view returns (address);
@@ -23,8 +13,22 @@ interface IStrategyAdmin {
     */
     function underlying() external view returns (address);
 
+    function performanceFee() external view returns (uint);
+
     /*
-    @notice Returns balance of underlying token
+    @notice Returns true if token cannot be swept
+    */
+    function assets(address _token) external view returns (bool);
+
+    /*
+    @notice Returns total amount of underlying transferred from vault
+    */
+    function totalDebt() external view returns (uint);
+
+    /*
+    @notice Returns amount of underlying stable coin locked in this contract
+    @dev Output may vary depending on price of liquidity provider token
+         where the underlying token is invested
     */
     function totalAssets() external view returns (uint);
 

@@ -1,4 +1,5 @@
-pragma solidity 0.5.17;
+// SPDX-License-Identifier: UNLICENSED
+pragma solidity 0.6.11;
 
 import "../interfaces/curve/Gauge.sol";
 import "../interfaces/curve/Minter.sol";
@@ -11,7 +12,7 @@ import "../UseUniswap.sol";
 */
 
 // @dev This is an abstract contract
-contract StrategyCurve is StrategyBase, UseUniswap {
+abstract contract StrategyCurve is StrategyBase, UseUniswap {
     // DAI = 0 | USDC = 1 | USDT = 2
     uint internal underlyingIndex;
 
@@ -33,21 +34,21 @@ contract StrategyCurve is StrategyBase, UseUniswap {
         address _underlying
     ) public StrategyBase(_controller, _vault, _underlying) {}
 
-    function _getVirtualPrice() internal view returns (uint);
+    function _getVirtualPrice() internal virtual view returns (uint);
 
-    function _totalAssets() internal view returns (uint) {
+    function _totalAssets() internal override view returns (uint) {
         uint lpBal = Gauge(gauge).balanceOf(address(this));
         uint pricePerShare = _getVirtualPrice();
 
         return lpBal.mul(pricePerShare).div(1e18);
     }
 
-    function _addLiquidity(uint _underlyingAmount) internal;
+    function _addLiquidity(uint _underlyingAmount) internal virtual;
 
     /*
     @notice Deposits underlying to Gauge
     */
-    function _depositUnderlying() internal {
+    function _depositUnderlying() internal override {
         // underlying to lp
         uint underlyingBal = IERC20(underlying).balanceOf(address(this));
         if (underlyingBal > 0) {
@@ -66,13 +67,13 @@ contract StrategyCurve is StrategyBase, UseUniswap {
         }
     }
 
-    function _removeLiquidityOneCoin(uint _lpAmount) internal;
+    function _removeLiquidityOneCoin(uint _lpAmount) internal virtual;
 
-    function _getTotalShares() internal view returns (uint) {
+    function _getTotalShares() internal override view returns (uint) {
         return Gauge(gauge).balanceOf(address(this));
     }
 
-    function _withdrawUnderlying(uint _lpAmount) internal {
+    function _withdrawUnderlying(uint _lpAmount) internal override {
         // withdraw lp from  Gauge
         Gauge(gauge).withdraw(_lpAmount);
 
@@ -86,7 +87,7 @@ contract StrategyCurve is StrategyBase, UseUniswap {
     /*
     @notice Claim CRV and swap for underlying token
     */
-    function _harvest() internal {
+    function _harvest() internal override {
         Minter(minter).mint(gauge);
 
         uint crvBal = IERC20(crv).balanceOf(address(this));
@@ -102,7 +103,7 @@ contract StrategyCurve is StrategyBase, UseUniswap {
     @dev Must return all underlying token to vault
     @dev Caller should implement guard agains slippage
     */
-    function exit() external onlyAuthorized {
+    function exit() external override onlyAuthorized {
         _harvest();
         _withdrawAll();
     }

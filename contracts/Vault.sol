@@ -1,15 +1,15 @@
-pragma solidity 0.5.17;
+// SPDX-License-Identifier: UNLICENSED
+pragma solidity 0.6.11;
 
 import "@openzeppelin/contracts/math/SafeMath.sol";
 import "@openzeppelin/contracts/utils/ReentrancyGuard.sol";
 import "@openzeppelin/contracts/token/ERC20/SafeERC20.sol";
 import "@openzeppelin/contracts/token/ERC20/IERC20.sol";
 import "@openzeppelin/contracts/token/ERC20/ERC20.sol";
-import "@openzeppelin/contracts/token/ERC20/ERC20Detailed.sol";
 
-import "./IStrategy.sol";
-import "./IVault.sol";
-import "./IController.sol";
+import "./protocol/IStrategy.sol";
+import "./protocol/IVault.sol";
+import "./protocol/IController.sol";
 
 /* potential hacks?
 - directly send underlying token to this vault or strategy
@@ -22,33 +22,33 @@ import "./IController.sol";
 - front running?
 */
 
-contract Vault is IVault, ERC20, ERC20Detailed, ReentrancyGuard {
+contract Vault is IVault, ERC20, ReentrancyGuard {
     using SafeERC20 for IERC20;
     using SafeMath for uint;
 
     event SetNextStrategy(address strategy);
     event SetStrategy(address strategy);
 
-    address public admin;
-    address public controller;
-    address public timeLock;
-    address public token;
-    address public strategy;
+    address public override admin;
+    address public override controller;
+    address public override timeLock;
+    address public override token;
+    address public override strategy;
 
     // percentange of token reserved in vault for cheap withdraw
-    uint public reserveMin = 500;
+    uint public override reserveMin = 500;
     uint private constant RESERVE_MAX = 10000;
 
     // Denominator used to calculate fees
     uint private constant FEE_MAX = 10000;
 
-    uint public withdrawFee;
+    uint public override withdrawFee;
     uint private constant WITHDRAW_FEE_CAP = 500; // upper limit to withdrawFee
 
     // mapping of approved strategies
-    mapping(address => bool) public strategies;
+    mapping(address => bool) public override strategies;
 
-    bool public paused;
+    bool public override paused;
 
     // mapping from tx.origin to block number
     // used to prevent flash loah attacks
@@ -63,14 +63,15 @@ contract Vault is IVault, ERC20, ERC20Detailed, ReentrancyGuard {
         address _token
     )
         public
-        ERC20Detailed(
-            string(abi.encodePacked("unagii_", ERC20Detailed(_token).name())),
-            string(abi.encodePacked("u", ERC20Detailed(_token).symbol())),
-            ERC20Detailed(_token).decimals()
+        ERC20(
+            string(abi.encodePacked("unagii_", ERC20(_token).name())),
+            string(abi.encodePacked("u", ERC20(_token).symbol()))
         )
     {
         require(_controller != address(0), "controller = zero address");
         require(_timeLock != address(0), "time lock = zero address");
+
+        _setupDecimals(ERC20(_token).decimals());
 
         admin = msg.sender;
         controller = _controller;
@@ -118,31 +119,31 @@ contract Vault is IVault, ERC20, ERC20Detailed, ReentrancyGuard {
         _;
     }
 
-    function setAdmin(address _admin) external onlyAdmin {
+    function setAdmin(address _admin) external override onlyAdmin {
         require(_admin != address(0), "admin = zero address");
         admin = _admin;
     }
 
-    function setController(address _controller) external onlyAdmin {
+    function setController(address _controller) external override onlyAdmin {
         require(_controller != address(0), "controller = zero address");
         controller = _controller;
     }
 
-    function setTimeLock(address _timeLock) external onlyTimeLock {
+    function setTimeLock(address _timeLock) external override onlyTimeLock {
         require(_timeLock != address(0), "time lock = zero address");
         timeLock = _timeLock;
     }
 
-    function setPause(bool _paused) external onlyAdmin {
+    function setPause(bool _paused) external override onlyAdmin {
         paused = _paused;
     }
 
-    function setReserveMin(uint _reserveMin) external onlyAdmin {
+    function setReserveMin(uint _reserveMin) external override onlyAdmin {
         require(_reserveMin <= RESERVE_MAX, "reserve min > max");
         reserveMin = _reserveMin;
     }
 
-    function setWithdrawFee(uint _fee) external onlyAdmin {
+    function setWithdrawFee(uint _fee) external override onlyAdmin {
         require(_fee <= WITHDRAW_FEE_CAP, "withdraw fee > cap");
         withdrawFee = _fee;
     }
@@ -155,7 +156,7 @@ contract Vault is IVault, ERC20, ERC20Detailed, ReentrancyGuard {
     @notice Returns balance of tokens in vault
     @return Amount of token in vault
     */
-    function balanceInVault() external view returns (uint) {
+    function balanceInVault() external override view returns (uint) {
         return _balanceInVault();
     }
 
@@ -172,7 +173,7 @@ contract Vault is IVault, ERC20, ERC20Detailed, ReentrancyGuard {
     @dev Output may vary depending on price of liquidity provider token
          where the underlying token is invested
     */
-    function balanceInStrategy() external view returns (uint) {
+    function balanceInStrategy() external override view returns (uint) {
         return _balanceInStrategy();
     }
 
@@ -186,7 +187,7 @@ contract Vault is IVault, ERC20, ERC20Detailed, ReentrancyGuard {
     /*
     @notice Returns amount of tokens invested strategy
     */
-    function totalDebtInStrategy() external view returns (uint) {
+    function totalDebtInStrategy() external override view returns (uint) {
         return _totalDebtInStrategy();
     }
 
@@ -198,7 +199,7 @@ contract Vault is IVault, ERC20, ERC20Detailed, ReentrancyGuard {
     @notice Returns the total amount of tokens in vault + total debt
     @return Total amount of tokens in vault + total debt
     */
-    function totalAssets() external view returns (uint) {
+    function totalAssets() external override view returns (uint) {
         return _totalAssets();
     }
 
@@ -211,7 +212,7 @@ contract Vault is IVault, ERC20, ERC20Detailed, ReentrancyGuard {
             cheap withdraw
     @return Reserve amount
     */
-    function minReserve() external view returns (uint) {
+    function minReserve() external override view returns (uint) {
         return _minReserve();
     }
 
@@ -234,7 +235,7 @@ contract Vault is IVault, ERC20, ERC20Detailed, ReentrancyGuard {
     @notice Returns amount of token available to be invested into strategy
     @return Amount of token available to be invested into strategy
     */
-    function availableToInvest() external view returns (uint) {
+    function availableToInvest() external override view returns (uint) {
         return _availableToInvest();
     }
 
@@ -242,7 +243,7 @@ contract Vault is IVault, ERC20, ERC20Detailed, ReentrancyGuard {
     @notice Approve strategy
     @param _strategy Address of strategy to revoke
     */
-    function approveStrategy(address _strategy) external onlyTimeLock {
+    function approveStrategy(address _strategy) external override onlyTimeLock {
         require(_strategy != address(0), "strategy = zero address");
         strategies[_strategy] = true;
     }
@@ -251,7 +252,7 @@ contract Vault is IVault, ERC20, ERC20Detailed, ReentrancyGuard {
     @notice Revoke strategy
     @param _strategy Address of strategy to revoke
     */
-    function revokeStrategy(address _strategy) external onlyAdmin {
+    function revokeStrategy(address _strategy) external override onlyAdmin {
         require(_strategy != address(0), "strategy = zero address");
         strategies[_strategy] = false;
     }
@@ -261,7 +262,11 @@ contract Vault is IVault, ERC20, ERC20Detailed, ReentrancyGuard {
     @param _strategy Address of strategy used
     @param _min Minimum undelying token current strategy must return. Prevents slippage
     */
-    function setStrategy(address _strategy, uint _min) external onlyAdminOrController {
+    function setStrategy(address _strategy, uint _min)
+        external
+        override
+        onlyAdminOrController
+    {
         require(strategies[_strategy], "!approved");
         require(_strategy != strategy, "new strategy = current strategy");
         require(
@@ -293,7 +298,13 @@ contract Vault is IVault, ERC20, ERC20Detailed, ReentrancyGuard {
     @notice Invest token from vault into strategy.
             Some token are kept in vault for cheap withdraw.
     */
-    function invest() external whenStrategyDefined whenNotPaused onlyAdminOrController {
+    function invest()
+        external
+        override
+        whenStrategyDefined
+        whenNotPaused
+        onlyAdminOrController
+    {
         uint amount = _availableToInvest();
         require(amount > 0, "available = 0");
 
@@ -309,7 +320,13 @@ contract Vault is IVault, ERC20, ERC20Detailed, ReentrancyGuard {
     @notice Deposit token into vault
     @param _amount Amount of token to transfer from `msg.sender`
     */
-    function deposit(uint _amount) external whenNotPaused nonReentrant noFlashLoan {
+    function deposit(uint _amount)
+        external
+        override
+        whenNotPaused
+        nonReentrant
+        noFlashLoan
+    {
         require(_amount > 0, "amount = 0");
 
         uint totalUnderlying = _totalAssets();
@@ -375,7 +392,7 @@ contract Vault is IVault, ERC20, ERC20Detailed, ReentrancyGuard {
     @param _shares Amount of shares
     @return Amount of underlying token that can be withdrawn
     */
-    function getExpectedReturn(uint _shares) external view returns (uint) {
+    function getExpectedReturn(uint _shares) external override view returns (uint) {
         uint balInVault = _balanceInVault();
         uint balInStrat = _balanceInStrategy();
 
@@ -387,7 +404,12 @@ contract Vault is IVault, ERC20, ERC20Detailed, ReentrancyGuard {
     @param _shares Amount of shares to burn
     @param _min Minimum amount of underlying token to return
     */
-    function withdraw(uint _shares, uint _min) external nonReentrant noFlashLoan {
+    function withdraw(uint _shares, uint _min)
+        external
+        override
+        nonReentrant
+        noFlashLoan
+    {
         require(_shares > 0, "shares = 0");
 
         uint balInVault = _balanceInVault();
@@ -438,7 +460,7 @@ contract Vault is IVault, ERC20, ERC20Detailed, ReentrancyGuard {
     @dev _token must not be equal to underlying token
     @dev Used to transfer token that was accidentally sent to this vault
     */
-    function sweep(address _token) external onlyAdmin {
+    function sweep(address _token) external override onlyAdmin {
         require(_token != token, "token = vault.token");
         IERC20(_token).safeTransfer(admin, IERC20(_token).balanceOf(address(this)));
     }

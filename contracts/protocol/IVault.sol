@@ -1,4 +1,5 @@
-pragma solidity 0.5.17;
+// SPDX-License-Identifier: UNLICENSED
+pragma solidity 0.6.11;
 
 interface IVault {
     function admin() external view returns (address);
@@ -10,6 +11,8 @@ interface IVault {
     function token() external view returns (address);
 
     function strategy() external view returns (address);
+
+    function strategies(address _strategy) external view returns (bool);
 
     function reserveMin() external view returns (uint);
 

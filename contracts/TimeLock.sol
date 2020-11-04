@@ -1,4 +1,5 @@
-pragma solidity 0.5.17;
+// SPDX-License-Identifier: UNLICENSED
+pragma solidity 0.6.11;
 import "@openzeppelin/contracts/math/SafeMath.sol";
 
 contract TimeLock {
@@ -45,7 +46,7 @@ contract TimeLock {
         delay = _delay;
     }
 
-    function() external payable {}
+    receive() external payable {}
 
     modifier onlyAdmin() {
         require(msg.sender == admin, "!admin");
@@ -125,7 +126,7 @@ contract TimeLock {
         queued[txHash] = false;
 
         // solium-disable-next-line security/no-call-value
-        (bool success, bytes memory returnData) = target.call.value(value)(data);
+        (bool success, bytes memory returnData) = target.call{value: value}(data);
         require(success, "tx failed");
 
         emit Execute(txHash, target, value, data, eta);

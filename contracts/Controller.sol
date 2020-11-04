@@ -1,10 +1,12 @@
-pragma solidity 0.5.17;
+// SPDX-License-Identifier: UNLICENSED
+pragma solidity 0.6.11;
 
 import "@openzeppelin/contracts/math/SafeMath.sol";
 import "@openzeppelin/contracts/token/ERC20/IERC20.sol";
-import "./IController.sol";
-import "./IVault.sol";
-import "./IStrategy.sol";
+
+import "./protocol/IController.sol";
+import "./protocol/IVault.sol";
+import "./protocol/IStrategy.sol";
 import "./AccessControl.sol";
 
 contract Controller is IController, AccessControl {
@@ -13,8 +15,8 @@ contract Controller is IController, AccessControl {
     bytes32 public constant ADMIN_ROLE = keccak256(abi.encodePacked("ADMIN"));
     bytes32 public constant HARVESTER_ROLE = keccak256(abi.encodePacked("HARVESTER"));
 
-    address public admin;
-    address public treasury;
+    address public override admin;
+    address public override treasury;
 
     constructor(address _treasury) public {
         require(_treasury != address(0), "treasury = zero address");
@@ -35,22 +37,22 @@ contract Controller is IController, AccessControl {
     @dev Please revoke ADMIN_ROLE and HARVESTER_ROLE for old admin
     @dev Please grant ADMIN_ROLE and HARVESTER_ROLE for new admin
     */
-    function setAdmin(address _admin) external onlyAdmin {
+    function setAdmin(address _admin) external override onlyAdmin {
         require(_admin != address(0), "admin = zero address");
         admin = _admin;
     }
 
-    function setTreasury(address _treasury) external onlyAdmin {
+    function setTreasury(address _treasury) external override onlyAdmin {
         require(_treasury != address(0), "treasury = zero address");
         treasury = _treasury;
     }
 
-    function grantRole(bytes32 _role, address _addr) external onlyAdmin {
+    function grantRole(bytes32 _role, address _addr) external override onlyAdmin {
         require(_role == ADMIN_ROLE || _role == HARVESTER_ROLE, "invalid role");
         _grantRole(_role, _addr);
     }
 
-    function revokeRole(bytes32 _role, address _addr) external onlyAdmin {
+    function revokeRole(bytes32 _role, address _addr) external override onlyAdmin {
         require(_role == ADMIN_ROLE || _role == HARVESTER_ROLE, "invalid role");
         _revokeRole(_role, _addr);
     }
@@ -59,16 +61,20 @@ contract Controller is IController, AccessControl {
         address _vault,
         address _strategy,
         uint _min
-    ) external onlyAuthorized(ADMIN_ROLE) {
+    ) external override onlyAuthorized(ADMIN_ROLE) {
         IVault(_vault).setStrategy(_strategy, _min);
     }
 
-    function invest(address _vault) external onlyAuthorized(HARVESTER_ROLE) {
+    function invest(address _vault) external override onlyAuthorized(HARVESTER_ROLE) {
         IVault(_vault).invest();
     }
 
     // @dev Warning: harvest can be called on strategy that is not set to any vault
-    function harvest(address _strategy) external onlyAuthorized(HARVESTER_ROLE) {
+    function harvest(address _strategy)
+        external
+        override
+        onlyAuthorized(HARVESTER_ROLE)
+    {
         IStrategy(_strategy).harvest();
     }
 
@@ -88,13 +94,14 @@ contract Controller is IController, AccessControl {
         address _strategy,
         uint _amount,
         uint _min
-    ) external onlyAuthorized(HARVESTER_ROLE) checkWithdraw(_strategy, _min) {
+    ) external override onlyAuthorized(HARVESTER_ROLE) checkWithdraw(_strategy, _min) {
         IStrategy(_strategy).withdraw(_amount);
     }
 
     // @dev Warning: withdrawAll can be called on strategy that is not set to any vault
     function withdrawAll(address _strategy, uint _min)
         external
+        override
         onlyAuthorized(ADMIN_ROLE)
         checkWithdraw(_strategy, _min)
     {
@@ -104,6 +111,7 @@ contract Controller is IController, AccessControl {
     // @dev Warning: exit can be called on strategy that is not set to any vault
     function exit(address _strategy, uint _min)
         external
+        override
         onlyAuthorized(ADMIN_ROLE)
         checkWithdraw(_strategy, _min)
     {

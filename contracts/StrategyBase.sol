@@ -1,31 +1,32 @@
-pragma solidity ^0.5.17;
+// SPDX-License-Identifier: UNLICENSED
+pragma solidity 0.6.11;
 
 import "@openzeppelin/contracts/token/ERC20/IERC20.sol";
 import "@openzeppelin/contracts/token/ERC20/SafeERC20.sol";
 import "@openzeppelin/contracts/math/SafeMath.sol";
 
-import "./IStrategy.sol";
-import "./IController.sol";
+import "./protocol/IStrategy.sol";
+import "./protocol/IController.sol";
 
-contract StrategyBase is IStrategy {
+abstract contract StrategyBase is IStrategy {
     using SafeERC20 for IERC20;
     using SafeMath for uint;
 
-    address public underlying;
+    address public override underlying;
 
-    address public admin;
-    address public controller;
-    address public vault;
+    address public override admin;
+    address public override controller;
+    address public override vault;
 
     // total amount of underlying transferred from vault
-    uint public totalDebt;
+    uint public override totalDebt;
 
     // performance fee sent to treasury when harvest() generates profit
-    uint public performanceFee = 100;
+    uint public override performanceFee = 100;
     uint private constant PERFORMANCE_FEE_MAX = 10000;
 
     // valuable tokens that cannot be swept
-    mapping(address => bool) public assets;
+    mapping(address => bool) public override assets;
 
     constructor(
         address _controller,
@@ -93,22 +94,22 @@ contract StrategyBase is IStrategy {
         }
     }
 
-    function _totalAssets() internal view returns (uint);
+    function _totalAssets() internal virtual view returns (uint);
 
     /*
     @notice Returns amount of underlying tokens locked in this contract
     */
-    function totalAssets() external view returns (uint) {
+    function totalAssets() external override view returns (uint) {
         return _totalAssets();
     }
 
-    function _depositUnderlying() internal;
+    function _depositUnderlying() internal virtual;
 
     /*
     @notice Deposit underlying token into this strategy
     @param _underlyingAmount Amount of underlying token to deposit
     */
-    function deposit(uint _underlyingAmount) external onlyAuthorized {
+    function deposit(uint _underlyingAmount) external override onlyAuthorized {
         require(_underlyingAmount > 0, "underlying = 0");
 
         _increaseDebt(_underlyingAmount);
@@ -119,16 +120,16 @@ contract StrategyBase is IStrategy {
     @notice Returns total shares owned by this contract for depositing underlying
             into external Defi
     */
-    function _getTotalShares() internal view returns (uint);
+    function _getTotalShares() internal virtual view returns (uint);
 
-    function _withdrawUnderlying(uint _shares) internal;
+    function _withdrawUnderlying(uint _shares) internal virtual;
 
     /*
     @notice Withdraw undelying token to vault
     @param _underlyingAmount Amount of underlying token to withdraw
     @dev Caller should implement guard agains slippage
     */
-    function withdraw(uint _underlyingAmount) external onlyAuthorized {
+    function withdraw(uint _underlyingAmount) external override onlyAuthorized {
         require(_underlyingAmount > 0, "underlying = 0");
         uint totalUnderlying = _totalAssets();
         require(_underlyingAmount <= totalUnderlying, "underlying > total");
@@ -174,20 +175,20 @@ contract StrategyBase is IStrategy {
     @notice Withdraw all underlying to vault
     @dev Caller should implement guard agains slippage
     */
-    function withdrawAll() external onlyAuthorized {
+    function withdrawAll() external override onlyAuthorized {
         _withdrawAll();
     }
 
     /*
     @notice Sell any staking rewards for underlying
     */
-    function _harvest() internal;
+    function _harvest() internal virtual;
 
     /*
     @notice Sell any staking rewards for underlying, deposit or transfer undelying
             depending on total debt
     */
-    function harvest() external onlyAuthorized {
+    function harvest() external override onlyAuthorized {
         _harvest();
 
         uint underlyingBal = IERC20(underlying).balanceOf(address(this));
@@ -212,7 +213,7 @@ contract StrategyBase is IStrategy {
         }
     }
 
-    function sweep(address _token) external onlyAdmin {
+    function sweep(address _token) external override onlyAdmin {
         require(!assets[_token], "asset");
 
         IERC20(_token).safeTransfer(admin, IERC20(_token).balanceOf(address(this)));

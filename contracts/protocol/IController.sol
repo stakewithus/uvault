@@ -1,27 +1,25 @@
-pragma solidity 0.5.17;
+// SPDX-License-Identifier: UNLICENSED
+pragma solidity 0.6.11;
 
-// Interface to use on Remix by admin
-interface IControllerAdmin {
-    // Admin helpers //
+interface IController {
+    function admin() external view returns (address);
+
+    function treasury() external view returns (address);
+
     function setAdmin(address _admin) external;
 
     function setTreasury(address _treasury) external;
-
-    function ADMIN_ROLE() external view returns (bytes32);
-
-    function HARVESTER_ROLE() external view returns (bytes32);
 
     function grantRole(bytes32 _role, address _addr) external;
 
     function revokeRole(bytes32 _role, address _addr) external;
 
-    function hasRole(bytes32 _role, address _addr) external view returns (bool);
-
-    // IController //
-    function admin() external view returns (address);
-
-    function treasury() external view returns (address);
-
+    /*
+    @notice Set strategy for vault
+    @param _vault Address of vault
+    @param _strategy Address of strategy
+    @param _min Minimum undelying token current strategy must return. Prevents slippage
+    */
     function setStrategy(
         address _vault,
         address _strategy,

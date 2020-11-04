@@ -1,4 +1,5 @@
-pragma solidity 0.5.17;
+// SPDX-License-Identifier: UNLICENSED
+pragma solidity 0.6.11;
 
 import "../interfaces/curve/ICurveFi3.sol";
 import "../interfaces/pickle/PickleJar.sol";
@@ -33,7 +34,7 @@ contract StrategyP3Crv is StrategyBase, UseUniswap {
     ) public StrategyBase(_controller, _vault, _underlying) {}
 
     // TODO vulnerable to price manipulation
-    function _totalAssets() internal view returns (uint) {
+    function _totalAssets() internal override view returns (uint) {
         // multiplied by 10 ** 18
         uint pricePerShare = PickleJar(jar).getRatio();
         (uint shares, ) = MasterChef(chef).userInfo(POOL_ID, address(this));
@@ -41,7 +42,7 @@ contract StrategyP3Crv is StrategyBase, UseUniswap {
         return shares.mul(pricePerShare).div(1e18).div(precisionDiv);
     }
 
-    function _depositUnderlying() internal {
+    function _depositUnderlying() internal override {
         // underlying to threeCrv
         uint underlyingBal = IERC20(underlying).balanceOf(address(this));
         if (underlyingBal > 0) {
@@ -71,12 +72,12 @@ contract StrategyP3Crv is StrategyBase, UseUniswap {
         }
     }
 
-    function _getTotalShares() internal view returns (uint) {
+    function _getTotalShares() internal override view returns (uint) {
         (uint p3CrvBal, ) = MasterChef(chef).userInfo(POOL_ID, address(this));
         return p3CrvBal;
     }
 
-    function _withdrawUnderlying(uint _p3CrvAmount) internal {
+    function _withdrawUnderlying(uint _p3CrvAmount) internal override {
         // unstake
         MasterChef(chef).withdraw(POOL_ID, _p3CrvAmount);
 
@@ -94,7 +95,7 @@ contract StrategyP3Crv is StrategyBase, UseUniswap {
         // Now we have underlying
     }
 
-    function _harvest() internal {
+    function _harvest() internal override {
         uint pickleBal = IERC20(pickle).balanceOf(address(this));
         if (pickleBal > 0) {
             _swap(pickle, underlying, pickleBal);
@@ -105,7 +106,7 @@ contract StrategyP3Crv is StrategyBase, UseUniswap {
     /*
     @dev Caller should implement guard agains slippage
     */
-    function exit() external onlyAuthorized {
+    function exit() external override onlyAuthorized {
         // Pickle is minted on withdraw so here we
         // 1. Withdraw from MasterChef
         // 2. Sell Pickle

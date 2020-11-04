@@ -57,7 +57,7 @@ npm run lint
 ```shell
 docker run -it -v $PWD:/code trailofbits/eth-security-toolbox
 
-solc-select 0.5.17
+solc-select 0.6.11
 cd /code
 # slither analysis
 slither --exclude-dependencies .

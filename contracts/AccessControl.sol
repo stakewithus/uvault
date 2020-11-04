@@ -1,4 +1,5 @@
-pragma solidity ^0.5.17;
+// SPDX-License-Identifier: UNLICENSED
+pragma solidity 0.6.11;
 
 contract AccessControl {
     event GrantRole(bytes32 indexed role, address indexed addr);

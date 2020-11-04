@@ -1,4 +1,5 @@
-pragma solidity 0.5.17;
+// SPDX-License-Identifier: UNLICENSED
+pragma solidity 0.6.11;
 
 import "../StrategyBase.sol";
 
@@ -17,17 +18,17 @@ contract StrategyTest is StrategyBase {
         address _underlying
     ) public StrategyBase(_controller, _vault, _underlying) {}
 
-    function _totalAssets() internal view returns (uint) {
+    function _totalAssets() internal override view returns (uint) {
         return IERC20(underlying).balanceOf(address(this));
     }
 
-    function _depositUnderlying() internal {}
+    function _depositUnderlying() internal override {}
 
-    function _getTotalShares() internal view returns (uint) {
+    function _getTotalShares() internal override view returns (uint) {
         return IERC20(underlying).balanceOf(address(this));
     }
 
-    function _withdrawUnderlying(uint _shares) internal {
+    function _withdrawUnderlying(uint _shares) internal override {
         _withdrawAmount_ = _shares;
 
         // burn token to simulate withdraw less than requested
@@ -36,11 +37,11 @@ contract StrategyTest is StrategyBase {
         }
     }
 
-    function _harvest() internal {
+    function _harvest() internal override {
         _harvestWasCalled_ = true;
     }
 
-    function exit() external onlyAuthorized {
+    function exit() external override onlyAuthorized {
         _exitWasCalled_ = true;
         _withdrawAll();
     }
