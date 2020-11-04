@@ -12,6 +12,7 @@ contract Strategy3CrvUsdc is Strategy3Crv {
     {
         // usdc
         underlyingIndex = 1;
+        precisionDiv = 1e12;
 
         // Curve
         // 3Crv

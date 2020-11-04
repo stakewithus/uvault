@@ -12,6 +12,7 @@ contract StrategyCusdDai is StrategyCusd {
     {
         // dai
         underlyingIndex = 0;
+        precisionDiv = 1;
 
         // Curve
         // cDAI/cUSDC

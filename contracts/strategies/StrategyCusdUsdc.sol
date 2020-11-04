@@ -12,6 +12,7 @@ contract StrategyCusdUsdc is StrategyCusd {
     {
         // usdc
         underlyingIndex = 1;
+        precisionDiv = 1e12;
 
         // Curve
         // cDAI/cUSDC

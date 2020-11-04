@@ -15,6 +15,8 @@ import "../UseUniswap.sol";
 abstract contract StrategyCurve is StrategyBase, UseUniswap {
     // DAI = 0 | USDC = 1 | USDT = 2
     uint internal underlyingIndex;
+    // precision to convert 10 ** 18  to underlying decimals
+    uint internal precisionDiv = 1;
 
     // Curve //
     // liquidity provider token (cDAI/cUSDC or 3Crv)
@@ -34,13 +36,13 @@ abstract contract StrategyCurve is StrategyBase, UseUniswap {
         address _underlying
     ) public StrategyBase(_controller, _vault, _underlying) {}
 
-    function _getVirtualPrice() internal virtual view returns (uint);
+    function _getVirtualPrice() internal view virtual returns (uint);
 
-    function _totalAssets() internal override view returns (uint) {
+    function _totalAssets() internal view override returns (uint) {
         uint lpBal = Gauge(gauge).balanceOf(address(this));
         uint pricePerShare = _getVirtualPrice();
 
-        return lpBal.mul(pricePerShare).div(1e18);
+        return lpBal.mul(pricePerShare).div(1e18).div(precisionDiv);
     }
 
     function _addLiquidity(uint _underlyingAmount) internal virtual;
@@ -69,7 +71,7 @@ abstract contract StrategyCurve is StrategyBase, UseUniswap {
 
     function _removeLiquidityOneCoin(uint _lpAmount) internal virtual;
 
-    function _getTotalShares() internal override view returns (uint) {
+    function _getTotalShares() internal view override returns (uint) {
         return Gauge(gauge).balanceOf(address(this));
     }
 

@@ -12,7 +12,6 @@ contract StrategyP3CrvUsdc is StrategyP3Crv {
     {
         // usdc
         underlyingIndex = 1;
-
         precisionDiv = 1e12;
 
         // Curve //

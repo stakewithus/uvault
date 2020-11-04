@@ -12,7 +12,6 @@ contract StrategyP3CrvDai is StrategyP3Crv {
     {
         // dai
         underlyingIndex = 0;
-
         precisionDiv = 1;
 
         // Curve //
