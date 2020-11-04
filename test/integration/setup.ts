@@ -20,25 +20,27 @@ export default (accounts: Truffle.Accounts) => {
   const treasury = accounts[1]
   const whale = accounts[2]
 
-  const MIN_WAIT_TIME = 0
+  // Mock time lock contract
+  const timeLock = accounts[3]
 
   // references to return
   interface Refs {
     admin: string
     treasury: string
+    timeLock: string
     underlying: TestTokenInstance
     gasToken: MockGasTokenInstance
     gasRelayer: GasRelayerInstance
     controller: ControllerInstance
     vault: VaultInstance
     strategy: StrategyTestInstance
-    MIN_WAIT_TIME: number
     whale: string
   }
 
   const refs: Refs = {
     admin,
     treasury,
+    timeLock,
     // @ts-ignore
     underlying: null,
     // @ts-ignore
@@ -51,7 +53,6 @@ export default (accounts: Truffle.Accounts) => {
     vault: null,
     // @ts-ignore
     strategy: null,
-    MIN_WAIT_TIME,
     whale,
   }
 
@@ -64,14 +65,9 @@ export default (accounts: Truffle.Accounts) => {
     const controller = await Controller.new(treasury, {
       from: admin,
     })
-    const vault = await Vault.new(
-      controller.address,
-      underlying.address,
-      MIN_WAIT_TIME,
-      {
-        from: admin,
-      }
-    )
+    const vault = await Vault.new(controller.address, timeLock, underlying.address, {
+      from: admin,
+    })
     const strategy = await StrategyTest.new(
       controller.address,
       vault.address,
@@ -93,12 +89,12 @@ export default (accounts: Truffle.Accounts) => {
 
     // deposit into vault
     const amount = pow(10, 18).mul(new BN(100))
-    await underlying.mint(whale, amount)
+    await underlying._mint_(whale, amount)
     await underlying.approve(vault.address, amount, {from: whale})
     await vault.deposit(amount, {from: whale})
 
     // set strategy
-    await vault.setNextStrategy(strategy.address, {from: admin})
+    await vault.approveStrategy(strategy.address, {from: timeLock})
     await controller.setStrategy(vault.address, strategy.address, new BN(0), {
       from: admin,
     })

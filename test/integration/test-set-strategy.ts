@@ -11,7 +11,7 @@ const StrategyTest = artifacts.require("StrategyTest")
 
 contract("integration", (accounts) => {
   const refs = _setup(accounts)
-  const {admin} = refs
+  const {admin, timeLock} = refs
 
   let controller: ControllerInstance
   let vault: VaultInstance
@@ -37,14 +37,14 @@ contract("integration", (accounts) => {
       }
     )
 
-    // set next strategy
-    await vault.setNextStrategy(newStrategy.address, {from: admin})
+    await vault.approveStrategy(newStrategy.address, {from: timeLock})
   })
 
   const snapshot = async () => {
     return {
       vault: {
         strategy: await vault.strategy(),
+        balanceInStrategy: await vault.balanceInStrategy(),
       },
       underlying: {
         vault: await underlying.balanceOf(vault.address),
@@ -64,7 +64,7 @@ contract("integration", (accounts) => {
     assert(
       eq(
         after.underlying.vault,
-        add(before.underlying.vault, before.underlying.strategy)
+        add(before.underlying.vault, before.vault.balanceInStrategy)
       ),
       "vault"
     )

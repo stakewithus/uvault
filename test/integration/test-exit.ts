@@ -31,6 +31,9 @@ contract("integration", (accounts) => {
         vault: await underlying.balanceOf(vault.address),
         strategy: await underlying.balanceOf(strategy.address),
       },
+      vault: {
+        balanceInStrategy: await vault.balanceInStrategy(),
+      },
     }
   }
 
@@ -45,7 +48,7 @@ contract("integration", (accounts) => {
     assert(
       eq(
         after.underlying.vault,
-        add(before.underlying.vault, before.underlying.strategy)
+        before.underlying.vault.add(before.vault.balanceInStrategy)
       ),
       "vault"
     )
@@ -63,7 +66,7 @@ contract("integration", (accounts) => {
   })
 
   it("should reject if transferred amount < min", async () => {
-    const amount = await underlying.balanceOf(strategy.address)
+    const amount = await strategy.totalAssets()
     const min = add(amount, 1)
 
     await chai

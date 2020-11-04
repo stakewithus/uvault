@@ -10,7 +10,7 @@ const Vault = artifacts.require("Vault")
 
 contract("integration", (accounts) => {
   const refs = _setup(accounts)
-  const {admin} = refs
+  const {admin, timeLock} = refs
 
   let controller: ControllerInstance
   let vault: VaultInstance
@@ -31,6 +31,7 @@ contract("integration", (accounts) => {
       },
       vault: {
         availableToInvest: await vault.availableToInvest(),
+        balanceInStrategy: await vault.balanceInStrategy(),
       },
     }
   }
@@ -48,7 +49,14 @@ contract("integration", (accounts) => {
       ),
       "vault after"
     )
-    assert(eq(after.underlying.strategy, before.vault.availableToInvest), "strategy")
+    assert(eq(after.underlying.strategy, before.underlying.strategy), "strategy")
+    assert(
+      eq(
+        after.vault.balanceInStrategy,
+        before.vault.balanceInStrategy.add(before.vault.availableToInvest)
+      ),
+      "balance in strategy"
+    )
   })
 
   it("should reject if not authorized", async () => {
@@ -58,7 +66,7 @@ contract("integration", (accounts) => {
   })
 
   it("should reject if strategy not set", async () => {
-    const vault = await Vault.new(controller.address, underlying.address, 0)
+    const vault = await Vault.new(controller.address, timeLock, underlying.address)
     assert.equal(await vault.strategy(), ZERO_ADDRESS, "strategy")
 
     await chai

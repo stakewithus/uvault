@@ -4,7 +4,7 @@ import {TestTokenInstance} from "../../types/TestToken"
 import {ControllerInstance} from "../../types/Controller"
 import {VaultInstance} from "../../types/Vault"
 import {StrategyTestInstance} from "../../types/StrategyTest"
-import {eq, add} from "../util"
+import {eq} from "../util"
 import _setup from "./setup"
 
 contract("integration", (accounts) => {
@@ -31,6 +31,9 @@ contract("integration", (accounts) => {
         vault: await underlying.balanceOf(vault.address),
         strategy: await underlying.balanceOf(strategy.address),
       },
+      vault: {
+        balanceInStrategy: await vault.balanceInStrategy(),
+      },
     }
   }
 
@@ -43,10 +46,17 @@ contract("integration", (accounts) => {
     const after = await snapshot()
 
     // check strategy transferred underlying token back to vault
-    assert(eq(after.underlying.vault, add(before.underlying.vault, amount)), "vault")
+    assert(
+      eq(
+        after.underlying.vault,
+        before.underlying.vault.add(before.vault.balanceInStrategy)
+      ),
+      "vault"
+    )
 
     // check strategy balance is zero
     assert(eq(after.underlying.strategy, new BN(0)), "strategy")
+    assert(eq(after.vault.balanceInStrategy, new BN(0)), "balance in strategy")
   })
 
   it("should reject if not authorized", async () => {
@@ -59,7 +69,7 @@ contract("integration", (accounts) => {
   })
 
   it("should reject if transferred amount < min", async () => {
-    const amount = await underlying.balanceOf(strategy.address)
+    const amount = await strategy.totalAssets()
     const min = amount.add(new BN(1))
 
     await chai
