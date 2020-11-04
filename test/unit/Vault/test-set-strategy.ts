@@ -5,7 +5,7 @@ import {Erc20TokenInstance} from "../../../types/Erc20Token"
 import {VaultInstance} from "../../../types/Vault"
 import {MockControllerInstance} from "../../../types/MockController"
 import {StrategyTestInstance} from "../../../types/StrategyTest"
-import {ZERO_ADDRESS, eq, MAX_UINT} from "../../util"
+import {eq} from "../../util"
 import _setup from "./setup"
 
 const StrategyTest = artifacts.require("StrategyTest")
@@ -37,6 +37,11 @@ contract("Vault", (accounts) => {
         from: admin,
       })
 
+      // check state
+      assert.equal(await vault.strategy(), strategy.address, "strategy")
+      // check external calls
+      assert.equal(await strategy._exitWasCalled_(), false, "exit")
+
       // check log
       assert.equal(tx.logs[0].event, "SetStrategy", "event")
       assert.equal(
@@ -45,10 +50,6 @@ contract("Vault", (accounts) => {
         strategy.address,
         "log strategy"
       )
-      // check state
-      assert.equal(await vault.strategy(), strategy.address, "strategy")
-      // check external calls
-      assert.equal(await strategy._exitWasCalled_(), false, "exit")
     })
 
     describe("update", () => {
@@ -74,10 +75,10 @@ contract("Vault", (accounts) => {
 
         // check state
         assert.equal(await vault.strategy(), newStrategy.address, "new strategy")
-        assert(eq(await vault.totalDebt(), new BN(0)), "total debt")
         // check external calls
-        assert(
+        assert.equal(
           eq(await token.allowance(vault.address, oldStrategy.address), new BN(0)),
+          true,
           "allowance"
         )
         assert.equal(await oldStrategy._exitWasCalled_(), true, "exit")

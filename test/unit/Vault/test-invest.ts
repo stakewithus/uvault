@@ -44,10 +44,9 @@ contract("Vault", (accounts) => {
           return {
             vault: {
               availableToInvest: await vault.availableToInvest(),
-              totalDebt: await vault.totalDebt(),
             },
             token: {
-              admin: await token.balanceOf(admin),
+              vault: await token.balanceOf(vault.address),
               strategy: await token.balanceOf(strategy.address),
             },
           }
@@ -59,16 +58,16 @@ contract("Vault", (accounts) => {
 
         // check token transfer to strategy
         assert.equal(
-          after.token.strategy.eq(before.vault.availableToInvest),
+          after.token.vault.eq(before.token.vault.sub(before.vault.availableToInvest)),
           true,
-          "invest"
+          "token vault"
         )
         assert.equal(
-          after.vault.totalDebt.eq(
-            before.vault.totalDebt.add(before.vault.availableToInvest)
+          after.token.strategy.eq(
+            before.token.strategy.add(before.vault.availableToInvest)
           ),
           true,
-          "total debt"
+          "token strategy"
         )
       })
 

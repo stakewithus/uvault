@@ -28,7 +28,7 @@ contract("Vault", (accounts) => {
     const min = frac(amount, 99, 100)
 
     beforeEach(async () => {
-      await token.__mint__(sender, amount)
+      await token._mint_(sender, amount)
       await token.approve(vault.address, amount, {from: sender})
       await vault.deposit(amount, {from: sender})
 
@@ -52,7 +52,6 @@ contract("Vault", (accounts) => {
           balanceInStrategy: await vault.balanceInStrategy(),
           balanceInVault: await vault.balanceInVault(),
           totalSupply: await vault.totalSupply(),
-          totalDebt: await vault.totalDebt(),
           totalAssets: await vault.totalAssets(),
         },
       }
@@ -76,6 +75,11 @@ contract("Vault", (accounts) => {
         true,
         "token vault"
       )
+      assert.equal(
+        after.token.strategy.eq(before.token.strategy),
+        true,
+        "token strategy"
+      )
 
       // check vault balance
       assert.equal(
@@ -88,7 +92,6 @@ contract("Vault", (accounts) => {
         true,
         "total supply"
       )
-      assert.equal(after.vault.totalDebt.eq(before.vault.totalDebt), true, "total debt")
     })
 
     it("should withdraw from strategy", async () => {
@@ -96,6 +99,7 @@ contract("Vault", (accounts) => {
       const shares = await vault.balanceOf(sender)
       const sharesToBurn = frac(shares, 1, 2)
       const amountToWithdraw = await vault.getExpectedReturn(sharesToBurn)
+      const min = amountToWithdraw
 
       const balInVault = await vault.balanceInVault()
       const balInStrat = await vault.balanceInStrategy()
@@ -109,25 +113,29 @@ contract("Vault", (accounts) => {
       assert.equal(
         amountToWithdraw.lte(balInStrat),
         true,
-        "withdraw amount > vault balance"
+        "withdraw amount > strategy balance"
       )
 
       const before = await snapshot()
       await vault.withdraw(sharesToBurn, 0, {from: sender})
       const after = await snapshot()
 
+      const fee = after.token.treasury.sub(before.token.treasury)
+
       assert.equal(
-        after.token.strategy.eq(before.token.strategy.sub(amountToWithdraw)),
+        after.token.sender.gte(before.token.sender.add(min.sub(fee))),
         true,
-        "strategy withdraw"
+        "token sender"
+      )
+
+      assert.equal(
+        after.token.strategy.lte(before.token.strategy.sub(amountToWithdraw)),
+        true,
+        "token strategy"
       )
       // check no tokens where withdrawn from vault
-      assert.equal(after.token.vault.eq(before.token.vault), true, "vault balance")
-      assert.equal(
-        after.vault.totalDebt.eq(before.vault.totalDebt.sub(amountToWithdraw)),
-        true,
-        "total debt"
-      )
+      assert.equal(after.token.vault.gte(before.token.vault), true, "token vault")
+      // check withdraw fee
       assert.equal(
         after.token.treasury.gte(before.token.treasury),
         true,
@@ -139,6 +147,7 @@ contract("Vault", (accounts) => {
       await vault.invest()
       const shares = await vault.balanceOf(sender)
       const amountToWithdraw = await vault.getExpectedReturn(shares)
+      const min = amountToWithdraw
 
       const balInVault = await vault.balanceInVault()
       const balInStrat = await vault.balanceInStrategy()
@@ -161,21 +170,22 @@ contract("Vault", (accounts) => {
 
       const strategyDiff = before.token.strategy.sub(after.token.strategy)
       const vaultDiff = before.token.vault.sub(after.token.vault)
+      const fee = after.token.treasury.sub(before.token.treasury)
 
       assert.equal(
-        strategyDiff.eq(amountToWithdraw.sub(before.vault.balanceInVault)),
+        after.token.sender.gte(before.token.sender.add(min.sub(fee))),
         true,
-        "strategy withdraw"
+        "token sender"
       )
       assert.equal(
-        vaultDiff.eq(amountToWithdraw.sub(before.vault.balanceInStrategy)),
+        strategyDiff.eq(amountToWithdraw.sub(before.token.vault)),
         true,
-        "vault withdraw"
+        "token strategy"
       )
       assert.equal(
-        after.vault.totalDebt.eq(before.vault.totalDebt.sub(strategyDiff)),
+        vaultDiff.eq(amountToWithdraw.sub(before.token.strategy)),
         true,
-        "total debt"
+        "token vault"
       )
       assert.equal(
         after.token.treasury.gte(before.token.treasury),

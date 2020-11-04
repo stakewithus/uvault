@@ -83,6 +83,11 @@ contract Vault is IVault, ERC20, ERC20Detailed, ReentrancyGuard {
         _;
     }
 
+    modifier onlyTimeLock() {
+        require(msg.sender == timeLock, "!time lock");
+        _;
+    }
+
     modifier onlyAdminOrController() {
         require(msg.sender == admin || msg.sender == controller, "!authorized");
         _;
@@ -121,11 +126,6 @@ contract Vault is IVault, ERC20, ERC20Detailed, ReentrancyGuard {
     function setController(address _controller) external onlyAdmin {
         require(_controller != address(0), "controller = zero address");
         controller = _controller;
-    }
-
-    modifier onlyTimeLock() {
-        require(msg.sender == timeLock, "!time lock");
-        _;
     }
 
     function setTimeLock(address _timeLock) external onlyTimeLock {
@@ -184,7 +184,7 @@ contract Vault is IVault, ERC20, ERC20Detailed, ReentrancyGuard {
     }
 
     /*
-    @notice Returns amount of tokens in strategy
+    @notice Returns amount of tokens invested strategy
     */
     function totalDebtInStrategy() external view returns (uint) {
         return _totalDebtInStrategy();

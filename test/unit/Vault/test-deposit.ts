@@ -20,26 +20,27 @@ contract("Vault", (accounts) => {
     const amount = pow(10, 18)
 
     beforeEach(async () => {
-      await token.__mint__(sender, amount)
+      await token._mint_(sender, amount)
       await token.approve(vault.address, amount, {from: sender})
     })
 
-    it("should deposit when total supply is 0", async () => {
-      const snapshot = async () => {
-        return {
-          token: {
-            sender: await token.balanceOf(sender),
-            vault: await token.balanceOf(vault.address),
+    const snapshot = async () => {
+      return {
+        token: {
+          sender: await token.balanceOf(sender),
+          vault: await token.balanceOf(vault.address),
+        },
+        vault: {
+          balanceOf: {
+            sender: await vault.balanceOf(sender),
           },
-          vault: {
-            balanceOf: {
-              sender: await vault.balanceOf(sender),
-            },
-            totalSupply: await vault.totalSupply(),
-          },
-        }
+          totalSupply: await vault.totalSupply(),
+          totalAssets: await vault.totalAssets(),
+        },
       }
+    }
 
+    it("should deposit when total supply is 0", async () => {
       const before = await snapshot()
       await vault.deposit(amount, {from: sender})
       const after = await snapshot()
@@ -70,21 +71,9 @@ contract("Vault", (accounts) => {
     })
 
     it("should deposit when total supply > 0", async () => {
-      const snapshot = async () => {
-        return {
-          vault: {
-            balanceOf: {
-              sender: await vault.balanceOf(sender),
-            },
-            totalSupply: await vault.totalSupply(),
-            totalAssets: await vault.totalAssets(),
-          },
-        }
-      }
-
       await vault.deposit(amount, {from: sender})
 
-      await token.__mint__(sender, amount)
+      await token._mint_(sender, amount)
       await token.approve(vault.address, amount, {from: sender})
 
       const before = await snapshot()

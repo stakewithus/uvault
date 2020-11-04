@@ -18,7 +18,7 @@ contract("Vault", (accounts) => {
       const reserve = new BN(123)
       await vault.setReserveMin(reserve, {from: admin})
 
-      assert(eq(await vault.reserveMin(), reserve), "reserve min")
+      assert.equal(eq(await vault.reserveMin(), reserve), true, "reserve min")
     })
 
     it("should reject if caller not admin", async () => {

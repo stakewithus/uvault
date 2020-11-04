@@ -1,5 +1,4 @@
 import chai from "chai"
-import {Erc20TokenInstance} from "../../../types/Erc20Token"
 import {VaultInstance} from "../../../types/Vault"
 import {ZERO_ADDRESS} from "../../util"
 import _setup from "./setup"
@@ -9,10 +8,8 @@ contract("Vault", (accounts) => {
   const {admin} = refs
 
   let vault: VaultInstance
-  let token: Erc20TokenInstance
   beforeEach(() => {
     vault = refs.vault
-    token = refs.token
   })
 
   describe("setController", () => {

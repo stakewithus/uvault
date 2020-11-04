@@ -14,7 +14,7 @@ contract("Vault", (accounts) => {
   describe("setPause", () => {
     it("should pause", async () => {
       await vault.setPause(true, {from: admin})
-      assert(await vault.paused(), "paused")
+      assert.equal(await vault.paused(), true, "paused")
     })
 
     it("should unpause", async () => {

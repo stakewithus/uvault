@@ -18,7 +18,7 @@ contract("Vault", (accounts) => {
       const fee = new BN(123)
       await vault.setWithdrawFee(fee, {from: admin})
 
-      assert(eq(await vault.withdrawFee(), fee), "fee")
+      assert.equal(eq(await vault.withdrawFee(), fee), true, "fee")
     })
 
     it("should reject if caller not admin", async () => {

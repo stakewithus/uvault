@@ -35,7 +35,7 @@ contract("Vault", (accounts) => {
 
       assert.equal(await vault.name(), "unagii_test", "name")
       assert.equal(await vault.symbol(), "uTEST", "symbol")
-      assert(eq(await vault.decimals(), await token.decimals()), "decimals")
+      assert.equal(eq(await vault.decimals(), await token.decimals()), true, "decimals")
 
       assert.equal(await vault.strategy(), ZERO_ADDRESS, "strategy")
     })

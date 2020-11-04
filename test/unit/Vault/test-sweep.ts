@@ -2,7 +2,6 @@ import chai from "chai"
 import BN from "bn.js"
 import {Erc20TokenInstance} from "../../../types/Erc20Token"
 import {VaultInstance} from "../../../types/Vault"
-import {add, sub, eq} from "../../util"
 import _setup from "./setup"
 
 const ERC20Token = artifacts.require("ERC20Token")
@@ -38,8 +37,16 @@ contract("Vault", (accounts) => {
       const after = await snapshot()
 
       // check token balance
-      assert(eq(after.token.admin, add(before.token.admin, amount)), "token admin")
-      assert(eq(after.token.vault, sub(before.token.vault, amount)), "token vault")
+      assert.equal(
+        after.token.admin.eq(before.token.admin.add(amount)),
+        true,
+        "token admin"
+      )
+      assert.equal(
+        after.token.vault.eq(before.token.vault.sub(amount)),
+        true,
+        "token vault"
+      )
     })
 
     it("should reject if not admin", async () => {

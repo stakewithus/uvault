@@ -60,7 +60,7 @@ interface IVault {
     function balanceInStrategy() external view returns (uint);
 
     /*
-    @notice Returns amount of tokens in strategy
+    @notice Returns amount of tokens invested strategy
     */
     function totalDebtInStrategy() external view returns (uint);
 

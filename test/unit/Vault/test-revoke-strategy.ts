@@ -1,5 +1,4 @@
 import chai from "chai"
-import BN from "bn.js"
 import {MockTimeLockInstance} from "../../../types/MockTimeLock"
 import {VaultInstance} from "../../../types/Vault"
 import {StrategyTestInstance} from "../../../types/StrategyTest"
