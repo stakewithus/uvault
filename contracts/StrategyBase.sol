@@ -201,14 +201,8 @@ abstract contract StrategyBase is IStrategy {
                 IERC20(underlying).safeTransfer(treasury, fee);
             }
 
-            uint totalUnderlying = _totalAssets();
-            if (totalUnderlying >= totalDebt) {
-                // transfer to vault and increase debt upon strategy.deposit()
-                IERC20(underlying).safeTransfer(vault, underlyingBal.sub(fee));
-            } else {
-                // deposit remaining underlying
-                _depositUnderlying();
-            }
+            // deposit remaining underlying
+            _depositUnderlying();
         }
     }
 

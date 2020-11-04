@@ -3,7 +3,7 @@ import {Ierc20Instance} from "../../../types/Ierc20"
 import {ControllerInstance} from "../../../types/Controller"
 import {GaugeInstance} from "../../../types/Gauge"
 import {StrategyInstance} from "./lib"
-import {eq, frac, pow} from "../../util"
+import {frac, pow} from "../../util"
 import {Setup, getSnapshot} from "./lib"
 
 export default (name: string, _setup: Setup, params: {DECIMALS: BN}) => {
@@ -51,20 +51,22 @@ export default (name: string, _setup: Setup, params: {DECIMALS: BN}) => {
       await strategy.withdrawAll({from: vault})
       const after = await snapshot()
 
-      // minimum amount of underlying that can be withdrawn
+      // minimum amount of underlying that must be withdrawn
       const minUnderlying = frac(before.strategy.totalAssets, 99, 100)
 
       // check balance of underlying transferred to treasury and vault
-      const underlyingDiff = after.underlying.vault.sub(before.underlying.vault)
-
-      assert(underlyingDiff.gte(minUnderlying), "underlying diff")
-
+      assert(
+        after.underlying.vault.gte(before.underlying.vault.add(minUnderlying)),
+        "underlying vault"
+      )
+      // check total debt
+      assert(after.strategy.totalDebt.eq(new BN(0)), "total debt")
       // check strategy does not have any underlying
-      assert(eq(after.underlying.strategy, new BN(0)), "underlying strategy")
+      assert(after.underlying.strategy.eq(new BN(0)), "underlying strategy")
       // check strategy dust is small
       assert(after.lp.strategy.lte(new BN(100)), "lp strategy")
       // check strategy does not have any lp in gauge
-      assert(eq(after.gauge.strategy, new BN(0)), "gauge strategy")
+      assert(after.gauge.strategy.eq(new BN(0)), "gauge strategy")
     })
   })
 }

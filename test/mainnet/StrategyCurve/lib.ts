@@ -1,6 +1,6 @@
-import { Ierc20Instance } from "../../../types/Ierc20"
-import { GaugeInstance } from "../../../types/Gauge"
-import { ControllerInstance } from "../../../types/Controller"
+import {Ierc20Instance} from "../../../types/Ierc20"
+import {GaugeInstance} from "../../../types/Gauge"
+import {ControllerInstance} from "../../../types/Controller"
 import {
   StrategyCusdDaiContract,
   StrategyCusdDaiInstance,
@@ -61,12 +61,13 @@ export function getSnapshot(params: {
   vault: string
   treasury: string
 }) {
-  const { strategy, underlying, lp, gauge, crv, vault, treasury } = params
+  const {strategy, underlying, lp, gauge, crv, vault, treasury} = params
 
   return async () => {
     const snapshot = {
       strategy: {
         totalAssets: await strategy.totalAssets(),
+        totalDebt: await strategy.totalDebt(),
       },
       underlying: {
         vault: await underlying.balanceOf(vault),

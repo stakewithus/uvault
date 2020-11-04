@@ -11,7 +11,6 @@ import "../UseUniswap.sol";
 - slippage when withdrawing all from strategy
 */
 
-// @dev This is an abstract contract
 abstract contract StrategyCurve is StrategyBase, UseUniswap {
     // DAI = 0 | USDC = 1 | USDT = 2
     uint internal underlyingIndex;

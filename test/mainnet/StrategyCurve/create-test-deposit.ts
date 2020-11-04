@@ -3,7 +3,7 @@ import {Ierc20Instance} from "../../../types/Ierc20"
 import {ControllerInstance} from "../../../types/Controller"
 import {GaugeInstance} from "../../../types/Gauge"
 import {StrategyInstance} from "./lib"
-import {eq, frac, pow} from "../../util"
+import {frac, pow} from "../../util"
 import {Setup, getSnapshot} from "./lib"
 
 export default (
@@ -60,16 +60,20 @@ export default (
       // minimum amount of lp minted
       const minLp = frac(depositAmount.mul(UNDERLYING_TO_CURVE_DECIMALS), 95, 100)
 
-      const gaugeDiff = after.gauge.strategy.sub(before.gauge.strategy)
-      const underlyingDiff = after.strategy.totalAssets.sub(before.strategy.totalAssets)
-
       // underlying transferred from vault to strategy
       assert(
-        eq(after.underlying.vault, before.underlying.vault.sub(depositAmount)),
+        after.underlying.vault.eq(before.underlying.vault.sub(depositAmount)),
         "underlying vault"
       )
-      assert(underlyingDiff.gte(minUnderlying), "min underlying")
-      assert(gaugeDiff.gte(minLp), "min gauge")
+      assert(
+        after.strategy.totalAssets.gte(before.strategy.totalAssets.add(minUnderlying)),
+        "total assets"
+      )
+      assert(
+        after.strategy.totalDebt.eq(before.strategy.totalDebt.add(depositAmount)),
+        "total debt"
+      )
+      assert(after.gauge.strategy.gte(before.gauge.strategy.add(minLp)), "min gauge")
     })
   })
 }
