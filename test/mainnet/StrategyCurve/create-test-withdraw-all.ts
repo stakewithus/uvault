@@ -1,18 +1,18 @@
 import BN from "bn.js"
-import { Ierc20Instance } from "../../../types/Ierc20"
-import { ControllerInstance } from "../../../types/Controller"
-import { GaugeInstance } from "../../../types/Gauge"
-import { StrategyInstance } from "./lib"
-import { eq, sub, frac, pow } from "../../util"
-import { Setup, getSnapshot } from "./lib"
+import {Ierc20Instance} from "../../../types/Ierc20"
+import {ControllerInstance} from "../../../types/Controller"
+import {GaugeInstance} from "../../../types/Gauge"
+import {StrategyInstance} from "./lib"
+import {eq, frac, pow} from "../../util"
+import {Setup, getSnapshot} from "./lib"
 
-export default (name: string, _setup: Setup, params: { DECIMALS: BN }) => {
+export default (name: string, _setup: Setup, params: {DECIMALS: BN}) => {
   contract(name, (accounts) => {
-    const { DECIMALS } = params
+    const {DECIMALS} = params
     const depositAmount = pow(10, DECIMALS).mul(new BN(100))
 
     const refs = _setup(accounts)
-    const { vault, treasury, whale } = refs
+    const {vault, treasury, whale} = refs
 
     let underlying: Ierc20Instance
     let lp: Ierc20Instance
@@ -29,11 +29,11 @@ export default (name: string, _setup: Setup, params: { DECIMALS: BN }) => {
       strategy = refs.strategy
 
       // deposit underlying into vault
-      await underlying.transfer(vault, depositAmount, { from: whale })
+      await underlying.transfer(vault, depositAmount, {from: whale})
 
       // deposit underlying into strategy
-      await underlying.approve(strategy.address, depositAmount, { from: vault })
-      await strategy.deposit(depositAmount, { from: vault })
+      await underlying.approve(strategy.address, depositAmount, {from: vault})
+      await strategy.deposit(depositAmount, {from: vault})
     })
 
     it("should withdraw all", async () => {
@@ -48,14 +48,14 @@ export default (name: string, _setup: Setup, params: { DECIMALS: BN }) => {
       })
 
       const before = await snapshot()
-      await strategy.withdrawAll({ from: vault })
+      await strategy.withdrawAll({from: vault})
       const after = await snapshot()
 
       // minimum amount of underlying that can be withdrawn
       const minUnderlying = frac(before.strategy.totalAssets, 99, 100)
 
       // check balance of underlying transferred to treasury and vault
-      const underlyingDiff = sub(after.underlying.vault, before.underlying.vault)
+      const underlyingDiff = after.underlying.vault.sub(before.underlying.vault)
 
       assert(underlyingDiff.gte(minUnderlying), "underlying diff")
 
