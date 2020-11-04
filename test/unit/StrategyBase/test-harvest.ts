@@ -30,8 +30,6 @@ contract("StrategyBase", (accounts) => {
       await underlying._mint_(vault.address, amount)
       await underlying._approve_(vault.address, strategy.address, amount)
       await strategy.deposit(amount, {from: admin})
-      // simulate profit from strategy
-      await underlying._mint_(strategy.address, amount)
     })
 
     const snapshot = async () => {
@@ -43,64 +41,37 @@ contract("StrategyBase", (accounts) => {
         },
         strategy: {
           totalDebt: await strategy.totalDebt(),
+          totalAssets: await strategy.totalAssets(),
         },
       }
     }
 
-    it("should transfer to vault", async () => {
-      // simulate total underlying > total debt
-      await strategy._setTotalDebt_(0)
-
+    it("should harvest", async () => {
       const before = await snapshot()
       await strategy.harvest({from: admin})
       const after = await snapshot()
 
       assert.equal(await strategy._harvestWasCalled_(), true, "harvest")
 
-      // check underlying balance
+      assert.equal(
+        after.strategy.totalAssets.gte(before.strategy.totalAssets),
+        true,
+        "total assets"
+      )
+      assert.equal(
+        after.strategy.totalDebt.eq(before.strategy.totalDebt),
+        true,
+        "total debt"
+      )
       assert.equal(
         after.underlying.treasury.gt(before.underlying.treasury),
         true,
         "underlying treasury"
       )
-
       assert.equal(
-        after.underlying.vault.gt(before.underlying.vault),
+        after.underlying.strategy.gte(before.underlying.strategy),
         true,
-        "underlying vault"
-      )
-
-      // check total debt
-      assert.equal(
-        after.strategy.totalDebt.eq(before.strategy.totalDebt),
-        true,
-        "total debt"
-      )
-    })
-
-    it("should deposit underlying", async () => {
-      // simulate total underlying < total debt
-      const debt = add(await strategy.totalAssets(), 1)
-      await strategy._setTotalDebt_(debt)
-
-      const before = await snapshot()
-      await strategy.harvest({from: admin})
-      const after = await snapshot()
-
-      assert.equal(await strategy._harvestWasCalled_(), true, "harvest")
-
-      // check underlying balance
-      assert.equal(
-        after.underlying.vault.eq(before.underlying.vault),
-        true,
-        "underlying vault"
-      )
-
-      // check total debt
-      assert.equal(
-        after.strategy.totalDebt.eq(before.strategy.totalDebt),
-        true,
-        "total debt"
+        "underlying strategy"
       )
     })
 
