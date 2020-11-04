@@ -1,7 +1,7 @@
 // SPDX-License-Identifier: UNLICENSED
 pragma solidity 0.6.11;
 
-import "../interfaces/curve/ICurveFi3.sol";
+import "../interfaces/curve/StableSwap3.sol";
 import "../interfaces/pickle/PickleJar.sol";
 import "../interfaces/pickle/MasterChef.sol";
 
@@ -17,7 +17,7 @@ contract StrategyP3Crv is StrategyBase, UseUniswap {
     // Curve //
     // 3Crv
     address internal threeCrv;
-    // ICurveFi3
+    // StableSwap3
     address internal curve;
 
     // Pickle //
@@ -34,7 +34,7 @@ contract StrategyP3Crv is StrategyBase, UseUniswap {
     ) public StrategyBase(_controller, _vault, _underlying) {}
 
     // TODO vulnerable to price manipulation
-    function _totalAssets() internal override view returns (uint) {
+    function _totalAssets() internal view override returns (uint) {
         // multiplied by 10 ** 18
         uint pricePerShare = PickleJar(jar).getRatio();
         (uint shares, ) = MasterChef(chef).userInfo(POOL_ID, address(this));
@@ -51,7 +51,7 @@ contract StrategyP3Crv is StrategyBase, UseUniswap {
             // mint threeCrv
             uint[3] memory amounts;
             amounts[underlyingIndex] = underlyingBal;
-            ICurveFi3(curve).add_liquidity(amounts, 0);
+            StableSwap3(curve).add_liquidity(amounts, 0);
             // Now we have 3Crv
         }
 
@@ -72,7 +72,7 @@ contract StrategyP3Crv is StrategyBase, UseUniswap {
         }
     }
 
-    function _getTotalShares() internal override view returns (uint) {
+    function _getTotalShares() internal view override returns (uint) {
         (uint p3CrvBal, ) = MasterChef(chef).userInfo(POOL_ID, address(this));
         return p3CrvBal;
     }
@@ -87,7 +87,7 @@ contract StrategyP3Crv is StrategyBase, UseUniswap {
         // withdraw underlying
         uint threeBal = IERC20(threeCrv).balanceOf(address(this));
         // creates threeCrv dust
-        ICurveFi3(curve).remove_liquidity_one_coin(
+        StableSwap3(curve).remove_liquidity_one_coin(
             threeBal,
             int128(underlyingIndex),
             0
