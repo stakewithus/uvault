@@ -4,7 +4,7 @@ import {ControllerInstance} from "../../../types/Controller"
 import {StrategyTestInstance} from "../../../types/StrategyTest"
 import {MockVaultInstance} from "../../../types/MockVault"
 
-const ERC20Token = artifacts.require("ERC20Token")
+const TestToken = artifacts.require("TestToken")
 const Controller = artifacts.require("Controller")
 const StrategyTest = artifacts.require("StrategyTest")
 const MockVault = artifacts.require("MockVault")
@@ -37,7 +37,7 @@ export default (accounts: Truffle.Accounts) => {
   }
 
   beforeEach(async () => {
-    refs.underlying = await ERC20Token.new()
+    refs.underlying = await TestToken.new()
     refs.controller = await Controller.new(treasury, {
       from: admin,
     })

@@ -54,6 +54,9 @@ contract("Vault", (accounts) => {
           totalSupply: await vault.totalSupply(),
           totalAssets: await vault.totalAssets(),
         },
+        strategy: {
+          _withdrawAmount_: await strategy._withdrawAmount_(),
+        },
       }
     }
 
@@ -76,7 +79,7 @@ contract("Vault", (accounts) => {
         "token vault"
       )
       assert.equal(
-        after.token.strategy.eq(before.token.strategy),
+        after.strategy._withdrawAmount_.eq(new BN(0)),
         true,
         "token strategy"
       )
@@ -127,9 +130,8 @@ contract("Vault", (accounts) => {
         true,
         "token sender"
       )
-
       assert.equal(
-        after.token.strategy.lte(before.token.strategy.sub(amountToWithdraw)),
+        after.strategy._withdrawAmount_.eq(amountToWithdraw),
         true,
         "token strategy"
       )
@@ -161,15 +163,13 @@ contract("Vault", (accounts) => {
       assert.equal(
         amountToWithdraw.gt(balInStrat),
         true,
-        "withdraw amount <= vault balance"
+        "withdraw amount <= strategy balance"
       )
 
       const before = await snapshot()
       await vault.withdraw(shares, 0, {from: sender})
       const after = await snapshot()
 
-      const strategyDiff = before.token.strategy.sub(after.token.strategy)
-      const vaultDiff = before.token.vault.sub(after.token.vault)
       const fee = after.token.treasury.sub(before.token.treasury)
 
       assert.equal(
@@ -178,12 +178,14 @@ contract("Vault", (accounts) => {
         "token sender"
       )
       assert.equal(
-        strategyDiff.eq(amountToWithdraw.sub(before.token.vault)),
+        after.strategy._withdrawAmount_.eq(amountToWithdraw.sub(before.token.vault)),
         true,
         "token strategy"
       )
       assert.equal(
-        vaultDiff.eq(amountToWithdraw.sub(before.token.strategy)),
+        after.token.vault.eq(
+          before.token.vault.sub(amountToWithdraw.sub(before.vault.balanceInStrategy))
+        ),
         true,
         "token vault"
       )

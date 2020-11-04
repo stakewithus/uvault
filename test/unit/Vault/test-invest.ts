@@ -5,7 +5,7 @@ import {TestTokenInstance} from "../../../types/TestToken"
 import {VaultInstance} from "../../../types/Vault"
 import {MockControllerInstance} from "../../../types/MockController"
 import {StrategyTestInstance} from "../../../types/StrategyTest"
-import {ZERO_ADDRESS, pow} from "../../util"
+import {ZERO_ADDRESS, eq, pow} from "../../util"
 import _setup from "./setup"
 
 contract("Vault", (accounts) => {
@@ -63,9 +63,7 @@ contract("Vault", (accounts) => {
           "token vault"
         )
         assert.equal(
-          after.token.strategy.eq(
-            before.token.strategy.add(before.vault.availableToInvest)
-          ),
+          eq(await strategy._depositAmount_(), before.vault.availableToInvest),
           true,
           "token strategy"
         )

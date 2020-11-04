@@ -5,7 +5,7 @@ import {eq, add} from "../../util"
 import _setup from "./setup"
 import BN from "bn.js"
 
-const ERC20Token = artifacts.require("ERC20Token")
+const TestToken = artifacts.require("TestToken")
 
 contract("StrategyBase", (accounts) => {
   const refs = _setup(accounts)
@@ -18,7 +18,7 @@ contract("StrategyBase", (accounts) => {
   beforeEach(async () => {
     strategy = refs.strategy
     underlying = refs.underlying
-    token = await ERC20Token.new()
+    token = await TestToken.new()
   })
 
   describe("setController", () => {

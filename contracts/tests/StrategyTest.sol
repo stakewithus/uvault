@@ -2,43 +2,58 @@
 pragma solidity 0.6.11;
 
 import "../StrategyBase.sol";
+import "./TestToken.sol";
 
 /* solium-disable */
 contract StrategyTest is StrategyBase {
     // test helper
+    uint public _depositAmount_;
     uint public _withdrawAmount_;
     bool public _harvestWasCalled_;
     bool public _exitWasCalled_;
     // simulate strategy withdrawing less than requested
     uint public _maxWithdrawAmount_ = uint(-1);
+    // mock liquidity provider
+    address public constant _POOL_ = address(1);
 
     constructor(
         address _controller,
         address _vault,
         address _underlying
-    ) public StrategyBase(_controller, _vault, _underlying) {}
-
-    function _totalAssets() internal override view returns (uint) {
-        return IERC20(underlying).balanceOf(address(this));
+    ) public StrategyBase(_controller, _vault, _underlying) {
+        // allow this contract to freely withdraw from POOL
+        TestToken(underlying)._approve_(_POOL_, address(this), uint(-1));
     }
 
-    function _depositUnderlying() internal override {}
+    function _totalAssets() internal override view returns (uint) {
+        return
+            IERC20(underlying).balanceOf(address(this)).add(
+                IERC20(underlying).balanceOf(_POOL_)
+            );
+    }
+
+    function _depositUnderlying() internal override {
+        uint bal = IERC20(underlying).balanceOf(address(this));
+        _depositAmount_ = bal;
+        IERC20(underlying).transfer(_POOL_, bal);
+    }
 
     function _getTotalShares() internal override view returns (uint) {
-        return IERC20(underlying).balanceOf(address(this));
+        return IERC20(underlying).balanceOf(_POOL_);
     }
 
     function _withdrawUnderlying(uint _shares) internal override {
         _withdrawAmount_ = _shares;
 
-        // burn token to simulate withdraw less than requested
         if (_shares > _maxWithdrawAmount_) {
-            IERC20(underlying).transfer(address(1), _shares.sub(_maxWithdrawAmount_));
+            _withdrawAmount_ = _maxWithdrawAmount_;
         }
+        IERC20(underlying).transferFrom(_POOL_, address(this), _withdrawAmount_);
     }
 
     function _harvest() internal override {
         _harvestWasCalled_ = true;
+        TestToken(underlying)._mint_(address(this), 100);
     }
 
     function exit() external override onlyAuthorized {

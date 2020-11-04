@@ -4,7 +4,7 @@ import {TestTokenInstance} from "../../../types/TestToken"
 import {VaultInstance} from "../../../types/Vault"
 import _setup from "./setup"
 
-const ERC20Token = artifacts.require("ERC20Token")
+const TestToken = artifacts.require("TestToken")
 
 contract("Vault", (accounts) => {
   const refs = _setup(accounts)
@@ -17,7 +17,7 @@ contract("Vault", (accounts) => {
   beforeEach(async () => {
     vault = refs.vault
     // create token != vault.token
-    token = await ERC20Token.new()
+    token = await TestToken.new()
     await token._mint_(vault.address, amount)
   })
 
