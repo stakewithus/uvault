@@ -34,6 +34,7 @@ contract("StrategyBase", (accounts) => {
             strategy: await underlying.balanceOf(strategy.address),
           },
           strategy: {
+            totalAssets: await strategy.totalAssets(),
             totalDebt: await strategy.totalDebt(),
           },
         }
@@ -45,7 +46,7 @@ contract("StrategyBase", (accounts) => {
 
       // check underlying balance
       assert.equal(
-        after.underlying.strategy.eq(before.underlying.strategy.sub(amount)),
+        after.underlying.strategy.eq(before.underlying.strategy),
         true,
         "underlying strategy"
       )
@@ -53,6 +54,13 @@ contract("StrategyBase", (accounts) => {
         after.underlying.vault.eq(before.underlying.vault.add(amount)),
         true,
         "underlying vault"
+      )
+
+      // check total assets
+      assert.equal(
+        after.strategy.totalAssets.eq(before.strategy.totalAssets.sub(amount)),
+        true,
+        "total assets"
       )
 
       // check total debt
@@ -76,7 +84,7 @@ contract("StrategyBase", (accounts) => {
     })
 
     it("should reject if amount > total", async () => {
-      const amount = add(await underlying.balanceOf(strategy.address), 1)
+      const amount = add(await strategy.totalAssets(), 1)
 
       await chai
         .expect(strategy.withdraw(amount, {from: admin}))

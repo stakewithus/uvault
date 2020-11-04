@@ -33,6 +33,7 @@ contract("StrategyBase", (accounts) => {
             strategy: await underlying.balanceOf(strategy.address),
           },
           strategy: {
+            totalAssets: await strategy.totalAssets(),
             totalDebt: await strategy.totalDebt(),
           },
         }
@@ -44,7 +45,7 @@ contract("StrategyBase", (accounts) => {
 
       // check underlying balance
       assert.equal(
-        after.underlying.strategy.eq(before.underlying.strategy.add(amount)),
+        after.underlying.strategy.eq(before.underlying.strategy),
         true,
         "underlying strategy"
       )
@@ -54,6 +55,12 @@ contract("StrategyBase", (accounts) => {
         "underlying vault"
       )
 
+      // check total assets
+      assert.equal(
+        after.strategy.totalAssets.eq(before.strategy.totalAssets.add(amount)),
+        true,
+        "total assets"
+      )
       // check total debt
       assert.equal(
         after.strategy.totalDebt.eq(before.strategy.totalDebt.add(amount)),
