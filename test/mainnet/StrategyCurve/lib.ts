@@ -1,6 +1,6 @@
-import {Ierc20Instance} from "../../../types/Ierc20"
-import {GaugeInstance} from "../../../types/Gauge"
-import {ControllerInstance} from "../../../types/Controller"
+import { Ierc20Instance } from "../../../types/Ierc20"
+import { GaugeInstance } from "../../../types/Gauge"
+import { ControllerInstance } from "../../../types/Controller"
 import {
   StrategyCusdDaiContract,
   StrategyCusdDaiInstance,
@@ -42,7 +42,7 @@ export interface Refs {
   vault: string
   treasury: string
   underlying: Ierc20Instance
-  cUnderlying: Ierc20Instance
+  lp: Ierc20Instance
   gauge: GaugeInstance
   crv: Ierc20Instance
   controller: ControllerInstance
@@ -55,13 +55,13 @@ export type Setup = (accounts: Truffle.Accounts) => Refs
 export function getSnapshot(params: {
   strategy: StrategyInstance
   underlying: Ierc20Instance
-  cUnderlying: Ierc20Instance
+  lp: Ierc20Instance
   gauge: GaugeInstance
   crv: Ierc20Instance
   vault: string
   treasury: string
 }) {
-  const {strategy, underlying, cUnderlying, gauge, crv, vault, treasury} = params
+  const { strategy, underlying, lp, gauge, crv, vault, treasury } = params
 
   return async () => {
     const snapshot = {
@@ -73,8 +73,8 @@ export function getSnapshot(params: {
         strategy: await underlying.balanceOf(strategy.address),
         treasury: await underlying.balanceOf(treasury),
       },
-      cUnderlying: {
-        strategy: await cUnderlying.balanceOf(strategy.address),
+      lp: {
+        strategy: await lp.balanceOf(strategy.address),
       },
       gauge: {
         strategy: await gauge.balanceOf(strategy.address),
