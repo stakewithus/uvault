@@ -16,5 +16,5 @@ interface StableSwap2 {
         bool donate_dust
     ) external;
 
-    function balances(uint index) external view returns (uint);
+    function balances(int128 index) external view returns (uint);
 }

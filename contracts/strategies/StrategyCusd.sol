@@ -45,12 +45,12 @@ contract StrategyCusd is StrategyCurve {
         balances[1] = StableSwap2(SWAP).balances(1).mul(1e12); // USDC
 
         // DAI
-        if (balances[0] < balances[1] && balances[0] < balances[2]) {
+        if (balances[0] < balances[1]) {
             return (DAI, 0);
         }
 
         // USDC
-        if (balances[1] < balances[0] && balances[1] < balances[2]) {
+        if (balances[1] < balances[0]) {
             return (USDC, 1);
         }
 
