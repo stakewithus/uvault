@@ -32,47 +32,10 @@ contract("StrategyBase", (accounts) => {
       await strategy.deposit(amount, {from: admin})
     })
 
-    const snapshot = async () => {
-      return {
-        underlying: {
-          vault: await underlying.balanceOf(vault.address),
-          strategy: await underlying.balanceOf(strategy.address),
-          treasury: await underlying.balanceOf(treasury),
-        },
-        strategy: {
-          totalDebt: await strategy.totalDebt(),
-          totalAssets: await strategy.totalAssets(),
-        },
-      }
-    }
-
     it("should harvest", async () => {
-      const before = await snapshot()
       await strategy.harvest({from: admin})
-      const after = await snapshot()
 
       assert.equal(await strategy._harvestWasCalled_(), true, "harvest")
-
-      assert.equal(
-        after.strategy.totalAssets.gte(before.strategy.totalAssets),
-        true,
-        "total assets"
-      )
-      assert.equal(
-        after.strategy.totalDebt.eq(before.strategy.totalDebt),
-        true,
-        "total debt"
-      )
-      assert.equal(
-        after.underlying.treasury.gt(before.underlying.treasury),
-        true,
-        "underlying treasury"
-      )
-      assert.equal(
-        after.underlying.strategy.gte(before.underlying.strategy),
-        true,
-        "underlying strategy"
-      )
     })
 
     it("should reject if caller not authorized", async () => {
