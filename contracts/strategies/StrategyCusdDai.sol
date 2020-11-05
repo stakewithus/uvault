@@ -4,8 +4,6 @@ pragma solidity 0.6.11;
 import "./StrategyCusd.sol";
 
 contract StrategyCusdDai is StrategyCusd {
-    address private constant DAI = 0x6B175474E89094C44Da98b954EedeAC495271d0F;
-
     constructor(address _controller, address _vault)
         public
         StrategyCusd(_controller, _vault, DAI)

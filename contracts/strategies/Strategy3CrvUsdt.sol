@@ -4,8 +4,6 @@ pragma solidity 0.6.11;
 import "./Strategy3Crv.sol";
 
 contract Strategy3CrvUsdt is Strategy3Crv {
-    address private constant USDT = 0xdAC17F958D2ee523a2206206994597C13D831ec7;
-
     constructor(address _controller, address _vault)
         public
         Strategy3Crv(_controller, _vault, USDT)

@@ -44,19 +44,19 @@ abstract contract StrategyCurve is StrategyBase, UseUniswap {
         return lpBal.mul(pricePerShare).div(1e18).div(precisionDiv);
     }
 
-    function _addLiquidity(uint _underlyingAmount) internal virtual;
+    function _addLiquidity(uint _amount, uint _index) internal virtual;
 
     /*
-    @notice Deposits underlying to Gauge
+    @notice deposit token into curve
     */
-    function _depositUnderlying() internal override {
-        // underlying to lp
-        uint underlyingBal = IERC20(underlying).balanceOf(address(this));
-        if (underlyingBal > 0) {
-            IERC20(underlying).safeApprove(pool, 0);
-            IERC20(underlying).safeApprove(pool, underlyingBal);
+    function _deposit(address _token, uint _index) private {
+        // coin to lp
+        uint bal = IERC20(_token).balanceOf(address(this));
+        if (bal > 0) {
+            IERC20(_token).safeApprove(pool, 0);
+            IERC20(_token).safeApprove(pool, bal);
             // mint lp
-            _addLiquidity(underlyingBal);
+            _addLiquidity(bal, _index);
         }
 
         // stake into Gauge
@@ -66,6 +66,13 @@ abstract contract StrategyCurve is StrategyBase, UseUniswap {
             IERC20(lp).safeApprove(gauge, lpBal);
             Gauge(gauge).deposit(lpBal);
         }
+    }
+
+    /*
+    @notice Deposits underlying to Gauge
+    */
+    function _depositUnderlying() internal override {
+        _deposit(underlying, underlyingIndex);
     }
 
     function _removeLiquidityOneCoin(uint _lpAmount) internal virtual;
@@ -85,35 +92,38 @@ abstract contract StrategyCurve is StrategyBase, UseUniswap {
         // Now we have underlying
     }
 
-    function _crvToUnderlying() internal {
+    function _getMostPremiumToken() internal view virtual returns (address, uint);
+
+    function _crvToToken(address _token) private {
         Minter(minter).mint(gauge);
 
         uint crvBal = IERC20(crv).balanceOf(address(this));
         if (crvBal > 0) {
-            _swap(crv, underlying, crvBal);
-            // Now this contract has underlying token
+            _swap(crv, _token, crvBal);
+            // Now this contract has token
         }
     }
 
     /*
-    @notice Claim CRV and swap for underlying token
+    @notice Claim CRV and deposit most premium stable coin into Curve
     */
     function harvest() external override onlyAuthorized {
-        _crvToUnderlying();
+        (address token, uint index) = _getMostPremiumToken();
 
-        uint underlyingBal = IERC20(underlying).balanceOf(address(this));
-        if (underlyingBal > 0) {
+        _crvToToken(token);
+
+        uint bal = IERC20(token).balanceOf(address(this));
+        if (bal > 0) {
             // transfer fee to treasury
-            uint fee = underlyingBal.mul(performanceFee).div(PERFORMANCE_FEE_MAX);
+            uint fee = bal.mul(performanceFee).div(PERFORMANCE_FEE_MAX);
             if (fee > 0) {
                 address treasury = IController(controller).treasury();
                 require(treasury != address(0), "treasury = zero address");
 
-                IERC20(underlying).safeTransfer(treasury, fee);
+                IERC20(token).safeTransfer(treasury, fee);
             }
 
-            // deposit remaining underlying
-            _depositUnderlying();
+            _deposit(token, index);
         }
     }
 
@@ -124,7 +134,7 @@ abstract contract StrategyCurve is StrategyBase, UseUniswap {
     @dev Caller should implement guard agains slippage
     */
     function exit() external override onlyAuthorized {
-        _crvToUnderlying();
+        _crvToToken(underlying);
         _withdrawAll();
     }
 }

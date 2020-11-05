@@ -14,4 +14,6 @@ interface StableSwap3 {
         int128 i,
         uint min_uamount
     ) external;
+
+    function balances(uint index) external view returns (uint);
 }
