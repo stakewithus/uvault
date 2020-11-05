@@ -43,6 +43,9 @@ contract StrategyCusd is StrategyCurve {
     }
 
     function _removeLiquidityOneCoin(uint _lpAmount) internal override {
+        IERC20(lp).safeApprove(pool, 0);
+        IERC20(lp).safeApprove(pool, _lpAmount);
+
         Deposit2(pool).remove_liquidity_one_coin(
             _lpAmount,
             int128(underlyingIndex),
