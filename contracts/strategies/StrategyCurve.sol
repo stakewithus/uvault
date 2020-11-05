@@ -92,9 +92,12 @@ abstract contract StrategyCurve is StrategyBase, UseUniswap {
         // Now we have underlying
     }
 
+    /*
+    @notice Returns address and index of token with lowest balance in Curve pool
+    */
     function _getMostPremiumToken() internal view virtual returns (address, uint);
 
-    function _crvToToken(address _token) private {
+    function _swapCrvFor(address _token) private {
         Minter(minter).mint(gauge);
 
         uint crvBal = IERC20(crv).balanceOf(address(this));
@@ -110,7 +113,7 @@ abstract contract StrategyCurve is StrategyBase, UseUniswap {
     function harvest() external override onlyAuthorized {
         (address token, uint index) = _getMostPremiumToken();
 
-        _crvToToken(token);
+        _swapCrvFor(token);
 
         uint bal = IERC20(token).balanceOf(address(this));
         if (bal > 0) {
@@ -134,7 +137,7 @@ abstract contract StrategyCurve is StrategyBase, UseUniswap {
     @dev Caller should implement guard agains slippage
     */
     function exit() external override onlyAuthorized {
-        _crvToToken(underlying);
+        _swapCrvFor(underlying);
         _withdrawAll();
     }
 }
