@@ -121,6 +121,29 @@ abstract contract StrategyBase is IStrategy {
     */
     function _getTotalShares() internal view virtual returns (uint);
 
+    function _getShares(uint _underlyingAmount, uint _totalUnderlying)
+        internal
+        view
+        returns (uint)
+    {
+        /*
+        calculate shares to withdraw
+
+        w = amount of underlying to withdraw
+        U = total redeemable underlying
+        s = shares to withdraw
+        P = total shares deposited into external liquidity pool
+
+        w / U = s / P
+        s = w / U * P
+        */
+        if (_totalUnderlying > 0) {
+            uint totalShares = _getTotalShares();
+            return _underlyingAmount.mul(totalShares).div(_totalUnderlying);
+        }
+        return 0;
+    }
+
     function _withdrawUnderlying(uint _shares) internal virtual;
 
     /*
@@ -133,19 +156,7 @@ abstract contract StrategyBase is IStrategy {
         uint totalUnderlying = _totalAssets();
         require(_underlyingAmount <= totalUnderlying, "underlying > total");
 
-        /*
-        calculate shares to withdraw
-
-        w = amount of underlying to withdraw
-        U = total redeemable underlying
-        s = shares to withdraw
-        P = total shares deposited into external liquidity pool
-
-        w / U = s / P
-        s = w / U * P
-        */
-        uint totalShares = _getTotalShares();
-        uint shares = _underlyingAmount.mul(totalShares).div(totalUnderlying);
+        uint shares = _getShares(_underlyingAmount, totalUnderlying);
         if (shares > 0) {
             _withdrawUnderlying(shares);
         }
@@ -183,6 +194,26 @@ abstract contract StrategyBase is IStrategy {
             depending on total debt
     */
     function harvest() external virtual override;
+
+    /*
+    @notice Transfer profit over total debt to vault
+    */
+    function skim() external override onlyAuthorized {
+        uint totalUnderlying = _totalAssets();
+
+        if (totalUnderlying > totalDebt) {
+            uint profit = totalUnderlying.sub(totalDebt);
+            uint shares = _getShares(profit, totalUnderlying);
+            if (shares > 0) {
+                uint balBefore = IERC20(underlying).balanceOf(address(this));
+                _withdrawUnderlying(shares);
+                uint balAfter = IERC20(underlying).balanceOf(address(this));
+
+                uint diff = balAfter.sub(balBefore);
+                IERC20(underlying).safeTransfer(vault, diff);
+            }
+        }
+    }
 
     function exit() external virtual override;
 

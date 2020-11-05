@@ -26,10 +26,7 @@ contract StrategyTest is StrategyBase {
     }
 
     function _totalAssets() internal view override returns (uint) {
-        return
-            IERC20(underlying).balanceOf(address(this)).add(
-                IERC20(underlying).balanceOf(_POOL_)
-            );
+        return IERC20(underlying).balanceOf(_POOL_);
     }
 
     function _depositUnderlying() internal override {
@@ -71,6 +68,10 @@ contract StrategyTest is StrategyBase {
 
     function _setAsset_(address _token) external {
         assets[_token] = true;
+    }
+
+    function _mintToPool_(uint _amount) external {
+        TestToken(underlying)._mint_(_POOL_, _amount);
     }
 
     function _setTotalDebt_(uint _debt) external {

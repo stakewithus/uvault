@@ -60,9 +60,13 @@ interface IStrategy {
     /*
     @notice Exit from strategy
     @dev Must transfer all underlying tokens back to vault
-    @dev Should transfer dust out of this contract
     */
     function exit() external;
+
+    /*
+    @notice Transfer profit over total debt to vault
+    */
+    function skim() external;
 
     /*
     @notice Transfer token in strategy to admin
