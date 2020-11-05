@@ -48,7 +48,7 @@ export default (name: string, _setup: Setup, params: {DECIMALS: BN}) => {
       })
 
       const before = await snapshot()
-      await controller.harvest(strategy.address, {from: admin})
+      await strategy.harvest({from: admin})
       const after = await snapshot()
 
       assert(

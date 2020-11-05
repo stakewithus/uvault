@@ -57,6 +57,7 @@ export function getSnapshot(params: {
     const snapshot = {
       strategy: {
         totalAssets: await strategy.totalAssets(),
+        totalDebt: await strategy.totalDebt(),
       },
       underlying: {
         vault: await underlying.balanceOf(vault),

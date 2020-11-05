@@ -36,9 +36,13 @@ export default (name: string, _setup: Setup, params: {DECIMALS: BN}) => {
       // deposit underlying into strategy
       await underlying.approve(strategy.address, depositAmount, {from: vault})
       await strategy.deposit(depositAmount, {from: vault})
+      // withdraw to claim Pickles
+      await strategy.withdrawAll({from: vault})
+      // harvest to create some profit
+      await strategy.harvest({from: admin})
     })
 
-    it("should harvest", async () => {
+    it("should skim", async () => {
       const snapshot = getSnapshot({
         underlying,
         jar,
@@ -51,22 +55,15 @@ export default (name: string, _setup: Setup, params: {DECIMALS: BN}) => {
       })
 
       const before = await snapshot()
-      // withdraw to claim Pickles
-      await strategy.withdrawAll({from: vault})
-      await strategy.harvest({from: admin})
+      await strategy.skim()
       const after = await snapshot()
 
-      // Check fee transfer
+      assert(after.underlying.vault.gte(before.underlying.vault), "underlying vault")
       assert(
-        after.underlying.treasury.gte(before.underlying.treasury),
-        "underlying treasury"
+        after.strategy.totalAssets.lte(before.strategy.totalAssets),
+        "total assets"
       )
-      // Check vault balance after withdraw
-      assert(after.underlying.vault.gt(before.underlying.vault), "underlying vault")
-      // Check strategy total assets > 0 from withdrawing and then selling Pickle
-      assert(after.strategy.totalAssets.gte(new BN(0)), "underlying strategy")
-      // Check Pickle was liquidated
-      assert(eq(after.pickle.strategy, new BN(0)), "pickle strategy")
+      assert(after.strategy.totalDebt.lte(before.strategy.totalDebt), "total debt")
     })
   })
 }
