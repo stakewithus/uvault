@@ -4,10 +4,10 @@ import {deploy} from "../lib"
 
 async function main() {
   await deploy("StrategyTest", async (_account, _network) => {
-    const {erc20, controller, vault} = config.ropsten
+    const {testToken, controller, vault} = config.ropsten
 
     const Strategy = await ethers.getContractFactory("StrategyTest")
-    return Strategy.deploy(controller, vault, erc20)
+    return Strategy.deploy(controller, vault, testToken)
   })
 }
 

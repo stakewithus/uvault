@@ -4,9 +4,10 @@ export interface Config {
     gasRelayer: string
     treasury: string
     controller: string
+    timeLock: string
     vault: string
     strategyTest: string
-    erc20: string
+    testToken: string
   }
   mainnet: {
     gasToken: string
@@ -44,14 +45,15 @@ const config: Config = {
     gasToken: "0x063f83affbcf64d7d84d306f5b85ed65c865dca4",
     gasRelayer: "0xD01D18440A150581A36581adD5b2bcb2DCc63333",
     treasury: "0x9a4c3Fc4683b95EBF11B535057B00812f6a549Bb",
-    controller: "0xd8a66AC84E1fAb8e0383DED05662132430c4a4D8",
+    controller: "0xE71e05B175b7D4B79Af587521f5F353DAaBd2A8a",
+    timeLock: "0xF75715Df8c6f2283cb23D85A3206ac9638C422a5",
     // vaults //
-    vault: "0x59f49CF5e35417e3a5d14B261253500a2f108154",
+    vault: "0x8fAFc60718a57e6200947130146F0B8cC645d360",
     // strategies //
-    strategyTest: "0x074A8b5c382a1327Dd3D12bfF30D0Cd5E57969B1",
+    strategyTest: "0x7a0cdf8a8c1d7873E49BB45D735a533b3cD78E27",
     // others //
     // used for testinng
-    erc20: "0x8D760CAbe956332e6021990FCCE40CBDDd5d7890",
+    testToken: "0x7F56619E1fAaF6c06B96225e6c8c737F0BBc91c5",
   },
   mainnet: {
     // CHI gas token
@@ -70,9 +72,9 @@ const config: Config = {
     usdcDegenVault: "0xEa3818341aA636A1d86D9e35eaF7413e44eCfe5F",
     usdtDegenVault: "0xB96C7E99d5E08b5B033484F68e12fD121647fe2a",
     // strategies //
-    strategyCusdDai: "",
+    strategyCusdDai: "0xfF1b8E9b4B77A2F77aeBA30e177DE51D9DdD3B95",
     strategyCusdUsdc: "",
-    strategy3CrvDai: "",
+    strategy3CrvDai: "0x2B193D22570FA134115E8Cf0a6709e9cf4De7E44",
     strategy3CrvUsdc: "",
     strategy3CrvUsdt: "",
     strategyP3CrvDai: "",
