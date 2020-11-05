@@ -3,7 +3,7 @@ import {Ierc20Instance} from "../../../types/Ierc20"
 import {ControllerInstance} from "../../../types/Controller"
 import {MasterChefInstance} from "../../../types/MasterChef"
 import {StrategyInstance} from "./lib"
-import {eq, sub, frac, pow} from "../../util"
+import {eq, frac, pow} from "../../util"
 import {Setup, getSnapshot} from "./lib"
 
 export default (name: string, _setup: Setup, params: {DECIMALS: BN}) => {
@@ -66,8 +66,14 @@ export default (name: string, _setup: Setup, params: {DECIMALS: BN}) => {
       const minUnderlying = frac(depositAmount, 99, 100)
 
       // check balance of underlying transferred to vault
-      const underlyingDiff = sub(after.underlying.vault, before.underlying.vault)
-      assert(underlyingDiff.gte(minUnderlying), "underlying diff")
+      assert(
+        after.underlying.vault.gte(before.underlying.vault.add(minUnderlying)),
+        "underlying vault"
+      )
+      assert(
+        after.strategy.totalDebt.lte(before.strategy.totalDebt.sub(minUnderlying)),
+        "total debt"
+      )
       // check strategy does not have any underlying
       assert(eq(after.underlying.strategy, new BN(0)), "underlying strategy")
       // check strategy dust is small

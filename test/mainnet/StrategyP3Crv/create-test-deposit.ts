@@ -3,7 +3,7 @@ import {Ierc20Instance} from "../../../types/Ierc20"
 import {ControllerInstance} from "../../../types/Controller"
 import {MasterChefInstance} from "../../../types/MasterChef"
 import {StrategyInstance} from "./lib"
-import {eq, sub, frac, pow} from "../../util"
+import {frac, pow} from "../../util"
 import {Setup, getSnapshot} from "./lib"
 
 export default (name: string, _setup: Setup, params: {DECIMALS: BN}) => {
@@ -57,17 +57,19 @@ export default (name: string, _setup: Setup, params: {DECIMALS: BN}) => {
       // minimum amount of underlying that can be withdrawn
       const minUnderlying = frac(depositAmount, 99, 100)
 
-      const underlyingDiff = sub(
-        after.strategy.totalAssets,
-        before.strategy.totalAssets
-      )
-
       // underlying transferred from vault to strategy
       assert(
-        eq(after.underlying.vault, sub(before.underlying.vault, depositAmount)),
+        after.underlying.vault.eq(before.underlying.vault.sub(depositAmount)),
         "underlying vault"
       )
-      assert(underlyingDiff.gte(minUnderlying), "min underlying")
+      assert(
+        after.strategy.totalAssets.gte(before.strategy.totalAssets.add(minUnderlying)),
+        "total assets"
+      )
+      assert(
+        after.strategy.totalDebt.eq(before.strategy.totalDebt.add(depositAmount)),
+        "total debt"
+      )
       // check 3Crv was deposited into Pickle jar
       assert(after.threeCrv.jar.gt(before.threeCrv.jar), "3Crv jar")
       // check p3Crv was staked into MasterChef

@@ -64,7 +64,7 @@ export default (name: string, _setup: Setup, params: {DECIMALS: BN}) => {
       // Check vault balance after withdraw
       assert(after.underlying.vault.gt(before.underlying.vault), "underlying vault")
       // Check strategy total assets > 0 from withdrawing and then selling Pickle
-      assert(after.strategy.totalAssets.gte(new BN(0)), "underlying strategy")
+      assert(after.strategy.totalAssets.gte(new BN(0)), "strategy total assets")
       // Check Pickle was liquidated
       assert(eq(after.pickle.strategy, new BN(0)), "pickle strategy")
     })

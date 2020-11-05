@@ -54,7 +54,7 @@ export default (name: string, _setup: Setup, params: {DECIMALS: BN}) => {
       // minimum amount of underlying that must be withdrawn
       const minUnderlying = frac(before.strategy.totalAssets, 99, 100)
 
-      // check balance of underlying transferred to treasury and vault
+      // check balance of underlying transferred to vault
       assert(
         after.underlying.vault.gte(before.underlying.vault.add(minUnderlying)),
         "underlying vault"

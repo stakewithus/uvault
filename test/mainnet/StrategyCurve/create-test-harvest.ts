@@ -57,7 +57,7 @@ export default (name: string, _setup: Setup, params: {DECIMALS: BN}) => {
       )
       assert(
         after.strategy.totalAssets.gte(before.strategy.totalAssets),
-        "strategy underlying balance"
+        "strategy total assets"
       )
       assert(after.gauge.strategy.gte(before.gauge.strategy), "gauge strategy")
       assert(after.crv.strategy.gte(before.crv.strategy), "crv strategy")

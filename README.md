@@ -42,7 +42,7 @@ ganache-cli \
 # test specific file
 truffle test --network mainnet_fork test/mainnet/path/to/test.ts
 # test all (need to restart truffle after each test)
-find test/mainnet -name "test-*.ts" -exec truffle test --network mainnet_fork {} \;
+find test/mainnet/Strategy3CrvDai -name "test-*.ts" -exec truffle test --network mainnet_fork {} \;
 ```
 
 ### Lint
