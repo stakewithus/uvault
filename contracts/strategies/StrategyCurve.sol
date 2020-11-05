@@ -50,7 +50,7 @@ abstract contract StrategyCurve is StrategyBase, UseUniswap {
     @notice deposit token into curve
     */
     function _deposit(address _token, uint _index) private {
-        // coin to lp
+        // token to lp
         uint bal = IERC20(_token).balanceOf(address(this));
         if (bal > 0) {
             IERC20(_token).safeApprove(pool, 0);
@@ -108,7 +108,7 @@ abstract contract StrategyCurve is StrategyBase, UseUniswap {
     }
 
     /*
-    @notice Claim CRV and deposit most premium stable coin into Curve
+    @notice Claim CRV and deposit most premium token into Curve
     */
     function harvest() external override onlyAuthorized {
         (address token, uint index) = _getMostPremiumToken();

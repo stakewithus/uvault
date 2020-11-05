@@ -9,6 +9,10 @@ import "../StrategyBase.sol";
 import "../UseUniswap.sol";
 
 contract StrategyP3Crv is StrategyBase, UseUniswap {
+    address internal constant DAI = 0x6B175474E89094C44Da98b954EedeAC495271d0F;
+    address internal constant USDC = 0xA0b86991c6218b36c1d19D4a2e9Eb0cE3606eB48;
+    address internal constant USDT = 0xdAC17F958D2ee523a2206206994597C13D831ec7;
+
     // DAI = 0 | USDC = 1 | USDT = 2
     uint internal underlyingIndex;
     // precision to convert 10 ** 18  to underlying decimals
@@ -42,15 +46,15 @@ contract StrategyP3Crv is StrategyBase, UseUniswap {
         return shares.mul(pricePerShare).div(1e18).div(precisionDiv);
     }
 
-    function _depositUnderlying() internal override {
-        // underlying to threeCrv
-        uint underlyingBal = IERC20(underlying).balanceOf(address(this));
-        if (underlyingBal > 0) {
-            IERC20(underlying).safeApprove(curve, 0);
-            IERC20(underlying).safeApprove(curve, underlyingBal);
+    function _deposit(address _token, uint _index) private {
+        // token to threeCrv
+        uint bal = IERC20(_token).balanceOf(address(this));
+        if (bal > 0) {
+            IERC20(_token).safeApprove(curve, 0);
+            IERC20(_token).safeApprove(curve, bal);
             // mint threeCrv
             uint[3] memory amounts;
-            amounts[underlyingIndex] = underlyingBal;
+            amounts[_index] = bal;
             StableSwap3(curve).add_liquidity(amounts, 0);
             // Now we have 3Crv
         }
@@ -70,6 +74,10 @@ contract StrategyP3Crv is StrategyBase, UseUniswap {
             IERC20(jar).safeApprove(chef, p3crvBal);
             MasterChef(chef).deposit(POOL_ID, p3crvBal);
         }
+    }
+
+    function _depositUnderlying() internal override {
+        _deposit(underlying, underlyingIndex);
     }
 
     function _getTotalShares() internal view override returns (uint) {
@@ -95,30 +103,61 @@ contract StrategyP3Crv is StrategyBase, UseUniswap {
         // Now we have underlying
     }
 
-    function _pickleToUnderlying() internal {
+    /*
+    @notice Returns address and index of token with lowest balance in Curve pool
+    */
+    function _getMostPremiumToken() internal view returns (address, uint) {
+        uint[] memory balances = new uint[](3);
+        balances[0] = StableSwap3(curve).balances(0); // DAI
+        balances[1] = StableSwap3(curve).balances(1).mul(1e12); // USDC
+        balances[2] = StableSwap3(curve).balances(2).mul(1e12); // USDT
+
+        // DAI
+        if (balances[0] < balances[1] && balances[0] < balances[2]) {
+            return (DAI, 0);
+        }
+
+        // USDC
+        if (balances[1] < balances[0] && balances[1] < balances[2]) {
+            return (USDC, 1);
+        }
+
+        // USDT
+        if (balances[2] < balances[0] && balances[2] < balances[1]) {
+            return (USDT, 2);
+        }
+
+        return (DAI, 0);
+    }
+
+    function _swapPickleFor(address _token) internal {
         uint pickleBal = IERC20(pickle).balanceOf(address(this));
         if (pickleBal > 0) {
-            _swap(pickle, underlying, pickleBal);
+            _swap(pickle, _token, pickleBal);
             // Now this contract has underlying token
         }
     }
 
+    /*
+    @notice Sell Pickle and deposit most premium token into Curve
+    */
     function harvest() external override onlyAuthorized {
-        _pickleToUnderlying();
+        (address token, uint index) = _getMostPremiumToken();
 
-        uint underlyingBal = IERC20(underlying).balanceOf(address(this));
-        if (underlyingBal > 0) {
+        _swapPickleFor(token);
+
+        uint bal = IERC20(token).balanceOf(address(this));
+        if (bal > 0) {
             // transfer fee to treasury
-            uint fee = underlyingBal.mul(performanceFee).div(PERFORMANCE_FEE_MAX);
+            uint fee = bal.mul(performanceFee).div(PERFORMANCE_FEE_MAX);
             if (fee > 0) {
                 address treasury = IController(controller).treasury();
                 require(treasury != address(0), "treasury = zero address");
 
-                IERC20(underlying).safeTransfer(treasury, fee);
+                IERC20(token).safeTransfer(treasury, fee);
             }
 
-            // deposit remaining underlying
-            _depositUnderlying();
+            _deposit(token, index);
         }
     }
 
@@ -131,7 +170,7 @@ contract StrategyP3Crv is StrategyBase, UseUniswap {
         // 2. Sell Pickle
         // 3. Transfer underlying to vault
         _withdrawAll();
-        _pickleToUnderlying();
+        _swapPickleFor(underlying);
 
         uint underlyingBal = IERC20(underlying).balanceOf(address(this));
         if (underlyingBal > 0) {

@@ -4,8 +4,6 @@ pragma solidity 0.6.11;
 import "./StrategyP3Crv.sol";
 
 contract StrategyP3CrvDai is StrategyP3Crv {
-    address private constant DAI = 0x6B175474E89094C44Da98b954EedeAC495271d0F;
-
     constructor(address _controller, address _vault)
         public
         StrategyP3Crv(_controller, _vault, DAI)
