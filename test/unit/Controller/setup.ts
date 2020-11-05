@@ -59,7 +59,7 @@ export default (accounts: Truffle.Accounts) => {
     )
 
     // fund strategy
-    await refs.underlying._mint_(refs.strategy.address, 1000)
+    await refs.strategy._mintToPool_(1000)
   })
 
   return refs

@@ -21,12 +21,14 @@ contract("Controller", (accounts) => {
 
   describe("withdraw", () => {
     it("should withdraw", async () => {
+      const before = await strategy.totalAssets()
       await controller.withdraw(strategy.address, amount, min, {
         from: admin,
       })
+      const after = await strategy.totalAssets()
 
       // check that strategy withdraw was called
-      assert(eq(await strategy.totalAssets(), new BN(0)), "withdraw")
+      assert(after.eq(before.sub(amount)), "withdraw")
     })
 
     it("should reject if withdraw < min", async () => {
