@@ -20,14 +20,15 @@ contract StrategyP3Crv is StrategyBase, UseUniswap {
 
     // Curve //
     // 3Crv
-    address internal threeCrv;
+    address internal constant threeCrv = 0x6c3F90f043a72FA612cbac8115EE7e52BDe6E490;
     // StableSwap3
-    address internal curve;
+    address internal constant curve = 0xbEbc44782C7dB0a1A60Cb6fe97d0b483032FF1C7;
 
     // Pickle //
-    address internal jar;
-    address internal chef;
-    address internal pickle;
+    address internal constant jar = 0x1BB74b5DdC1f4fC91D6f9E7906cf68bc93538e33;
+    address internal constant chef = 0xbD17B1ce622d73bD438b9E658acA5996dc394b0d;
+    address internal constant pickle = 0x429881672B9AE42b8EbA0E26cD9C73711b891Ca5;
+
     // POOL ID for 3Crv jar
     uint private constant POOL_ID = 14;
 
@@ -35,7 +36,10 @@ contract StrategyP3Crv is StrategyBase, UseUniswap {
         address _controller,
         address _vault,
         address _underlying
-    ) public StrategyBase(_controller, _vault, _underlying) {}
+    ) public StrategyBase(_controller, _vault, _underlying) {
+        // Assets that cannot be swept by admin
+        assets[pickle] = true;
+    }
 
     // TODO vulnerable to price manipulation
     function _totalAssets() internal view override returns (uint) {

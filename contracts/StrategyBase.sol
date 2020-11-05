@@ -210,7 +210,9 @@ abstract contract StrategyBase is IStrategy {
                 uint balAfter = IERC20(underlying).balanceOf(address(this));
 
                 uint diff = balAfter.sub(balBefore);
-                IERC20(underlying).safeTransfer(vault, diff);
+                if (diff > 0) {
+                    IERC20(underlying).safeTransfer(vault, diff);
+                }
             }
         }
     }

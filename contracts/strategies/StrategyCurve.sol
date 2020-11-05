@@ -84,7 +84,6 @@ abstract contract StrategyCurve is StrategyBase, UseUniswap {
     function _withdrawUnderlying(uint _lpAmount) internal override {
         // withdraw lp from  Gauge
         Gauge(gauge).withdraw(_lpAmount);
-
         // withdraw underlying
         uint lpBal = IERC20(lp).balanceOf(address(this));
         // creates lp dust
