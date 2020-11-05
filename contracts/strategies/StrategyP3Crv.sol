@@ -95,11 +95,30 @@ contract StrategyP3Crv is StrategyBase, UseUniswap {
         // Now we have underlying
     }
 
-    function _harvest() internal override {
+    function _pickleToUnderlying() internal {
         uint pickleBal = IERC20(pickle).balanceOf(address(this));
         if (pickleBal > 0) {
             _swap(pickle, underlying, pickleBal);
             // Now this contract has underlying token
+        }
+    }
+
+    function harvest() external override onlyAuthorized {
+        _pickleToUnderlying();
+
+        uint underlyingBal = IERC20(underlying).balanceOf(address(this));
+        if (underlyingBal > 0) {
+            // transfer fee to treasury
+            uint fee = underlyingBal.mul(performanceFee).div(PERFORMANCE_FEE_MAX);
+            if (fee > 0) {
+                address treasury = IController(controller).treasury();
+                require(treasury != address(0), "treasury = zero address");
+
+                IERC20(underlying).safeTransfer(treasury, fee);
+            }
+
+            // deposit remaining underlying
+            _depositUnderlying();
         }
     }
 
@@ -112,7 +131,7 @@ contract StrategyP3Crv is StrategyBase, UseUniswap {
         // 2. Sell Pickle
         // 3. Transfer underlying to vault
         _withdrawAll();
-        _harvest();
+        _pickleToUnderlying();
 
         uint underlyingBal = IERC20(underlying).balanceOf(address(this));
         if (underlyingBal > 0) {

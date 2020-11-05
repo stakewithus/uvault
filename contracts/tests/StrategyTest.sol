@@ -51,9 +51,8 @@ contract StrategyTest is StrategyBase {
         IERC20(underlying).transferFrom(_POOL_, address(this), _withdrawAmount_);
     }
 
-    function _harvest() internal override {
+    function harvest() external override onlyAuthorized {
         _harvestWasCalled_ = true;
-        TestToken(underlying)._mint_(address(this), 100);
     }
 
     function exit() external override onlyAuthorized {

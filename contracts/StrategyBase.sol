@@ -22,7 +22,7 @@ abstract contract StrategyBase is IStrategy {
 
     // performance fee sent to treasury when harvest() generates profit
     uint public override performanceFee = 100;
-    uint private constant PERFORMANCE_FEE_MAX = 10000;
+    uint internal constant PERFORMANCE_FEE_MAX = 10000;
 
     // valuable tokens that cannot be swept
     mapping(address => bool) public override assets;
@@ -179,32 +179,10 @@ abstract contract StrategyBase is IStrategy {
     }
 
     /*
-    @notice Sell any staking rewards for underlying
-    */
-    function _harvest() internal virtual;
-
-    /*
     @notice Sell any staking rewards for underlying, deposit or transfer undelying
             depending on total debt
     */
-    function harvest() external override onlyAuthorized {
-        _harvest();
-
-        uint underlyingBal = IERC20(underlying).balanceOf(address(this));
-        if (underlyingBal > 0) {
-            // transfer fee to treasury
-            uint fee = underlyingBal.mul(performanceFee).div(PERFORMANCE_FEE_MAX);
-            if (fee > 0) {
-                address treasury = IController(controller).treasury();
-                require(treasury != address(0), "treasury = zero address");
-
-                IERC20(underlying).safeTransfer(treasury, fee);
-            }
-
-            // deposit remaining underlying
-            _depositUnderlying();
-        }
-    }
+    function harvest() external virtual override;
 
     function exit() external virtual override;
 

@@ -85,10 +85,7 @@ abstract contract StrategyCurve is StrategyBase, UseUniswap {
         // Now we have underlying
     }
 
-    /*
-    @notice Claim CRV and swap for underlying token
-    */
-    function _harvest() internal override {
+    function _crvToUnderlying() internal {
         Minter(minter).mint(gauge);
 
         uint crvBal = IERC20(crv).balanceOf(address(this));
@@ -99,13 +96,35 @@ abstract contract StrategyCurve is StrategyBase, UseUniswap {
     }
 
     /*
+    @notice Claim CRV and swap for underlying token
+    */
+    function harvest() external override onlyAuthorized {
+        _crvToUnderlying();
+
+        uint underlyingBal = IERC20(underlying).balanceOf(address(this));
+        if (underlyingBal > 0) {
+            // transfer fee to treasury
+            uint fee = underlyingBal.mul(performanceFee).div(PERFORMANCE_FEE_MAX);
+            if (fee > 0) {
+                address treasury = IController(controller).treasury();
+                require(treasury != address(0), "treasury = zero address");
+
+                IERC20(underlying).safeTransfer(treasury, fee);
+            }
+
+            // deposit remaining underlying
+            _depositUnderlying();
+        }
+    }
+
+    /*
     @notice Exit strategy by harvesting CRV to underlying token and then
             withdrawing all underlying to vault
     @dev Must return all underlying token to vault
     @dev Caller should implement guard agains slippage
     */
     function exit() external override onlyAuthorized {
-        _harvest();
+        _crvToUnderlying();
         _withdrawAll();
     }
 }
