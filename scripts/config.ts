@@ -13,9 +13,11 @@ export interface Config {
     gasRelayer: string
     treasury: string
     controller: string
-    daiVault: string
-    usdcVault: string
-    usdtVault: string
+    timeLock: string
+    // low risk vaults
+    daiSafeVault: string
+    usdcSafeVault: string
+    usdtSafeVault: string
     strategyDaiToCusd: string
     strategyDaiTo3Crv: string
     strategyUsdcToCusd: string
@@ -48,10 +50,12 @@ const config: Config = {
     gasRelayer: "0xe26C446fDCcD62F97a1D6bC21DD92638B0191037",
     treasury: "0x9a4c3Fc4683b95EBF11B535057B00812f6a549Bb",
     controller: "0xdDA49776E897BB9C6c6D0f98EE4b409795cdcE2b",
+    // TODO: deploy time lock
+    timeLock: "0x86d10751B18F3fE331C146546868a07224A8598B",
     // vaults //
-    daiVault: "0x8C63c3C29868dB34349ca9EF4a3eD6ccA7210bBE",
-    usdcVault: "0xdeb4A1149fe09Eecff1eC25BB3008C4aD236c1b4",
-    usdtVault: "0xB25dBe8955806203E8511FFce5D359fE8cAef787",
+    daiSafeVault: "0xEf64a0728C6Ede1d7259955a49D046c0fefd6d15",
+    usdcSafeVault: "0xEa3818341aA636A1d86D9e35eaF7413e44eCfe5F",
+    usdtSafeVault: "0xB96C7E99d5E08b5B033484F68e12fD121647fe2a",
     // strategies //
     strategyDaiToCusd: "0xFa5D9F59A4E7a9554b983F841C966E4C47F3Bd4F",
     strategyDaiTo3Crv: "0x283948BcEd828fdD289B1a1d61c523f05F8cA43B",
