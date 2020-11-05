@@ -12,7 +12,7 @@ const INFURA_API_KEY = process.env.INFURA_API_KEY
 const config: BuidlerConfig = {
   defaultNetwork: "buidlerevm",
   solc: {
-    version: "0.5.17",
+    version: "0.6.11",
     optimizer: {enabled: true, runs: 200},
   },
   networks: {
