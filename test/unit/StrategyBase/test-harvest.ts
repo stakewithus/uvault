@@ -10,7 +10,7 @@ import _setup from "./setup"
 
 contract("StrategyBase", (accounts) => {
   const refs = _setup(accounts)
-  const {admin, treasury} = refs
+  const {admin} = refs
 
   let strategy: StrategyTestInstance
   let underlying: TestTokenInstance
