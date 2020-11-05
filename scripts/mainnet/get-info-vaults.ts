@@ -108,19 +108,25 @@ async function main() {
       daiSafeVault,
       usdcSafeVault,
       usdtSafeVault,
-      strategyDaiTo3Crv,
-      strategyDaiToCusd,
-      strategyUsdcTo3Crv,
-      strategyUsdcToCusd,
-      strategyUsdtTo3Crv,
+      strategyCusdDai,
+      strategyCusdUsdc,
+      strategy3CrvDai,
+      strategy3CrvUsdc,
+      strategy3CrvUsdt,
+      strategyP3CrvDai,
+      strategyP3CrvUsdc,
+      strategyP3CrvUsdt,
     } = config.mainnet
 
     const addrToStrat = {
-      [strategyDaiTo3Crv]: "DAI -> 3CRV",
-      [strategyDaiToCusd]: "DAI -> CUSD",
-      [strategyUsdcTo3Crv]: "USDC -> 3CRV",
-      [strategyUsdcToCusd]: "USDC -> CUSD",
-      [strategyUsdtTo3Crv]: "USDT -> 3Crv",
+      [strategyCusdDai]: "DAI -> CUSD",
+      [strategyCusdUsdc]: "USDC -> CUSD",
+      [strategy3CrvDai]: "DAI -> 3CRV",
+      [strategy3CrvUsdc]: "USDC -> 3CRV",
+      [strategy3CrvUsdt]: "USDT -> 3CRV",
+      [strategyP3CrvDai]: "DAI -> P3CRV",
+      [strategyP3CrvUsdc]: "USDC -> P3CRV",
+      [strategyP3CrvUsdt]: "USDT -> P3CRV",
     }
 
     const vaults: Vault[] = [
