@@ -20,6 +20,10 @@ interface IVault {
 
     function paused() external view returns (bool);
 
+    function whitelist(address _addr) external view returns (bool);
+
+    function setWhitelist(address _addr, bool _approve) external;
+
     function setAdmin(address _admin) external;
 
     function setController(address _controller) external;

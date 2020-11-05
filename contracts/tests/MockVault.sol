@@ -15,6 +15,7 @@ contract MockVault is IVault {
     bool public override paused;
 
     mapping(address => bool) public override strategies;
+    mapping(address => bool) public override whitelist;
 
     // test helpers
     uint public _setStrategyMin_;
@@ -42,6 +43,8 @@ contract MockVault is IVault {
 
     function setPause(bool _paused) external override {}
 
+    function setWhitelist(address _addr, bool _approve) external override {}
+
     function setReserveMin(uint _min) external override {}
 
     function setWithdrawFee(uint _fee) external override {}
@@ -55,27 +58,27 @@ contract MockVault is IVault {
         _setStrategyMin_ = _min;
     }
 
-    function balanceInVault() external override view returns (uint) {
+    function balanceInVault() external view override returns (uint) {
         return 0;
     }
 
-    function balanceInStrategy() external override view returns (uint) {
+    function balanceInStrategy() external view override returns (uint) {
         return 0;
     }
 
-    function totalDebtInStrategy() external override view returns (uint) {
+    function totalDebtInStrategy() external view override returns (uint) {
         return 0;
     }
 
-    function totalAssets() external override view returns (uint) {
+    function totalAssets() external view override returns (uint) {
         return 0;
     }
 
-    function minReserve() external override view returns (uint) {
+    function minReserve() external view override returns (uint) {
         return 0;
     }
 
-    function availableToInvest() external override view returns (uint) {
+    function availableToInvest() external view override returns (uint) {
         return 0;
     }
 
@@ -87,7 +90,7 @@ contract MockVault is IVault {
         _depositAmount_ = _amount;
     }
 
-    function getExpectedReturn(uint _shares) external override view returns (uint) {
+    function getExpectedReturn(uint _shares) external view override returns (uint) {
         return 0;
     }
 

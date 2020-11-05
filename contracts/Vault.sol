@@ -50,9 +50,9 @@ contract Vault is IVault, ERC20, ReentrancyGuard {
 
     bool public override paused;
 
-    // mapping from tx.origin to block number
+    // whitelisted addresses
     // used to prevent flash loah attacks
-    mapping(address => uint) public blockNumberLast;
+    mapping(address => bool) public override whitelist;
 
     /*
     @dev vault decimals must be equal to token decimals
@@ -106,16 +106,10 @@ contract Vault is IVault, ERC20, ReentrancyGuard {
 
     /*
     @dev modifier to prevent flash loan
-    @dev caller is restricted to one tx per block
+    @dev caller is restricted to EOA or whitelisted contract
     */
-    modifier noFlashLoan() {
-        // TODO use msg.sender == tx.origin?
-        // TODO tx.origin any security risk?
-        require(
-            blockNumberLast[tx.origin] < block.number,
-            "last block number >= block.number"
-        );
-        blockNumberLast[tx.origin] = block.number;
+    modifier guard() {
+        require((msg.sender == tx.origin) || whitelist[msg.sender], "!whitelist");
         _;
     }
 
@@ -136,6 +130,10 @@ contract Vault is IVault, ERC20, ReentrancyGuard {
 
     function setPause(bool _paused) external override onlyAdmin {
         paused = _paused;
+    }
+
+    function setWhitelist(address _addr, bool _approve) external override onlyAdmin {
+        whitelist[_addr] = _approve;
     }
 
     function setReserveMin(uint _reserveMin) external override onlyAdmin {
@@ -320,13 +318,7 @@ contract Vault is IVault, ERC20, ReentrancyGuard {
     @notice Deposit token into vault
     @param _amount Amount of token to transfer from `msg.sender`
     */
-    function deposit(uint _amount)
-        external
-        override
-        whenNotPaused
-        nonReentrant
-        noFlashLoan
-    {
+    function deposit(uint _amount) external override whenNotPaused nonReentrant guard {
         require(_amount > 0, "amount = 0");
 
         uint totalUnderlying = _totalAssets();
@@ -404,12 +396,7 @@ contract Vault is IVault, ERC20, ReentrancyGuard {
     @param _shares Amount of shares to burn
     @param _min Minimum amount of underlying token to return
     */
-    function withdraw(uint _shares, uint _min)
-        external
-        override
-        nonReentrant
-        noFlashLoan
-    {
+    function withdraw(uint _shares, uint _min) external override nonReentrant guard {
         require(_shares > 0, "shares = 0");
 
         uint balInVault = _balanceInVault();
