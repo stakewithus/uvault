@@ -10,13 +10,16 @@ interface Snapshot {
     address: string
     admin: string
     controller: string
+    timeLock: string
     strategy: string
-    reserveMin: BN
-    withdrawFee: BN
     paused: boolean
+    withdrawFee: BN
+    reserveMin: BN
     minReserve: BN
+    availableToInvest: BN
     balanceInVault: BN
     balanceInStrategy: BN
+    totalDebtInStrategy: BN
     totalAssets: BN
   }
 }
@@ -27,13 +30,16 @@ async function snapshot(vaultAddr: string): Promise<Snapshot> {
   // TS bug? cannot return correct values when using await inside hash map
   const admin = await vault.admin()
   const controller = await vault.controller()
+  const timeLock = await vault.timeLock()
   const strategy = await vault.strategy()
-  const reserveMin = await vault.reserveMin()
-  const withdrawFee = await vault.withdrawFee()
   const paused = await vault.paused()
+  const withdrawFee = await vault.withdrawFee()
+  const reserveMin = await vault.reserveMin()
   const minReserve = await vault.minReserve()
+  const availableToInvest = await vault.availableToInvest()
   const balanceInVault = await vault.balanceInVault()
   const balanceInStrategy = await vault.balanceInStrategy()
+  const totalDebtInStrategy = await vault.totalDebtInStrategy()
   const totalAssets = await vault.totalAssets()
 
   return {
@@ -41,13 +47,16 @@ async function snapshot(vaultAddr: string): Promise<Snapshot> {
       address: vaultAddr,
       admin,
       controller,
+      timeLock,
       strategy,
-      reserveMin,
-      withdrawFee,
       paused,
+      withdrawFee,
+      reserveMin,
       minReserve,
+      availableToInvest,
       balanceInVault,
       balanceInStrategy,
+      totalDebtInStrategy,
       totalAssets,
     },
   }
@@ -55,16 +64,6 @@ async function snapshot(vaultAddr: string): Promise<Snapshot> {
 
 function formatBN(x: BN, decimals: number): string {
   return ethers.utils.formatUnits(x.toString(), decimals)
-}
-
-function formatDate(d: BN): string {
-  const t = d.toNumber() * 1000
-
-  if (t == 0) {
-    return "0"
-  }
-
-  return new Date(t).toISOString()
 }
 
 function formatPercent(x: BN, max: number): string {
@@ -78,16 +77,23 @@ function printSnapshot(snap: Snapshot, decimals: number, addrToStrat: any) {
   console.log(`Vault ${snap.vault.address}`)
   console.log(`admin: ${snap.vault.admin}`)
   console.log(`controller: ${snap.vault.controller}`)
+  console.log(`time lock: ${snap.vault.timeLock}`)
   console.log(`strategy: ${currentStratName} ${snap.vault.strategy}`)
+  console.log(`paused: ${snap.vault.paused}`)
   console.log(`withdraw fee: ${formatPercent(snap.vault.withdrawFee, FEE_MAX)}`)
   console.log(`reserve min: ${formatPercent(snap.vault.reserveMin, RESERVE_MAX)}`)
-  console.log(`paused: ${snap.vault.paused}`)
+  console.log(`min reserve: ${formatBN(snap.vault.minReserve, decimals)}`)
+  console.log(
+    `available to invest: ${formatBN(snap.vault.availableToInvest, decimals)}`
+  )
   console.log(`balance in vault: ${formatBN(snap.vault.balanceInVault, decimals)}`)
   console.log(
     `balance in strategy: ${formatBN(snap.vault.balanceInStrategy, decimals)}`
   )
+  console.log(
+    `total debt in strategy: ${formatBN(snap.vault.totalDebtInStrategy, decimals)}`
+  )
   console.log(`total assets: ${formatBN(snap.vault.totalAssets, decimals)}`)
-  console.log(`min reserve: ${formatBN(snap.vault.minReserve, decimals)}`)
 }
 
 interface Vault {
@@ -99,9 +105,9 @@ interface Vault {
 async function main() {
   try {
     const {
-      daiVault,
-      usdcVault,
-      usdtVault,
+      daiSafeVault,
+      usdcSafeVault,
+      usdtSafeVault,
       strategyDaiTo3Crv,
       strategyDaiToCusd,
       strategyUsdcTo3Crv,
@@ -119,18 +125,18 @@ async function main() {
 
     const vaults: Vault[] = [
       {
-        name: "DAI Vault",
-        address: daiVault,
+        name: "DAI Safe Vault",
+        address: daiSafeVault,
         decimals: 18,
       },
       {
-        name: "USDC Vault",
-        address: usdcVault,
+        name: "USDC Safe Vault",
+        address: usdcSafeVault,
         decimals: 6,
       },
       {
-        name: "USDT Vault",
-        address: usdtVault,
+        name: "USDT Safe Vault",
+        address: usdtSafeVault,
         decimals: 6,
       },
     ]
