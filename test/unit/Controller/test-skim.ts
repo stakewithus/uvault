@@ -14,21 +14,19 @@ contract("Controller", (accounts) => {
     strategy = refs.strategy
   })
 
-  describe("harvest", () => {
-    it("should harvest", async () => {
-      await controller.harvest(strategy.address, {from: admin})
-
-      assert(await strategy._harvestWasCalled_(), "harvest")
+  describe("skim", () => {
+    it("should skim", async () => {
+      await controller.skim(strategy.address, {from: admin})
     })
 
     it("should reject if caller not authorized", async () => {
       await chai
-        .expect(controller.harvest(strategy.address, {from: accounts[1]}))
+        .expect(controller.skim(strategy.address, {from: accounts[1]}))
         .to.be.rejectedWith("!authorized")
     })
 
     it("should reject invalid strategy address", async () => {
-      await chai.expect(controller.harvest(accounts[1], {from: admin})).to.be.rejected
+      await chai.expect(controller.skim(accounts[1], {from: admin})).to.be.rejected
     })
   })
 })

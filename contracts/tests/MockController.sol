@@ -36,6 +36,8 @@ contract MockController is IController {
 
     function harvest(address _strategy) external override {}
 
+    function skim(address _strategy) external override {}
+
     function withdraw(
         address _strategy,
         uint _amount,

@@ -39,6 +39,8 @@ interface IController {
 
     function harvest(address _strategy) external;
 
+    function skim(address _strategy) external;
+
     /*
     @notice Withdraw from strategy to vault
     @param _strategy Address of strategy

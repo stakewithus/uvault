@@ -19,7 +19,7 @@ contract("Controller", (accounts) => {
   })
 
   describe("setStrategy", () => {
-    it("should set strategy admin", async () => {
+    it("should set strategy", async () => {
       await controller.setStrategy(vault.address, strategy.address, new BN(0), {
         from: admin,
       })

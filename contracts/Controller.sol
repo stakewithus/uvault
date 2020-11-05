@@ -80,6 +80,11 @@ contract Controller is IController, AccessControl {
         IStrategy(_strategy).harvest();
     }
 
+    // @dev Warning: Skim can be called on strategy that is not set to any vault
+    function skim(address _strategy) external override onlyAuthorized(HARVESTER_ROLE) {
+        IStrategy(_strategy).skim();
+    }
+
     modifier checkWithdraw(address _strategy, uint _min) {
         address vault = IStrategy(_strategy).vault();
         address token = IVault(vault).token();

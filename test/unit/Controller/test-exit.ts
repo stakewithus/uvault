@@ -16,7 +16,7 @@ contract("Controller", (accounts) => {
   })
 
   describe("exit", () => {
-    it("should exit admin", async () => {
+    it("should exit", async () => {
       await controller.exit(strategy.address, 0, {from: admin})
 
       assert(await strategy._exitWasCalled_(), "exit")

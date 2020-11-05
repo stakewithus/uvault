@@ -15,7 +15,7 @@ contract("Controller", (accounts) => {
   })
 
   describe("invest", () => {
-    it("should invest admin", async () => {
+    it("should invest", async () => {
       await controller.invest(vault.address, {from: admin})
 
       assert(await vault._investWasCalled_(), "invest")
