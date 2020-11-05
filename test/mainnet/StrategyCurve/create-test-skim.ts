@@ -53,12 +53,17 @@ export default (name: string, _setup: Setup, params: {DECIMALS: BN}) => {
       await strategy.skim()
       const after = await snapshot()
 
-      assert(after.underlying.vault.gte(before.underlying.vault), "underlying vault")
-      assert(
-        after.strategy.totalAssets.lte(before.strategy.totalAssets),
-        "total assets"
-      )
-      assert(after.strategy.totalDebt.lte(before.strategy.totalDebt), "total debt")
+      // total assets > total debt
+      if (before.strategy.totalAssets.gt(before.strategy.totalDebt)) {
+        // check profit was transferred to vault
+        assert(
+          after.strategy.totalAssets.lte(before.strategy.totalAssets),
+          "total assets"
+        )
+        assert(after.underlying.vault.gt(before.underlying.vault), "underlying vault")
+      }
+
+      assert(after.strategy.totalDebt.eq(before.strategy.totalDebt), "total debt")
     })
   })
 }
