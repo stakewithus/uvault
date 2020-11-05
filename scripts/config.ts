@@ -18,11 +18,20 @@ export interface Config {
     daiSafeVault: string
     usdcSafeVault: string
     usdtSafeVault: string
-    strategyDaiToCusd: string
-    strategyDaiTo3Crv: string
-    strategyUsdcToCusd: string
-    strategyUsdcTo3Crv: string
-    strategyUsdtTo3Crv: string
+    // high risk vaults
+    daiDegenVault: string
+    usdcDegenVault: string
+    usdtDegenVault: string
+    // strategies
+    strategyCusdDai: string
+    strategyCusdUsdc: string
+    strategy3CrvDai: string
+    strategy3CrvUsdc: string
+    strategy3CrvUsdt: string
+    strategyP3CrvDai: string
+    strategyP3CrvUsdc: string
+    strategyP3CrvUsdt: string
+    // others
     dai: string
     usdc: string
     usdt: string
@@ -56,12 +65,19 @@ const config: Config = {
     daiSafeVault: "0xEf64a0728C6Ede1d7259955a49D046c0fefd6d15",
     usdcSafeVault: "0xEa3818341aA636A1d86D9e35eaF7413e44eCfe5F",
     usdtSafeVault: "0xB96C7E99d5E08b5B033484F68e12fD121647fe2a",
+    // TODO deploy degen vaults
+    daiDegenVault: "0xEf64a0728C6Ede1d7259955a49D046c0fefd6d15",
+    usdcDegenVault: "0xEa3818341aA636A1d86D9e35eaF7413e44eCfe5F",
+    usdtDegenVault: "0xB96C7E99d5E08b5B033484F68e12fD121647fe2a",
     // strategies //
-    strategyDaiToCusd: "0xFa5D9F59A4E7a9554b983F841C966E4C47F3Bd4F",
-    strategyDaiTo3Crv: "0x283948BcEd828fdD289B1a1d61c523f05F8cA43B",
-    strategyUsdcToCusd: "0x0690E1CA12E18C78a7dbAae9BDE5328008e3a2ce",
-    strategyUsdcTo3Crv: "0xF8daBcEF10d7431462E922812090600a58FB2243",
-    strategyUsdtTo3Crv: "0xbDB20f7Bf6E7Adc6cbF5c9F476a0fDE63e494F48",
+    strategyCusdDai: "",
+    strategyCusdUsdc: "",
+    strategy3CrvDai: "",
+    strategy3CrvUsdc: "",
+    strategy3CrvUsdt: "",
+    strategyP3CrvDai: "",
+    strategyP3CrvUsdc: "",
+    strategyP3CrvUsdt: "",
     // others //
     dai: "0x6B175474E89094C44Da98b954EedeAC495271d0F",
     usdc: "0xA0b86991c6218b36c1d19D4a2e9Eb0cE3606eB48",
