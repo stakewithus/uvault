@@ -1,8 +1,9 @@
 // SPDX-License-Identifier: UNLICENSED
 pragma solidity 0.6.11;
 import "@openzeppelin/contracts/math/SafeMath.sol";
+import "./protocol/ITimeLock.sol";
 
-contract TimeLock {
+contract TimeLock is ITimeLock {
     using SafeMath for uint;
 
     event NewAdmin(address admin);
@@ -33,10 +34,10 @@ contract TimeLock {
     uint public constant MIN_DELAY = 1 days;
     uint public constant MAX_DELAY = 30 days;
 
-    address public admin;
-    uint public delay;
+    address public override admin;
+    uint public override delay;
 
-    mapping(bytes32 => bool) public queued;
+    mapping(bytes32 => bool) public override queued;
 
     constructor(uint _delay) public {
         require(_delay >= MIN_DELAY, "delay < min");
@@ -46,14 +47,14 @@ contract TimeLock {
         delay = _delay;
     }
 
-    receive() external payable {}
+    receive() external payable override {}
 
     modifier onlyAdmin() {
         require(msg.sender == admin, "!admin");
         _;
     }
 
-    function setAdmin(address _admin) external onlyAdmin {
+    function setAdmin(address _admin) external override onlyAdmin {
         require(_admin != address(0), "admin = zero address");
         admin = _admin;
         emit NewAdmin(_admin);
@@ -62,7 +63,7 @@ contract TimeLock {
     /*
     @dev Only this contract can execute this function
     */
-    function setDelay(uint _delay) external {
+    function setDelay(uint _delay) external override {
         require(msg.sender == address(this), "!timelock");
         require(_delay >= MIN_DELAY, "delay < min");
         require(_delay <= MAX_DELAY, "delay > max");
@@ -85,7 +86,7 @@ contract TimeLock {
         uint value,
         bytes calldata data,
         uint eta
-    ) external pure returns (bytes32) {
+    ) external pure override returns (bytes32) {
         return _getTxHash(target, value, data, eta);
     }
 
@@ -101,7 +102,7 @@ contract TimeLock {
         uint value,
         bytes calldata data,
         uint eta
-    ) external onlyAdmin returns (bytes32) {
+    ) external override onlyAdmin returns (bytes32) {
         require(eta >= block.timestamp.add(delay), "eta < now + delay");
 
         bytes32 txHash = _getTxHash(target, value, data, eta);
@@ -117,7 +118,7 @@ contract TimeLock {
         uint value,
         bytes calldata data,
         uint eta
-    ) external payable onlyAdmin returns (bytes memory) {
+    ) external payable override onlyAdmin returns (bytes memory) {
         bytes32 txHash = _getTxHash(target, value, data, eta);
         require(queued[txHash], "!queued");
         require(block.timestamp >= eta, "eta < now");
@@ -139,7 +140,7 @@ contract TimeLock {
         uint value,
         bytes calldata data,
         uint eta
-    ) external onlyAdmin {
+    ) external override onlyAdmin {
         bytes32 txHash = _getTxHash(target, value, data, eta);
         require(queued[txHash], "!queued");
 
