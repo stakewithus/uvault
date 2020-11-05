@@ -20,16 +20,16 @@ contract StrategyP3Crv is StrategyBase, UseUniswap {
 
     // Curve //
     // 3Crv
-    address internal constant threeCrv = 0x6c3F90f043a72FA612cbac8115EE7e52BDe6E490;
+    address internal constant THREE_CRV = 0x6c3F90f043a72FA612cbac8115EE7e52BDe6E490;
     // StableSwap3
-    address internal constant curve = 0xbEbc44782C7dB0a1A60Cb6fe97d0b483032FF1C7;
+    address internal constant CURVE = 0xbEbc44782C7dB0a1A60Cb6fe97d0b483032FF1C7;
 
     // Pickle //
-    address internal constant jar = 0x1BB74b5DdC1f4fC91D6f9E7906cf68bc93538e33;
-    address internal constant chef = 0xbD17B1ce622d73bD438b9E658acA5996dc394b0d;
-    address internal constant pickle = 0x429881672B9AE42b8EbA0E26cD9C73711b891Ca5;
+    address internal constant JAR = 0x1BB74b5DdC1f4fC91D6f9E7906cf68bc93538e33;
+    address internal constant CHEF = 0xbD17B1ce622d73bD438b9E658acA5996dc394b0d;
+    address internal constant PICKLE = 0x429881672B9AE42b8EbA0E26cD9C73711b891Ca5;
 
-    // POOL ID for 3Crv jar
+    // POOL ID for 3Crv JAR
     uint private constant POOL_ID = 14;
 
     constructor(
@@ -38,45 +38,45 @@ contract StrategyP3Crv is StrategyBase, UseUniswap {
         address _underlying
     ) public StrategyBase(_controller, _vault, _underlying) {
         // Assets that cannot be swept by admin
-        assets[pickle] = true;
+        assets[PICKLE] = true;
     }
 
     // TODO vulnerable to price manipulation
     function _totalAssets() internal view override returns (uint) {
         // multiplied by 10 ** 18
-        uint pricePerShare = PickleJar(jar).getRatio();
-        (uint shares, ) = MasterChef(chef).userInfo(POOL_ID, address(this));
+        uint pricePerShare = PickleJar(JAR).getRatio();
+        (uint shares, ) = MasterChef(CHEF).userInfo(POOL_ID, address(this));
 
         return shares.mul(pricePerShare).div(1e18).div(precisionDiv);
     }
 
     function _deposit(address _token, uint _index) private {
-        // token to threeCrv
+        // token to THREE_CRV
         uint bal = IERC20(_token).balanceOf(address(this));
         if (bal > 0) {
-            IERC20(_token).safeApprove(curve, 0);
-            IERC20(_token).safeApprove(curve, bal);
-            // mint threeCrv
+            IERC20(_token).safeApprove(CURVE, 0);
+            IERC20(_token).safeApprove(CURVE, bal);
+            // mint THREE_CRV
             uint[3] memory amounts;
             amounts[_index] = bal;
-            StableSwap3(curve).add_liquidity(amounts, 0);
+            StableSwap3(CURVE).add_liquidity(amounts, 0);
             // Now we have 3Crv
         }
 
-        // deposit 3Crv into Pickle
-        uint threeBal = IERC20(threeCrv).balanceOf(address(this));
+        // deposit 3Crv into PICKLE
+        uint threeBal = IERC20(THREE_CRV).balanceOf(address(this));
         if (threeBal > 0) {
-            IERC20(threeCrv).safeApprove(jar, 0);
-            IERC20(threeCrv).safeApprove(jar, threeBal);
-            PickleJar(jar).deposit(threeBal);
+            IERC20(THREE_CRV).safeApprove(JAR, 0);
+            IERC20(THREE_CRV).safeApprove(JAR, threeBal);
+            PickleJar(JAR).deposit(threeBal);
         }
 
         // stake p3crv
-        uint p3crvBal = IERC20(jar).balanceOf(address(this));
+        uint p3crvBal = IERC20(JAR).balanceOf(address(this));
         if (p3crvBal > 0) {
-            IERC20(jar).safeApprove(chef, 0);
-            IERC20(jar).safeApprove(chef, p3crvBal);
-            MasterChef(chef).deposit(POOL_ID, p3crvBal);
+            IERC20(JAR).safeApprove(CHEF, 0);
+            IERC20(JAR).safeApprove(CHEF, p3crvBal);
+            MasterChef(CHEF).deposit(POOL_ID, p3crvBal);
         }
     }
 
@@ -85,21 +85,21 @@ contract StrategyP3Crv is StrategyBase, UseUniswap {
     }
 
     function _getTotalShares() internal view override returns (uint) {
-        (uint p3CrvBal, ) = MasterChef(chef).userInfo(POOL_ID, address(this));
+        (uint p3CrvBal, ) = MasterChef(CHEF).userInfo(POOL_ID, address(this));
         return p3CrvBal;
     }
 
     function _withdrawUnderlying(uint _p3CrvAmount) internal override {
         // unstake
-        MasterChef(chef).withdraw(POOL_ID, _p3CrvAmount);
+        MasterChef(CHEF).withdraw(POOL_ID, _p3CrvAmount);
 
-        // withdraw threeCrv from  Pickle
-        PickleJar(jar).withdraw(_p3CrvAmount);
+        // withdraw THREE_CRV from  PICKLE
+        PickleJar(JAR).withdraw(_p3CrvAmount);
 
         // withdraw underlying
-        uint threeBal = IERC20(threeCrv).balanceOf(address(this));
-        // creates threeCrv dust
-        StableSwap3(curve).remove_liquidity_one_coin(
+        uint threeBal = IERC20(THREE_CRV).balanceOf(address(this));
+        // creates THREE_CRV dust
+        StableSwap3(CURVE).remove_liquidity_one_coin(
             threeBal,
             int128(underlyingIndex),
             0
@@ -108,13 +108,13 @@ contract StrategyP3Crv is StrategyBase, UseUniswap {
     }
 
     /*
-    @notice Returns address and index of token with lowest balance in Curve pool
+    @notice Returns address and index of token with lowest balance in CURVE pool
     */
     function _getMostPremiumToken() internal view returns (address, uint) {
         uint[] memory balances = new uint[](3);
-        balances[0] = StableSwap3(curve).balances(0); // DAI
-        balances[1] = StableSwap3(curve).balances(1).mul(1e12); // USDC
-        balances[2] = StableSwap3(curve).balances(2).mul(1e12); // USDT
+        balances[0] = StableSwap3(CURVE).balances(0); // DAI
+        balances[1] = StableSwap3(CURVE).balances(1).mul(1e12); // USDC
+        balances[2] = StableSwap3(CURVE).balances(2).mul(1e12); // USDT
 
         // DAI
         if (balances[0] < balances[1] && balances[0] < balances[2]) {
@@ -135,15 +135,15 @@ contract StrategyP3Crv is StrategyBase, UseUniswap {
     }
 
     function _swapPickleFor(address _token) internal {
-        uint pickleBal = IERC20(pickle).balanceOf(address(this));
+        uint pickleBal = IERC20(PICKLE).balanceOf(address(this));
         if (pickleBal > 0) {
-            _swap(pickle, _token, pickleBal);
+            _swap(PICKLE, _token, pickleBal);
             // Now this contract has underlying token
         }
     }
 
     /*
-    @notice Sell Pickle and deposit most premium token into Curve
+    @notice Sell PICKLE and deposit most premium token into CURVE
     */
     function harvest() external override onlyAuthorized {
         (address token, uint index) = _getMostPremiumToken();
@@ -169,9 +169,9 @@ contract StrategyP3Crv is StrategyBase, UseUniswap {
     @dev Caller should implement guard agains slippage
     */
     function exit() external override onlyAuthorized {
-        // Pickle is minted on withdraw so here we
+        // PICKLE is minted on withdraw so here we
         // 1. Withdraw from MasterChef
-        // 2. Sell Pickle
+        // 2. Sell PICKLE
         // 3. Transfer underlying to vault
         _withdrawAll();
         _swapPickleFor(underlying);
