@@ -15,12 +15,14 @@ export function getAddress(config: Config, network: string, name: string): strin
 export async function getAccountAddress(
   bre: BuidlerRuntimeEnvironment
 ): Promise<string> {
+  // @ts-ignore
   const [account] = await bre.ethers.getSigners()
 
   const addr = await account.getAddress()
   const balance = await account.getBalance()
 
   console.log("Account:", addr)
+  // @ts-ignore
   console.log("Balance:", bre.ethers.utils.formatEther(balance), "ETH")
 
   return addr
