@@ -1,4 +1,4 @@
-// SPDX-License-Identifier: UNLICENSED
+// SPDX-License-Identifier: AGPL-3.0-or-later
 pragma solidity 0.6.11;
 
 // https://github.com/curvefi/curve-contract/blob/master/contracts/gauges/LiquidityGauge.vy
