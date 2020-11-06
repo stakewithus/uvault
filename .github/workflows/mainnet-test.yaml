@@ -26,7 +26,6 @@ jobs:
 
       - name: Test mainnet fork
         run: |
-          echo $USDT_WHALE
           ganache-cli \
           --fork https://mainnet.infura.io/v3/$INFURA_API_KEY \
           --unlock $STABLE_COIN_HOLDER \
