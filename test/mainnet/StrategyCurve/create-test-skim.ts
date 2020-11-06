@@ -1,5 +1,5 @@
 import BN from "bn.js"
-import {Ierc20Instance} from "../../../types/Ierc20"
+import {IERC20Instance} from "../../../types/IERC20"
 import {ControllerInstance} from "../../../types/Controller"
 import {GaugeInstance} from "../../../types/Gauge"
 import {StrategyInstance} from "./lib"
@@ -14,10 +14,10 @@ export default (name: string, _setup: Setup, params: {DECIMALS: BN}) => {
     const refs = _setup(accounts)
     const {admin, vault, treasury, whale} = refs
 
-    let underlying: Ierc20Instance
-    let lp: Ierc20Instance
+    let underlying: IERC20Instance
+    let lp: IERC20Instance
     let gauge: GaugeInstance
-    let crv: Ierc20Instance
+    let crv: IERC20Instance
     let controller: ControllerInstance
     let strategy: StrategyInstance
     beforeEach(async () => {

@@ -1,4 +1,4 @@
-import {Ierc20Instance} from "../../../types/Ierc20"
+import {IERC20Instance} from "../../../types/IERC20"
 import {GaugeInstance} from "../../../types/Gauge"
 import {ControllerInstance} from "../../../types/Controller"
 import {
@@ -41,10 +41,10 @@ export interface Refs {
   admin: string
   vault: string
   treasury: string
-  underlying: Ierc20Instance
-  lp: Ierc20Instance
+  underlying: IERC20Instance
+  lp: IERC20Instance
   gauge: GaugeInstance
-  crv: Ierc20Instance
+  crv: IERC20Instance
   controller: ControllerInstance
   strategy: StrategyInstance
   whale: string
@@ -54,10 +54,10 @@ export type Setup = (accounts: Truffle.Accounts) => Refs
 
 export function getSnapshot(params: {
   strategy: StrategyInstance
-  underlying: Ierc20Instance
-  lp: Ierc20Instance
+  underlying: IERC20Instance
+  lp: IERC20Instance
   gauge: GaugeInstance
-  crv: Ierc20Instance
+  crv: IERC20Instance
   vault: string
   treasury: string
 }) {

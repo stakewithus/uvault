@@ -1,5 +1,5 @@
 import BN from "bn.js"
-import {Ierc20Instance} from "../../../types/Ierc20"
+import {IERC20Instance} from "../../../types/IERC20"
 import {ControllerInstance} from "../../../types/Controller"
 import {MasterChefInstance} from "../../../types/MasterChef"
 import {StrategyInstance} from "./lib"
@@ -13,11 +13,11 @@ export default (name: string, _setup: Setup, params: {DECIMALS: BN}) => {
 
     const {DECIMALS} = params
 
-    let underlying: Ierc20Instance
-    let jar: Ierc20Instance
+    let underlying: IERC20Instance
+    let jar: IERC20Instance
     let chef: MasterChefInstance
-    let pickle: Ierc20Instance
-    let threeCrv: Ierc20Instance
+    let pickle: IERC20Instance
+    let threeCrv: IERC20Instance
     let controller: ControllerInstance
     let strategy: StrategyInstance
     beforeEach(() => {
