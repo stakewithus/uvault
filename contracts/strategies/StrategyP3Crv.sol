@@ -41,7 +41,7 @@ contract StrategyP3Crv is StrategyBase, UseUniswap {
         assets[PICKLE] = true;
     }
 
-    // TODO vulnerable to price manipulation
+    // TODO security: vulnerable to price manipulation
     function _totalAssets() internal view override returns (uint) {
         // getRatio() is multiplied by 10 ** 18
         uint pricePerShare = PickleJar(JAR).getRatio();
