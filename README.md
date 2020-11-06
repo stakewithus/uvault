@@ -22,6 +22,8 @@ npm run compile
 cp .env.sample .env
 # unit test
 npm run test:unit
+# integration test
+npm run test:integration
 
 # test mainnet fork
 source .env
