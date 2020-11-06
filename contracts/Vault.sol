@@ -107,6 +107,7 @@ contract Vault is IVault, ERC20, ReentrancyGuard {
     /*
     @dev modifier to prevent flash loan
     @dev caller is restricted to EOA or whitelisted contract
+    @dev Warning: Users can have their funds stuck if shares is transferred to a contract
     */
     modifier guard() {
         require((msg.sender == tx.origin) || whitelist[msg.sender], "!whitelist");
