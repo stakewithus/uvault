@@ -43,7 +43,7 @@ contract StrategyP3Crv is StrategyBase, UseUniswap {
 
     // TODO vulnerable to price manipulation
     function _totalAssets() internal view override returns (uint) {
-        // multiplied by 10 ** 18
+        // getRatio() is multiplied by 10 ** 18
         uint pricePerShare = PickleJar(JAR).getRatio();
         (uint shares, ) = MasterChef(CHEF).userInfo(POOL_ID, address(this));
 
