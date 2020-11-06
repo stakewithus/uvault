@@ -20,14 +20,14 @@ contract StrategyP3Crv is StrategyBase, UseUniswap {
 
     // Curve //
     // 3Crv
-    address internal constant THREE_CRV = 0x6c3F90f043a72FA612cbac8115EE7e52BDe6E490;
+    address private constant THREE_CRV = 0x6c3F90f043a72FA612cbac8115EE7e52BDe6E490;
     // StableSwap3
-    address internal constant CURVE = 0xbEbc44782C7dB0a1A60Cb6fe97d0b483032FF1C7;
+    address private constant CURVE = 0xbEbc44782C7dB0a1A60Cb6fe97d0b483032FF1C7;
 
     // Pickle //
-    address internal constant JAR = 0x1BB74b5DdC1f4fC91D6f9E7906cf68bc93538e33;
-    address internal constant CHEF = 0xbD17B1ce622d73bD438b9E658acA5996dc394b0d;
-    address internal constant PICKLE = 0x429881672B9AE42b8EbA0E26cD9C73711b891Ca5;
+    address private constant JAR = 0x1BB74b5DdC1f4fC91D6f9E7906cf68bc93538e33;
+    address private constant CHEF = 0xbD17B1ce622d73bD438b9E658acA5996dc394b0d;
+    address private constant PICKLE = 0x429881672B9AE42b8EbA0E26cD9C73711b891Ca5;
 
     // POOL ID for 3Crv JAR
     uint private constant POOL_ID = 14;
@@ -110,7 +110,7 @@ contract StrategyP3Crv is StrategyBase, UseUniswap {
     /*
     @notice Returns address and index of token with lowest balance in CURVE pool
     */
-    function _getMostPremiumToken() internal view returns (address, uint) {
+    function _getMostPremiumToken() private view returns (address, uint) {
         uint[] memory balances = new uint[](3);
         balances[0] = StableSwap3(CURVE).balances(0); // DAI
         balances[1] = StableSwap3(CURVE).balances(1).mul(1e12); // USDC
@@ -134,7 +134,7 @@ contract StrategyP3Crv is StrategyBase, UseUniswap {
         return (DAI, 0);
     }
 
-    function _swapPickleFor(address _token) internal {
+    function _swapPickleFor(address _token) private {
         uint pickleBal = IERC20(PICKLE).balanceOf(address(this));
         if (pickleBal > 0) {
             _swap(PICKLE, _token, pickleBal);
