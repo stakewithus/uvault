@@ -89,6 +89,13 @@ env $(cat .env) npx buidler run scripts/script-to-run.ts --network ropsten
 
 See [scripts/config.ts](./scripts/config.ts)
 
+##### Flatten Contracts
+
+```shell
+npm i -g truffle-flattener
+truffle-flattener <solidity-files>
+```
+
 ### APY
 
 ```
