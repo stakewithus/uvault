@@ -26,6 +26,7 @@ jobs:
 
       - name: Test mainnet fork
         run: echo "Skip"
+        # TODO fix
         # run: |
         #   ganache-cli \
         #   --fork https://mainnet.infura.io/v3/$INFURA_API_KEY \
