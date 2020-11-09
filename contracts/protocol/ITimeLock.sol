@@ -2,6 +2,30 @@
 pragma solidity 0.6.11;
 
 interface ITimeLock {
+    event NewAdmin(address admin);
+    event NewDelay(uint delay);
+    event Queue(
+        bytes32 indexed txHash,
+        address indexed target,
+        uint value,
+        bytes data,
+        uint eta
+    );
+    event Execute(
+        bytes32 indexed txHash,
+        address indexed target,
+        uint value,
+        bytes data,
+        uint eta
+    );
+    event Cancel(
+        bytes32 indexed txHash,
+        address indexed target,
+        uint value,
+        bytes data,
+        uint eta
+    );
+
     function admin() external view returns (address);
 
     function delay() external view returns (uint);
