@@ -63,14 +63,14 @@ const config: Config = {
     controller: "0xdDA49776E897BB9C6c6D0f98EE4b409795cdcE2b",
     // TODO: deploy time lock
     timeLock: "0x86d10751B18F3fE331C146546868a07224A8598B",
-    // vaults //
+    // safe vaults //
     daiSafeVault: "0xEf64a0728C6Ede1d7259955a49D046c0fefd6d15",
     usdcSafeVault: "0xEa3818341aA636A1d86D9e35eaF7413e44eCfe5F",
     usdtSafeVault: "0xB96C7E99d5E08b5B033484F68e12fD121647fe2a",
-    // TODO deploy degen vaults
-    daiDegenVault: "0xEf64a0728C6Ede1d7259955a49D046c0fefd6d15",
-    usdcDegenVault: "0xEa3818341aA636A1d86D9e35eaF7413e44eCfe5F",
-    usdtDegenVault: "0xB96C7E99d5E08b5B033484F68e12fD121647fe2a",
+    // degen vaults //
+    daiDegenVault: "0x1133b7AA55fB87Af5dE48A6C908E6436d09F1644",
+    usdcDegenVault: "0x4Da0f9627616951BD694fEc66e1A24715dB584b0",
+    usdtDegenVault: "0x89814761D8E0C35f0FdC3A88B8c43B459709974A",
     // strategies //
     strategyCusdDai: "0xfF1b8E9b4B77A2F77aeBA30e177DE51D9DdD3B95",
     strategyCusdUsdc: "0x96F605838918d5CFDdA5641726E7c5a31c7106F3",
