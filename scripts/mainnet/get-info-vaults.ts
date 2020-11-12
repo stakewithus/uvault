@@ -1,5 +1,5 @@
 import BN from "bn.js"
-import {ethers} from "@nomiclabs/buidler"
+import {ethers} from "hardhat"
 import config from "../config"
 
 const FEE_MAX = 10000

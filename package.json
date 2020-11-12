@@ -33,8 +33,7 @@
   },
   "homepage": "https://github.com/stakewithus/uvault#readme",
   "devDependencies": {
-    "@nomiclabs/buidler": "^1.4.8",
-    "@nomiclabs/buidler-ethers": "^2.0.2",
+    "@nomiclabs/hardhat-ethers": "^2.0.0",
     "@openzeppelin/test-helpers": "^0.5.9",
     "@typechain/truffle-v5": "^3.0.0",
     "@types/bn.js": "^4.11.6",
@@ -49,6 +48,7 @@
     "eth-gas-reporter": "^0.2.19",
     "ethers": "^5.0.19",
     "ganache-cli": "^6.12.1",
+    "hardhat": "^2.0.3",
     "prettier": "^2.1.2",
     "prettier-plugin-solidity": "^1.0.0-alpha.60",
     "solhint": "^3.3.2",

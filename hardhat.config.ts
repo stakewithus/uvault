@@ -1,7 +1,6 @@
 import fs from "fs"
-import {BuidlerConfig, usePlugin} from "@nomiclabs/buidler/config"
-
-usePlugin("@nomiclabs/buidler-ethers")
+import {HardhatUserConfig} from "hardhat/config"
+import "@nomiclabs/hardhat-ethers"
 
 const MAINNET_PRIVATE_KEY = fs.readFileSync(".secret.mainnet").toString().trim()
 const TESTNET_PRIVATE_KEY = fs.readFileSync(".secret.testnet").toString().trim()
@@ -9,11 +8,15 @@ const TESTNET_PRIVATE_KEY = fs.readFileSync(".secret.testnet").toString().trim()
 const INFURA_API_KEY = process.env.INFURA_API_KEY
 // const ETHERSCAN_API_KEY = process.env.ETHERSCAN_API_KEY
 
-const config: BuidlerConfig = {
-  defaultNetwork: "buidlerevm",
-  solc: {
+const config: HardhatUserConfig = {
+  solidity: {
     version: "0.6.11",
-    optimizer: {enabled: true, runs: 200},
+    settings: {
+      optimizer: {
+        enabled: true,
+        runs: 200,
+      },
+    },
   },
   networks: {
     ropsten: {

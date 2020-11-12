@@ -1,4 +1,4 @@
-import {ethers} from "@nomiclabs/buidler"
+import {ethers} from "hardhat"
 import config from "../config"
 import {deploy} from "../lib"
 

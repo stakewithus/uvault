@@ -8,9 +8,5 @@
     "resolveJsonModule": true
   },
   "include": ["scripts", "test"],
-  "files": [
-    "./buidler.config.ts",
-    "node_modules/@nomiclabs/buidler-ethers/src/type-extensions.d.ts",
-    "./types/types.d.ts"
-  ]
+  "files": ["hardhat.config.ts", "./types/types.d.ts"]
 }
