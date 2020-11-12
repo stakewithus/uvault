@@ -137,7 +137,11 @@ contract Vault is IVault, ERC20, ReentrancyGuard {
 
     function setWhitelist(address _addr, bool _approve) external override onlyAdmin {
         whitelist[_addr] = _approve;
+<<<<<<< HEAD
         emit SetWhitelist(_addr, _approve);
+=======
+        // TODO emit SetWhitelist(_addr, _approve);
+>>>>>>> Vault: todo
     }
 
     function setReserveMin(uint _reserveMin) external override onlyAdmin {
