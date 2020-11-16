@@ -1,18 +1,15 @@
 import BN from "bn.js"
-import {IERC20Instance} from "../../../types/IERC20"
-import {ControllerInstance} from "../../../types/Controller"
-import {GaugeInstance} from "../../../types/Gauge"
-import {StrategyInstance} from "./lib"
-import {pow} from "../../util"
-import {Setup, getSnapshot} from "./lib"
+import { IERC20Instance, ControllerInstance, GaugeInstance } from "../../../types"
+import { pow } from "../../util"
+import { StrategyInstance, Setup, getSnapshot } from "./lib"
 
-export default (name: string, _setup: Setup, params: {DECIMALS: BN}) => {
+export default (name: string, _setup: Setup, params: { DECIMALS: BN }) => {
   contract(name, (accounts) => {
-    const {DECIMALS} = params
-    const depositAmount = pow(10, DECIMALS).mul(new BN(100))
+    const { DECIMALS } = params
+    const depositAmount = pow(10, DECIMALS).mul(new BN(1000000))
 
     const refs = _setup(accounts)
-    const {vault, treasury, whale} = refs
+    const { vault, treasury, whale } = refs
 
     let underlying: IERC20Instance
     let lp: IERC20Instance
@@ -29,11 +26,11 @@ export default (name: string, _setup: Setup, params: {DECIMALS: BN}) => {
       strategy = refs.strategy
 
       // deposit underlying into vault
-      await underlying.transfer(vault, depositAmount, {from: whale})
+      await underlying.transfer(vault, depositAmount, { from: whale })
 
       // deposit underlying into strategy
-      await underlying.approve(strategy.address, depositAmount, {from: vault})
-      await strategy.deposit(depositAmount, {from: vault})
+      await underlying.approve(strategy.address, depositAmount, { from: vault })
+      await strategy.deposit(depositAmount, { from: vault })
     })
 
     it("should exit", async () => {
@@ -48,7 +45,7 @@ export default (name: string, _setup: Setup, params: {DECIMALS: BN}) => {
       })
 
       const before = await snapshot()
-      await strategy.exit({from: vault})
+      await strategy.exit({ from: vault })
       const after = await snapshot()
 
       assert(after.gauge.strategy.eq(new BN(0)), "gauge strategy")

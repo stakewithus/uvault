@@ -1,15 +1,12 @@
 import BN from "bn.js"
-import { IERC20Instance } from "../../../types/IERC20"
-import { ControllerInstance } from "../../../types/Controller"
-import { GaugeInstance } from "../../../types/Gauge"
-import { StrategyInstance } from "./lib"
+import { IERC20Instance, ControllerInstance, GaugeInstance } from "../../../types"
 import { pow } from "../../util"
-import { Setup, getSnapshot } from "./lib"
+import { StrategyInstance, Setup, getSnapshot } from "./lib"
 
 export default (name: string, _setup: Setup, params: { DECIMALS: BN }) => {
   contract(name, (accounts) => {
     const { DECIMALS } = params
-    const depositAmount = pow(10, DECIMALS).mul(new BN(100))
+    const depositAmount = pow(10, DECIMALS).mul(new BN(1000000))
 
     const refs = _setup(accounts)
     const { admin, vault, treasury, whale } = refs
@@ -60,7 +57,8 @@ export default (name: string, _setup: Setup, params: { DECIMALS: BN }) => {
         "strategy total assets"
       )
       assert(after.gauge.strategy.gte(before.gauge.strategy), "gauge strategy")
-      assert(after.crv.strategy.gte(before.crv.strategy), "crv strategy")
+      // Check CRV was liquidated
+      assert(after.crv.strategy.gte(new BN(0)), "crv strategy")
     })
   })
 }

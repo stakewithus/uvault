@@ -1,10 +1,7 @@
 import BN from "bn.js"
-import { IERC20Instance } from "../../../types/IERC20"
-import { ControllerInstance } from "../../../types/Controller"
-import { GaugeInstance } from "../../../types/Gauge"
-import { StrategyInstance } from "./lib"
+import { IERC20Instance, ControllerInstance, GaugeInstance } from "../../../types"
 import { frac, pow } from "../../util"
-import { Setup, getSnapshot } from "./lib"
+import { StrategyInstance, Setup, getSnapshot } from "./lib"
 
 export default (
   name: string,

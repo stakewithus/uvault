@@ -1,26 +1,18 @@
-import {IERC20Instance} from "../../../types/IERC20"
-import {GaugeInstance} from "../../../types/Gauge"
-import {ControllerInstance} from "../../../types/Controller"
 import {
+  IERC20Instance,
+  GaugeInstance,
+  ControllerInstance,
   StrategyCusdDaiContract,
   StrategyCusdDaiInstance,
-} from "../../../types/StrategyCusdDai"
-import {
   StrategyCusdUsdcContract,
   StrategyCusdUsdcInstance,
-} from "../../../types/StrategyCusdUsdc"
-import {
   Strategy3CrvDaiContract,
   Strategy3CrvDaiInstance,
-} from "../../../types/Strategy3CrvDai"
-import {
   Strategy3CrvUsdcContract,
   Strategy3CrvUsdcInstance,
-} from "../../../types/Strategy3CrvUsdc"
-import {
   Strategy3CrvUsdtContract,
   Strategy3CrvUsdtInstance,
-} from "../../../types/Strategy3CrvUsdt"
+} from "../../../types"
 
 export type StrategyContract =
   | StrategyCusdDaiContract
@@ -61,7 +53,7 @@ export function getSnapshot(params: {
   vault: string
   treasury: string
 }) {
-  const {strategy, underlying, lp, gauge, crv, vault, treasury} = params
+  const { strategy, underlying, lp, gauge, crv, vault, treasury } = params
 
   return async () => {
     const snapshot = {
