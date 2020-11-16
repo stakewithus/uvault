@@ -60,7 +60,14 @@ contract("StrategyPdaiDai", (accounts) => {
     const after = await snapshot()
 
     assert(after.underlying.vault.gte(before.underlying.vault), "underlying vault")
-    assert(after.strategy.totalAssets.lte(before.strategy.totalAssets), "total assets")
+
+    if (before.strategy.totalAssets.gte(before.strategy.totalDebt)) {
+      assert(
+        after.strategy.totalAssets.lte(before.strategy.totalAssets),
+        "total assets"
+      )
+    }
+
     assert(after.strategy.totalDebt.lte(before.strategy.totalDebt), "total debt")
   })
 })
