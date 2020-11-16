@@ -47,9 +47,7 @@ export default (name: string, _setup: Setup, params: { DECIMALS: BN }) => {
         vault,
       })
 
-      // withdraw amount may be < deposit amount
-      // so here we get the maximum redeemable amount
-      const withdrawAmount = await strategy.totalAssets()
+      const withdrawAmount = frac(await strategy.totalAssets(), 50, 100)
 
       const before = await snapshot()
       await strategy.withdraw(withdrawAmount, { from: vault })
@@ -57,7 +55,7 @@ export default (name: string, _setup: Setup, params: { DECIMALS: BN }) => {
 
       // transfer underlying to vault //
       // minimum amount of underlying that can be withdrawn
-      const minUnderlying = frac(depositAmount, 99, 100)
+      const minUnderlying = frac(withdrawAmount, 99, 100)
 
       // check balance of underlying transferred to vault
       assert(
@@ -68,15 +66,11 @@ export default (name: string, _setup: Setup, params: { DECIMALS: BN }) => {
         after.strategy.totalDebt.lte(before.strategy.totalDebt.sub(minUnderlying)),
         "total debt"
       )
-      // check strategy does not have any underlying
-      assert(eq(after.underlying.strategy, new BN(0)), "underlying strategy")
-      // check strategy dust is small
-      assert(after.threeCrv.strategy.lte(new BN(100)), "jar strategy")
-      // check Pickle was minted
-      assert(after.pickle.strategy.gt(before.pickle.strategy), "pickle strategy")
-      // unstake p3crv from MasterChef
-      // TODO
-      assert(after.chef.staked.eq(new BN(0)), "chef")
+      assert(
+        after.strategy.totalAssets.lte(before.strategy.totalAssets.sub(minUnderlying)),
+        "total assets"
+      )
+      assert(after.chef.staked.lt(before.chef.staked), "chef")
     })
   })
 }

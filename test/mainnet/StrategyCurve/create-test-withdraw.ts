@@ -66,7 +66,6 @@ export default (name: string, _setup: Setup, params: { DECIMALS: BN }) => {
         after.strategy.totalAssets.lte(before.strategy.totalAssets.sub(minUnderlying)),
         "total assets"
       )
-      // check strategy dust is small
       assert(after.gauge.strategy.lt(before.gauge.strategy), "gauge strategy")
     })
   })
