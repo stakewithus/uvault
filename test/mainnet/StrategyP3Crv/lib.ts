@@ -1,18 +1,14 @@
-import {IERC20Instance} from "../../../types/IERC20"
-import {MasterChefInstance} from "../../../types/MasterChef"
-import {ControllerInstance} from "../../../types/Controller"
 import {
+  IERC20Instance,
+  MasterChefInstance,
+  ControllerInstance,
   StrategyP3CrvDaiContract,
   StrategyP3CrvDaiInstance,
-} from "../../../types/StrategyP3CrvDai"
-import {
   StrategyP3CrvUsdcContract,
   StrategyP3CrvUsdcInstance,
-} from "../../../types/StrategyP3CrvUsdc"
-import {
   StrategyP3CrvUsdtContract,
   StrategyP3CrvUsdtInstance,
-} from "../../../types/StrategyP3CrvUsdt"
+} from "../../../types"
 
 export type StrategyContract =
   | StrategyP3CrvDaiContract
@@ -51,7 +47,7 @@ export function getSnapshot(params: {
   vault: string
   treasury: string
 }) {
-  const {strategy, underlying, jar, chef, pickle, threeCrv, vault, treasury} = params
+  const { strategy, underlying, jar, chef, pickle, threeCrv, vault, treasury } = params
 
   return async () => {
     const snapshot = {
@@ -74,6 +70,9 @@ export function getSnapshot(params: {
       },
       pickle: {
         strategy: await pickle.balanceOf(strategy.address),
+      },
+      chef: {
+        staked: (await chef.userInfo(14, strategy.address))[0],
       },
     }
 

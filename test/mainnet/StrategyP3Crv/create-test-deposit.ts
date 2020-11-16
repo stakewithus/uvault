@@ -1,17 +1,14 @@
 import BN from "bn.js"
-import {IERC20Instance} from "../../../types/IERC20"
-import {ControllerInstance} from "../../../types/Controller"
-import {MasterChefInstance} from "../../../types/MasterChef"
-import {StrategyInstance} from "./lib"
-import {frac, pow} from "../../util"
-import {Setup, getSnapshot} from "./lib"
+import { IERC20Instance, ControllerInstance, MasterChefInstance } from "../../../types"
+import { frac, pow } from "../../util"
+import { StrategyInstance, Setup, getSnapshot } from "./lib"
 
-export default (name: string, _setup: Setup, params: {DECIMALS: BN}) => {
+export default (name: string, _setup: Setup, params: { DECIMALS: BN }) => {
   contract(name, (accounts) => {
     const refs = _setup(accounts)
-    const {vault, treasury, whale} = refs
+    const { vault, treasury, whale } = refs
 
-    const {DECIMALS} = params
+    const { DECIMALS } = params
 
     let underlying: IERC20Instance
     let jar: IERC20Instance
@@ -31,13 +28,13 @@ export default (name: string, _setup: Setup, params: {DECIMALS: BN}) => {
     })
 
     it("should deposit", async () => {
-      const depositAmount = pow(10, DECIMALS)
+      const depositAmount = pow(10, DECIMALS).mul(new BN(1000000))
 
       // transfer underlying to vault
-      await underlying.transfer(vault, depositAmount, {from: whale})
+      await underlying.transfer(vault, depositAmount, { from: whale })
 
       // approve strategy to spend underlying from vault
-      await underlying.approve(strategy.address, depositAmount, {from: vault})
+      await underlying.approve(strategy.address, depositAmount, { from: vault })
 
       const snapshot = getSnapshot({
         underlying,
@@ -51,7 +48,7 @@ export default (name: string, _setup: Setup, params: {DECIMALS: BN}) => {
       })
 
       const before = await snapshot()
-      await strategy.deposit(depositAmount, {from: vault})
+      await strategy.deposit(depositAmount, { from: vault })
       const after = await snapshot()
 
       // minimum amount of underlying that can be withdrawn
@@ -74,6 +71,7 @@ export default (name: string, _setup: Setup, params: {DECIMALS: BN}) => {
       assert(after.threeCrv.jar.gt(before.threeCrv.jar), "3Crv jar")
       // check p3Crv was staked into MasterChef
       assert(after.jar.chef.gt(before.jar.chef), "p3crv")
+      assert(after.chef.staked.gt(before.chef.staked), "chef - strategy")
     })
   })
 }

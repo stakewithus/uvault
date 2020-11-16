@@ -1,18 +1,15 @@
 import BN from "bn.js"
-import {IERC20Instance} from "../../../types/IERC20"
-import {ControllerInstance} from "../../../types/Controller"
-import {MasterChefInstance} from "../../../types/MasterChef"
-import {StrategyInstance} from "./lib"
-import {eq, frac, pow} from "../../util"
-import {Setup, getSnapshot} from "./lib"
+import { IERC20Instance, ControllerInstance, MasterChefInstance } from "../../../types"
+import { eq, frac, pow } from "../../util"
+import { StrategyInstance, Setup, getSnapshot } from "./lib"
 
-export default (name: string, _setup: Setup, params: {DECIMALS: BN}) => {
+export default (name: string, _setup: Setup, params: { DECIMALS: BN }) => {
   contract(name, (accounts) => {
-    const {DECIMALS} = params
-    const depositAmount = pow(10, DECIMALS).mul(new BN(100))
+    const { DECIMALS } = params
+    const depositAmount = pow(10, DECIMALS).mul(new BN(1000000))
 
     const refs = _setup(accounts)
-    const {vault, treasury, whale} = refs
+    const { vault, treasury, whale } = refs
 
     let underlying: IERC20Instance
     let jar: IERC20Instance
@@ -31,11 +28,11 @@ export default (name: string, _setup: Setup, params: {DECIMALS: BN}) => {
       strategy = refs.strategy
 
       // deposit underlying into vault
-      await underlying.transfer(vault, depositAmount, {from: whale})
+      await underlying.transfer(vault, depositAmount, { from: whale })
 
       // deposit underlying into strategy
-      await underlying.approve(strategy.address, depositAmount, {from: vault})
-      await strategy.deposit(depositAmount, {from: vault})
+      await underlying.approve(strategy.address, depositAmount, { from: vault })
+      await strategy.deposit(depositAmount, { from: vault })
     })
 
     it("should withdraw all", async () => {
@@ -51,7 +48,7 @@ export default (name: string, _setup: Setup, params: {DECIMALS: BN}) => {
       })
 
       const before = await snapshot()
-      await strategy.withdrawAll({from: vault})
+      await strategy.withdrawAll({ from: vault })
       const after = await snapshot()
 
       // minimum amount of underlying that can be withdrawn
@@ -72,6 +69,8 @@ export default (name: string, _setup: Setup, params: {DECIMALS: BN}) => {
       assert(after.threeCrv.strategy.lte(new BN(100)), "3crv strategy")
       // check Pickle was minted
       assert(after.pickle.strategy.gt(before.pickle.strategy), "pickle strategy")
+      // check staked amount in MasterChef
+      assert(after.chef.staked.eq(new BN(0)), "chef")
     })
   })
 }
