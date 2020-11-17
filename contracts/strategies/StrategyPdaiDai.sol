@@ -102,8 +102,8 @@ contract StrategyPdaiDai is StrategyBase, UseUniswap {
         MasterChef(CHEF).deposit(POOL_ID, 0);
         _swapPickle();
         // get staking rewards WETH
-        // PickleStaking(STAKING).getReward();
-        // _swapWeth();
+        PickleStaking(STAKING).getReward();
+        _swapWeth();
 
         uint bal = IERC20(underlying).balanceOf(address(this));
         if (bal > 0) {
@@ -129,6 +129,7 @@ contract StrategyPdaiDai is StrategyBase, UseUniswap {
         // 2. Sell PICKLE
         // 3. Transfer underlying to vault
         _withdrawAll();
+        // exit staking
         _swapPickle();
 
         uint underlyingBal = IERC20(underlying).balanceOf(address(this));

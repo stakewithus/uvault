@@ -56,6 +56,7 @@ export function getSnapshot(params: {
       },
       staking: {
         strategy: await staking.balanceOf(strategy.address),
+        earned: await staking.earned(strategy.address),
       },
     }
 
