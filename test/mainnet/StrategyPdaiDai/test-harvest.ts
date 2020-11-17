@@ -37,9 +37,6 @@ contract("StrategyPdaiDai", (accounts) => {
     // deposit underlying into strategy
     await underlying.approve(strategy.address, depositAmount, { from: vault })
     await strategy.deposit(depositAmount, { from: vault })
-
-    // withdraw to claim Pickles
-    await strategy.withdrawAll({ from: vault })
   })
 
   it("should harvest", async () => {

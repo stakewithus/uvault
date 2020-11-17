@@ -75,11 +75,24 @@ contract StrategyPdaiDai is StrategyBase, UseUniswap {
         }
     }
 
+    function _swapWeth() private {
+        uint wethBal = IERC20(WETH).balanceOf(address(this));
+        if (wethBal > 0) {
+            _swap(WETH, underlying, wethBal);
+            // Now this contract has underlying token
+        }
+    }
+
     /*
     @notice Sell PICKLE and deposit most premium token into CURVE
     */
     function harvest() external override onlyAuthorized {
+        // claim Pickle
+        MasterChef(CHEF).deposit(POOL_ID, 0);
         _swapPickle();
+        // get staking rewards WETH
+        // PickleStaking(STAKING).getReward();
+        // _swapWeth();
 
         uint bal = IERC20(underlying).balanceOf(address(this));
         if (bal > 0) {
