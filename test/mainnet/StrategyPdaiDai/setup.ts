@@ -1,10 +1,18 @@
 import BN from "bn.js"
 import { sendEther } from "../../util"
-import { PDAI_JAR, PICKLE, MASTER_CHEF, DAI, DAI_WHALE } from "../config"
+import {
+  PDAI_JAR,
+  PICKLE,
+  MASTER_CHEF,
+  PICKLE_STAKING,
+  DAI,
+  DAI_WHALE,
+} from "../config"
 import { Refs } from "./lib"
 
 const IERC20 = artifacts.require("IERC20")
 const MasterChef = artifacts.require("MasterChef")
+const PickleStaking = artifacts.require("PickleStaking")
 const StrategyPdaiDai = artifacts.require("StrategyPdaiDai")
 const Controller = artifacts.require("Controller")
 
@@ -30,6 +38,8 @@ export default (accounts: Truffle.Accounts) => {
     // @ts-ignore
     pickle: null,
     // @ts-ignore
+    staking: null,
+    // @ts-ignore
     controller: null,
     // @ts-ignore
     strategy: null,
@@ -41,6 +51,7 @@ export default (accounts: Truffle.Accounts) => {
     refs.jar = await IERC20.at(PDAI_JAR)
     refs.chef = await MasterChef.at(MASTER_CHEF)
     refs.pickle = await IERC20.at(PICKLE)
+    refs.staking = await PickleStaking.at(PICKLE_STAKING)
     refs.controller = await Controller.new(treasury)
     refs.strategy = await StrategyPdaiDai.new(refs.controller.address, vault)
   })

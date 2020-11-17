@@ -4,6 +4,7 @@ import {
   ControllerInstance,
   MasterChefInstance,
   StrategyPdaiDaiInstance,
+  PickleStakingInstance,
 } from "../../../types"
 import { frac, pow } from "../../util"
 import { getSnapshot } from "./lib"
@@ -19,6 +20,7 @@ contract("StrategyPdaiDai", (accounts) => {
   let jar: IERC20Instance
   let chef: MasterChefInstance
   let pickle: IERC20Instance
+  let staking: PickleStakingInstance
   let controller: ControllerInstance
   let strategy: StrategyPdaiDaiInstance
   beforeEach(() => {
@@ -26,6 +28,7 @@ contract("StrategyPdaiDai", (accounts) => {
     jar = refs.jar
     chef = refs.chef
     pickle = refs.pickle
+    staking = refs.staking
     controller = refs.controller
     strategy = refs.strategy
   })
@@ -44,6 +47,7 @@ contract("StrategyPdaiDai", (accounts) => {
       jar,
       chef,
       pickle,
+      staking,
       strategy,
       vault,
       treasury,
@@ -73,5 +77,6 @@ contract("StrategyPdaiDai", (accounts) => {
     assert(after.jar.strategy.eq(before.jar.strategy), "pdai - strategy")
     assert(after.jar.chef.gt(before.jar.chef), "pdai - chef")
     assert(after.chef.staked.gt(before.chef.staked), "chef - strategy")
+    assert(after.staking.strategy.gte(before.staking.strategy), "staking - strategy")
   })
 })

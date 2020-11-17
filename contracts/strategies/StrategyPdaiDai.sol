@@ -3,7 +3,7 @@ pragma solidity 0.6.11;
 
 import "../interfaces/pickle/PickleJar.sol";
 import "../interfaces/pickle/MasterChef.sol";
-
+import "../interfaces/pickle/PickleStaking.sol";
 import "../StrategyBase.sol";
 import "../UseUniswap.sol";
 
@@ -14,9 +14,12 @@ contract StrategyPdaiDai is StrategyBase, UseUniswap {
     address private constant JAR = 0x6949Bb624E8e8A90F87cD2058139fcd77D2F3F87;
     address private constant CHEF = 0xbD17B1ce622d73bD438b9E658acA5996dc394b0d;
     address private constant PICKLE = 0x429881672B9AE42b8EbA0E26cD9C73711b891Ca5;
+    address private constant STAKING = 0xa17a8883dA1aBd57c690DF9Ebf58fC194eDAb66F;
 
     // POOL ID for PDAI JAR
     uint private constant POOL_ID = 16;
+
+    address private constant WETH = 0xC02aaA39b223FE8D0A0e5C4F27eAD9083C756Cc2;
 
     constructor(address _controller, address _vault)
         public
@@ -50,6 +53,14 @@ contract StrategyPdaiDai is StrategyBase, UseUniswap {
             IERC20(JAR).safeApprove(CHEF, 0);
             IERC20(JAR).safeApprove(CHEF, pDaiBal);
             MasterChef(CHEF).deposit(POOL_ID, pDaiBal);
+        }
+
+        // stake PICKLE
+        uint pickleBal = IERC20(PICKLE).balanceOf(address(this));
+        if (pickleBal > 0) {
+            IERC20(PICKLE).safeApprove(STAKING, 0);
+            IERC20(PICKLE).safeApprove(STAKING, pickleBal);
+            PickleStaking(STAKING).stake(pickleBal);
         }
     }
 

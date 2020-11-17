@@ -1,7 +1,10 @@
-import { IERC20Instance } from "../../../types/IERC20"
-import { MasterChefInstance } from "../../../types/MasterChef"
-import { ControllerInstance } from "../../../types/Controller"
-import { StrategyPdaiDaiInstance } from "../../../types/StrategyPdaiDai"
+import {
+  IERC20Instance,
+  MasterChefInstance,
+  PickleStakingInstance,
+  ControllerInstance,
+  StrategyPdaiDaiInstance,
+} from "../../../types"
 
 // references to return
 export interface Refs {
@@ -12,6 +15,7 @@ export interface Refs {
   jar: IERC20Instance
   chef: MasterChefInstance
   pickle: IERC20Instance
+  staking: PickleStakingInstance
   controller: ControllerInstance
   strategy: StrategyPdaiDaiInstance
   whale: string
@@ -23,10 +27,11 @@ export function getSnapshot(params: {
   jar: IERC20Instance
   chef: MasterChefInstance
   pickle: IERC20Instance
+  staking: PickleStakingInstance
   vault: string
   treasury: string
 }) {
-  const { strategy, underlying, jar, chef, pickle, vault, treasury } = params
+  const { strategy, underlying, jar, chef, pickle, staking, vault, treasury } = params
 
   return async () => {
     const snapshot = {
@@ -48,6 +53,9 @@ export function getSnapshot(params: {
       },
       chef: {
         staked: (await chef.userInfo(16, strategy.address))[0],
+      },
+      staking: {
+        strategy: await staking.balanceOf(strategy.address),
       },
     }
 
