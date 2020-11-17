@@ -16,6 +16,10 @@ contract StrategyPdaiDai is StrategyBase, UseUniswap {
     address private constant PICKLE = 0x429881672B9AE42b8EbA0E26cD9C73711b891Ca5;
     address private constant STAKING = 0xa17a8883dA1aBd57c690DF9Ebf58fC194eDAb66F;
 
+    // percentage of Pickle to sell, rest is staked
+    uint public pickleSell = 10000;
+    uint private constant PICKLE_SELL_MAX = 10000;
+
     // POOL ID for PDAI JAR
     uint private constant POOL_ID = 16;
 
@@ -27,6 +31,11 @@ contract StrategyPdaiDai is StrategyBase, UseUniswap {
     {
         // Assets that cannot be swept by admin
         assets[PICKLE] = true;
+    }
+
+    function setPickleSell(uint _sell) external onlyAdmin {
+        require(_sell <= PICKLE_SELL_MAX, "sell > max");
+        pickleSell = _sell;
     }
 
     // TODO security: vulnerable to price manipulation?
@@ -78,14 +87,6 @@ contract StrategyPdaiDai is StrategyBase, UseUniswap {
         // Now we have underlying
     }
 
-    function _swapPickle() private {
-        uint pickleBal = IERC20(PICKLE).balanceOf(address(this));
-        if (pickleBal > 0) {
-            _swap(PICKLE, underlying, pickleBal);
-            // Now this contract has underlying token
-        }
-    }
-
     function _swapWeth() private {
         uint wethBal = IERC20(WETH).balanceOf(address(this));
         if (wethBal > 0) {
@@ -100,7 +101,14 @@ contract StrategyPdaiDai is StrategyBase, UseUniswap {
     function harvest() external override onlyAuthorized {
         // claim Pickle
         MasterChef(CHEF).deposit(POOL_ID, 0);
-        _swapPickle();
+
+        // unsold amount will be staked in _depositUnderlying()
+        uint pickleBal = IERC20(PICKLE).balanceOf(address(this));
+        uint pickleAmount = pickleBal.mul(pickleSell).div(PICKLE_SELL_MAX);
+        if (pickleAmount > 0) {
+            _swap(PICKLE, underlying, pickleAmount);
+            // Now this contract has underlying token
+        }
         // get staking rewards WETH
         PickleStaking(STAKING).getReward();
         _swapWeth();
@@ -138,7 +146,12 @@ contract StrategyPdaiDai is StrategyBase, UseUniswap {
             _swapWeth();
         }
         _withdrawAll();
-        _swapPickle();
+
+        uint pickleBal = IERC20(PICKLE).balanceOf(address(this));
+        if (pickleBal > 0) {
+            _swap(PICKLE, underlying, pickleBal);
+            // Now this contract has underlying token
+        }
 
         uint bal = IERC20(underlying).balanceOf(address(this));
         if (bal > 0) {
