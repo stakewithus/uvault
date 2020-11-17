@@ -32,6 +32,7 @@ export interface Config {
     strategyP3CrvDai: string
     strategyP3CrvUsdc: string
     strategyP3CrvUsdt: string
+    strategyPdaiDai: string
     // others
     dai: string
     usdc: string
@@ -81,6 +82,7 @@ const config: Config = {
     strategyP3CrvDai: "0xCd9A4c92c90a7ABC63dBCb60a1A0A60054A4139b",
     strategyP3CrvUsdc: "0x34B2aBE99E4654bd1bCB55BF42707c997Bf9A799",
     strategyP3CrvUsdt: "0x41017dDc66583b24EcA97D53a4c9512462126daf",
+    strategyPdaiDai: "0x399ce456b198BD5C82586e0281F5742FA5228f76",
     // others //
     dai: "0x6B175474E89094C44Da98b954EedeAC495271d0F",
     usdc: "0xA0b86991c6218b36c1d19D4a2e9Eb0cE3606eB48",
