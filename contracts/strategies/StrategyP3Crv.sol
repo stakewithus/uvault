@@ -78,6 +78,7 @@ contract StrategyP3Crv is StrategyBase, UseUniswap {
             IERC20(JAR).safeApprove(CHEF, p3crvBal);
             MasterChef(CHEF).deposit(POOL_ID, p3crvBal);
         }
+        // TODO stake
     }
 
     function _depositUnderlying() internal override {
@@ -142,6 +143,9 @@ contract StrategyP3Crv is StrategyBase, UseUniswap {
     @notice Sell PICKLE and deposit most premium token into CURVE
     */
     function harvest() external override onlyAuthorized {
+        // TODO: claim Pickle
+        // MasterChef(CHER).deposit(POOL_ID, 0);
+
         (address token, uint index) = _getMostPremiumToken();
 
         _swapPickleFor(token);
