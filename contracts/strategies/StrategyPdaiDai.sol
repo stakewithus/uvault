@@ -124,17 +124,25 @@ contract StrategyPdaiDai is StrategyBase, UseUniswap {
     @dev Caller should implement guard agains slippage
     */
     function exit() external override onlyAuthorized {
-        // PICKLE is minted on withdraw so here we
-        // 1. Withdraw from MasterChef
-        // 2. Sell PICKLE
-        // 3. Transfer underlying to vault
+        /*
+        PICKLE is minted on deposit / withdraw so here we
+        0. Unstake PICKLE and claim WETH rewards
+        1. Sell WETH
+        2. Withdraw from MasterChef
+        3. Sell PICKLE
+        4. Transfer underlying to vault
+        */
+        uint staked = PickleStaking(STAKING).balanceOf(address(this));
+        if (staked > 0) {
+            PickleStaking(STAKING).exit();
+            _swapWeth();
+        }
         _withdrawAll();
-        // exit staking
         _swapPickle();
 
-        uint underlyingBal = IERC20(underlying).balanceOf(address(this));
-        if (underlyingBal > 0) {
-            IERC20(underlying).safeTransfer(vault, underlyingBal);
+        uint bal = IERC20(underlying).balanceOf(address(this));
+        if (bal > 0) {
+            IERC20(underlying).safeTransfer(vault, bal);
         }
     }
 }
