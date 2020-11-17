@@ -1,5 +1,5 @@
 import BN from "bn.js"
-import {ethers} from "hardhat"
+import { ethers } from "hardhat"
 import config from "../config"
 
 const FEE_MAX = 10000
@@ -108,6 +108,7 @@ async function main() {
       daiSafeVault,
       usdcSafeVault,
       usdtSafeVault,
+      daiDegenVault,
       strategyCusdDai,
       strategyCusdUsdc,
       strategy3CrvDai,
@@ -116,6 +117,7 @@ async function main() {
       strategyP3CrvDai,
       strategyP3CrvUsdc,
       strategyP3CrvUsdt,
+      strategyPdaiDai,
     } = config.mainnet
 
     const addrToStrat = {
@@ -127,6 +129,7 @@ async function main() {
       [strategyP3CrvDai]: "DAI -> P3CRV",
       [strategyP3CrvUsdc]: "USDC -> P3CRV",
       [strategyP3CrvUsdt]: "USDT -> P3CRV",
+      [strategyPdaiDai]: "DAI -> PDAI",
     }
 
     const vaults: Vault[] = [
@@ -144,6 +147,11 @@ async function main() {
         name: "USDT Safe Vault",
         address: usdtSafeVault,
         decimals: 6,
+      },
+      {
+        name: "DAI Degen Vault",
+        address: daiDegenVault,
+        decimals: 18,
       },
     ]
 
