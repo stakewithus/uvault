@@ -4,6 +4,7 @@ import {
   ControllerInstance,
   MasterChefInstance,
   StrategyPdaiDaiInstance,
+  PickleStakingInstance,
 } from "../../../types"
 import { eq, pow } from "../../util"
 import { getSnapshot } from "./lib"
@@ -21,6 +22,7 @@ contract("StrategyPdaiDai", (accounts) => {
   let jar: IERC20Instance
   let chef: MasterChefInstance
   let pickle: IERC20Instance
+  let staking: PickleStakingInstance
   let controller: ControllerInstance
   let strategy: StrategyPdaiDaiInstance
   beforeEach(async () => {
@@ -28,6 +30,7 @@ contract("StrategyPdaiDai", (accounts) => {
     jar = refs.jar
     chef = refs.chef
     pickle = refs.pickle
+    staking = refs.staking
     controller = refs.controller
     strategy = refs.strategy
 
@@ -48,6 +51,7 @@ contract("StrategyPdaiDai", (accounts) => {
       jar,
       chef,
       pickle,
+      staking,
       strategy,
       treasury,
       vault,
