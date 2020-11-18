@@ -17,7 +17,7 @@ contract StrategyPdaiDai is StrategyBase, UseUniswap {
     address private constant STAKING = 0xa17a8883dA1aBd57c690DF9Ebf58fC194eDAb66F;
 
     // percentage of Pickle to sell, rest is staked
-    uint public pickleSell = 10000;
+    uint public pickleSell = 5000;
     uint private constant PICKLE_SELL_MAX = 10000;
 
     // POOL ID for PDAI JAR
