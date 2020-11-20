@@ -1,12 +1,15 @@
 import "../setup"
 import BN from "bn.js"
-import {TestTokenInstance} from "../../types/TestToken"
-import {MockGasTokenInstance} from "../../types/MockGasToken"
-import {GasRelayerInstance} from "../../types/GasRelayer"
-import {ControllerInstance} from "../../types/Controller"
-import {VaultInstance} from "../../types/Vault"
-import {StrategyTestInstance} from "../../types/StrategyTest"
-import {pow} from "../util"
+import {
+  TestTokenInstance,
+  MockGasTokenInstance,
+  GasRelayerInstance,
+  ControllerInstance,
+  VaultInstance,
+  StrategyTestInstance,
+  StrategyNoOpInstance,
+} from "../../types"
+import { pow } from "../util"
 
 const TestToken = artifacts.require("TestToken")
 const MockGasToken = artifacts.require("MockGasToken")
@@ -14,6 +17,7 @@ const GasRelayer = artifacts.require("GasRelayer")
 const Controller = artifacts.require("Controller")
 const Vault = artifacts.require("Vault")
 const StrategyTest = artifacts.require("StrategyTest")
+const StrategyNoOp = artifacts.require("StrategyNoOp")
 
 export default (accounts: Truffle.Accounts) => {
   const admin = accounts[0]
@@ -34,6 +38,7 @@ export default (accounts: Truffle.Accounts) => {
     controller: ControllerInstance
     vault: VaultInstance
     strategy: StrategyTestInstance
+    strategyNoOp: StrategyNoOpInstance
     whale: string
   }
 
@@ -53,6 +58,8 @@ export default (accounts: Truffle.Accounts) => {
     vault: null,
     // @ts-ignore
     strategy: null,
+    // @ts-ignore
+    strategyNoOp: null,
     whale,
   }
 
@@ -76,6 +83,14 @@ export default (accounts: Truffle.Accounts) => {
         from: admin,
       }
     )
+    const strategyNoOp = await StrategyNoOp.new(
+      controller.address,
+      vault.address,
+      underlying.address,
+      {
+        from: admin,
+      }
+    )
 
     refs.underlying = underlying
     refs.gasToken = gasToken
@@ -83,18 +98,22 @@ export default (accounts: Truffle.Accounts) => {
     refs.controller = controller
     refs.vault = vault
     refs.strategy = strategy
+    refs.strategyNoOp = strategyNoOp
 
     const adminRole = await controller.ADMIN_ROLE()
-    await controller.grantRole(adminRole, gasRelayer.address, {from: admin})
+    await controller.grantRole(adminRole, gasRelayer.address, { from: admin })
 
     // deposit into vault
     const amount = pow(10, 18).mul(new BN(100))
     await underlying._mint_(whale, amount)
-    await underlying.approve(vault.address, amount, {from: whale})
-    await vault.deposit(amount, {from: whale})
+    await underlying.approve(vault.address, amount, { from: whale })
+    await vault.deposit(amount, { from: whale })
+
+    // approve StrategyNoOp
+    await vault.approveStrategy(strategyNoOp.address, { from: timeLock })
 
     // set strategy
-    await vault.approveStrategy(strategy.address, {from: timeLock})
+    await vault.approveStrategy(strategy.address, { from: timeLock })
     await controller.setStrategy(vault.address, strategy.address, new BN(0), {
       from: admin,
     })
