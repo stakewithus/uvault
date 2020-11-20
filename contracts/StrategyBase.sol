@@ -89,7 +89,7 @@ abstract contract StrategyBase is IStrategy {
         if (diff > totalDebt) {
             totalDebt = 0;
         } else {
-            totalDebt = totalDebt.sub(diff);
+            totalDebt = totalDebt - diff;
         }
     }
 
@@ -139,7 +139,7 @@ abstract contract StrategyBase is IStrategy {
         */
         if (_totalUnderlying > 0) {
             uint totalShares = _getTotalShares();
-            return _underlyingAmount.mul(totalShares).div(_totalUnderlying);
+            return _underlyingAmount.mul(totalShares) / _totalUnderlying;
         }
         return 0;
     }
@@ -202,7 +202,7 @@ abstract contract StrategyBase is IStrategy {
         uint totalUnderlying = _totalAssets();
 
         if (totalUnderlying > totalDebt) {
-            uint profit = totalUnderlying.sub(totalDebt);
+            uint profit = totalUnderlying - totalDebt;
             uint shares = _getShares(profit, totalUnderlying);
             if (shares > 0) {
                 uint balBefore = IERC20(underlying).balanceOf(address(this));
