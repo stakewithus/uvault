@@ -40,11 +40,8 @@ contract TimeLock is ITimeLock {
     mapping(bytes32 => bool) public override queued;
 
     constructor(uint _delay) public {
-        require(_delay >= MIN_DELAY, "delay < min");
-        require(_delay <= MAX_DELAY, "delay > max");
-
         admin = msg.sender;
-        delay = _delay;
+        _setDelay(_delay);
     }
 
     receive() external payable override {}
@@ -60,16 +57,21 @@ contract TimeLock is ITimeLock {
         emit NewAdmin(_admin);
     }
 
-    /*
-    @dev Only this contract can execute this function
-    */
-    function setDelay(uint _delay) external override {
-        require(msg.sender == address(this), "!timelock");
+    function _setDelay(uint _delay) private {
         require(_delay >= MIN_DELAY, "delay < min");
         require(_delay <= MAX_DELAY, "delay > max");
         delay = _delay;
 
         emit NewDelay(delay);
+    }
+
+    /*
+    @dev Only this contract can execute this function
+    */
+    function setDelay(uint _delay) external override {
+        require(msg.sender == address(this), "!timelock");
+
+        _setDelay(_delay);
     }
 
     function _getTxHash(
