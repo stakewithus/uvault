@@ -41,7 +41,7 @@ abstract contract StrategyCurve is StrategyBase, UseUniswap {
         uint lpBal = Gauge(gauge).balanceOf(address(this));
         uint pricePerShare = _getVirtualPrice();
 
-        return lpBal.mul(pricePerShare).div(1e18).div(precisionDiv);
+        return lpBal.mul(pricePerShare) / (precisionDiv.mul(1e18));
     }
 
     function _addLiquidity(uint _amount, uint _index) internal virtual;
@@ -117,7 +117,7 @@ abstract contract StrategyCurve is StrategyBase, UseUniswap {
         uint bal = IERC20(token).balanceOf(address(this));
         if (bal > 0) {
             // transfer fee to treasury
-            uint fee = bal.mul(performanceFee).div(PERFORMANCE_FEE_MAX);
+            uint fee = bal.mul(performanceFee) / PERFORMANCE_FEE_MAX;
             if (fee > 0) {
                 address treasury = IController(controller).treasury();
                 require(treasury != address(0), "treasury = zero address");
