@@ -64,11 +64,6 @@ contract StrategyCusd is StrategyCurve {
             return (DAI, 0);
         }
 
-        // USDC
-        if (balances[1] < balances[0]) {
-            return (USDC, 1);
-        }
-
-        return (DAI, 0);
+        return (USDC, 1);
     }
 }
