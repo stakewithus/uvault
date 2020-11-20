@@ -11,7 +11,7 @@ import _setup from "./setup"
 
 const StrategyTest = artifacts.require("StrategyTest")
 
-contract("integration", (accounts) => {
+contract("integration - withdraw", (accounts) => {
   const refs = _setup(accounts)
   const { admin } = refs
 

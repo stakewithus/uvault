@@ -1,17 +1,19 @@
 import chai from "chai"
 import BN from "bn.js"
-import {TestTokenInstance} from "../../types/TestToken"
-import {ControllerInstance} from "../../types/Controller"
-import {VaultInstance} from "../../types/Vault"
-import {StrategyTestInstance} from "../../types/StrategyTest"
-import {eq, add} from "../util"
+import {
+  TestTokenInstance,
+  ControllerInstance,
+  VaultInstance,
+  StrategyTestInstance,
+} from "../../types"
+import { eq, add } from "../util"
 import _setup from "./setup"
 
 const StrategyTest = artifacts.require("StrategyTest")
 
-contract("integration", (accounts) => {
+contract("integration - set strategy", (accounts) => {
   const refs = _setup(accounts)
-  const {admin, timeLock} = refs
+  const { admin, timeLock } = refs
 
   let controller: ControllerInstance
   let vault: VaultInstance
@@ -25,7 +27,7 @@ contract("integration", (accounts) => {
     underlying = refs.underlying
 
     // invest into current strategy
-    await controller.invest(vault.address, {from: admin})
+    await controller.invest(vault.address, { from: admin })
 
     // new stratgy
     newStrategy = await StrategyTest.new(
@@ -37,7 +39,7 @@ contract("integration", (accounts) => {
       }
     )
 
-    await vault.approveStrategy(newStrategy.address, {from: timeLock})
+    await vault.approveStrategy(newStrategy.address, { from: timeLock })
   })
 
   const snapshot = async () => {
@@ -57,7 +59,9 @@ contract("integration", (accounts) => {
     const min = await vault.balanceInStrategy()
 
     const before = await snapshot()
-    await controller.setStrategy(vault.address, newStrategy.address, min, {from: admin})
+    await controller.setStrategy(vault.address, newStrategy.address, min, {
+      from: admin,
+    })
     const after = await snapshot()
 
     // check strategy transferred all underlying token back to vault

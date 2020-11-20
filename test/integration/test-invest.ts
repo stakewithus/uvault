@@ -10,7 +10,7 @@ import _setup from "./setup"
 
 const Vault = artifacts.require("Vault")
 
-contract("integration", (accounts) => {
+contract("integration - invest", (accounts) => {
   const refs = _setup(accounts)
   const { admin, timeLock } = refs
 
