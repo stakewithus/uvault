@@ -227,7 +227,7 @@ contract Vault is IVault, ERC20, ReentrancyGuard {
             return 0;
         }
 
-        return balInVault.sub(reserve);
+        return balInVault - reserve;
     }
 
     /*
@@ -375,7 +375,7 @@ contract Vault is IVault, ERC20, ReentrancyGuard {
 
         uint totalShares = totalSupply();
         if (totalShares > 0) {
-            return _shares.mul(totalUnderlying).div(totalShares);
+            return _shares.mul(totalUnderlying) / totalShares;
         }
         return 0;
     }
@@ -423,16 +423,17 @@ contract Vault is IVault, ERC20, ReentrancyGuard {
             if (diff < amountFromStrat) {
                 // withdraw amount - withdraw amount from strat = amount to withdraw from vault
                 // diff = actual amount returned from strategy
-                withdrawAmount = withdrawAmount.sub(amountFromStrat).add(diff);
+                // NOTE: withdrawAmount >= amountFromStrat
+                withdrawAmount = (withdrawAmount - amountFromStrat).add(diff);
             }
 
             // transfer to treasury
-            uint fee = withdrawAmount.mul(withdrawFee).div(FEE_MAX);
+            uint fee = withdrawAmount.mul(withdrawFee) / FEE_MAX;
             if (fee > 0) {
                 address treasury = IController(controller).treasury();
                 require(treasury != address(0), "treasury = zero address");
 
-                withdrawAmount = withdrawAmount.sub(fee);
+                withdrawAmount = withdrawAmount - fee;
                 IERC20(token).safeTransfer(treasury, fee);
             }
         }
