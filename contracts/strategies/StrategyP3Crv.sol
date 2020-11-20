@@ -117,21 +117,17 @@ contract StrategyP3Crv is StrategyBase, UseUniswap {
         balances[2] = StableSwap3(CURVE).balances(2).mul(1e12); // USDT
 
         // DAI
-        if (balances[0] < balances[1] && balances[0] < balances[2]) {
+        if (balances[0] <= balances[1] && balances[0] <= balances[2]) {
             return (DAI, 0);
         }
 
         // USDC
-        if (balances[1] < balances[0] && balances[1] < balances[2]) {
+        if (balances[1] <= balances[0] && balances[1] <= balances[2]) {
             return (USDC, 1);
         }
 
         // USDT
-        if (balances[2] < balances[0] && balances[2] < balances[1]) {
-            return (USDT, 2);
-        }
-
-        return (DAI, 0);
+        return (USDT, 2);
     }
 
     function _swapPickleFor(address _token) private {
