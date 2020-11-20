@@ -1,9 +1,10 @@
 import "../../setup"
-import {TestTokenInstance} from "../../../types/TestToken"
-import {ControllerInstance} from "../../../types/Controller"
-import {StrategyTestInstance} from "../../../types/StrategyTest"
-import {MockVaultInstance} from "../../../types/MockVault"
-import {MockTimeLockInstance} from "../../../types"
+import { TestTokenInstance } from "../../../types/TestToken"
+import { ControllerInstance } from "../../../types/Controller"
+import { StrategyTestInstance } from "../../../types/StrategyTest"
+import { MockVaultInstance } from "../../../types/MockVault"
+import { MockTimeLockInstance } from "../../../types"
+import BN from "bn.js"
 
 const TestToken = artifacts.require("TestToken")
 const Controller = artifacts.require("Controller")
@@ -58,6 +59,8 @@ export default (accounts: Truffle.Accounts) => {
       refs.underlying.address
     )
 
+    // set vault.strategy
+    await refs.vault.setStrategy(refs.strategy.address, new BN(0))
     // fund strategy
     await refs.strategy._mintToPool_(1000)
   })

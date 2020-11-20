@@ -1,16 +1,18 @@
 import chai from "chai"
-import {TestTokenInstance} from "../../types/TestToken"
-import {ControllerInstance} from "../../types/Controller"
-import {VaultInstance} from "../../types/Vault"
-import {StrategyTestInstance} from "../../types/StrategyTest"
-import {eq, sub, ZERO_ADDRESS} from "../util"
+import {
+  TestTokenInstance,
+  ControllerInstance,
+  VaultInstance,
+  StrategyTestInstance,
+} from "../../types"
+import { eq, sub, ZERO_ADDRESS } from "../util"
 import _setup from "./setup"
 
 const Vault = artifacts.require("Vault")
 
 contract("integration", (accounts) => {
   const refs = _setup(accounts)
-  const {admin, timeLock} = refs
+  const { admin, timeLock } = refs
 
   let controller: ControllerInstance
   let vault: VaultInstance
@@ -38,7 +40,7 @@ contract("integration", (accounts) => {
 
   it("should invest", async () => {
     const before = await snapshot()
-    await controller.invest(vault.address, {from: admin})
+    await controller.invest(vault.address, { from: admin })
     const after = await snapshot()
 
     // check underlying was transferred from vault to strategy
@@ -61,16 +63,16 @@ contract("integration", (accounts) => {
 
   it("should reject if not authorized", async () => {
     await chai
-      .expect(controller.invest(vault.address, {from: accounts[1]}))
+      .expect(controller.invest(vault.address, { from: accounts[1] }))
       .to.be.rejectedWith("!authorized")
   })
 
-  it("should reject if strategy not set", async () => {
+  it("should reject if not currenty strategy", async () => {
     const vault = await Vault.new(controller.address, timeLock, underlying.address)
     assert.equal(await vault.strategy(), ZERO_ADDRESS, "strategy")
 
     await chai
-      .expect(controller.invest(vault.address, {from: admin}))
+      .expect(controller.invest(vault.address, { from: admin }))
       .to.be.rejectedWith("strategy = zero address")
   })
 })

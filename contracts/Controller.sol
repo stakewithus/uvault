@@ -13,9 +13,8 @@ contract Controller is IController, AccessControl {
     using SafeMath for uint;
 
     bytes32 public constant override ADMIN_ROLE = keccak256(abi.encodePacked("ADMIN"));
-    bytes32 public constant override HARVESTER_ROLE = keccak256(
-        abi.encodePacked("HARVESTER")
-    );
+    bytes32 public constant override HARVESTER_ROLE =
+        keccak256(abi.encodePacked("HARVESTER"));
 
     address public override admin;
     address public override treasury;
@@ -32,6 +31,15 @@ contract Controller is IController, AccessControl {
 
     modifier onlyAdmin() {
         require(msg.sender == admin, "!admin");
+        _;
+    }
+
+    modifier isCurrentStrategy(address _strategy) {
+        address vault = IStrategy(_strategy).vault();
+        /*
+        Check that _strategy is the current strategy used by the vault.
+        */
+        require(IVault(vault).strategy() == _strategy, "!strategy");
         _;
     }
 
@@ -71,17 +79,21 @@ contract Controller is IController, AccessControl {
         IVault(_vault).invest();
     }
 
-    // @dev Warning: harvest can be called on strategy that is not set to any vault
     function harvest(address _strategy)
         external
         override
+        isCurrentStrategy(_strategy)
         onlyAuthorized(HARVESTER_ROLE)
     {
         IStrategy(_strategy).harvest();
     }
 
-    // @dev Warning: Skim can be called on strategy that is not set to any vault
-    function skim(address _strategy) external override onlyAuthorized(HARVESTER_ROLE) {
+    function skim(address _strategy)
+        external
+        override
+        isCurrentStrategy(_strategy)
+        onlyAuthorized(HARVESTER_ROLE)
+    {
         IStrategy(_strategy).skim();
     }
 
@@ -96,29 +108,34 @@ contract Controller is IController, AccessControl {
         require(balAfter.sub(balBefore) >= _min, "withdraw < min");
     }
 
-    // @dev Warning: withdraw can be called on strategy that is not set to any vault
     function withdraw(
         address _strategy,
         uint _amount,
         uint _min
-    ) external override onlyAuthorized(HARVESTER_ROLE) checkWithdraw(_strategy, _min) {
+    )
+        external
+        override
+        isCurrentStrategy(_strategy)
+        onlyAuthorized(HARVESTER_ROLE)
+        checkWithdraw(_strategy, _min)
+    {
         IStrategy(_strategy).withdraw(_amount);
     }
 
-    // @dev Warning: withdrawAll can be called on strategy that is not set to any vault
     function withdrawAll(address _strategy, uint _min)
         external
         override
+        isCurrentStrategy(_strategy)
         onlyAuthorized(ADMIN_ROLE)
         checkWithdraw(_strategy, _min)
     {
         IStrategy(_strategy).withdrawAll();
     }
 
-    // @dev Warning: exit can be called on strategy that is not set to any vault
     function exit(address _strategy, uint _min)
         external
         override
+        isCurrentStrategy(_strategy)
         onlyAuthorized(ADMIN_ROLE)
         checkWithdraw(_strategy, _min)
     {

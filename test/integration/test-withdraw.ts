@@ -1,15 +1,19 @@
 import chai from "chai"
 import BN from "bn.js"
-import {TestTokenInstance} from "../../types/TestToken"
-import {ControllerInstance} from "../../types/Controller"
-import {VaultInstance} from "../../types/Vault"
-import {StrategyTestInstance} from "../../types/StrategyTest"
-import {eq} from "../util"
+import {
+  TestTokenInstance,
+  ControllerInstance,
+  VaultInstance,
+  StrategyTestInstance,
+} from "../../types"
+import { eq } from "../util"
 import _setup from "./setup"
+
+const StrategyTest = artifacts.require("StrategyTest")
 
 contract("integration", (accounts) => {
   const refs = _setup(accounts)
-  const {admin} = refs
+  const { admin } = refs
 
   let controller: ControllerInstance
   let vault: VaultInstance
@@ -22,7 +26,7 @@ contract("integration", (accounts) => {
     underlying = refs.underlying
 
     // invest
-    await controller.invest(vault.address, {from: admin})
+    await controller.invest(vault.address, { from: admin })
   })
 
   const snapshot = async () => {
@@ -42,11 +46,22 @@ contract("integration", (accounts) => {
     const min = amount
 
     const before = await snapshot()
-    await controller.withdraw(strategy.address, amount, min, {from: admin})
+    await controller.withdraw(strategy.address, amount, min, { from: admin })
     const after = await snapshot()
 
     // check strategy transferred underlying token back to vault
     assert(eq(after.underlying.vault, before.underlying.vault.add(amount)), "vault")
+  })
+
+  it("should reject if not currenty strategy", async () => {
+    const strategy = await StrategyTest.new(
+      controller.address,
+      vault.address,
+      underlying.address
+    )
+    await chai
+      .expect(controller.withdraw(strategy.address, 0, 0, { from: admin }))
+      .to.be.rejectedWith("!strategy")
   })
 
   it("should reject if not authorized", async () => {
@@ -54,7 +69,7 @@ contract("integration", (accounts) => {
     const min = amount
 
     await chai
-      .expect(controller.withdraw(strategy.address, amount, min, {from: accounts[1]}))
+      .expect(controller.withdraw(strategy.address, amount, min, { from: accounts[1] }))
       .to.be.rejectedWith("!authorized")
   })
 
@@ -63,7 +78,7 @@ contract("integration", (accounts) => {
     const min = amount.add(new BN(1))
 
     await chai
-      .expect(controller.withdraw(strategy.address, amount, min, {from: accounts[1]}))
+      .expect(controller.withdraw(strategy.address, amount, min, { from: accounts[1] }))
       .to.be.rejectedWith("!authorized")
   })
 })
