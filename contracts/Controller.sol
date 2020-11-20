@@ -126,7 +126,7 @@ contract Controller is IController, AccessControl {
         external
         override
         isCurrentStrategy(_strategy)
-        onlyAuthorized(ADMIN_ROLE)
+        onlyAuthorized(HARVESTER_ROLE)
         checkWithdraw(_strategy, _min)
     {
         IStrategy(_strategy).withdrawAll();
