@@ -43,12 +43,15 @@ contract Controller is IController, AccessControl {
         _;
     }
 
-    /*
-    @dev Dont forget to revoke ADMIN_ROLE and HARVESTER_ROLE for old admin
-    @dev Dont forget to grant ADMIN_ROLE and HARVESTER_ROLE for new admin
-    */
     function setAdmin(address _admin) external override onlyAdmin {
         require(_admin != address(0), "admin = zero address");
+
+        _revokeRole(ADMIN_ROLE, admin);
+        _revokeRole(HARVESTER_ROLE, admin);
+
+        _grantRole(ADMIN_ROLE, _admin);
+        _grantRole(HARVESTER_ROLE, _admin);
+
         admin = _admin;
     }
 
