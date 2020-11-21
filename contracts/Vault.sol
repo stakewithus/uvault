@@ -26,8 +26,9 @@ contract Vault is IVault, ERC20, ReentrancyGuard {
     using SafeERC20 for IERC20;
     using SafeMath for uint;
 
-    event SetNextStrategy(address strategy);
     event SetStrategy(address strategy);
+    event ApproveStrategy(address strategy);
+    event RevokeStrategy(address strategy);
 
     address public override admin;
     address public override controller;
@@ -245,6 +246,8 @@ contract Vault is IVault, ERC20, ReentrancyGuard {
     function approveStrategy(address _strategy) external override onlyTimeLock {
         require(_strategy != address(0), "strategy = zero address");
         strategies[_strategy] = true;
+
+        emit ApproveStrategy(_strategy);
     }
 
     /*
@@ -254,6 +257,8 @@ contract Vault is IVault, ERC20, ReentrancyGuard {
     function revokeStrategy(address _strategy) external override onlyAdmin {
         require(_strategy != address(0), "strategy = zero address");
         strategies[_strategy] = false;
+
+        emit RevokeStrategy(_strategy);
     }
 
     /*
