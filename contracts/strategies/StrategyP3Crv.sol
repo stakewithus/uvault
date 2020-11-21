@@ -47,7 +47,7 @@ contract StrategyP3Crv is StrategyBase, UseUniswap {
         uint pricePerShare = PickleJar(JAR).getRatio();
         (uint shares, ) = MasterChef(CHEF).userInfo(POOL_ID, address(this));
 
-        return shares.mul(pricePerShare).div(1e18).div(precisionDiv);
+        return shares.mul(pricePerShare).div(precisionDiv) / 1e18;
     }
 
     function _deposit(address _token, uint _index) private {
@@ -149,7 +149,7 @@ contract StrategyP3Crv is StrategyBase, UseUniswap {
         uint bal = IERC20(token).balanceOf(address(this));
         if (bal > 0) {
             // transfer fee to treasury
-            uint fee = bal.mul(performanceFee).div(PERFORMANCE_FEE_MAX);
+            uint fee = bal.mul(performanceFee) / PERFORMANCE_FEE_MAX;
             if (fee > 0) {
                 address treasury = IController(controller).treasury();
                 require(treasury != address(0), "treasury = zero address");

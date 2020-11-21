@@ -204,7 +204,7 @@ contract Vault is IVault, ERC20, ReentrancyGuard {
     }
 
     function _minReserve() private view returns (uint) {
-        return _totalAssets().mul(reserveMin).div(RESERVE_MAX);
+        return _totalAssets().mul(reserveMin) / RESERVE_MAX;
     }
 
     /*

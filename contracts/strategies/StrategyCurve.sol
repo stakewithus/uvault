@@ -41,7 +41,7 @@ abstract contract StrategyCurve is StrategyBase, UseUniswap {
         uint lpBal = Gauge(gauge).balanceOf(address(this));
         uint pricePerShare = _getVirtualPrice();
 
-        return lpBal.mul(pricePerShare) / (precisionDiv.mul(1e18));
+        return lpBal.mul(pricePerShare).div(precisionDiv) / 1e18;
     }
 
     function _addLiquidity(uint _amount, uint _index) internal virtual;
