@@ -401,8 +401,9 @@ contract Vault is IVault, ERC20, ReentrancyGuard {
     @notice Withdraw underlying token
     @param _shares Amount of shares to burn
     @param _min Minimum amount of underlying token to return
+    @dev Keep `guard` modifier, else attacker can deposit and then use smart
+         contract to attack from withdraw
     */
-    // TODO: security remove guard?
     function withdraw(uint _shares, uint _min) external override nonReentrant guard {
         require(_shares > 0, "shares = 0");
 
