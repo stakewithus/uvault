@@ -29,6 +29,7 @@ contract Vault is IVault, ERC20, ReentrancyGuard {
     event SetStrategy(address strategy);
     event ApproveStrategy(address strategy);
     event RevokeStrategy(address strategy);
+    event SetWhitelist(address addr, bool approved);
 
     address public override admin;
     address public override controller;
@@ -136,6 +137,7 @@ contract Vault is IVault, ERC20, ReentrancyGuard {
 
     function setWhitelist(address _addr, bool _approve) external override onlyAdmin {
         whitelist[_addr] = _approve;
+        emit SetWhitelist(_addr, _approve);
     }
 
     function setReserveMin(uint _reserveMin) external override onlyAdmin {
