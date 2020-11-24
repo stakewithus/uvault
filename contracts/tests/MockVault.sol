@@ -90,7 +90,7 @@ contract MockVault is IVault {
         _depositAmount_ = _amount;
     }
 
-    function getExpectedReturn(uint _shares) external view override returns (uint) {
+    function getExpectedReturn(uint) external view override returns (uint) {
         return 0;
     }
 

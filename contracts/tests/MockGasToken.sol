@@ -33,7 +33,7 @@ contract MockGasToken is GasToken {
         return true;
     }
 
-    function balanceOf(address _account) external view override returns (uint) {
+    function balanceOf(address) external view override returns (uint) {
         return 0;
     }
 }
