@@ -1,8 +1,10 @@
 import chai from "chai"
-import {MockTimeLockInstance} from "../../../types/MockTimeLock"
-import {VaultInstance} from "../../../types/Vault"
-import {StrategyTestInstance} from "../../../types/StrategyTest"
-import {ZERO_ADDRESS} from "../../util"
+import {
+  MockTimeLockInstance,
+  VaultInstance,
+  StrategyTestInstance,
+} from "../../../types"
+import { ZERO_ADDRESS } from "../../util"
 import _setup from "./setup"
 
 contract("Vault", (accounts) => {
@@ -19,6 +21,7 @@ contract("Vault", (accounts) => {
 
   describe("approveStrategy", () => {
     it("should approve", async () => {
+      // note: cannot test logs
       await timeLock._approveStrategy_(vault.address, strategy.address)
 
       assert.equal(await vault.strategies(strategy.address), true, "strategy")
@@ -26,7 +29,7 @@ contract("Vault", (accounts) => {
 
     it("should reject if not time lock", async () => {
       await chai
-        .expect(vault.approveStrategy(strategy.address, {from: accounts[1]}))
+        .expect(vault.approveStrategy(strategy.address, { from: accounts[1] }))
         .to.be.rejectedWith("!time lock")
     })
 
