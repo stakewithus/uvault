@@ -6,9 +6,8 @@ import "../protocol/IController.sol";
 /* solium-disable */
 contract MockController is IController {
     bytes32 public constant override ADMIN_ROLE = keccak256(abi.encodePacked("ADMIN"));
-    bytes32 public constant override HARVESTER_ROLE = keccak256(
-        abi.encodePacked("HARVESTER")
-    );
+    bytes32 public constant override HARVESTER_ROLE =
+        keccak256(abi.encodePacked("HARVESTER"));
 
     address public override admin;
     address public override treasury;
