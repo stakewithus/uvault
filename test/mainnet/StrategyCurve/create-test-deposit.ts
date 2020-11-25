@@ -30,13 +30,13 @@ export default (
     })
 
     it("should deposit", async () => {
-      const depositAmount = pow(10, DECIMALS).mul(new BN(1000000))
+      const DEPOSIT_AMOUNT = pow(10, DECIMALS).mul(new BN(1000000))
 
       // transfer underlying to vault
-      await underlying.transfer(vault, depositAmount, { from: whale })
+      await underlying.transfer(vault, DEPOSIT_AMOUNT, { from: whale })
 
       // approve strategy to spend underlying from vault
-      await underlying.approve(strategy.address, depositAmount, { from: vault })
+      await underlying.approve(strategy.address, DEPOSIT_AMOUNT, { from: vault })
 
       const snapshot = getSnapshot({
         underlying,
@@ -49,17 +49,17 @@ export default (
       })
 
       const before = await snapshot()
-      await strategy.deposit(depositAmount, { from: vault })
+      await strategy.deposit(DEPOSIT_AMOUNT, { from: vault })
       const after = await snapshot()
 
       // minimum amount of underlying that can be withdrawn
-      const minUnderlying = frac(depositAmount, 99, 100)
+      const minUnderlying = frac(DEPOSIT_AMOUNT, 99, 100)
       // minimum amount of lp minted
-      const minLp = frac(depositAmount.mul(UNDERLYING_TO_CURVE_DECIMALS), 95, 100)
+      const minLp = frac(DEPOSIT_AMOUNT.mul(UNDERLYING_TO_CURVE_DECIMALS), 95, 100)
 
       // underlying transferred from vault to strategy
       assert(
-        after.underlying.vault.eq(before.underlying.vault.sub(depositAmount)),
+        after.underlying.vault.eq(before.underlying.vault.sub(DEPOSIT_AMOUNT)),
         "underlying vault"
       )
       assert(
@@ -67,7 +67,7 @@ export default (
         "total assets"
       )
       assert(
-        after.strategy.totalDebt.eq(before.strategy.totalDebt.add(depositAmount)),
+        after.strategy.totalDebt.eq(before.strategy.totalDebt.add(DEPOSIT_AMOUNT)),
         "total debt"
       )
       assert(after.gauge.strategy.gte(before.gauge.strategy.add(minLp)), "min gauge")
