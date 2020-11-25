@@ -2,16 +2,25 @@ import {
   IERC20Instance,
   GaugeInstance,
   ControllerInstance,
+  // cusd
   StrategyCusdDaiContract,
   StrategyCusdDaiInstance,
   StrategyCusdUsdcContract,
   StrategyCusdUsdcInstance,
+  // 3crv
   Strategy3CrvDaiContract,
   Strategy3CrvDaiInstance,
   Strategy3CrvUsdcContract,
   Strategy3CrvUsdcInstance,
   Strategy3CrvUsdtContract,
   Strategy3CrvUsdtInstance,
+  // gusd
+  StrategyGusdDaiContract,
+  StrategyGusdDaiInstance,
+  StrategyGusdUsdcContract,
+  StrategyGusdUsdcInstance,
+  StrategyGusdUsdtContract,
+  StrategyGusdUsdtInstance,
 } from "../../../types"
 
 export type StrategyContract =
@@ -20,6 +29,9 @@ export type StrategyContract =
   | Strategy3CrvDaiContract
   | Strategy3CrvUsdcContract
   | Strategy3CrvUsdtContract
+  | StrategyGusdDaiContract
+  | StrategyGusdUsdcContract
+  | StrategyGusdUsdtContract
 
 export type StrategyInstance =
   | StrategyCusdUsdcInstance
@@ -27,6 +39,9 @@ export type StrategyInstance =
   | Strategy3CrvDaiInstance
   | Strategy3CrvUsdcInstance
   | Strategy3CrvUsdtInstance
+  | StrategyGusdDaiInstance
+  | StrategyGusdUsdcInstance
+  | StrategyGusdUsdtInstance
 
 // references to return
 export interface Refs {
