@@ -78,6 +78,6 @@ contract StrategyGusd is StrategyCurve {
         if (minIndex == 2) {
             return (USDC, 2);
         }
-        return (USDC, 3);
+        return (USDT, 3);
     }
 }
