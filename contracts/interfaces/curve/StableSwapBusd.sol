@@ -10,5 +10,5 @@ interface StableSwapBusd {
     2 USDT
     3 BUSD
     */
-    function balances(uint index) external view returns (uint);
+    function balances(int128 index) external view returns (uint);
 }
