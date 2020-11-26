@@ -55,7 +55,7 @@ export default (
       // minimum amount of underlying that can be withdrawn
       const minUnderlying = frac(DEPOSIT_AMOUNT, 99, 100)
       // minimum amount of lp minted
-      const minLp = frac(DEPOSIT_AMOUNT.mul(UNDERLYING_TO_CURVE_DECIMALS), 95, 100)
+      const minLp = frac(DEPOSIT_AMOUNT.mul(UNDERLYING_TO_CURVE_DECIMALS), 93, 100)
 
       // underlying transferred from vault to strategy
       assert(

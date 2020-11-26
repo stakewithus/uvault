@@ -21,6 +21,13 @@ import {
   StrategyGusdUsdcInstance,
   StrategyGusdUsdtContract,
   StrategyGusdUsdtInstance,
+  // busd
+  StrategyBusdDaiContract,
+  StrategyBusdDaiInstance,
+  StrategyBusdUsdcContract,
+  StrategyBusdUsdcInstance,
+  StrategyBusdUsdtContract,
+  StrategyBusdUsdtInstance,
 } from "../../../types"
 
 export type StrategyContract =
@@ -32,6 +39,9 @@ export type StrategyContract =
   | StrategyGusdDaiContract
   | StrategyGusdUsdcContract
   | StrategyGusdUsdtContract
+  | StrategyBusdDaiContract
+  | StrategyBusdUsdcContract
+  | StrategyBusdUsdtContract
 
 export type StrategyInstance =
   | StrategyCusdUsdcInstance
@@ -42,6 +52,9 @@ export type StrategyInstance =
   | StrategyGusdDaiInstance
   | StrategyGusdUsdcInstance
   | StrategyGusdUsdtInstance
+  | StrategyBusdDaiInstance
+  | StrategyBusdUsdcInstance
+  | StrategyBusdUsdtInstance
 
 // references to return
 export interface Refs {
