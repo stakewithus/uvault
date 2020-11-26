@@ -23,8 +23,6 @@ contract StrategyPdaiDai is StrategyBase, UseUniswap {
     // POOL ID for PDAI JAR
     uint private constant POOL_ID = 16;
 
-    address private constant WETH = 0xC02aaA39b223FE8D0A0e5C4F27eAD9083C756Cc2;
-
     constructor(address _controller, address _vault)
         public
         StrategyBase(_controller, _vault, DAI)

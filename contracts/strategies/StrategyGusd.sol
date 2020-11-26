@@ -62,7 +62,7 @@ contract StrategyGusd is StrategyCurve {
         balances[2] = StableSwap3(BASE_POOL).balances(1).mul(1e12); // USDC
         balances[3] = StableSwap3(BASE_POOL).balances(2).mul(1e12); // USDT
 
-        uint minIndex;
+        uint minIndex = 0;
         for (uint i = 1; i < balances.length; i++) {
             if (balances[i] <= balances[minIndex]) {
                 minIndex = i;
