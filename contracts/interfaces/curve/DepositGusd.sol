@@ -2,7 +2,6 @@
 pragma solidity 0.6.11;
 
 interface DepositGusd {
-    // NOTE: GUSD + DAI, USDC, USDT = 4
     /*
     0 GUSD
     1 DAI
