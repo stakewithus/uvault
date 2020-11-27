@@ -6,9 +6,8 @@ import "./interfaces/GasToken.sol";
 import "./AccessControl.sol";
 
 contract GasRelayer is AccessControl {
-    bytes32 public constant GAS_TOKEN_USER_ROLE = keccak256(
-        abi.encodePacked("GAS_TOKEN_USER")
-    );
+    bytes32 public constant GAS_TOKEN_USER_ROLE =
+        keccak256(abi.encodePacked("GAS_TOKEN_USER"));
 
     address public admin;
     address public gasToken;
