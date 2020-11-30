@@ -6,11 +6,6 @@ import "../interfaces/curve/Minter.sol";
 import "../StrategyBase.sol";
 import "../UseUniswap.sol";
 
-/* potential hacks?
-- front running?
-- slippage when withdrawing all from strategy
-*/
-
 abstract contract StrategyCurve is StrategyBase, UseUniswap {
     // DAI = 0 | USDC = 1 | USDT = 2
     uint internal underlyingIndex;
