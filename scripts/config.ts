@@ -62,8 +62,7 @@ const config: Config = {
     gasRelayer: "0xe26C446fDCcD62F97a1D6bC21DD92638B0191037",
     treasury: "0x9a4c3Fc4683b95EBF11B535057B00812f6a549Bb",
     controller: "0xdDA49776E897BB9C6c6D0f98EE4b409795cdcE2b",
-    // TODO: deploy time lock
-    timeLock: "0x86d10751B18F3fE331C146546868a07224A8598B",
+    timeLock: "0x8dcb98361a49550593B57747Ab2825983EF43662",
     // safe vaults //
     daiSafeVault: "0xEf64a0728C6Ede1d7259955a49D046c0fefd6d15",
     usdcSafeVault: "0xEa3818341aA636A1d86D9e35eaF7413e44eCfe5F",
