@@ -11,17 +11,6 @@ import "./protocol/IStrategy.sol";
 import "./protocol/IVault.sol";
 import "./protocol/IController.sol";
 
-/* potential hacks?
-- directly send underlying token to this vault or strategy
-- flash loan
-    - flashloan make undelying token less valuable
-    - vault deposit
-    - flashloan make underlying token more valuable
-    - vault withdraw
-    - return loan
-- front running?
-*/
-
 contract Vault is IVault, ERC20, ReentrancyGuard {
     using SafeERC20 for IERC20;
     using SafeMath for uint;
