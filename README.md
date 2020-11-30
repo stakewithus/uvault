@@ -85,6 +85,15 @@ slither . --print vars-and-auth
 env $(cat .env) npx hardhat run scripts/script-to-run.ts --network ropsten
 ```
 
+##### Deploy Vault
+
+1. Deploy `Vault` with `timeLock` set to `admin`
+2. Deploy `StrategyNoOp`
+3. `Vault.approveStrategy(address of StrategyNoOp)`
+4. Deploy, approve and set any other strategy
+5. `Vault.setTimelock(address of timeLock contract)`
+6. `Vault.setAdmin(address of multi sig)`
+
 ##### Deployed Contracts
 
 See [scripts/config.ts](./scripts/config.ts)
