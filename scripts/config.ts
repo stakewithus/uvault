@@ -19,10 +19,10 @@ export interface Config {
     daiSafeVault: string
     usdcSafeVault: string
     usdtSafeVault: string
-    // high risk vaults
-    daiDegenVault: string
-    usdcDegenVault: string
-    usdtDegenVault: string
+    // higher risk vaults
+    daiGrowthVault: string
+    usdcGrowthVault: string
+    usdtGrowthVault: string
     // strategies
     strategyCusdDai: string
     strategyCusdUsdc: string
@@ -67,17 +67,17 @@ const config: Config = {
     daiSafeVault: "0xEf64a0728C6Ede1d7259955a49D046c0fefd6d15",
     usdcSafeVault: "0xEa3818341aA636A1d86D9e35eaF7413e44eCfe5F",
     usdtSafeVault: "0xB96C7E99d5E08b5B033484F68e12fD121647fe2a",
-    // degen vaults //
-    daiDegenVault: "0x1133b7AA55fB87Af5dE48A6C908E6436d09F1644",
-    usdcDegenVault: "0x4Da0f9627616951BD694fEc66e1A24715dB584b0",
-    usdtDegenVault: "0x89814761D8E0C35f0FdC3A88B8c43B459709974A",
+    // growth vaults //
+    daiGrowthVault: "0x1133b7AA55fB87Af5dE48A6C908E6436d09F1644",
+    usdcGrowthVault: "0x4Da0f9627616951BD694fEc66e1A24715dB584b0",
+    usdtGrowthVault: "0x89814761D8E0C35f0FdC3A88B8c43B459709974A",
     // strategies //
     strategyCusdDai: "0xfF1b8E9b4B77A2F77aeBA30e177DE51D9DdD3B95",
     strategyCusdUsdc: "0x96F605838918d5CFDdA5641726E7c5a31c7106F3",
     strategy3CrvDai: "0x2B193D22570FA134115E8Cf0a6709e9cf4De7E44",
     strategy3CrvUsdc: "0x6589B18246482Ddd31A30AeE2864E765211f404f",
     strategy3CrvUsdt: "0x11C689532C04a8fc09C4df2957266f8F29fe99a4",
-    // TODO need to re-deploy, point to degen vaults
+    // TODO need to re-deploy, point to growth vaults
     strategyP3CrvDai: "0xCd9A4c92c90a7ABC63dBCb60a1A0A60054A4139b",
     strategyP3CrvUsdc: "0x34B2aBE99E4654bd1bCB55BF42707c997Bf9A799",
     strategyP3CrvUsdt: "0x41017dDc66583b24EcA97D53a4c9512462126daf",

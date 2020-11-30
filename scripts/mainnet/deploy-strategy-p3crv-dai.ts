@@ -1,13 +1,13 @@
-import {ethers} from "hardhat"
+import { ethers } from "hardhat"
 import config from "../config"
-import {deploy} from "../lib"
+import { deploy } from "../lib"
 
 async function main() {
   await deploy("StrategyP3CrvDai", async (_account, _network) => {
-    const {controller, daiDegenVault} = config.mainnet
+    const { controller, daiGrowthVault } = config.mainnet
 
     const Strategy = await ethers.getContractFactory("StrategyP3CrvDai")
-    return Strategy.deploy(controller, daiDegenVault)
+    return Strategy.deploy(controller, daiGrowthVault)
   })
 }
 

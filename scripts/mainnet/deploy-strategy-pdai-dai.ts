@@ -4,10 +4,10 @@ import { deploy } from "../lib"
 
 async function main() {
   await deploy("StrategyPdaiDai", async (_account, _network) => {
-    const { controller, daiDegenVault } = config.mainnet
+    const { controller, daiGrowthVault } = config.mainnet
 
     const Strategy = await ethers.getContractFactory("StrategyPdaiDai")
-    return Strategy.deploy(controller, daiDegenVault)
+    return Strategy.deploy(controller, daiGrowthVault)
   })
 }
 

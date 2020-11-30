@@ -108,7 +108,7 @@ async function main() {
       daiSafeVault,
       usdcSafeVault,
       usdtSafeVault,
-      daiDegenVault,
+      daiGrowthVault,
       strategyCusdDai,
       strategyCusdUsdc,
       strategy3CrvDai,
@@ -149,8 +149,8 @@ async function main() {
         decimals: 6,
       },
       {
-        name: "DAI Degen Vault",
-        address: daiDegenVault,
+        name: "DAI Growth Vault",
+        address: daiGrowthVault,
         decimals: 18,
       },
     ]
