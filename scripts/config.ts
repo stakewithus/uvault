@@ -59,7 +59,7 @@ const config: Config = {
   mainnet: {
     // CHI gas token
     gasToken: "0x0000000000004946c0e9F43F4Dee607b0eF1fA1c",
-    gasRelayer: "0xe26C446fDCcD62F97a1D6bC21DD92638B0191037",
+    gasRelayer: "0x3d85984C88fA9a75Ad0F341CC279A6BCdB54767e",
     treasury: "0x9a4c3Fc4683b95EBF11B535057B00812f6a549Bb",
     controller: "0x13195FA27De3FC1b5AdcFB9b005989157600EFCC",
     timeLock: "0x8dcb98361a49550593B57747Ab2825983EF43662",
