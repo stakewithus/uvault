@@ -64,13 +64,13 @@ const config: Config = {
     controller: "0x13195FA27De3FC1b5AdcFB9b005989157600EFCC",
     timeLock: "0x8dcb98361a49550593B57747Ab2825983EF43662",
     // safe vaults //
-    daiSafeVault: "0xEf64a0728C6Ede1d7259955a49D046c0fefd6d15",
-    usdcSafeVault: "0xEa3818341aA636A1d86D9e35eaF7413e44eCfe5F",
-    usdtSafeVault: "0xB96C7E99d5E08b5B033484F68e12fD121647fe2a",
+    daiSafeVault: "0x4aD0b81f92B16624BBcF46FC0030cFBBf8d02376",
+    usdcSafeVault: "0xBc5991cCd8cAcEba01edC44C2BB9832712c29cAB",
+    usdtSafeVault: "0x178Bf8fD04b47D2De3eF3f6b3D112106375ad584",
     // growth vaults //
-    daiGrowthVault: "0x1133b7AA55fB87Af5dE48A6C908E6436d09F1644",
-    usdcGrowthVault: "0x4Da0f9627616951BD694fEc66e1A24715dB584b0",
-    usdtGrowthVault: "0x89814761D8E0C35f0FdC3A88B8c43B459709974A",
+    daiGrowthVault: "0x388029Bd38cf6CA61D3f74CA2984d37CFdB8e3fA",
+    usdcGrowthVault: "0xEAa84fc94bCE3028050D185657eBcA4B3dcc232B",
+    usdtGrowthVault: "0x0b3A87aFfbFe0F38490DA657a813A95e7844B38a",
     // strategies //
     strategyCusdDai: "0xfF1b8E9b4B77A2F77aeBA30e177DE51D9DdD3B95",
     strategyCusdUsdc: "0x96F605838918d5CFDdA5641726E7c5a31c7106F3",
