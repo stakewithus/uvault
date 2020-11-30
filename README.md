@@ -103,7 +103,7 @@ See [scripts/config.ts](./scripts/config.ts)
 ```shell
 # Warning: Temporary delete any unnecessary contracts and clear the artifacts and build
 # otherwise these will also be part of the verified contract.
-env $(cat .env) npx hardhat verify --network mainnet DEPLOYED_CONTRACT_ADDRESS "Constructor argument 1"
+env $(cat .env) npx hardhat verify --network mainnet DEPLOYED_CONTRACT_ADDRESS CONSTRUCTOR_ARG_1 CONSTRUCTOR_ARG_2 ...
 ```
 
 ##### Flatten Contracts
