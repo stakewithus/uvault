@@ -72,11 +72,11 @@ const config: Config = {
     usdcGrowthVault: "0xEAa84fc94bCE3028050D185657eBcA4B3dcc232B",
     usdtGrowthVault: "0x0b3A87aFfbFe0F38490DA657a813A95e7844B38a",
     // strategies //
-    strategyCusdDai: "0xfF1b8E9b4B77A2F77aeBA30e177DE51D9DdD3B95",
-    strategyCusdUsdc: "0x96F605838918d5CFDdA5641726E7c5a31c7106F3",
+    strategyCusdDai: "0x9459cD762eA42C7B4e0Dea24d5f427D5a07094D7",
+    strategyCusdUsdc: "0xd050bd4F1f4E5Bc7E864333E367099BAd5cA0B3D",
     strategy3CrvDai: "0x2B193D22570FA134115E8Cf0a6709e9cf4De7E44",
     strategy3CrvUsdc: "0x6589B18246482Ddd31A30AeE2864E765211f404f",
-    strategy3CrvUsdt: "0x11C689532C04a8fc09C4df2957266f8F29fe99a4",
+    strategy3CrvUsdt: "0xAC6B27B9A57E0d1BDd2c471f83F3D91Ab36df980",
     // TODO need to re-deploy, point to growth vaults
     strategyP3CrvDai: "0xCd9A4c92c90a7ABC63dBCb60a1A0A60054A4139b",
     strategyP3CrvUsdc: "0x34B2aBE99E4654bd1bCB55BF42707c997Bf9A799",
