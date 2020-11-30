@@ -1,12 +1,13 @@
 import fs from "fs"
-import {HardhatUserConfig} from "hardhat/config"
+import { HardhatUserConfig } from "hardhat/config"
 import "@nomiclabs/hardhat-ethers"
+import "@nomiclabs/hardhat-etherscan"
 
 const MAINNET_PRIVATE_KEY = fs.readFileSync(".secret.mainnet").toString().trim()
 const TESTNET_PRIVATE_KEY = fs.readFileSync(".secret.testnet").toString().trim()
 
 const INFURA_API_KEY = process.env.INFURA_API_KEY
-// const ETHERSCAN_API_KEY = process.env.ETHERSCAN_API_KEY
+const ETHERSCAN_API_KEY = process.env.ETHERSCAN_API_KEY
 
 const config: HardhatUserConfig = {
   solidity: {
@@ -37,10 +38,10 @@ const config: HardhatUserConfig = {
       url: "http://127.0.0.1:8555", // Coverage launches its own ganache-cli client
     },
   },
-  // etherscan: {
-  //   url: "https://api-ropsten.etherscan.io/api",
-  //   apiKey: ETHERSCAN_API_KEY,
-  // },
+  etherscan: {
+    // url: "https://api-ropsten.etherscan.io/api",
+    apiKey: ETHERSCAN_API_KEY,
+  },
 }
 
 export default config

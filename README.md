@@ -89,6 +89,13 @@ env $(cat .env) npx hardhat run scripts/script-to-run.ts --network ropsten
 
 See [scripts/config.ts](./scripts/config.ts)
 
+##### Verify Contract on Etherscan
+
+```shell
+# Warning: Remove any unnecessary contracts and clear the artifacts otherwise these will also be part of the verified contract.
+env $(cat .env) npx hardhat verify --network mainnet DEPLOYED_CONTRACT_ADDRESS "Constructor argument 1"
+```
+
 ##### Flatten Contracts
 
 ```shell
