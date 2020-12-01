@@ -74,8 +74,8 @@ const config: Config = {
     // strategies //
     strategyCusdDai: "0x9459cD762eA42C7B4e0Dea24d5f427D5a07094D7",
     strategyCusdUsdc: "0xd050bd4F1f4E5Bc7E864333E367099BAd5cA0B3D",
-    strategy3CrvDai: "0x2B193D22570FA134115E8Cf0a6709e9cf4De7E44",
-    strategy3CrvUsdc: "0x6589B18246482Ddd31A30AeE2864E765211f404f",
+    strategy3CrvDai: "0xbc33957CC1Ef9E99D86f06A8af3f5fe22753ec93",
+    strategy3CrvUsdc: "0x549452631ec594C0580d0bf313D2dF22304f574F",
     strategy3CrvUsdt: "0xAC6B27B9A57E0d1BDd2c471f83F3D91Ab36df980",
     // TODO need to re-deploy, point to growth vaults
     strategyP3CrvDai: "0xCd9A4c92c90a7ABC63dBCb60a1A0A60054A4139b",
