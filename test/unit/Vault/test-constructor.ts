@@ -1,17 +1,17 @@
 import chai from "chai"
 import BN from "bn.js"
-import {TestTokenInstance} from "../../../types/TestToken"
-import {VaultInstance} from "../../../types/Vault"
-import {MockControllerInstance} from "../../../types/MockController"
-import {MockTimeLockInstance} from "../../../types/MockTimeLock"
-import {ZERO_ADDRESS, eq} from "../../util"
+import { TestTokenInstance } from "../../../types/TestToken"
+import { VaultInstance } from "../../../types/Vault"
+import { MockControllerInstance } from "../../../types/MockController"
+import { MockTimeLockInstance } from "../../../types/MockTimeLock"
+import { ZERO_ADDRESS, eq } from "../../util"
 import _setup from "./setup"
 
 const Vault = artifacts.require("Vault")
 
 contract("Vault", (accounts) => {
   const refs = _setup(accounts)
-  const {admin} = refs
+  const { admin } = refs
 
   let controller: MockControllerInstance
   let timeLock: MockTimeLockInstance
@@ -26,7 +26,12 @@ contract("Vault", (accounts) => {
 
   describe("constructor", () => {
     it("should deploy", async () => {
-      const vault = await Vault.new(controller.address, timeLock.address, token.address)
+      const vault = await Vault.new(
+        controller.address,
+        timeLock.address,
+        token.address,
+        { from: admin }
+      )
 
       assert.equal(await vault.admin(), admin, "admin")
       assert.equal(await vault.controller(), controller.address, "controller")
