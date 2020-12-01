@@ -20,17 +20,14 @@ jobs:
       - name: Setup Node.js
         uses: actions/setup-node@v1
 
-      - name: Install Ganache
-        run: npm install -g ganache-cli@6.8.2
-
       - name: Npm install
         run: npm install
 
       - name: Run unit test
         run: npm run test:unit
-        env:
-          NODE_OPTIONS: --max-old-space-size=1024
+        # env:
+        #   NODE_OPTIONS: --max-old-space-size=1024
       - name: Run integration test
         run: npm run test:integration
-        env:
-          NODE_OPTIONS: --max-old-space-size=1024
+        # env:
+        #   NODE_OPTIONS: --max-old-space-size=1024
