@@ -1,5 +1,5 @@
-import {ethers} from "hardhat"
-import {deploy} from "./lib"
+import { ethers } from "hardhat"
+import { deploy } from "./lib"
 
 const DELAY = 60 * 60 * 24
 
