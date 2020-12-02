@@ -44,14 +44,14 @@ const config: Config = {
   ropsten: {
     // CHI gas token
     gasToken: "0x063f83affbcf64d7d84d306f5b85ed65c865dca4",
-    gasRelayer: "0xD01D18440A150581A36581adD5b2bcb2DCc63333",
+    gasRelayer: "0xe4E84d453933e8CCDd4F7FE81a67B1d835773E94",
     treasury: "0x9a4c3Fc4683b95EBF11B535057B00812f6a549Bb",
-    controller: "0xE71e05B175b7D4B79Af587521f5F353DAaBd2A8a",
-    timeLock: "0xF75715Df8c6f2283cb23D85A3206ac9638C422a5",
+    controller: "0xCB398855b588C7842CEf05aD68e061339CbbE136",
+    timeLock: "0x223f437800AA2606b18eC59c5700c992eBb9f5C3",
     // vaults //
-    vault: "0x8fAFc60718a57e6200947130146F0B8cC645d360",
+    vault: "0x0A8dd477226C9fba0d28E9ed7d16205c9354cE58",
     // strategies //
-    strategyTest: "0x7a0cdf8a8c1d7873E49BB45D735a533b3cD78E27",
+    strategyTest: "0xEDCf4EF1E0Eb5A962C4F4d96584D58161FDAD74C",
     // others //
     // used for testinng
     testToken: "0x7F56619E1fAaF6c06B96225e6c8c737F0BBc91c5",
