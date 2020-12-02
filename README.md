@@ -77,6 +77,9 @@ slither . --print call-graph
 slither . --print cfg
 slither . --print function-summary
 slither . --print vars-and-auth
+
+# check ERC20
+slither-check-erc . Vault
 ```
 
 ### Deploy
