@@ -1,11 +1,9 @@
 import Web3 from "web3"
 
-// npx ts-node scripts/print-set-delay-data.ts network delay
+// npx ts-node scripts/print-set-delay-data.ts delay
 function main() {
-  const network = process.argv[2]
-  const delay = parseInt(process.argv[3])
+  const delay = parseInt(process.argv[2])
 
-  console.log(`Network: ${network}`)
   console.log(`Delay: ${delay}`)
 
   const web3 = new Web3()
