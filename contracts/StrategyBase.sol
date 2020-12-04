@@ -21,7 +21,7 @@ abstract contract StrategyBase is IStrategy {
     uint public override totalDebt;
 
     // performance fee sent to treasury when harvest() generates profit
-    uint public override performanceFee = 100;
+    uint public override performanceFee = 500;
     uint internal constant PERFORMANCE_FEE_MAX = 10000;
 
     // valuable tokens that cannot be swept
