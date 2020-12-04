@@ -57,7 +57,7 @@ npm run lint
 ### Slither
 
 ```shell
-docker run -it -v $PWD:/code trailofbits/eth-security-toolbox
+docker run -it --rm -v $PWD:/code trailofbits/eth-security-toolbox
 
 solc-select 0.6.11
 cd /code
