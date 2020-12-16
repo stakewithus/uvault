@@ -68,3 +68,12 @@ export async function deployTimeLock() {
     return TimeLock.deploy(MIN_DELAY)
   })
 }
+
+export async function deployGasRelayer() {
+  await deploy("GasRelayer", async (_account, network) => {
+    const gasToken = getAddress(config, network, "gasToken")
+
+    const GasRelayer = await ethers.getContractFactory("GasRelayer")
+    return GasRelayer.deploy(gasToken)
+  })
+}
