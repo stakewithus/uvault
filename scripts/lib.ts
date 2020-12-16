@@ -1,7 +1,7 @@
 import assert from "assert"
-import hre from "hardhat"
+import hre, { ethers} from "hardhat"
 import {Contract} from "ethers"
-import {Config} from "./config"
+import config, {Config} from "./config"
 
 export function getAddress(config: Config, network: string, name: string): string {
   // @ts-ignore
@@ -49,4 +49,13 @@ export async function deploy(
     console.error(error)
     process.exit(1)
   }
+}
+
+export async function deployController(network: string) {
+  await deploy("Controller", async (_account, _network) => {
+    const treasury = getAddress(config, network, "treasury")
+
+    const Controller = await ethers.getContractFactory("Controller")
+    return Controller.deploy(treasury)
+  })
 }
