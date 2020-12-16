@@ -1,19 +1,8 @@
-import { ethers } from "hardhat"
+import {deployVault} from "../lib"
 import config from "../config"
-import { deploy } from "../lib"
 
 async function main() {
-  await deploy("USDC Vault", async (_account, _network) => {
-    const { controller, timeLock, usdc } = config.mainnet
-
-    console.log(`WARNING: time lock is set to admin account ${_account}`)
-    console.log(
-      `Set time lock to ${timeLock} after you are done approving initial strategy`
-    )
-
-    const Vault = await ethers.getContractFactory("Vault")
-    return Vault.deploy(controller, _account, usdc)
-  })
+  await deployVault("mainnet", config.mainnet.usdc)
 }
 
 main()
