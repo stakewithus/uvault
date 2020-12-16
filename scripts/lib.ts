@@ -59,3 +59,12 @@ export async function deployController(network: string) {
     return Controller.deploy(treasury)
   })
 }
+
+export async function deployTimeLock() {
+  const MIN_DELAY = 60 * 60 * 24
+
+  await deploy("TimeLock", async (_account, _network) => {
+    const TimeLock = await ethers.getContractFactory("TimeLock")
+    return TimeLock.deploy(MIN_DELAY)
+  })
+}
