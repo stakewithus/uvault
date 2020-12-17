@@ -52,36 +52,3 @@ export async function deploy(
     process.exit(1)
   }
 }
-
-type Strategy =
-  | "StrategyCusdDai"
-  | "StrategyCusdUsdc"
-  | "Strategy3CrvDai"
-  | "Strategy3CrvUsdc"
-  | "Strategy3CrvUsdt"
-  | "StrategyPaxDai"
-  | "StrategyPaxUsdc"
-  | "StrategyPaxUsdt"
-  | "StrategyBusdDai"
-  | "StrategyBusdUsdc"
-  | "StrategyBusdUsdt"
-  | "StrategyGusdDai"
-  | "StrategyGusdUsdc"
-  | "StrategyGusdUsdt"
-  | "StrategyP3CrvDai"
-  | "StrategyP3CrvUsdc"
-  | "StrategyP3CrvUsdt"
-  | "StrategyPdaiDai"
-
-export async function deployStrategy(
-  network: Network,
-  strategy: Strategy,
-  vault: string
-) {
-  await deploy(strategy, async (_account, _network) => {
-    const controller = getAddress(config, network, "controller")
-
-    const Strategy = await ethers.getContractFactory(strategy)
-    return Strategy.deploy(controller, vault)
-  })
-}

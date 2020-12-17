@@ -3,11 +3,16 @@ import { Contract } from "ethers"
 import { HardhatRuntimeEnvironment } from "hardhat/types"
 import { Config } from "./config"
 
-type Network = "mainnet" | "ropsten" | "dev"
+type Network = "mainnet" | "ropsten"
 
-export function getAddress(config: Config, network: Network, name: string): string {
+export function getAddress(
+  config: Config,
+  network: Network,
+  dev: boolean,
+  name: string
+): string {
   // @ts-ignore
-  const addr = config[network][name]
+  const addr = dev ? config["dev"][name] : config[network][name]
   assert(addr, `${network} ${name} is undefined`)
 
   return addr
@@ -16,11 +21,17 @@ export function getAddress(config: Config, network: Network, name: string): stri
 export async function deploy(
   hre: HardhatRuntimeEnvironment,
   name: string,
+  dev: boolean,
   _deploy: (account: string, network: Network) => Promise<Contract>
 ) {
   const network = hre.network.name
   console.log(`Network: ${network}`)
+  console.log(`Dev: ${dev}`)
   console.log(`Contract: ${name}`)
+
+  if (dev) {
+    assert(network === "mainnet", `Must use mainnet for dev = true`)
+  }
 
   try {
     const provider = hre.ethers.providers.getDefaultProvider()

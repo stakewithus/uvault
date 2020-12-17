@@ -105,6 +105,7 @@ const config: Config = {
     usdc: "0xA0b86991c6218b36c1d19D4a2e9Eb0cE3606eB48",
     usdt: "0xdAC17F958D2ee523a2206206994597C13D831ec7",
   },
+  // mainnet dev
   dev: {
     controller: "0x75e8336418e30b58d8dAd426F98D3D60244A08d3",
     treasury: "0x9a4c3Fc4683b95EBF11B535057B00812f6a549Bb",
@@ -114,15 +115,54 @@ const config: Config = {
     usdcVault: "0x167E3254a9298ebF29F67e0AE0326d2018c9bC44",
     usdtVault: "0xdADa607772Ad29f5a90a8817532Ebf983709af15",
     // strategies //
-    strategyPaxDai: "0x2b3512efBeeb609CF9D49486b6e2DD9CF10Be6c9",
-    strategyPaxUsdc: "0xb1F1AeD30dFe5787dFb65F6Cb96D90b3ae347F68",
-    strategyPaxUsdt: "0x3032dBB5DB8aB5Bd85bf2Ca496e02Ce5378A5726",
     strategyBusdDai: "0xffa01cA5FFd9e9F8a24CfdcA8C9157bD59D80405",
     strategyBusdUsdc: "0x042b298B30C67c8921d5376ad9a065E834280F26",
     strategyBusdUsdt: "0xedA38758d7Ea23adc780731d16A4382f17C9e59a",
     strategyGusdDai: "0xa017E55f85548Ff80261F74112415f7fA30cD28E",
-    strategyGusdUsdc: "",
+    strategyGusdUsdc: "0x668973f5f8E47844bc75Bbe9BAd9C7AD0542B8bc",
     strategyGusdUsdt: "",
+    strategyPaxDai: "0x2b3512efBeeb609CF9D49486b6e2DD9CF10Be6c9",
+    strategyPaxUsdc: "0xb1F1AeD30dFe5787dFb65F6Cb96D90b3ae347F68",
+    strategyPaxUsdt: "0x3032dBB5DB8aB5Bd85bf2Ca496e02Ce5378A5726",
+  },
+}
+
+// mappings from strategy to vault and token
+export const STRATEGIES = {
+  ropsten: {
+    StrategyTest: {
+      token: "testToken",
+      vault: "vault",
+    },
+  },
+  dev: {
+    StrategyBusdDai: {
+      vault: "daiVault",
+    },
+    StrategyBusdUsdc: {
+      vault: "usdcVault",
+    },
+    StrategyBusdUsdt: {
+      vault: "usdtVault",
+    },
+    StrategyGusdDai: {
+      vault: "daiVault",
+    },
+    StrategyGusdUsdc: {
+      vault: "usdcVault",
+    },
+    StrategyGusdUsdt: {
+      vault: "usdtVault",
+    },
+    StrategyPaxDai: {
+      vault: "daiVault",
+    },
+    StrategyPaxUsdc: {
+      vault: "usdcVault",
+    },
+    StrategyPaxUsdt: {
+      vault: "usdtVault",
+    },
   },
 }
 

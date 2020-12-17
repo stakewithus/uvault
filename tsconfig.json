@@ -8,5 +8,6 @@
     "resolveJsonModule": true
   },
   "include": ["scripts", "test"],
+  "exclude": ["memo"],
   "files": ["hardhat.config.ts", "./types/types.d.ts"]
 }
