@@ -62,15 +62,6 @@ export async function deployController(network: Network) {
   })
 }
 
-export async function deployGasRelayer(network: Network) {
-  await deploy("GasRelayer", async (_account, _network) => {
-    const gasToken = getAddress(config, network, "gasToken")
-
-    const GasRelayer = await ethers.getContractFactory("GasRelayer")
-    return GasRelayer.deploy(gasToken)
-  })
-}
-
 export async function deployVault(network: Network, token: string) {
   await deploy("Vault", async (_account, _network) => {
     console.log(`token: ${token}`)
