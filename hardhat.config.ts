@@ -2,6 +2,8 @@ import fs from "fs"
 import { HardhatUserConfig } from "hardhat/config"
 import "@nomiclabs/hardhat-ethers"
 import "@nomiclabs/hardhat-etherscan"
+// tasks
+import "./scripts/deploy-time-lock"
 
 const MAINNET_PRIVATE_KEY = fs.readFileSync(".secret.mainnet").toString().trim()
 const TESTNET_PRIVATE_KEY = fs.readFileSync(".secret.testnet").toString().trim()

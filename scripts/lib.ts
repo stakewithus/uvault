@@ -62,15 +62,6 @@ export async function deployController(network: Network) {
   })
 }
 
-export async function deployTimeLock() {
-  const MIN_DELAY = 60 * 60 * 24
-
-  await deploy("TimeLock", async (_account, _network) => {
-    const TimeLock = await ethers.getContractFactory("TimeLock")
-    return TimeLock.deploy(MIN_DELAY)
-  })
-}
-
 export async function deployGasRelayer(network: Network) {
   await deploy("GasRelayer", async (_account, _network) => {
     const gasToken = getAddress(config, network, "gasToken")
