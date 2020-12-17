@@ -64,8 +64,8 @@ const config: Config = {
     gasToken: "0x063f83affbcf64d7d84d306f5b85ed65c865dca4",
     gasRelayer: "0xe4E84d453933e8CCDd4F7FE81a67B1d835773E94",
     treasury: "0x9a4c3Fc4683b95EBF11B535057B00812f6a549Bb",
-    controller: "0xCB398855b588C7842CEf05aD68e061339CbbE136",
-    timeLock: "0x223f437800AA2606b18eC59c5700c992eBb9f5C3",
+    controller: "0xBf2bFf3A85bC3663E808963be17564D0707D900b",
+    timeLock: "0xDb3906814Cc730ef4c8A5cf5C63A523494224150",
     // vaults //
     vault: "0x0A8dd477226C9fba0d28E9ed7d16205c9354cE58",
     // strategies //
@@ -108,6 +108,7 @@ const config: Config = {
   dev: {
     controller: "0x75e8336418e30b58d8dAd426F98D3D60244A08d3",
     treasury: "0x9a4c3Fc4683b95EBF11B535057B00812f6a549Bb",
+    // time lock set to admin
     timeLock: "0x86d10751B18F3fE331C146546868a07224A8598B",
     daiVault: "0xFd9f501324c07613f8Fb4d73C798D764D0BFcdcC",
     usdcVault: "0x167E3254a9298ebF29F67e0AE0326d2018c9bC44",

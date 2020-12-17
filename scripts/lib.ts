@@ -53,15 +53,6 @@ export async function deploy(
   }
 }
 
-export async function deployController(network: Network) {
-  await deploy("Controller", async (_account, _network) => {
-    const treasury = getAddress(config, network, "treasury")
-
-    const Controller = await ethers.getContractFactory("Controller")
-    return Controller.deploy(treasury)
-  })
-}
-
 export async function deployVault(network: Network, token: string) {
   await deploy("Vault", async (_account, _network) => {
     console.log(`token: ${token}`)

@@ -5,6 +5,7 @@ import "@nomiclabs/hardhat-etherscan"
 // tasks
 import "./scripts/deploy-time-lock"
 import "./scripts/deploy-gas-relayer"
+import "./scripts/deploy-controller"
 
 const PRIVATE_KEY = fs.readFileSync(".secret").toString().trim()
 
