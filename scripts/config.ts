@@ -120,7 +120,7 @@ const config: Config = {
     strategyBusdUsdt: "0xedA38758d7Ea23adc780731d16A4382f17C9e59a",
     strategyGusdDai: "0xa017E55f85548Ff80261F74112415f7fA30cD28E",
     strategyGusdUsdc: "0x668973f5f8E47844bc75Bbe9BAd9C7AD0542B8bc",
-    strategyGusdUsdt: "",
+    strategyGusdUsdt: "0xB295bEC46cF0141B7E011Dc19Ae0036796691083",
     strategyPaxDai: "0x2b3512efBeeb609CF9D49486b6e2DD9CF10Be6c9",
     strategyPaxUsdc: "0xb1F1AeD30dFe5787dFb65F6Cb96D90b3ae347F68",
     strategyPaxUsdt: "0x3032dBB5DB8aB5Bd85bf2Ca496e02Ce5378A5726",
