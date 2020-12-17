@@ -37,7 +37,7 @@ export interface Config {
     dai: string
     usdc: string
     usdt: string
-  },
+  }
   // mainnet dev
   dev: {
     controller: string
@@ -113,16 +113,16 @@ const config: Config = {
     usdcVault: "0x167E3254a9298ebF29F67e0AE0326d2018c9bC44",
     usdtVault: "0xdADa607772Ad29f5a90a8817532Ebf983709af15",
     // strategies //
-    strategyPaxDai: "",
-    strategyPaxUsdc: "",
-    strategyPaxUsdt: "",
-    strategyBusdDai: "",
-    strategyBusdUsdc: "",
-    strategyBusdUsdt: "",
-    strategyGusdDai: "",
+    strategyPaxDai: "0x2b3512efBeeb609CF9D49486b6e2DD9CF10Be6c9",
+    strategyPaxUsdc: "0xb1F1AeD30dFe5787dFb65F6Cb96D90b3ae347F68",
+    strategyPaxUsdt: "0x3032dBB5DB8aB5Bd85bf2Ca496e02Ce5378A5726",
+    strategyBusdDai: "0xffa01cA5FFd9e9F8a24CfdcA8C9157bD59D80405",
+    strategyBusdUsdc: "0x042b298B30C67c8921d5376ad9a065E834280F26",
+    strategyBusdUsdt: "0xedA38758d7Ea23adc780731d16A4382f17C9e59a",
+    strategyGusdDai: "0xa017E55f85548Ff80261F74112415f7fA30cD28E",
     strategyGusdUsdc: "",
-    strategyGusdUsdt: ""
-  }
+    strategyGusdUsdt: "",
+  },
 }
 
 export default config
