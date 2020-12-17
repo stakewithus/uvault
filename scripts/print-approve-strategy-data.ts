@@ -1,6 +1,6 @@
 import Web3 from "web3"
 import config from "./config"
-import { getAddress } from "./lib2"
+import { getAddress } from "./lib"
 
 // npx ts-node scripts/print-approve-strategy-data.ts network strategy-name false
 function main() {

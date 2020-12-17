@@ -1,7 +1,7 @@
 import assert from "assert"
 import { task } from "hardhat/config"
 import config from "./config"
-import { deploy, getAddress } from "./lib2"
+import { deploy, getAddress } from "./lib"
 
 /*
 usage:

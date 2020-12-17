@@ -1,6 +1,6 @@
 import assert from "assert"
 import { task } from "hardhat/config"
-import { deploy } from "../lib2"
+import { deploy } from "../lib"
 
 /*
 usage:
