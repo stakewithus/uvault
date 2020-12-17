@@ -8,6 +8,7 @@ usage:
 env $(cat .env) npx hardhat deploy:strategy \
 --network ropsten \
 --strategy StrategyTest \
+--dev false
 */
 task("deploy:strategy", "Deploy vault")
   .addParam("strategy", "Name of strategy")
