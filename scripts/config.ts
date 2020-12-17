@@ -67,7 +67,7 @@ const config: Config = {
     controller: "0xBf2bFf3A85bC3663E808963be17564D0707D900b",
     timeLock: "0xDb3906814Cc730ef4c8A5cf5C63A523494224150",
     // vaults //
-    vault: "0x0A8dd477226C9fba0d28E9ed7d16205c9354cE58",
+    vault: "0xc8E2357fA7f51e84beBFD4A0075c53D49d0A0D88",
     // strategies //
     strategyTest: "0xEDCf4EF1E0Eb5A962C4F4d96584D58161FDAD74C",
     // others //

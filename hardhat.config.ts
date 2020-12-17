@@ -6,6 +6,7 @@ import "@nomiclabs/hardhat-etherscan"
 import "./scripts/deploy-time-lock"
 import "./scripts/deploy-gas-relayer"
 import "./scripts/deploy-controller"
+import "./scripts/deploy-vault"
 
 const PRIVATE_KEY = fs.readFileSync(".secret").toString().trim()
 

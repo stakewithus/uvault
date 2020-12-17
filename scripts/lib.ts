@@ -53,18 +53,6 @@ export async function deploy(
   }
 }
 
-export async function deployVault(network: Network, token: string) {
-  await deploy("Vault", async (_account, _network) => {
-    console.log(`token: ${token}`)
-
-    const controller = getAddress(config, network, "controller")
-    const timeLock = getAddress(config, network, "timeLock")
-
-    const Vault = await ethers.getContractFactory("Vault")
-    return Vault.deploy(controller, timeLock, token)
-  })
-}
-
 type Strategy =
   | "StrategyCusdDai"
   | "StrategyCusdUsdc"
