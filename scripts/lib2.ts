@@ -1,8 +1,17 @@
 import assert from "assert"
 import { Contract } from "ethers"
 import { HardhatRuntimeEnvironment } from "hardhat/types"
+import { Config } from "./config"
 
-type Network = "mainnet" | "ropsten"
+type Network = "mainnet" | "ropsten" | "dev"
+
+export function getAddress(config: Config, network: Network, name: string): string {
+  // @ts-ignore
+  const addr = config[network][name]
+  assert(addr, `${network} ${name} is undefined`)
+
+  return addr
+}
 
 export async function deploy(
   hre: HardhatRuntimeEnvironment,
