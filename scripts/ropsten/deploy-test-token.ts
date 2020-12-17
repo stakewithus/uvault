@@ -4,7 +4,7 @@ import { deploy } from "../lib2"
 
 /*
 usage:
-env $(cat .env) npx hardhat deploy:controller --network ropsten
+env $(cat .env) npx hardhat deploy:test-token --network ropsten
 */
 task("deploy:test-token", "Deploy controller").setAction(async (_args, hre) => {
   assert(hre.network.name === "ropsten", `network != ropsten`)
