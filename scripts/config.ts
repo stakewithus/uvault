@@ -40,6 +40,8 @@ export interface Config {
   }
   // mainnet dev
   dev: {
+    gasToken: string
+    gasRelayer: string
     controller: string
     treasury: string
     timeLock: string
@@ -107,6 +109,9 @@ const config: Config = {
   },
   // mainnet dev
   dev: {
+    // CHI gas token
+    gasToken: "0x0000000000004946c0e9F43F4Dee607b0eF1fA1c",
+    gasRelayer: "0xC946321C467e6865942dfdb2C55d1c78F0A55338",
     controller: "0x75e8336418e30b58d8dAd426F98D3D60244A08d3",
     treasury: "0x9a4c3Fc4683b95EBF11B535057B00812f6a549Bb",
     // time lock set to admin
