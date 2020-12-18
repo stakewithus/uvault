@@ -28,7 +28,7 @@ npm run test:integration
 # test mainnet fork
 source .env
 
-ganache-cli \
+npx ganache-cli \
 --fork https://mainnet.infura.io/v3/$INFURA_API_KEY \
 --unlock $STABLE_COIN_HOLDER \
 --unlock $DAI_WHALE \
@@ -42,7 +42,7 @@ ganache-cli \
 # Error: Returned error: Returned error: project ID does not have access to archive state
 
 # test specific file
-truffle test --network mainnet_fork test/mainnet/path/to/test.ts
+npx truffle test --network mainnet_fork test/mainnet/path/to/test.ts
 # test all (need to restart truffle after each test)
 find test/mainnet -name "test-*.ts" -exec truffle test --network mainnet_fork {} \;
 ```

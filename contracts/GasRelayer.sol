@@ -60,6 +60,7 @@ contract GasRelayer is AccessControl {
         gasToken = _gasToken;
     }
 
+    // cannot mint more than 140 CHI per block
     function mintGasToken(uint _amount) external {
         GasToken(gasToken).mint(_amount);
     }
