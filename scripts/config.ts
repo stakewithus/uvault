@@ -62,7 +62,7 @@ const config: Config = {
   ropsten: {
     // CHI gas token
     gasToken: "0x063f83affbcf64d7d84d306f5b85ed65c865dca4",
-    gasRelayer: "0xe4E84d453933e8CCDd4F7FE81a67B1d835773E94",
+    gasRelayer: "0xad2907C6aA26588f579e5D4bEeE6d945ba18BDb4",
     treasury: "0x9a4c3Fc4683b95EBF11B535057B00812f6a549Bb",
     controller: "0xBf2bFf3A85bC3663E808963be17564D0707D900b",
     timeLock: "0xDb3906814Cc730ef4c8A5cf5C63A523494224150",
