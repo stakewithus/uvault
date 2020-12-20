@@ -53,12 +53,12 @@ export default (name: string, _setup: Setup, params: { DECIMALS: BN }) => {
         "underlying treasury"
       )
       assert(
-        after.strategy.totalAssets.gte(before.strategy.totalAssets),
+        after.strategy.totalAssets.gt(before.strategy.totalAssets),
         "strategy total assets"
       )
-      assert(after.gauge.strategy.gte(before.gauge.strategy), "gauge strategy")
+      assert(after.gauge.strategy.gt(before.gauge.strategy), "gauge strategy")
       // Check CRV was liquidated
-      assert(after.crv.strategy.gte(new BN(0)), "crv strategy")
+      assert(after.crv.strategy.eq(new BN(0)), "crv strategy")
     })
   })
 }
