@@ -85,7 +85,9 @@ slither-check-erc . Vault
 ### Deploy
 
 ```shell
-env $(cat .env) npx hardhat run scripts/script-to-run.ts --network ropsten
+rm -rf build artifacts cache
+npx hardhat compile
+env $(cat .env) npx hardhat deploy:strategy --network mainnet --strategy StrategyGusdDai --dev true
 ```
 
 ##### Deploy Vault
