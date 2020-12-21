@@ -43,6 +43,14 @@ contract StrategyNoOp is IStrategy {
         _;
     }
 
+    modifier onlyAuthorized() {
+        require(
+            msg.sender == admin || msg.sender == controller || msg.sender == vault,
+            "!authorized"
+        );
+        _;
+    }
+
     function setAdmin(address _admin) external override onlyAdmin {
         require(_admin != address(0), "admin = zero address");
         admin = _admin;
@@ -84,8 +92,12 @@ contract StrategyNoOp is IStrategy {
         revert("no-op");
     }
 
-    function exit() external override {
-        // left as blank so that Vault can call exit() during Vault.setStrategy()
+    // @dev tranfser accidentally sent underlying tokens back to vault
+    function exit() external override onlyAuthorized {
+        uint bal = IERC20(underlying).balanceOf(address(this));
+        if (bal > 0) {
+            IERC20(underlying).safeTransfer(vault, bal);
+        }
     }
 
     function sweep(address _token) external override onlyAdmin {
