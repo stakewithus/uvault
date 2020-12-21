@@ -123,7 +123,7 @@ const config: Config = {
     strategyBusdDai: "0xffa01cA5FFd9e9F8a24CfdcA8C9157bD59D80405",
     strategyBusdUsdc: "0x042b298B30C67c8921d5376ad9a065E834280F26",
     strategyBusdUsdt: "0xedA38758d7Ea23adc780731d16A4382f17C9e59a",
-    strategyGusdDai: "0x0A81bE3DA1AA091a060106005047FFd62D38E731",
+    strategyGusdDai: "0xfd11221fE0E2c8e552afe8622946946428a17650",
     strategyGusdUsdc: "0x668973f5f8E47844bc75Bbe9BAd9C7AD0542B8bc",
     strategyGusdUsdt: "0xB295bEC46cF0141B7E011Dc19Ae0036796691083",
     strategyPaxDai: "0x2b3512efBeeb609CF9D49486b6e2DD9CF10Be6c9",
