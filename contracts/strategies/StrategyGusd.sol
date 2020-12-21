@@ -58,13 +58,13 @@ contract StrategyGusd is StrategyCurve {
     function _getMostPremiumToken() internal view override returns (address, uint) {
         /*
         Swapping small amount of CRV (< $0.01) with GUSD can cause Uniswap to fail
-        since 0 GUSD is returned from the trade
+        since 0 GUSD is returned from the trade.
+        So we skip buying GUSD
         */
-        uint[4] memory balances;
-        balances[0] = StableSwapGusd(SWAP).balances(0).mul(1e16); // GUSD
-        balances[1] = StableSwap3(BASE_POOL).balances(0); // DAI
-        balances[2] = StableSwap3(BASE_POOL).balances(1).mul(1e12); // USDC
-        balances[3] = StableSwap3(BASE_POOL).balances(2).mul(1e12); // USDT
+        uint[3] memory balances;
+        balances[0] = StableSwap3(BASE_POOL).balances(0); // DAI
+        balances[1] = StableSwap3(BASE_POOL).balances(1).mul(1e12); // USDC
+        balances[2] = StableSwap3(BASE_POOL).balances(2).mul(1e12); // USDT
 
         uint minIndex = 0;
         for (uint i = 1; i < balances.length; i++) {
@@ -73,13 +73,17 @@ contract StrategyGusd is StrategyCurve {
             }
         }
 
+        /*
+        GUSD 0 (skip)
+        DAI  1
+        USDC 2
+        USDT 3
+        */
+
         if (minIndex == 0) {
-            return (GUSD, 0);
-        }
-        if (minIndex == 1) {
             return (DAI, 1);
         }
-        if (minIndex == 2) {
+        if (minIndex == 1) {
             return (USDC, 2);
         }
         return (USDT, 3);
