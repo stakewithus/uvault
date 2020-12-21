@@ -19,7 +19,7 @@ contract StrategyPax is StrategyCurve {
         address _underlying
     ) public StrategyCurve(_controller, _vault, _underlying) {
         // Curve
-        // DAI/USDC/USDT/PAX
+        // ypaxCrv (DAI/USDC/USDT/PAX)
         lp = 0xD905e2eaeBe188fc92179b6350807D8bd91Db0D8;
         // DepositPax
         pool = 0xA50cCc70b6a011CffDdf45057E39679379187287;
