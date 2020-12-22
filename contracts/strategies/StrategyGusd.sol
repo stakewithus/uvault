@@ -74,7 +74,6 @@ contract StrategyGusd is StrategyCurve {
         }
 
         /*
-        GUSD 0 (skip)
         DAI  1
         USDC 2
         USDT 3
