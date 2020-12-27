@@ -33,6 +33,15 @@ export interface Config {
     strategyP3CrvUsdc: string
     strategyP3CrvUsdt: string
     strategyPdaiDai: string
+    strategyPaxDai: string
+    strategyPaxUsdc: string
+    strategyPaxUsdt: string
+    strategyBusdDai: string
+    strategyBusdUsdc: string
+    strategyBusdUsdt: string
+    strategyGusdDai: string
+    strategyGusdUsdc: string
+    strategyGusdUsdt: string
     // others
     dai: string
     usdc: string
@@ -97,6 +106,15 @@ const config: Config = {
     strategy3CrvDai: "0xbc33957CC1Ef9E99D86f06A8af3f5fe22753ec93",
     strategy3CrvUsdc: "0x549452631ec594C0580d0bf313D2dF22304f574F",
     strategy3CrvUsdt: "0xAC6B27B9A57E0d1BDd2c471f83F3D91Ab36df980",
+    strategyBusdDai: "0x982cfc1598e8A4e473601DDBEC3699d7C7947717",
+    strategyBusdUsdc: "0xE4bF8c52FF170Bed33E52530A103C21ad5f638f9",
+    strategyBusdUsdt: "0xAa8fB748fDC8dc72bF278505d9e535aF44208442",
+    strategyGusdDai: "0x45f88290f4f5aEB345728542E3074d700AA93b93",
+    strategyGusdUsdc: "0xd4F486EA3C68A307c3E8420232eE44d7604a4e99",
+    strategyGusdUsdt: "0x58B5Bc0683f22eBb617AE1a504BD12528BE4FB9F",
+    strategyPaxDai: "0xF7F6919d1Ae0B075cFb8033F41dAc5C982C8f257",
+    strategyPaxUsdc: "0xaEe92DC91d8572482Dc30C344c979fDef843DFcd",
+    strategyPaxUsdt: "0xFe08F6D37FCD1ed1CB7f357b23Bfdf77cD1f6A8e",
     // TODO need to re-deploy, point to growth vaults
     strategyP3CrvDai: "0xCd9A4c92c90a7ABC63dBCb60a1A0A60054A4139b",
     strategyP3CrvUsdc: "0x34B2aBE99E4654bd1bCB55BF42707c997Bf9A799",
@@ -138,6 +156,35 @@ export const STRATEGIES = {
     StrategyTest: {
       token: "testToken",
       vault: "vault",
+    },
+  },
+  mainnet: {
+    StrategyBusdDai: {
+      vault: "daiSafeVault",
+    },
+    StrategyBusdUsdc: {
+      vault: "usdcSafeVault",
+    },
+    StrategyBusdUsdt: {
+      vault: "usdtSafeVault",
+    },
+    StrategyGusdDai: {
+      vault: "daiSafeVault",
+    },
+    StrategyGusdUsdc: {
+      vault: "usdcSafeVault",
+    },
+    StrategyGusdUsdt: {
+      vault: "usdtSafeVault",
+    },
+    StrategyPaxDai: {
+      vault: "daiSafeVault",
+    },
+    StrategyPaxUsdc: {
+      vault: "usdcSafeVault",
+    },
+    StrategyPaxUsdt: {
+      vault: "usdtSafeVault",
     },
   },
   dev: {
