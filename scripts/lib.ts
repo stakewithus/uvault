@@ -34,7 +34,9 @@ export async function deploy(
   }
 
   try {
+    // @ts-ignore
     const provider = hre.ethers.providers.getDefaultProvider()
+    // @ts-ignore
     const [account] = await hre.ethers.getSigners()
 
     const accountAddr = await account.getAddress()
@@ -42,7 +44,9 @@ export async function deploy(
     const gasPrice = await provider.getGasPrice()
 
     console.log(`Account: ${accountAddr}`)
+    // @ts-ignore
     console.log(`Balance: ${hre.ethers.utils.formatEther(balance)} ETH`)
+    // @ts-ignore
     console.log(`Gas price: ${hre.ethers.utils.formatUnits(gasPrice, "gwei")} gwei`)
 
     assert(network === "mainnet" || network === "ropsten", `Invalid network ${network}`)
