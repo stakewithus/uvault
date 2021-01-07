@@ -80,7 +80,7 @@ const config: Config = {
     // vaults //
     vault: "0xc8E2357fA7f51e84beBFD4A0075c53D49d0A0D88",
     // strategies //
-    strategyTest: "0xEDCf4EF1E0Eb5A962C4F4d96584D58161FDAD74C",
+    strategyTest: "0x0dDA2b6D771789803803798cFD3C7Ea55BED7C2F",
     // others //
     // used for testinng
     testToken: "0x7F56619E1fAaF6c06B96225e6c8c737F0BBc91c5",
