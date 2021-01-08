@@ -4,6 +4,7 @@ pragma solidity 0.6.11;
 import "../interfaces/curve/StableSwapAave.sol";
 import "./StrategyCurve.sol";
 
+// TODO use 1inch?
 contract StrategyAave is StrategyCurve {
     // Aave StableSwap
     address private constant SWAP = 0xDeBF20617708857ebe4F679508E7b7863a8A8EeE;
