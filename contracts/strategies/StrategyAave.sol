@@ -36,17 +36,21 @@ contract StrategyAave is StrategyCurve {
     function _addLiquidity(uint _amount, uint _index) internal override {
         uint[3] memory amounts;
         amounts[_index] = _amount;
-        StableSwapAave(pool).add_liquidity(amounts, 1, true);
+        // TODO add slippage
+        // min = virtual price * (100 - slippage) / 100
+        StableSwapAave(pool).add_liquidity(amounts, 0, true);
     }
 
     function _removeLiquidityOneCoin(uint _lpAmount) internal override {
         IERC20(lp).safeApprove(pool, 0);
         IERC20(lp).safeApprove(pool, _lpAmount);
 
+        // TODO add slippage
+        // min = virtual price * (100 - slippage) / 100
         StableSwapAave(pool).remove_liquidity_one_coin(
             _lpAmount,
             int128(underlyingIndex),
-            1,
+            0,
             true
         );
     }
