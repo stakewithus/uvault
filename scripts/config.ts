@@ -7,6 +7,7 @@ export interface Config {
     timeLock: string
     vault: string
     strategyTest: string
+    strategyNoOp: string
     testToken: string
   }
   mainnet: {
@@ -81,6 +82,7 @@ const config: Config = {
     vault: "0xc8E2357fA7f51e84beBFD4A0075c53D49d0A0D88",
     // strategies //
     strategyTest: "0x0dDA2b6D771789803803798cFD3C7Ea55BED7C2F",
+    strategyNoOp: "0x90E5216F8aBf7B68cA7D4eC856476Ef2C0857Cb2",
     // others //
     // used for testinng
     testToken: "0x7F56619E1fAaF6c06B96225e6c8c737F0BBc91c5",
@@ -154,6 +156,10 @@ const config: Config = {
 export const STRATEGIES = {
   ropsten: {
     StrategyTest: {
+      token: "testToken",
+      vault: "vault",
+    },
+    StrategyNoOp: {
       token: "testToken",
       vault: "vault",
     },

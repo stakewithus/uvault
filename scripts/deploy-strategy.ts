@@ -8,10 +8,12 @@ usage:
 env $(cat .env) npx hardhat deploy:strategy \
 --network ropsten \
 --strategy StrategyTest \
+--vault vault \
 --dev false
 */
 task("deploy:strategy", "Deploy vault")
   .addParam("strategy", "Name of strategy")
+  .addParam("vault", "Name of vault")
   .addOptionalParam("dev", "Use mainnet dev", "false")
   .setAction(async (args, hre) => {
     assert(args.dev === "false" || args.dev === "true", `invalid arg dev: ${args.dev}`)
@@ -20,15 +22,9 @@ task("deploy:strategy", "Deploy vault")
     await deploy(hre, args.strategy, dev, async (_account, network) => {
       console.log(`strategy: ${args.strategy}`)
 
-      const vault = getAddress(
-        config,
-        network,
-        dev,
-        // @ts-ignore
-        STRATEGIES[dev ? "dev" : network][args.strategy].vault
-      )
+      const vault = getAddress(config, network, dev, args.vault)
 
-      console.log(`vault: ${vault}`)
+      console.log(`${args.vault}: ${vault}`)
 
       // @ts-ignore
       const _token = STRATEGIES[dev ? "dev" : network][args.strategy].token
