@@ -25,6 +25,12 @@ export interface Config {
     usdcGrowthVault: string
     usdtGrowthVault: string
     // strategies
+    strategyNoOpSafeDai: string
+    strategyNoOpSafeUsdc: string
+    strategyNoOpSafeUsdt: string
+    strategyNoOpGrowthDai: string
+    strategyNoOpGrowthUsdc: string
+    strategyNoOpGrowthUsdt: string
     strategyCusdDai: string
     strategyCusdUsdc: string
     strategy3CrvDai: string
@@ -58,6 +64,9 @@ export interface Config {
     daiVault: string
     usdcVault: string
     usdtVault: string
+    strategyNoOpDai: string
+    strategyNoOpUsdc: string
+    strategyNoOpUsdt: string
     strategyPaxDai: string
     strategyPaxUsdc: string
     strategyPaxUsdt: string
@@ -67,6 +76,10 @@ export interface Config {
     strategyGusdDai: string
     strategyGusdUsdc: string
     strategyGusdUsdt: string
+    // others
+    dai: string
+    usdc: string
+    usdt: string
   }
 }
 
@@ -103,6 +116,12 @@ const config: Config = {
     usdcGrowthVault: "0xEAa84fc94bCE3028050D185657eBcA4B3dcc232B",
     usdtGrowthVault: "0x0b3A87aFfbFe0F38490DA657a813A95e7844B38a",
     // strategies //
+    strategyNoOpSafeDai: "0xB8B2d189DB65A50422A444cA284f04c6421F610B",
+    strategyNoOpSafeUsdc: "0x63a72001F48e3bbd461C268b7Bb417374D0b19a1",
+    strategyNoOpSafeUsdt: "0x9120EC076162d464eeEFB058f3376E770d325335",
+    strategyNoOpGrowthDai: "0x3FA09208a066853DB14be80d93A440Ffa529D0ea",
+    strategyNoOpGrowthUsdc: "0x87E0F7400FeBe60f7361a5F5533327278Adb84DE",
+    strategyNoOpGrowthUsdt: "0x7Ff2f6A01980d8b80c17269Eb9cBb23694Ffb10D",
     strategyCusdDai: "0x9459cD762eA42C7B4e0Dea24d5f427D5a07094D7",
     strategyCusdUsdc: "0xd050bd4F1f4E5Bc7E864333E367099BAd5cA0B3D",
     strategy3CrvDai: "0xbc33957CC1Ef9E99D86f06A8af3f5fe22753ec93",
@@ -140,6 +159,9 @@ const config: Config = {
     usdcVault: "0x167E3254a9298ebF29F67e0AE0326d2018c9bC44",
     usdtVault: "0xdADa607772Ad29f5a90a8817532Ebf983709af15",
     // strategies //
+    strategyNoOpDai: "0x1b79EbE1C9c128Eb30e6f6EBb0741991B696ab80",
+    strategyNoOpUsdc: "0x64d43B0D0EDfa8434059d12bCF861da7eE8dD4bc",
+    strategyNoOpUsdt: "0xc2e4e82853c28DCF81930852E5A055236364d8F6",
     strategyBusdDai: "0xffa01cA5FFd9e9F8a24CfdcA8C9157bD59D80405",
     strategyBusdUsdc: "0x042b298B30C67c8921d5376ad9a065E834280F26",
     strategyBusdUsdt: "0xedA38758d7Ea23adc780731d16A4382f17C9e59a",
@@ -149,78 +171,10 @@ const config: Config = {
     strategyPaxDai: "0x2b3512efBeeb609CF9D49486b6e2DD9CF10Be6c9",
     strategyPaxUsdc: "0xb1F1AeD30dFe5787dFb65F6Cb96D90b3ae347F68",
     strategyPaxUsdt: "0x3032dBB5DB8aB5Bd85bf2Ca496e02Ce5378A5726",
-  },
-}
-
-// mappings from strategy to vault and token
-export const STRATEGIES = {
-  ropsten: {
-    StrategyTest: {
-      token: "testToken",
-      vault: "vault",
-    },
-    StrategyNoOp: {
-      token: "testToken",
-      vault: "vault",
-    },
-  },
-  mainnet: {
-    StrategyBusdDai: {
-      vault: "daiSafeVault",
-    },
-    StrategyBusdUsdc: {
-      vault: "usdcSafeVault",
-    },
-    StrategyBusdUsdt: {
-      vault: "usdtSafeVault",
-    },
-    StrategyGusdDai: {
-      vault: "daiSafeVault",
-    },
-    StrategyGusdUsdc: {
-      vault: "usdcSafeVault",
-    },
-    StrategyGusdUsdt: {
-      vault: "usdtSafeVault",
-    },
-    StrategyPaxDai: {
-      vault: "daiSafeVault",
-    },
-    StrategyPaxUsdc: {
-      vault: "usdcSafeVault",
-    },
-    StrategyPaxUsdt: {
-      vault: "usdtSafeVault",
-    },
-  },
-  dev: {
-    StrategyBusdDai: {
-      vault: "daiVault",
-    },
-    StrategyBusdUsdc: {
-      vault: "usdcVault",
-    },
-    StrategyBusdUsdt: {
-      vault: "usdtVault",
-    },
-    StrategyGusdDai: {
-      vault: "daiVault",
-    },
-    StrategyGusdUsdc: {
-      vault: "usdcVault",
-    },
-    StrategyGusdUsdt: {
-      vault: "usdtVault",
-    },
-    StrategyPaxDai: {
-      vault: "daiVault",
-    },
-    StrategyPaxUsdc: {
-      vault: "usdcVault",
-    },
-    StrategyPaxUsdt: {
-      vault: "usdtVault",
-    },
+    // others //
+    dai: "0x6B175474E89094C44Da98b954EedeAC495271d0F",
+    usdc: "0xA0b86991c6218b36c1d19D4a2e9Eb0cE3606eB48",
+    usdt: "0xdAC17F958D2ee523a2206206994597C13D831ec7",
   },
 }
 
