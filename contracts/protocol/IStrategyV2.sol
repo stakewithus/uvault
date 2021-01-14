@@ -57,12 +57,17 @@ interface IStrategyV2 {
 
     /*
     @notice Sell any staking rewards for underlying, deposit undelying
-    @param _min Min total assets observed offchain
-    @param _max Max total assets oberved offchain
-    @dev Guard against manipulation of external price feed by checking that it
-         is between `_min` and `_max` 
     */
-    function harvest(uint _min, uint _max) external;
+    function harvest() external;
+
+    /*
+    @notice Increase total debt if profit > 0
+    @param _min Min total assets observed offchain
+    @param _max Max total assets observed offchain
+    @dev Guard against manipulation of external price feed by checking that
+         total assets is between `_min` and `_max` 
+    */
+    function skim(uint _min, uint _max) external;
 
     /*
     @notice Exit from strategy

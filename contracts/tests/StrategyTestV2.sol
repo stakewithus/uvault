@@ -10,8 +10,6 @@ contract StrategyTestV2 is StrategyBaseV2 {
     uint public _depositAmount_;
     uint public _withdrawAmount_;
     bool public _harvestWasCalled_;
-    uint public _harvestMin_;
-    uint public _harvestMax_;
     bool public _exitWasCalled_;
     // simulate strategy withdrawing less than requested
     uint public _maxWithdrawAmount_ = uint(-1);
@@ -50,9 +48,7 @@ contract StrategyTestV2 is StrategyBaseV2 {
         IERC20(underlying).transferFrom(_POOL_, address(this), _withdrawAmount_);
     }
 
-    function harvest(uint _min, uint _max) external override onlyAuthorized {
-        _harvestMin_ = _min;
-        _harvestMax_ = _max;
+    function harvest() external override onlyAuthorized {
         _harvestWasCalled_ = true;
     }
 

@@ -12,8 +12,7 @@ import "./protocol/IControllerV2.sol";
 /*
 Changes from StrategyBase V1
 - performance fee capped at 20%
-- removed skim()
-- change harvest() to harvest(uint,uint)
+- update skim(), does not withdraw underlying token, instead increments total debt
 */
 
 abstract contract StrategyBaseV2 is IStrategyV2 {
@@ -200,12 +199,34 @@ abstract contract StrategyBaseV2 is IStrategyV2 {
 
     /*
     @notice Sell any staking rewards for underlying, deposit undelying
-    @param _min Min total assets observed offchain
-    @param _max Max total assets oberved offchain
-    @dev Guard against manipulation of external price feed by checking that it
-         is between `_min` and `_max` 
     */
-    function harvest(uint _min, uint _max) external virtual override;
+    function harvest() external virtual override;
+
+    /*
+    @notice Increase total debt if profit > 0
+    @param _min Min total assets observed offchain
+    @param _max Max total assets observed offchain
+    @dev Guard against manipulation of external price feed by checking that
+         total assets is between `_min` and `_max` 
+    */
+    function skim(uint _min, uint _max) external override onlyAuthorized {
+        uint total = _totalAssets();
+        // protect against price manipulation
+        require(total >= _min, "total < min");
+        require(total <= _max, "total > max");
+
+        if (total > totalDebt) {
+            /*
+            If we were to withdraw profit (total - totalDebt) followed
+            by deposit, this would increase the total debt roughly by the
+            profit.
+
+            Withdrawing consumes high gas, so here we omit it and
+            directly increase debt, as if withdraw and deposit were called.
+            */
+            totalDebt = totalDebt.add(total - totalDebt);
+        }
+    }
 
     function exit() external virtual override;
 
