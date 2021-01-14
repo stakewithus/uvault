@@ -10,6 +10,11 @@ import "./protocol/IStrategy.sol";
 import "./protocol/IStrategyV2.sol";
 import "./AccessControl.sol";
 
+/*
+Changes from Controller V1
+- function harvest is overloaded to support v1 and v2 strategies
+*/
+
 contract ControllerV2 is IControllerV2, AccessControl {
     using SafeMath for uint;
 
