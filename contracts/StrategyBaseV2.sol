@@ -9,6 +9,13 @@ import "./protocol/IStrategyV2.sol";
 // used inside harvest
 import "./protocol/IControllerV2.sol";
 
+/*
+Changes from StrategyBase V1
+- performance fee capped at 20%
+- removed skim()
+- change harvest() to harvest(uint,uint)
+*/
+
 abstract contract StrategyBaseV2 is IStrategyV2 {
     using SafeERC20 for IERC20;
     using SafeMath for uint;
@@ -23,6 +30,7 @@ abstract contract StrategyBaseV2 is IStrategyV2 {
 
     // performance fee sent to treasury when harvest() generates profit
     uint public override performanceFee = 500;
+    uint private constant PERFORMANCE_FEE_CAP = 2000; // upper limit to performance fee
     uint internal constant PERFORMANCE_FEE_MAX = 10000;
 
     // valuable tokens that cannot be swept
@@ -69,7 +77,7 @@ abstract contract StrategyBaseV2 is IStrategyV2 {
     }
 
     function setPerformanceFee(uint _fee) external override onlyAdmin {
-        require(_fee <= PERFORMANCE_FEE_MAX, "performance fee > max");
+        require(_fee <= PERFORMANCE_FEE_CAP, "performance fee > cap");
         performanceFee = _fee;
     }
 
