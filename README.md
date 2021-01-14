@@ -1,4 +1,4 @@
-# Unagi Vault
+# Unagii Vault
 
 ### Contract Design Goals
 
@@ -7,7 +7,7 @@
 
 ### Contract Architecture
 
-![unagi arch](unagi-arch.png)
+![unagii arch](unagii-arch.png)
 
 ### Install
 
