@@ -9,7 +9,7 @@
   "scripts": {
     "postinstall": "npm run compile && npm run types",
     "compile": "truffle compile",
-    "clean": "rm -rf cache artifacts build",
+    "clean": "rm -rf cache artifacts build types",
     "solhint": "solhint 'contracts/**/*.sol'",
     "lint": "prettier --write contracts/*.sol contracts/**/*.sol",
     "lint:check": "prettier --check contracts/*.sol contracts/**/*.sol",
