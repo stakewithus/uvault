@@ -1,0 +1,34 @@
+import chai from "chai"
+import { ControllerV2Instance } from "../../../types"
+import { ZERO_ADDRESS } from "../../util"
+import _setup from "./setup"
+
+contract("Controller", (accounts) => {
+  const refs = _setup(accounts)
+  const { admin } = refs
+
+  let controller: ControllerV2Instance
+  beforeEach(() => {
+    controller = refs.controller
+  })
+
+  describe("setTreasury", () => {
+    it("should set treasury", async () => {
+      await controller.setTreasury(accounts[2], { from: admin })
+
+      assert.equal(await controller.treasury(), accounts[2])
+    })
+
+    it("should reject if caller not admin", async () => {
+      await chai
+        .expect(controller.setTreasury(accounts[1], { from: accounts[1] }))
+        .to.be.rejectedWith("!admin")
+    })
+
+    it("should reject zero address", async () => {
+      await chai
+        .expect(controller.setTreasury(ZERO_ADDRESS, { from: admin }))
+        .to.be.rejectedWith("treasury = zero address")
+    })
+  })
+})

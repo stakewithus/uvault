@@ -18,7 +18,7 @@ contract MockVault is IVault {
     mapping(address => bool) public override whitelist;
 
     // test helpers
-    uint public _setStrategyMin_;
+    uint public _strategyMin_;
     bool public _investWasCalled_;
     uint public _depositAmount_;
     uint public _withdrawAmount_;
@@ -55,7 +55,7 @@ contract MockVault is IVault {
 
     function setStrategy(address _strategy, uint _min) external override {
         strategy = _strategy;
-        _setStrategyMin_ = _min;
+        _strategyMin_ = _min;
     }
 
     function balanceInVault() external view override returns (uint) {
