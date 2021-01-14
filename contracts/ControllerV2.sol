@@ -6,13 +6,12 @@ import "@openzeppelin/contracts/token/ERC20/IERC20.sol";
 
 import "./protocol/IControllerV2.sol";
 import "./protocol/IVault.sol";
-import "./protocol/IStrategy.sol";
 import "./protocol/IStrategyV2.sol";
 import "./AccessControl.sol";
 
 /*
 Changes from Controller V1
-- function harvest is overloaded to support v1 and v2 strategies
+- function skim is updated to pass min, max inputs
 */
 
 contract ControllerV2 is IControllerV2, AccessControl {
@@ -44,7 +43,7 @@ contract ControllerV2 is IControllerV2, AccessControl {
     }
 
     modifier isCurrentStrategy(address _strategy) {
-        address vault = IStrategy(_strategy).vault();
+        address vault = IStrategyV2(_strategy).vault();
         /*
         Check that _strategy is the current strategy used by the vault.
         */
@@ -91,43 +90,25 @@ contract ControllerV2 is IControllerV2, AccessControl {
         IVault(_vault).invest();
     }
 
-    /* 
-    @dev v1 strategy call
-    */
     function harvest(address _strategy)
         external
         override
         isCurrentStrategy(_strategy)
         onlyAuthorized(HARVESTER_ROLE)
     {
-        IStrategy(_strategy).harvest();
+        IStrategyV2(_strategy).harvest();
     }
 
-    /* 
-    @dev v2 strategy call
-    */
-    function harvest(
+    function skim(
         address _strategy,
         uint _min,
         uint _max
     ) external override isCurrentStrategy(_strategy) onlyAuthorized(HARVESTER_ROLE) {
-        IStrategyV2(_strategy).harvest(_min, _max);
-    }
-
-    /* 
-    @dev v1 strategy call
-    */
-    function skim(address _strategy)
-        external
-        override
-        isCurrentStrategy(_strategy)
-        onlyAuthorized(HARVESTER_ROLE)
-    {
-        IStrategy(_strategy).skim();
+        IStrategyV2(_strategy).skim(_min, _max);
     }
 
     modifier checkWithdraw(address _strategy, uint _min) {
-        address vault = IStrategy(_strategy).vault();
+        address vault = IStrategyV2(_strategy).vault();
         address token = IVault(vault).token();
 
         uint balBefore = IERC20(token).balanceOf(vault);
@@ -148,7 +129,7 @@ contract ControllerV2 is IControllerV2, AccessControl {
         onlyAuthorized(HARVESTER_ROLE)
         checkWithdraw(_strategy, _min)
     {
-        IStrategy(_strategy).withdraw(_amount);
+        IStrategyV2(_strategy).withdraw(_amount);
     }
 
     function withdrawAll(address _strategy, uint _min)
@@ -158,7 +139,7 @@ contract ControllerV2 is IControllerV2, AccessControl {
         onlyAuthorized(HARVESTER_ROLE)
         checkWithdraw(_strategy, _min)
     {
-        IStrategy(_strategy).withdrawAll();
+        IStrategyV2(_strategy).withdrawAll();
     }
 
     function exit(address _strategy, uint _min)
@@ -168,6 +149,6 @@ contract ControllerV2 is IControllerV2, AccessControl {
         onlyAuthorized(ADMIN_ROLE)
         checkWithdraw(_strategy, _min)
     {
-        IStrategy(_strategy).exit();
+        IStrategyV2(_strategy).exit();
     }
 }

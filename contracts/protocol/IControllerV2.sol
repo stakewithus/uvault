@@ -39,27 +39,19 @@ interface IControllerV2 {
 
     /*
     @notice Claim rewards and deposit into strategy
-    @dev call to v1 strategies
     */
     function harvest(address _strategy) external;
 
     /*
-    @notice Claim rewards and deposit into strategy
+    @notice Update total debt if profit > 0. Does not withdraw profit.
     @param _min Min total assets observed offchain
-    @param _max Max total assets oberved offchain
-    @dev call to v2 strategies
+    @param _max Max total assets observed offchain
     */
-    function harvest(
+    function skim(
         address _strategy,
         uint _min,
         uint _max
     ) external;
-
-    /*
-    @notice Withdraw any profit over debt back into vault
-    @dev call to v1 strategy
-    */
-    function skim(address _strategy) external;
 
     /*
     @notice Withdraw from strategy to vault

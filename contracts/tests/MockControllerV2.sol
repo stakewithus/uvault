@@ -38,13 +38,11 @@ contract MockControllerV2 is IControllerV2 {
 
     function harvest(address _strategy) external override {}
 
-    function harvest(
+    function skim(
         address _strategy,
         uint _min,
         uint _max
     ) external override {}
-
-    function skim(address _strategy) external override {}
 
     function withdraw(
         address _strategy,

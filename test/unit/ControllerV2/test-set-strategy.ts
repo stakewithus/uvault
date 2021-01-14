@@ -18,7 +18,7 @@ contract("Controller", (accounts) => {
   beforeEach(() => {
     controller = refs.controller
     vault = refs.vault
-    strategy = refs.strategyV2
+    strategy = refs.strategy
   })
 
   describe("setStrategy", () => {

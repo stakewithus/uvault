@@ -17,7 +17,7 @@ contract("Controller", (accounts) => {
   let vault: MockVaultInstance
   beforeEach(() => {
     controller = refs.controller
-    strategy = refs.strategyV2
+    strategy = refs.strategy
     vault = refs.vault
   })
 
