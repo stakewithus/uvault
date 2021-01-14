@@ -6,11 +6,11 @@ import "./StrategyCurve.sol";
 
 import "../interfaces/curve/Gauge.sol";
 import "../interfaces/curve/Minter.sol";
-import "../StrategyBase.sol";
+import "../StrategyBaseV2.sol";
 import "../UseUniswap.sol";
 
 // TODO constant private var
-contract StrategyAaveDai is StrategyBase, UseUniswap {
+contract StrategyAaveDai is StrategyBaseV2, UseUniswap {
     address private constant DAI = 0x6B175474E89094C44Da98b954EedeAC495271d0F;
     address private constant USDC = 0xA0b86991c6218b36c1d19D4a2e9Eb0cE3606eB48;
     address private constant USDT = 0xdAC17F958D2ee523a2206206994597C13D831ec7;
@@ -21,13 +21,10 @@ contract StrategyAaveDai is StrategyBase, UseUniswap {
     uint private precisionDiv = 1;
 
     // Curve //
-    // liquidity provider token (cDAI/cUSDC or 3Crv)
-    // Curve aDAI/aUSDC/aUSDT
+    // liquidity provider token (Curve aDAI/aUSDC/aUSDT)
     address private lp = 0xFd2a8fA60Abd58Efe3EeE34dd494cD491dC14900;
-    // ICurveFi2 or ICurveFi3
     // StableSwapAave
     address private pool = 0xDeBF20617708857ebe4F679508E7b7863a8A8EeE;
-    // Gauge
     // LiquidityGaugeV2
     address private gauge = 0xd662908ADA2Ea1916B3318327A97eB18aD588b5d;
     // Minter
@@ -39,7 +36,7 @@ contract StrategyAaveDai is StrategyBase, UseUniswap {
         address _controller,
         address _vault,
         address _underlying
-    ) public StrategyBase(_controller, _vault, _underlying) {}
+    ) public StrategyBaseV2(_controller, _vault, _underlying) {}
 
     function _getVirtualPrice() internal view returns (uint) {
         return StableSwapAave(pool).get_virtual_price();
@@ -154,35 +151,12 @@ contract StrategyAaveDai is StrategyBase, UseUniswap {
 
     /*
     @notice Claim CRV and deposit most premium token into Curve
-    */
-    function harvest() external override onlyAuthorized {
-        (address token, uint index) = _getMostPremiumToken();
-
-        _swapCrvFor(token);
-
-        uint bal = IERC20(token).balanceOf(address(this));
-        if (bal > 0) {
-            // transfer fee to treasury
-            uint fee = bal.mul(performanceFee) / PERFORMANCE_FEE_MAX;
-            if (fee > 0) {
-                address treasury = IController(controller).treasury();
-                require(treasury != address(0), "treasury = zero address");
-
-                IERC20(token).safeTransfer(treasury, fee);
-            }
-
-            _deposit(token, index);
-        }
-    }
-
-    /*
-    @notice Claim CRV and deposit most premium token into Curve
     @param _min Min total assets observed offchain
     @param _max Max total assets oberved offchain
     @dev Guard against manipulation of external price feed by checking that it
          is between `_min` and `_max` 
     */
-    function harvest2(uint _min, uint _max) external onlyAuthorized {
+    function harvest(uint _min, uint _max) external override onlyAuthorized {
         uint totalBefore = _totalAssets();
         // protect against price manipulation
         require(totalBefore >= _min, "total < min");
@@ -197,7 +171,7 @@ contract StrategyAaveDai is StrategyBase, UseUniswap {
             // transfer fee to treasury
             uint fee = bal.mul(performanceFee) / PERFORMANCE_FEE_MAX;
             if (fee > 0) {
-                address treasury = IController(controller).treasury();
+                address treasury = IControllerV2(controller).treasury();
                 require(treasury != address(0), "treasury = zero address");
 
                 IERC20(token).safeTransfer(treasury, fee);
@@ -207,6 +181,14 @@ contract StrategyAaveDai is StrategyBase, UseUniswap {
 
             uint totalAfter = _totalAssets();
             if (totalAfter > totalDebt) {
+                /*
+                If we were to withdraw profit (totalAfter - totalDebt) followed
+                by deposit, this would increase the total debt roughly by the
+                profit.
+
+                Withdrawing consumes high gas, so here we omit it and
+                directly increase debt, as if withdraw and deposit were called.
+                */
                 totalDebt = totalDebt.add(totalAfter - totalDebt);
             }
         }
