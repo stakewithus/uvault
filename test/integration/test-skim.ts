@@ -1,21 +1,21 @@
 import chai from "chai"
 import {
   TestTokenInstance,
-  ControllerInstance,
+  ControllerV2Instance,
   VaultInstance,
-  StrategyTestInstance,
+  StrategyTestV2Instance,
 } from "../../types"
 import _setup from "./setup"
 
-const StrategyTest = artifacts.require("StrategyTest")
+const StrategyTestV2 = artifacts.require("StrategyTestV2")
 
 contract("integration - skim", (accounts) => {
   const refs = _setup(accounts)
   const { admin } = refs
 
-  let controller: ControllerInstance
+  let controller: ControllerV2Instance
   let vault: VaultInstance
-  let strategy: StrategyTestInstance
+  let strategy: StrategyTestV2Instance
   let underlying: TestTokenInstance
   beforeEach(async () => {
     controller = refs.controller
@@ -25,23 +25,32 @@ contract("integration - skim", (accounts) => {
   })
 
   it("should skim", async () => {
-    await controller.skim(strategy.address, { from: admin })
+    const min = 0
+    const max = await strategy.totalAssets()
+
+    await controller.skim(strategy.address, min, max, { from: admin })
   })
 
   it("should reject if not currenty strategy", async () => {
-    const strategy = await StrategyTest.new(
+    const min = 0
+    const max = await strategy.totalAssets()
+
+    const newStrategy = await StrategyTestV2.new(
       controller.address,
       vault.address,
       underlying.address
     )
     await chai
-      .expect(controller.skim(strategy.address, { from: admin }))
+      .expect(controller.skim(newStrategy.address, min, max, { from: admin }))
       .to.be.rejectedWith("!strategy")
   })
 
   it("should reject if not authorized", async () => {
+    const min = 0
+    const max = await strategy.totalAssets()
+
     await chai
-      .expect(controller.skim(strategy.address, { from: accounts[1] }))
+      .expect(controller.skim(strategy.address, min, max, { from: accounts[1] }))
       .to.be.rejectedWith("!authorized")
   })
 })

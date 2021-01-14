@@ -1,9 +1,9 @@
 import chai from "chai"
 import {
   TestTokenInstance,
-  ControllerInstance,
+  ControllerV2Instance,
   VaultInstance,
-  StrategyTestInstance,
+  StrategyTestV2Instance,
 } from "../../types"
 import _setup from "./setup"
 
@@ -13,9 +13,9 @@ contract("integration - harvest", (accounts) => {
   const refs = _setup(accounts)
   const { admin } = refs
 
-  let controller: ControllerInstance
+  let controller: ControllerV2Instance
   let vault: VaultInstance
-  let strategy: StrategyTestInstance
+  let strategy: StrategyTestV2Instance
   let underlying: TestTokenInstance
   beforeEach(async () => {
     controller = refs.controller

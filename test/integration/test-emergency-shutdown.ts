@@ -2,21 +2,21 @@ import chai from "chai"
 import BN from "bn.js"
 import {
   TestTokenInstance,
-  ControllerInstance,
+  ControllerV2Instance,
   VaultInstance,
-  StrategyTestInstance,
-  StrategyNoOpInstance,
+  StrategyTestV2Instance,
+  StrategyNoOpV2Instance,
 } from "../../types"
 import _setup from "./setup"
 
 contract("integration - emergency shutdown and recovery", (accounts) => {
   const refs = _setup(accounts)
-  const { admin, timeLock } = refs
+  const { admin } = refs
 
-  let controller: ControllerInstance
+  let controller: ControllerV2Instance
   let vault: VaultInstance
-  let strategy: StrategyTestInstance
-  let strategyNoOp: StrategyNoOpInstance
+  let strategy: StrategyTestV2Instance
+  let strategyNoOp: StrategyNoOpV2Instance
   let underlying: TestTokenInstance
   beforeEach(async () => {
     controller = refs.controller
@@ -74,7 +74,6 @@ contract("integration - emergency shutdown and recovery", (accounts) => {
       from: admin,
     })
 
-    const before = await snapshot()
     await controller.setStrategy(vault.address, strategy.address, 0, {
       from: admin,
     })

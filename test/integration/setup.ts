@@ -4,20 +4,20 @@ import {
   TestTokenInstance,
   MockGasTokenInstance,
   GasRelayerInstance,
-  ControllerInstance,
+  ControllerV2Instance,
   VaultInstance,
-  StrategyTestInstance,
-  StrategyNoOpInstance,
+  StrategyTestV2Instance,
+  StrategyNoOpV2Instance,
 } from "../../types"
 import { pow } from "../util"
 
 const TestToken = artifacts.require("TestToken")
 const MockGasToken = artifacts.require("MockGasToken")
 const GasRelayer = artifacts.require("GasRelayer")
-const Controller = artifacts.require("Controller")
+const ControllerV2 = artifacts.require("ControllerV2")
 const Vault = artifacts.require("Vault")
-const StrategyTest = artifacts.require("StrategyTest")
-const StrategyNoOp = artifacts.require("StrategyNoOp")
+const StrategyTestV2 = artifacts.require("StrategyTestV2")
+const StrategyNoOpV2 = artifacts.require("StrategyNoOpV2")
 
 export default (accounts: Truffle.Accounts) => {
   const admin = accounts[0]
@@ -35,10 +35,10 @@ export default (accounts: Truffle.Accounts) => {
     underlying: TestTokenInstance
     gasToken: MockGasTokenInstance
     gasRelayer: GasRelayerInstance
-    controller: ControllerInstance
+    controller: ControllerV2Instance
     vault: VaultInstance
-    strategy: StrategyTestInstance
-    strategyNoOp: StrategyNoOpInstance
+    strategy: StrategyTestV2Instance
+    strategyNoOp: StrategyNoOpV2Instance
     whale: string
   }
 
@@ -69,13 +69,13 @@ export default (accounts: Truffle.Accounts) => {
     const gasRelayer = await GasRelayer.new(gasToken.address, {
       from: admin,
     })
-    const controller = await Controller.new(treasury, {
+    const controller = await ControllerV2.new(treasury, {
       from: admin,
     })
     const vault = await Vault.new(controller.address, timeLock, underlying.address, {
       from: admin,
     })
-    const strategy = await StrategyTest.new(
+    const strategy = await StrategyTestV2.new(
       controller.address,
       vault.address,
       underlying.address,
@@ -83,7 +83,7 @@ export default (accounts: Truffle.Accounts) => {
         from: admin,
       }
     )
-    const strategyNoOp = await StrategyNoOp.new(
+    const strategyNoOp = await StrategyNoOpV2.new(
       controller.address,
       vault.address,
       underlying.address,

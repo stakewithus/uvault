@@ -2,24 +2,24 @@ import chai from "chai"
 import BN from "bn.js"
 import {
   TestTokenInstance,
-  ControllerInstance,
+  ControllerV2Instance,
   VaultInstance,
-  StrategyTestInstance,
+  StrategyTestV2Instance,
 } from "../../types"
 import { eq, add } from "../util"
 import _setup from "./setup"
 
-const StrategyTest = artifacts.require("StrategyTest")
+const StrategyTestV2 = artifacts.require("StrategyTestV2")
 
 contract("integration - set strategy", (accounts) => {
   const refs = _setup(accounts)
   const { admin, timeLock } = refs
 
-  let controller: ControllerInstance
+  let controller: ControllerV2Instance
   let vault: VaultInstance
-  let strategy: StrategyTestInstance
+  let strategy: StrategyTestV2Instance
   let underlying: TestTokenInstance
-  let newStrategy: StrategyTestInstance
+  let newStrategy: StrategyTestV2Instance
   beforeEach(async () => {
     controller = refs.controller
     vault = refs.vault
@@ -30,7 +30,7 @@ contract("integration - set strategy", (accounts) => {
     await controller.invest(vault.address, { from: admin })
 
     // new stratgy
-    newStrategy = await StrategyTest.new(
+    newStrategy = await StrategyTestV2.new(
       controller.address,
       vault.address,
       underlying.address,
