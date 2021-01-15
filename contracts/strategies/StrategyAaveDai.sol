@@ -39,23 +39,11 @@ contract StrategyAaveDai is StrategyBaseV2, UseUniswap {
         StrategyBaseV2(_controller, _vault, UNDERLYING)
     {}
 
-    function _getVirtualPrice() internal view returns (uint) {
-        return StableSwapAave(POOL).get_virtual_price();
-    }
-
     function _totalAssets() internal view override returns (uint) {
         uint lpBal = LiquidityGaugeV2(GAUGE).balanceOf(address(this));
-        uint pricePerShare = _getVirtualPrice();
+        uint pricePerShare = StableSwapAave(POOL).get_virtual_price();
 
         return lpBal.mul(pricePerShare).div(PRECISION_DIV) / 1e18;
-    }
-
-    function _addLiquidity(uint _amount, uint _index) internal {
-        uint[3] memory amounts;
-        amounts[_index] = _amount;
-        // TODO add slippage
-        // min = virtual price * (100 - slippage) / 100
-        StableSwapAave(POOL).add_liquidity(amounts, 0, true);
     }
 
     /*
@@ -67,8 +55,13 @@ contract StrategyAaveDai is StrategyBaseV2, UseUniswap {
         if (bal > 0) {
             IERC20(_token).safeApprove(POOL, 0);
             IERC20(_token).safeApprove(POOL, bal);
+
             // mint LP
-            _addLiquidity(bal, _index);
+            uint[3] memory amounts;
+            amounts[_index] = bal;
+            // TODO add slippage
+            // min = virtual price * (100 - slippage) / 100
+            StableSwapAave(POOL).add_liquidity(amounts, 0, true);
         }
 
         // stake into LiquidityGaugeV2
@@ -87,20 +80,6 @@ contract StrategyAaveDai is StrategyBaseV2, UseUniswap {
         _deposit(underlying, UNDERLYING_INDEX);
     }
 
-    function _removeLiquidityOneCoin(uint _lpAmount) internal {
-        IERC20(LP).safeApprove(POOL, 0);
-        IERC20(LP).safeApprove(POOL, _lpAmount);
-
-        // TODO add slippage
-        // min = virtual price * (100 - slippage) / 100
-        StableSwapAave(POOL).remove_liquidity_one_coin(
-            _lpAmount,
-            int128(UNDERLYING_INDEX),
-            0,
-            true
-        );
-    }
-
     function _getTotalShares() internal view override returns (uint) {
         return LiquidityGaugeV2(GAUGE).balanceOf(address(this));
     }
@@ -110,8 +89,20 @@ contract StrategyAaveDai is StrategyBaseV2, UseUniswap {
         LiquidityGaugeV2(GAUGE).withdraw(_lpAmount);
         // withdraw underlying
         uint lpBal = IERC20(LP).balanceOf(address(this));
+
+        // remove liquidity
+        IERC20(LP).safeApprove(POOL, 0);
+        IERC20(LP).safeApprove(POOL, _lpAmount);
+
         // creates LP dust
-        _removeLiquidityOneCoin(lpBal);
+        // TODO add slippage
+        // min = virtual price * (100 - slippage) / 100
+        StableSwapAave(POOL).remove_liquidity_one_coin(
+            lpBal,
+            int128(UNDERLYING_INDEX),
+            0,
+            true
+        );
         // Now we have underlying
     }
 
