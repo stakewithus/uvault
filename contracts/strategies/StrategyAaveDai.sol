@@ -2,8 +2,6 @@
 pragma solidity 0.6.11;
 
 import "../interfaces/curve/StableSwapAave.sol";
-import "./StrategyCurve.sol";
-
 import "../interfaces/curve/LiquidityGaugeV2.sol";
 import "../interfaces/curve/Minter.sol";
 import "../StrategyBaseV2.sol";
@@ -33,11 +31,19 @@ contract StrategyAaveDai is StrategyBaseV2, UseUniswap {
     // DAO
     address private constant CRV = 0xD533a949740bb3306d119CC777fa900bA034cd52;
 
-    // infinite approval?
+    // prevent slippage from deposit / withdraw into Curve ppol
+    uint public slippage = 100;
+    uint private constant SLIPPAGE_MAX = 10000;
+
     constructor(address _controller, address _vault)
         public
         StrategyBaseV2(_controller, _vault, UNDERLYING)
     {}
+
+    function setSlippage(uint _slippage) external onlyAdmin {
+        require(_slippage <= SLIPPAGE_MAX, "slippage > max");
+        slippage = _slippage;
+    }
 
     function _totalAssets() internal view override returns (uint) {
         uint lpBal = LiquidityGaugeV2(GAUGE).balanceOf(address(this));
@@ -59,9 +65,12 @@ contract StrategyAaveDai is StrategyBaseV2, UseUniswap {
             // mint LP
             uint[3] memory amounts;
             amounts[_index] = bal;
-            // TODO add slippage
-            // min = virtual price * (100 - slippage) / 100
-            StableSwapAave(POOL).add_liquidity(amounts, 0, true);
+
+            uint pricePerShare = StableSwapAave(POOL).get_virtual_price();
+            uint shares = bal.mul(PRECISION_DIV).mul(1e18).div(pricePerShare);
+            uint min = shares.mul(SLIPPAGE_MAX - slippage).div(SLIPPAGE_MAX);
+
+            StableSwapAave(POOL).add_liquidity(amounts, min, true);
         }
 
         // stake into LiquidityGaugeV2
@@ -87,20 +96,25 @@ contract StrategyAaveDai is StrategyBaseV2, UseUniswap {
     function _withdrawUnderlying(uint _lpAmount) internal override {
         // withdraw LP from  LiquidityGaugeV2
         LiquidityGaugeV2(GAUGE).withdraw(_lpAmount);
-        // withdraw underlying
+
+        // withdraw underlying //
         uint lpBal = IERC20(LP).balanceOf(address(this));
 
         // remove liquidity
         IERC20(LP).safeApprove(POOL, 0);
         IERC20(LP).safeApprove(POOL, _lpAmount);
 
-        // creates LP dust
-        // TODO add slippage
-        // min = virtual price * (100 - slippage) / 100
+        /*
+        (shares * price per shares) / (1e18 * PRECISION_DIV) = underlying amount
+        */
+        uint pricePerShare = StableSwapAave(POOL).get_virtual_price();
+        uint underlyingAmount = _lpAmount.mul(pricePerShare).div(PRECISION_DIV) / 1e18;
+        uint min = underlyingAmount.mul(SLIPPAGE_MAX - slippage).div(SLIPPAGE_MAX);
+        // withdraw creates LP dust
         StableSwapAave(POOL).remove_liquidity_one_coin(
             lpBal,
             int128(UNDERLYING_INDEX),
-            0,
+            min,
             true
         );
         // Now we have underlying
