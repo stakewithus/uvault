@@ -10,6 +10,5 @@ contract StrategyAaveUsdt is StrategyAave {
     {
         // USDT
         underlyingIndex = 2;
-        precisionDiv = 1e12;
     }
 }

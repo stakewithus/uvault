@@ -15,7 +15,7 @@ contract StrategyAave is StrategyBaseV2, UseUniswap {
     // DAI = 0 | USDC = 1 | USDT = 2
     uint internal underlyingIndex;
     // precision to convert 10 ** 18  to underlying decimals
-    uint internal precisionDiv;
+    uint[3] private PRECISION_DIVS = [1, 1e12, 1e12];
 
     // Curve //
     // liquidity provider token (Curve aDAI/aUSDC/aUSDT)
@@ -39,7 +39,6 @@ contract StrategyAave is StrategyBaseV2, UseUniswap {
         address _underlying
     ) public StrategyBaseV2(_controller, _vault, _underlying) {}
 
-    // TODO test
     function setSlippage(uint _slippage) external onlyAdmin {
         require(_slippage <= SLIPPAGE_MAX, "slippage > max");
         slippage = _slippage;
@@ -49,7 +48,7 @@ contract StrategyAave is StrategyBaseV2, UseUniswap {
         uint lpBal = LiquidityGaugeV2(GAUGE).balanceOf(address(this));
         uint pricePerShare = StableSwapAave(POOL).get_virtual_price();
 
-        return lpBal.mul(pricePerShare).div(precisionDiv) / 1e18;
+        return lpBal.mul(pricePerShare).div(PRECISION_DIVS[underlyingIndex]) / 1e18;
     }
 
     /*
@@ -66,8 +65,11 @@ contract StrategyAave is StrategyBaseV2, UseUniswap {
             uint[3] memory amounts;
             amounts[_index] = bal;
 
+            /*
+            shares = underlying amount * precision div * 1e18 / price per share
+            */
             uint pricePerShare = StableSwapAave(POOL).get_virtual_price();
-            uint shares = bal.mul(precisionDiv).mul(1e18).div(pricePerShare);
+            uint shares = bal.mul(PRECISION_DIVS[_index]).mul(1e18).div(pricePerShare);
             uint min = shares.mul(SLIPPAGE_MAX - slippage).div(SLIPPAGE_MAX);
 
             StableSwapAave(POOL).add_liquidity(amounts, min, true);
@@ -105,10 +107,11 @@ contract StrategyAave is StrategyBaseV2, UseUniswap {
         IERC20(LP).safeApprove(POOL, _lpAmount);
 
         /*
-        (shares * price per shares) / (1e18 * precisionDiv) = underlying amount
+        underlying amount = (shares * price per shares) / (1e18 * precision div)
         */
         uint pricePerShare = StableSwapAave(POOL).get_virtual_price();
-        uint underlyingAmount = _lpAmount.mul(pricePerShare).div(precisionDiv) / 1e18;
+        uint underlyingAmount =
+            _lpAmount.mul(pricePerShare).div(PRECISION_DIVS[underlyingIndex]) / 1e18;
         uint min = underlyingAmount.mul(SLIPPAGE_MAX - slippage).div(SLIPPAGE_MAX);
         // withdraw creates LP dust
         StableSwapAave(POOL).remove_liquidity_one_coin(

@@ -10,6 +10,5 @@ contract StrategyAaveDai is StrategyAave {
     {
         // DAI
         underlyingIndex = 0;
-        precisionDiv = 1;
     }
 }
