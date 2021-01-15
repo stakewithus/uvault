@@ -4,50 +4,51 @@ pragma solidity 0.6.11;
 import "../interfaces/curve/StableSwapAave.sol";
 import "./StrategyCurve.sol";
 
+// TODO LiquidityGaugeV2
 import "../interfaces/curve/Gauge.sol";
 import "../interfaces/curve/Minter.sol";
 import "../StrategyBaseV2.sol";
 import "../UseUniswap.sol";
 
-// TODO constant private var
 contract StrategyAaveDai is StrategyBaseV2, UseUniswap {
     address private constant DAI = 0x6B175474E89094C44Da98b954EedeAC495271d0F;
     address private constant USDC = 0xA0b86991c6218b36c1d19D4a2e9Eb0cE3606eB48;
     address private constant USDT = 0xdAC17F958D2ee523a2206206994597C13D831ec7;
 
+    address private constant UNDERLYING = DAI;
+
     // DAI = 0 | USDC = 1 | USDT = 2
-    uint private underlyingIndex = 0;
+    uint private constant UNDERLYING_INDEX = 0;
     // precision to convert 10 ** 18  to underlying decimals
-    uint private precisionDiv = 1;
+    uint private constant PRECISION_DIV = 1;
 
     // Curve //
     // liquidity provider token (Curve aDAI/aUSDC/aUSDT)
-    address private lp = 0xFd2a8fA60Abd58Efe3EeE34dd494cD491dC14900;
+    address private constant LP = 0xFd2a8fA60Abd58Efe3EeE34dd494cD491dC14900;
     // StableSwapAave
-    address private pool = 0xDeBF20617708857ebe4F679508E7b7863a8A8EeE;
+    address private constant POOL = 0xDeBF20617708857ebe4F679508E7b7863a8A8EeE;
     // LiquidityGaugeV2
-    address private gauge = 0xd662908ADA2Ea1916B3318327A97eB18aD588b5d;
+    address private constant GAUGE = 0xd662908ADA2Ea1916B3318327A97eB18aD588b5d;
     // Minter
-    address private minter = 0xd061D61a4d941c39E5453435B6345Dc261C2fcE0;
+    address private constant MINTER = 0xd061D61a4d941c39E5453435B6345Dc261C2fcE0;
     // DAO
-    address private crv = 0xD533a949740bb3306d119CC777fa900bA034cd52;
+    address private constant CRV = 0xD533a949740bb3306d119CC777fa900bA034cd52;
 
     // infinite approval?
-    constructor(
-        address _controller,
-        address _vault,
-        address _underlying
-    ) public StrategyBaseV2(_controller, _vault, _underlying) {}
+    constructor(address _controller, address _vault)
+        public
+        StrategyBaseV2(_controller, _vault, UNDERLYING)
+    {}
 
     function _getVirtualPrice() internal view returns (uint) {
-        return StableSwapAave(pool).get_virtual_price();
+        return StableSwapAave(POOL).get_virtual_price();
     }
 
     function _totalAssets() internal view override returns (uint) {
-        uint lpBal = Gauge(gauge).balanceOf(address(this));
+        uint lpBal = Gauge(GAUGE).balanceOf(address(this));
         uint pricePerShare = _getVirtualPrice();
 
-        return lpBal.mul(pricePerShare).div(precisionDiv) / 1e18;
+        return lpBal.mul(pricePerShare).div(PRECISION_DIV) / 1e18;
     }
 
     function _addLiquidity(uint _amount, uint _index) internal {
@@ -55,28 +56,28 @@ contract StrategyAaveDai is StrategyBaseV2, UseUniswap {
         amounts[_index] = _amount;
         // TODO add slippage
         // min = virtual price * (100 - slippage) / 100
-        StableSwapAave(pool).add_liquidity(amounts, 0, true);
+        StableSwapAave(POOL).add_liquidity(amounts, 0, true);
     }
 
     /*
     @notice deposit token into curve
     */
     function _deposit(address _token, uint _index) internal {
-        // token to lp
+        // token to LP
         uint bal = IERC20(_token).balanceOf(address(this));
         if (bal > 0) {
-            IERC20(_token).safeApprove(pool, 0);
-            IERC20(_token).safeApprove(pool, bal);
-            // mint lp
+            IERC20(_token).safeApprove(POOL, 0);
+            IERC20(_token).safeApprove(POOL, bal);
+            // mint LP
             _addLiquidity(bal, _index);
         }
 
         // stake into Gauge
-        uint lpBal = IERC20(lp).balanceOf(address(this));
+        uint lpBal = IERC20(LP).balanceOf(address(this));
         if (lpBal > 0) {
-            IERC20(lp).safeApprove(gauge, 0);
-            IERC20(lp).safeApprove(gauge, lpBal);
-            Gauge(gauge).deposit(lpBal);
+            IERC20(LP).safeApprove(GAUGE, 0);
+            IERC20(LP).safeApprove(GAUGE, lpBal);
+            Gauge(GAUGE).deposit(lpBal);
         }
     }
 
@@ -84,45 +85,45 @@ contract StrategyAaveDai is StrategyBaseV2, UseUniswap {
     @notice Deposits underlying to Gauge
     */
     function _depositUnderlying() internal override {
-        _deposit(underlying, underlyingIndex);
+        _deposit(underlying, UNDERLYING_INDEX);
     }
 
     function _removeLiquidityOneCoin(uint _lpAmount) internal {
-        IERC20(lp).safeApprove(pool, 0);
-        IERC20(lp).safeApprove(pool, _lpAmount);
+        IERC20(LP).safeApprove(POOL, 0);
+        IERC20(LP).safeApprove(POOL, _lpAmount);
 
         // TODO add slippage
         // min = virtual price * (100 - slippage) / 100
-        StableSwapAave(pool).remove_liquidity_one_coin(
+        StableSwapAave(POOL).remove_liquidity_one_coin(
             _lpAmount,
-            int128(underlyingIndex),
+            int128(UNDERLYING_INDEX),
             0,
             true
         );
     }
 
     function _getTotalShares() internal view override returns (uint) {
-        return Gauge(gauge).balanceOf(address(this));
+        return Gauge(GAUGE).balanceOf(address(this));
     }
 
     function _withdrawUnderlying(uint _lpAmount) internal override {
-        // withdraw lp from  Gauge
-        Gauge(gauge).withdraw(_lpAmount);
+        // withdraw LP from  Gauge
+        Gauge(GAUGE).withdraw(_lpAmount);
         // withdraw underlying
-        uint lpBal = IERC20(lp).balanceOf(address(this));
-        // creates lp dust
+        uint lpBal = IERC20(LP).balanceOf(address(this));
+        // creates LP dust
         _removeLiquidityOneCoin(lpBal);
         // Now we have underlying
     }
 
     /*
-    @notice Returns address and index of token with lowest balance in Curve pool
+    @notice Returns address and index of token with lowest balance in Curve POOL
     */
     function _getMostPremiumToken() internal view returns (address, uint) {
         uint[3] memory balances;
-        balances[0] = StableSwapAave(pool).balances(0); // DAI
-        balances[1] = StableSwapAave(pool).balances(1).mul(1e12); // USDC
-        balances[2] = StableSwapAave(pool).balances(2).mul(1e12); // USDT
+        balances[0] = StableSwapAave(POOL).balances(0); // DAI
+        balances[1] = StableSwapAave(POOL).balances(1).mul(1e12); // USDC
+        balances[2] = StableSwapAave(POOL).balances(2).mul(1e12); // USDT
 
         uint minIndex = 0;
         for (uint i = 1; i < balances.length; i++) {
@@ -141,11 +142,11 @@ contract StrategyAaveDai is StrategyBaseV2, UseUniswap {
     }
 
     function _swapCrvFor(address _token) internal {
-        Minter(minter).mint(gauge);
+        Minter(MINTER).mint(GAUGE);
 
-        uint crvBal = IERC20(crv).balanceOf(address(this));
+        uint crvBal = IERC20(CRV).balanceOf(address(this));
         if (crvBal > 0) {
-            _swap(crv, _token, crvBal);
+            _swap(CRV, _token, crvBal);
             // Now this contract has token
         }
     }
