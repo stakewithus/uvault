@@ -76,6 +76,10 @@ export interface Config {
     strategyGusdDai: string
     strategyGusdUsdc: string
     strategyGusdUsdt: string
+    // v2 strategies
+    strategyAaveDai: string
+    strategyAaveUsdc: string
+    strategyAaveUsdt: string
     // others
     dai: string
     usdc: string
@@ -171,6 +175,10 @@ const config: Config = {
     strategyPaxDai: "0x2b3512efBeeb609CF9D49486b6e2DD9CF10Be6c9",
     strategyPaxUsdc: "0xb1F1AeD30dFe5787dFb65F6Cb96D90b3ae347F68",
     strategyPaxUsdt: "0x3032dBB5DB8aB5Bd85bf2Ca496e02Ce5378A5726",
+    // v2 strategies
+    strategyAaveDai: "0x156f47C98BEFee0Be232f26dcecA600C5D3496C5",
+    strategyAaveUsdc: "0xaE4BF42667A6cFc9B3C45b07fB63881077CB12C7",
+    strategyAaveUsdt: "0xFa76D3492B3D9EcdA2122DB84FAeCbf434684AF0",
     // others //
     dai: "0x6B175474E89094C44Da98b954EedeAC495271d0F",
     usdc: "0xA0b86991c6218b36c1d19D4a2e9Eb0cE3606eB48",
