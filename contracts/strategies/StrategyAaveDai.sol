@@ -4,8 +4,7 @@ pragma solidity 0.6.11;
 import "../interfaces/curve/StableSwapAave.sol";
 import "./StrategyCurve.sol";
 
-// TODO LiquidityGaugeV2
-import "../interfaces/curve/Gauge.sol";
+import "../interfaces/curve/LiquidityGaugeV2.sol";
 import "../interfaces/curve/Minter.sol";
 import "../StrategyBaseV2.sol";
 import "../UseUniswap.sol";
@@ -45,7 +44,7 @@ contract StrategyAaveDai is StrategyBaseV2, UseUniswap {
     }
 
     function _totalAssets() internal view override returns (uint) {
-        uint lpBal = Gauge(GAUGE).balanceOf(address(this));
+        uint lpBal = LiquidityGaugeV2(GAUGE).balanceOf(address(this));
         uint pricePerShare = _getVirtualPrice();
 
         return lpBal.mul(pricePerShare).div(PRECISION_DIV) / 1e18;
@@ -72,12 +71,12 @@ contract StrategyAaveDai is StrategyBaseV2, UseUniswap {
             _addLiquidity(bal, _index);
         }
 
-        // stake into Gauge
+        // stake into LiquidityGaugeV2
         uint lpBal = IERC20(LP).balanceOf(address(this));
         if (lpBal > 0) {
             IERC20(LP).safeApprove(GAUGE, 0);
             IERC20(LP).safeApprove(GAUGE, lpBal);
-            Gauge(GAUGE).deposit(lpBal);
+            LiquidityGaugeV2(GAUGE).deposit(lpBal);
         }
     }
 
@@ -103,12 +102,12 @@ contract StrategyAaveDai is StrategyBaseV2, UseUniswap {
     }
 
     function _getTotalShares() internal view override returns (uint) {
-        return Gauge(GAUGE).balanceOf(address(this));
+        return LiquidityGaugeV2(GAUGE).balanceOf(address(this));
     }
 
     function _withdrawUnderlying(uint _lpAmount) internal override {
-        // withdraw LP from  Gauge
-        Gauge(GAUGE).withdraw(_lpAmount);
+        // withdraw LP from  LiquidityGaugeV2
+        LiquidityGaugeV2(GAUGE).withdraw(_lpAmount);
         // withdraw underlying
         uint lpBal = IERC20(LP).balanceOf(address(this));
         // creates LP dust
