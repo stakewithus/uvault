@@ -7,10 +7,10 @@ import { deploy, getAddress } from "./lib"
 usage:
 env $(cat .env) npx hardhat deploy:strategy \
 --network ropsten \
+--dev false \
 --strategy StrategyNoOp \
 --vault vault
 --token testToken
---dev false
 */
 task("deploy:strategy", "Deploy vault")
   .addParam("strategy", "Name of strategy")
