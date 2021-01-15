@@ -15,7 +15,7 @@ env $(cat .env) npx hardhat deploy:strategy \
 task("deploy:strategy", "Deploy vault")
   .addParam("strategy", "Name of strategy")
   .addParam("vault", "Name of vault")
-  .addParam("token", "Name of token")
+  .addOptionalParam("token", "Name of token", "")
   .addOptionalParam("dev", "Use mainnet dev", "false")
   .setAction(async (args, hre) => {
     assert(args.dev === "false" || args.dev === "true", `invalid arg dev: ${args.dev}`)
