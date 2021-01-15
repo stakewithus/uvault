@@ -2,6 +2,7 @@ import BN from "bn.js"
 import {
   IERC20Instance,
   ControllerV2Instance,
+  StableSwapAaveInstance,
   LiquidityGaugeV2Instance,
 } from "../../../types"
 import { pow } from "../../util"
@@ -13,10 +14,11 @@ export default (name: string, _setup: Setup, params: { DECIMALS: BN }) => {
     const DEPOSIT_AMOUNT = pow(10, DECIMALS).mul(new BN(1000000))
 
     const refs = _setup(accounts)
-    const { admin, vault, treasury, whale } = refs
+    const { admin, vault, whale } = refs
 
     let underlying: IERC20Instance
     let lp: IERC20Instance
+    let stableSwap: StableSwapAaveInstance
     let gauge: LiquidityGaugeV2Instance
     let crv: IERC20Instance
     let controller: ControllerV2Instance
@@ -24,6 +26,7 @@ export default (name: string, _setup: Setup, params: { DECIMALS: BN }) => {
     beforeEach(async () => {
       underlying = refs.underlying
       lp = refs.lp
+      stableSwap = refs.stableSwap
       gauge = refs.gauge
       crv = refs.crv
       controller = refs.controller
@@ -38,15 +41,7 @@ export default (name: string, _setup: Setup, params: { DECIMALS: BN }) => {
     })
 
     it("should harvest", async () => {
-      const snapshot = getSnapshot({
-        underlying,
-        lp,
-        gauge,
-        crv,
-        strategy,
-        treasury,
-        vault,
-      })
+      const snapshot = getSnapshot(refs)
 
       const before = await snapshot()
       await strategy.harvest({ from: admin })

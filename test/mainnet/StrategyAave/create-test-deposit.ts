@@ -2,6 +2,7 @@ import BN from "bn.js"
 import {
   IERC20Instance,
   ControllerV2Instance,
+  StableSwapAaveInstance,
   LiquidityGaugeV2Instance,
 } from "../../../types"
 import { frac, pow } from "../../util"
@@ -14,12 +15,13 @@ export default (
 ) => {
   contract(name, (accounts) => {
     const refs = _setup(accounts)
-    const { vault, treasury, whale } = refs
+    const { vault, whale } = refs
 
     const { DECIMALS, UNDERLYING_TO_CURVE_DECIMALS } = params
 
     let underlying: IERC20Instance
     let lp: IERC20Instance
+    let stableSwap: StableSwapAaveInstance
     let gauge: LiquidityGaugeV2Instance
     let crv: IERC20Instance
     let controller: ControllerV2Instance
@@ -27,6 +29,7 @@ export default (
     beforeEach(() => {
       underlying = refs.underlying
       lp = refs.lp
+      stableSwap = refs.stableSwap
       gauge = refs.gauge
       crv = refs.crv
       controller = refs.controller
@@ -42,15 +45,7 @@ export default (
       // approve strategy to spend underlying from vault
       await underlying.approve(strategy.address, DEPOSIT_AMOUNT, { from: vault })
 
-      const snapshot = getSnapshot({
-        underlying,
-        lp,
-        gauge,
-        crv,
-        strategy,
-        vault,
-        treasury,
-      })
+      const snapshot = getSnapshot(refs)
 
       const before = await snapshot()
       await strategy.deposit(DEPOSIT_AMOUNT, { from: vault })
@@ -59,7 +54,13 @@ export default (
       // minimum amount of underlying that can be withdrawn
       const minUnderlying = frac(DEPOSIT_AMOUNT, 99, 100)
       // minimum amount of lp minted
-      const minLp = frac(DEPOSIT_AMOUNT.mul(UNDERLYING_TO_CURVE_DECIMALS), 93, 100)
+      const minLp = frac(
+        DEPOSIT_AMOUNT.mul(UNDERLYING_TO_CURVE_DECIMALS).mul(
+          pow(10, 18).div(before.stableSwap.virtualPrice)
+        ),
+        99,
+        100
+      )
 
       // underlying transferred from vault to strategy
       assert(

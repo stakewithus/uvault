@@ -1,5 +1,6 @@
 import {
   IERC20Instance,
+  StableSwapAaveInstance,
   LiquidityGaugeV2Instance,
   ControllerV2Instance,
   StrategyAaveDaiContract,
@@ -27,6 +28,7 @@ export interface Refs {
   treasury: string
   underlying: IERC20Instance
   lp: IERC20Instance
+  stableSwap: StableSwapAaveInstance
   gauge: LiquidityGaugeV2Instance
   crv: IERC20Instance
   controller: ControllerV2Instance
@@ -40,12 +42,13 @@ export function getSnapshot(params: {
   strategy: StrategyInstance
   underlying: IERC20Instance
   lp: IERC20Instance
+  stableSwap: StableSwapAaveInstance
   gauge: LiquidityGaugeV2Instance
   crv: IERC20Instance
   vault: string
   treasury: string
 }) {
-  const { strategy, underlying, lp, gauge, crv, vault, treasury } = params
+  const { strategy, underlying, lp, stableSwap, gauge, crv, vault, treasury } = params
 
   return async () => {
     const snapshot = {
@@ -60,6 +63,9 @@ export function getSnapshot(params: {
       },
       lp: {
         strategy: await lp.balanceOf(strategy.address),
+      },
+      stableSwap: {
+        virtualPrice: await stableSwap.get_virtual_price(),
       },
       gauge: {
         strategy: await gauge.balanceOf(strategy.address),

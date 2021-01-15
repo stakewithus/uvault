@@ -1,6 +1,7 @@
 import BN from "bn.js"
 import {
   IERC20Instance,
+  StableSwapAaveInstance,
   ControllerV2Instance,
   LiquidityGaugeV2Instance,
 } from "../../../types"
@@ -17,6 +18,7 @@ export default (name: string, _setup: Setup, params: { DECIMALS: BN }) => {
 
     let underlying: IERC20Instance
     let lp: IERC20Instance
+    let stableSwap: StableSwapAaveInstance
     let gauge: LiquidityGaugeV2Instance
     let crv: IERC20Instance
     let controller: ControllerV2Instance
@@ -24,6 +26,7 @@ export default (name: string, _setup: Setup, params: { DECIMALS: BN }) => {
     beforeEach(async () => {
       underlying = refs.underlying
       lp = refs.lp
+      stableSwap = refs.stableSwap
       gauge = refs.gauge
       crv = refs.crv
       controller = refs.controller
@@ -38,15 +41,7 @@ export default (name: string, _setup: Setup, params: { DECIMALS: BN }) => {
     })
 
     it("should exit", async () => {
-      const snapshot = getSnapshot({
-        underlying,
-        lp,
-        gauge,
-        crv,
-        strategy,
-        treasury,
-        vault,
-      })
+      const snapshot = getSnapshot(refs)
 
       const before = await snapshot()
       await strategy.exit({ from: vault })

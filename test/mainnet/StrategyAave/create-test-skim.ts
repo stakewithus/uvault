@@ -2,6 +2,7 @@ import BN from "bn.js"
 import {
   IERC20Instance,
   ControllerV2Instance,
+  StableSwapAaveInstance,
   LiquidityGaugeV2Instance,
 } from "../../../types"
 import { pow, frac } from "../../util"
@@ -13,10 +14,11 @@ export default (name: string, _setup: Setup, params: { DECIMALS: BN }) => {
     const DEPOSIT_AMOUNT = pow(10, DECIMALS).mul(new BN(1000000))
 
     const refs = _setup(accounts)
-    const { admin, vault, treasury, whale } = refs
+    const { admin, vault, whale } = refs
 
     let underlying: IERC20Instance
     let lp: IERC20Instance
+    let stableSwap: StableSwapAaveInstance
     let gauge: LiquidityGaugeV2Instance
     let crv: IERC20Instance
     let controller: ControllerV2Instance
@@ -24,6 +26,7 @@ export default (name: string, _setup: Setup, params: { DECIMALS: BN }) => {
     beforeEach(async () => {
       underlying = refs.underlying
       lp = refs.lp
+      stableSwap = refs.stableSwap
       gauge = refs.gauge
       crv = refs.crv
       controller = refs.controller
@@ -40,15 +43,7 @@ export default (name: string, _setup: Setup, params: { DECIMALS: BN }) => {
     })
 
     it("should skim", async () => {
-      const snapshot = getSnapshot({
-        underlying,
-        lp,
-        gauge,
-        crv,
-        strategy,
-        treasury,
-        vault,
-      })
+      const snapshot = getSnapshot(refs)
 
       const min = frac(await strategy.totalAssets(), 99, 100)
       const max = frac(await strategy.totalAssets(), 101, 100)
@@ -57,17 +52,11 @@ export default (name: string, _setup: Setup, params: { DECIMALS: BN }) => {
       await strategy.skim(min, max, { from: admin })
       const after = await snapshot()
 
-      // check profit was transferred to vault
-      assert(after.underlying.vault.gte(before.underlying.vault), "underlying vault")
-
-      if (before.strategy.totalAssets.gte(before.strategy.totalDebt)) {
-        assert(
-          after.strategy.totalAssets.lte(before.strategy.totalAssets),
-          "total assets"
-        )
-      }
-
-      assert(after.strategy.totalDebt.lte(before.strategy.totalDebt), "total debt")
+      assert(
+        after.strategy.totalAssets.gte(before.strategy.totalAssets),
+        "total assets"
+      )
+      assert(after.strategy.totalDebt.gte(before.strategy.totalDebt), "total debt")
     })
   })
 }
