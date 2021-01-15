@@ -74,7 +74,7 @@ contract StrategyAaveDai is StrategyBaseV2, UseUniswap {
     }
 
     /*
-    @notice Deposits underlying to Gauge
+    @notice Deposits underlying to LiquidityGaugeV2
     */
     function _depositUnderlying() internal override {
         _deposit(underlying, UNDERLYING_INDEX);
@@ -109,7 +109,7 @@ contract StrategyAaveDai is StrategyBaseV2, UseUniswap {
     /*
     @notice Returns address and index of token with lowest balance in Curve POOL
     */
-    function _getMostPremiumToken() internal view returns (address, uint) {
+    function _getMostPremiumToken() private view returns (address, uint) {
         uint[3] memory balances;
         balances[0] = StableSwapAave(POOL).balances(0); // DAI
         balances[1] = StableSwapAave(POOL).balances(1).mul(1e12); // USDC
@@ -131,7 +131,7 @@ contract StrategyAaveDai is StrategyBaseV2, UseUniswap {
         return (USDT, 2);
     }
 
-    function _swapCrvFor(address _token) internal {
+    function _swapCrvFor(address _token) private {
         Minter(MINTER).mint(GAUGE);
 
         uint crvBal = IERC20(CRV).balanceOf(address(this));
