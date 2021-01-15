@@ -32,6 +32,7 @@ contract StrategyAaveDai is StrategyBaseV2, UseUniswap {
     // DAO
     address private crv = 0xD533a949740bb3306d119CC777fa900bA034cd52;
 
+    // infinite approval?
     constructor(
         address _controller,
         address _vault,
