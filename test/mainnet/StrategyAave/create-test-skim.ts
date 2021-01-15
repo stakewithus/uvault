@@ -1,6 +1,10 @@
 import BN from "bn.js"
-import { IERC20Instance, ControllerInstance, GaugeInstance } from "../../../types"
-import { pow } from "../../util"
+import {
+  IERC20Instance,
+  ControllerV2Instance,
+  LiquidityGaugeV2Instance,
+} from "../../../types"
+import { pow, frac } from "../../util"
 import { StrategyInstance, Setup, getSnapshot } from "./lib"
 
 export default (name: string, _setup: Setup, params: { DECIMALS: BN }) => {
@@ -13,9 +17,9 @@ export default (name: string, _setup: Setup, params: { DECIMALS: BN }) => {
 
     let underlying: IERC20Instance
     let lp: IERC20Instance
-    let gauge: GaugeInstance
+    let gauge: LiquidityGaugeV2Instance
     let crv: IERC20Instance
-    let controller: ControllerInstance
+    let controller: ControllerV2Instance
     let strategy: StrategyInstance
     beforeEach(async () => {
       underlying = refs.underlying
@@ -46,9 +50,11 @@ export default (name: string, _setup: Setup, params: { DECIMALS: BN }) => {
         vault,
       })
 
+      const min = frac(await strategy.totalAssets(), 99, 100)
+      const max = frac(await strategy.totalAssets(), 101, 100)
+
       const before = await snapshot()
-      // @ts-ignore
-      await strategy.skim()
+      await strategy.skim(min, max, { from: admin })
       const after = await snapshot()
 
       // check profit was transferred to vault

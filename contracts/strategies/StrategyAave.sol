@@ -39,6 +39,7 @@ contract StrategyAave is StrategyBaseV2, UseUniswap {
         address _underlying
     ) public StrategyBaseV2(_controller, _vault, _underlying) {}
 
+    // TODO test
     function setSlippage(uint _slippage) external onlyAdmin {
         require(_slippage <= SLIPPAGE_MAX, "slippage > max");
         slippage = _slippage;

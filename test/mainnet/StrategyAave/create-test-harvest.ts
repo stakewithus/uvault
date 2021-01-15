@@ -1,5 +1,9 @@
 import BN from "bn.js"
-import { IERC20Instance, ControllerInstance, GaugeInstance } from "../../../types"
+import {
+  IERC20Instance,
+  ControllerV2Instance,
+  LiquidityGaugeV2Instance,
+} from "../../../types"
 import { pow } from "../../util"
 import { StrategyInstance, Setup, getSnapshot } from "./lib"
 
@@ -13,9 +17,9 @@ export default (name: string, _setup: Setup, params: { DECIMALS: BN }) => {
 
     let underlying: IERC20Instance
     let lp: IERC20Instance
-    let gauge: GaugeInstance
+    let gauge: LiquidityGaugeV2Instance
     let crv: IERC20Instance
-    let controller: ControllerInstance
+    let controller: ControllerV2Instance
     let strategy: StrategyInstance
     beforeEach(async () => {
       underlying = refs.underlying
@@ -31,11 +35,9 @@ export default (name: string, _setup: Setup, params: { DECIMALS: BN }) => {
       // deposit underlying into strategy
       await underlying.approve(strategy.address, DEPOSIT_AMOUNT, { from: vault })
       await strategy.deposit(DEPOSIT_AMOUNT, { from: vault })
-      // harvest to create some profit
-      await strategy.harvest({ from: admin })
     })
 
-    it("should skim", async () => {
+    it("should harvest", async () => {
       const snapshot = getSnapshot({
         underlying,
         lp,
@@ -47,21 +49,20 @@ export default (name: string, _setup: Setup, params: { DECIMALS: BN }) => {
       })
 
       const before = await snapshot()
-      // @ts-ignore
-      await strategy.skim()
+      await strategy.harvest({ from: admin })
       const after = await snapshot()
 
-      // check profit was transferred to vault
-      assert(after.underlying.vault.gte(before.underlying.vault), "underlying vault")
-
-      if (before.strategy.totalAssets.gte(before.strategy.totalDebt)) {
-        assert(
-          after.strategy.totalAssets.lte(before.strategy.totalAssets),
-          "total assets"
-        )
-      }
-
-      assert(after.strategy.totalDebt.lte(before.strategy.totalDebt), "total debt")
+      assert(
+        after.underlying.treasury.gte(before.underlying.treasury),
+        "underlying treasury"
+      )
+      assert(
+        after.strategy.totalAssets.gt(before.strategy.totalAssets),
+        "strategy total assets"
+      )
+      assert(after.gauge.strategy.gt(before.gauge.strategy), "gauge strategy")
+      // Check CRV was liquidated
+      assert(after.crv.strategy.eq(new BN(0)), "crv strategy")
     })
   })
 }
