@@ -3,13 +3,13 @@ pragma solidity 0.6.11;
 
 import "./StrategyAave.sol";
 
-contract StrategyAaveDai is StrategyAave {
+contract StrategyAaveUsdt is StrategyAave {
     constructor(address _controller, address _vault)
         public
-        StrategyAave(_controller, _vault, DAI)
+        StrategyAave(_controller, _vault, USDT)
     {
-        // DAI
-        underlyingIndex = 0;
-        precisionDiv = 1;
+        // USDT
+        underlyingIndex = 2;
+        precisionDiv = 1e12;
     }
 }
