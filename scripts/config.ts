@@ -160,7 +160,7 @@ const config: Config = {
     // v1 (keep until controller v1 authorizations are revoked)
     // controller: "0x75e8336418e30b58d8dAd426F98D3D60244A08d3",
     // v2
-    controller: "0xE9e85692953e02AfCd657f927ba4065dda7e350b",
+    controller: "0x4b847DE01696f7D94b50Df9F2B4BdFEeAA379722",
     treasury: "0x9a4c3Fc4683b95EBF11B535057B00812f6a549Bb",
     // time lock set to admin
     timeLock: "0x86d10751B18F3fE331C146546868a07224A8598B",
