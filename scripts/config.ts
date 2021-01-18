@@ -167,7 +167,7 @@ const config: Config = {
     daiVault: "0xFd9f501324c07613f8Fb4d73C798D764D0BFcdcC",
     usdcVault: "0x167E3254a9298ebF29F67e0AE0326d2018c9bC44",
     usdtVault: "0xdADa607772Ad29f5a90a8817532Ebf983709af15",
-    // strategies //
+    // strategies v1 (TODO redeploy v2) //
     strategyNoOpDai: "0x1b79EbE1C9c128Eb30e6f6EBb0741991B696ab80",
     strategyNoOpUsdc: "0x64d43B0D0EDfa8434059d12bCF861da7eE8dD4bc",
     strategyNoOpUsdt: "0xc2e4e82853c28DCF81930852E5A055236364d8F6",
