@@ -7,6 +7,7 @@ export interface Config {
     timeLock: string
     vault: string
     strategyTest: string
+    strategyTestV2: string
     strategyNoOp: string
     testToken: string
   }
@@ -93,12 +94,13 @@ const config: Config = {
     gasToken: "0x063f83affbcf64d7d84d306f5b85ed65c865dca4",
     gasRelayer: "0xad2907C6aA26588f579e5D4bEeE6d945ba18BDb4",
     treasury: "0x9a4c3Fc4683b95EBF11B535057B00812f6a549Bb",
-    controller: "0xBf2bFf3A85bC3663E808963be17564D0707D900b",
+    controller: "0x736d2245e691efADc66ca60DC0a474C3121b939E",
     timeLock: "0xDb3906814Cc730ef4c8A5cf5C63A523494224150",
     // vaults //
     vault: "0xc8E2357fA7f51e84beBFD4A0075c53D49d0A0D88",
     // strategies //
     strategyTest: "0x0dDA2b6D771789803803798cFD3C7Ea55BED7C2F",
+    strategyTestV2: "0xc103Cab5CCBb54c61A46DD68438e1C28af074E16",
     strategyNoOp: "0x90E5216F8aBf7B68cA7D4eC856476Ef2C0857Cb2",
     // others //
     // used for testinng
