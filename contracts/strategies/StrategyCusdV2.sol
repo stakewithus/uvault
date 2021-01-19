@@ -49,7 +49,7 @@ contract StrategyCusdV2 is StrategyBaseV2, UseUniswap {
     function _totalAssets() internal view override returns (uint) {
         uint lpBal = LiquidityGauge(GAUGE).balanceOf(address(this));
         /*
-        get_virtual_price is calculated with exchange rate of cToken to underlying.
+        get_virtual_price is calculated with exchange rate of wrapped token to underlying.
         So price per share = underlying price per LP share
         */
         uint pricePerShare = StableSwapCompound(SWAP).get_virtual_price();
@@ -74,7 +74,7 @@ contract StrategyCusdV2 is StrategyBaseV2, UseUniswap {
             /*
             shares = underlying amount * precision div * 1e18 / price per share
             */
-            uint pricePerShare = StableSwapCompound(POOL).get_virtual_price();
+            uint pricePerShare = StableSwapCompound(SWAP).get_virtual_price();
             uint shares = bal.mul(PRECISION_DIVS[_index]).mul(1e18).div(pricePerShare);
             uint min = shares.mul(SLIPPAGE_MAX - slippage).div(SLIPPAGE_MAX);
 
@@ -115,7 +115,7 @@ contract StrategyCusdV2 is StrategyBaseV2, UseUniswap {
         /*
         underlying amount = (shares * price per shares) / (1e18 * precision div)
         */
-        uint pricePerShare = StableSwapCompound(POOL).get_virtual_price();
+        uint pricePerShare = StableSwapCompound(SWAP).get_virtual_price();
         uint underlyingAmount =
             lpBal.mul(pricePerShare).div(PRECISION_DIVS[underlyingIndex]) / 1e18;
         uint min = underlyingAmount.mul(SLIPPAGE_MAX - slippage).div(SLIPPAGE_MAX);

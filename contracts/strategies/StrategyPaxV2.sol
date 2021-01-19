@@ -72,7 +72,7 @@ contract StrategyPaxV2 is StrategyBaseV2, UseUniswap {
             /*
             shares = underlying amount * precision div * 1e18 / price per share
             */
-            uint pricePerShare = StableSwapPax(POOL).get_virtual_price();
+            uint pricePerShare = StableSwapPax(SWAP).get_virtual_price();
             uint shares = bal.mul(PRECISION_DIVS[_index]).mul(1e18).div(pricePerShare);
             uint min = shares.mul(SLIPPAGE_MAX - slippage).div(SLIPPAGE_MAX);
 
@@ -113,7 +113,7 @@ contract StrategyPaxV2 is StrategyBaseV2, UseUniswap {
         /*
         underlying amount = (shares * price per shares) / (1e18 * precision div)
         */
-        uint pricePerShare = StableSwapPax(POOL).get_virtual_price();
+        uint pricePerShare = StableSwapPax(SWAP).get_virtual_price();
         uint underlyingAmount =
             lpBal.mul(pricePerShare).div(PRECISION_DIVS[underlyingIndex]) / 1e18;
         uint min = underlyingAmount.mul(SLIPPAGE_MAX - slippage).div(SLIPPAGE_MAX);
