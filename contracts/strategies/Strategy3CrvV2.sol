@@ -1,11 +1,11 @@
 // SPDX-License-Identifier: AGPL-3.0-or-later
 pragma solidity 0.6.11;
 
-import "../interfaces/curve/StableSwap3Pool.sol";
-import "../interfaces/curve/LiquidityGauge.sol";
-import "../interfaces/curve/Minter.sol";
 import "../StrategyBaseV2.sol";
 import "../UseUniswap.sol";
+import "../interfaces/curve/LiquidityGauge.sol";
+import "../interfaces/curve/Minter.sol";
+import "../interfaces/curve/StableSwap3Pool.sol";
 
 contract Strategy3CrvV2 is StrategyBaseV2, UseUniswap {
     address internal constant DAI = 0x6B175474E89094C44Da98b954EedeAC495271d0F;

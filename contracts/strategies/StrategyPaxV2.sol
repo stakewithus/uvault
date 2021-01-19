@@ -1,12 +1,12 @@
 // SPDX-License-Identifier: AGPL-3.0-or-later
 pragma solidity 0.6.11;
 
-import "../interfaces/curve/StableSwapPax.sol";
-import "../interfaces/curve/DepositPax.sol";
-import "../interfaces/curve/LiquidityGauge.sol";
-import "../interfaces/curve/Minter.sol";
 import "../StrategyBaseV2.sol";
 import "../UseUniswap.sol";
+import "../interfaces/curve/LiquidityGauge.sol";
+import "../interfaces/curve/Minter.sol";
+import "../interfaces/curve/StableSwapPax.sol";
+import "../interfaces/curve/DepositPax.sol";
 
 contract StrategyPaxV2 is StrategyBaseV2, UseUniswap {
     // StableSwapPax

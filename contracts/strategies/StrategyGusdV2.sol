@@ -1,13 +1,13 @@
 // SPDX-License-Identifier: AGPL-3.0-or-later
 pragma solidity 0.6.11;
 
+import "../StrategyBaseV2.sol";
+import "../UseUniswap.sol";
+import "../interfaces/curve/LiquidityGauge.sol";
+import "../interfaces/curve/Minter.sol";
 import "../interfaces/curve/StableSwapGusd.sol";
 import "../interfaces/curve/StableSwap3Pool.sol";
 import "../interfaces/curve/DepositGusd.sol";
-import "../interfaces/curve/LiquidityGauge.sol";
-import "../interfaces/curve/Minter.sol";
-import "../StrategyBaseV2.sol";
-import "../UseUniswap.sol";
 
 contract StrategyGusdV2 is StrategyBaseV2, UseUniswap {
     // StableSwap3Pool
