@@ -10,9 +10,9 @@ import "../StrategyBaseV2.sol";
 import "../UseUniswap.sol";
 
 contract StrategyGusdV2 is StrategyBaseV2, UseUniswap {
-    // 3Pool StableSwap
+    // StableSwap3Pool
     address private constant BASE_POOL = 0xbEbc44782C7dB0a1A60Cb6fe97d0b483032FF1C7;
-    // GUSD StableSwap
+    // StableSwapGusd
     address private constant SWAP = 0x4f062658EaAF2C1ccf8C8e36D6824CDf41167956;
     address private constant GUSD = 0x056Fd409E1d7A124BD7017459dFEa2F387b6d5Cd;
     address internal constant DAI = 0x6B175474E89094C44Da98b954EedeAC495271d0F;
