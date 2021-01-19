@@ -104,14 +104,14 @@ contract StrategyAave is StrategyBaseV2, UseUniswap {
 
         // remove liquidity
         IERC20(LP).safeApprove(POOL, 0);
-        IERC20(LP).safeApprove(POOL, _lpAmount);
+        IERC20(LP).safeApprove(POOL, lpBal);
 
         /*
         underlying amount = (shares * price per shares) / (1e18 * precision div)
         */
         uint pricePerShare = StableSwapAave(POOL).get_virtual_price();
         uint underlyingAmount =
-            _lpAmount.mul(pricePerShare).div(PRECISION_DIVS[underlyingIndex]) / 1e18;
+            lpBal.mul(pricePerShare).div(PRECISION_DIVS[underlyingIndex]) / 1e18;
         uint min = underlyingAmount.mul(SLIPPAGE_MAX - slippage).div(SLIPPAGE_MAX);
         // withdraw creates LP dust
         StableSwapAave(POOL).remove_liquidity_one_coin(
