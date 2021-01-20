@@ -85,6 +85,9 @@ slither . --print vars-and-auth
 
 # check ERC20
 slither-check-erc . Vault
+
+# reset Slither
+rm slither.db.json
 ```
 
 ### Deploy

@@ -11,7 +11,6 @@ contract StrategyGusd is StrategyCurve {
     address private constant BASE_POOL = 0xbEbc44782C7dB0a1A60Cb6fe97d0b483032FF1C7;
     // GUSD StableSwap
     address private constant SWAP = 0x4f062658EaAF2C1ccf8C8e36D6824CDf41167956;
-    address private constant GUSD = 0x056Fd409E1d7A124BD7017459dFEa2F387b6d5Cd;
     address internal constant DAI = 0x6B175474E89094C44Da98b954EedeAC495271d0F;
     address internal constant USDC = 0xA0b86991c6218b36c1d19D4a2e9Eb0cE3606eB48;
     address internal constant USDT = 0xdAC17F958D2ee523a2206206994597C13D831ec7;
