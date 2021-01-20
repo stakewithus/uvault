@@ -25,6 +25,16 @@ jobs:
           NODE_OPTIONS: --max-old-space-size=4096
         run: npm install
 
+      - name: Compile
+        env:
+          NODE_OPTIONS: --max-old-space-size=4096
+        run: npm run compile
+
+      - name: Generate types
+        env:
+          NODE_OPTIONS: --max-old-space-size=4096
+        run: npm run types
+
       - name: Start Ganache
         run: |
           ganache-cli > /dev/null 2>&1 & sleep 10
