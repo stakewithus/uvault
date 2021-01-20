@@ -13,7 +13,8 @@ env:
 jobs:
   tests:
     runs-on: ubuntu-latest
-
+    env:
+      NODE_OPTIONS: --max-old-space-size=4096
     steps:
       - uses: actions/checkout@v1
 
@@ -21,26 +22,18 @@ jobs:
         uses: actions/setup-node@v1
 
       - name: Npm install
-        env:
-          NODE_OPTIONS: --max-old-space-size=4096
         run: npm install
 
       - name: Compile
-        env:
-          NODE_OPTIONS: --max-old-space-size=4096
         run: npm run compile
 
       - name: Generate types
-        env:
-          NODE_OPTIONS: --max-old-space-size=4096
         run: npm run types
 
-      - name: Start Ganache
+      - name: Run unit test
         run: |
           ganache-cli > /dev/null 2>&1 & sleep 10
-
-      - name: Run unit test
-        run: npm run test:unit
+          npm run test:unit
       #   # env:
       #   #   NODE_OPTIONS: --max-old-space-size=1024
       # - name: Run integration test
