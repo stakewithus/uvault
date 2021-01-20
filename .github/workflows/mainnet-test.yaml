@@ -15,17 +15,20 @@ jobs:
     steps:
       - uses: actions/checkout@v1
 
-      - name: Setup Node.js
-        uses: actions/setup-node@v1
-
-      - name: Install Ganache
-        run: npm install -g ganache-cli@6.8.2
-
-      - name: Npm install
-        run: npm install
-
       - name: Test mainnet fork
         run: echo "Skip"
+
+        # - name: Setup Node.js
+        #   uses: actions/setup-node@v1
+
+        # - name: Install Ganache
+        #   run: npm install -g ganache-cli@6.8.2
+
+        # - name: Npm install
+        #   run: npm install
+
+        # - name: Test mainnet fork
+        #   run: echo "Skip"
         # TODO fix
         # run: |
         #   ganache-cli \
