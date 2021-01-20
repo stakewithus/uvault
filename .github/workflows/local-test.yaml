@@ -32,13 +32,6 @@ jobs:
 
       - name: Run unit test
         run: npm run test:unit
-        # run: |
-        #   ganache-cli > /dev/null 2>&1 &
-        #   sleep 15
-        #   npm run test:unit
-      #   # env:
-      #   #   NODE_OPTIONS: --max-old-space-size=1024
-      # - name: Run integration test
-      #   run: npm run test:integration
-      #   # env:
-      #   #   NODE_OPTIONS: --max-old-space-size=1024
+
+      - name: Run integration test
+        run: npm run test:integration
