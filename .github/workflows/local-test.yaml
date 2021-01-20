@@ -31,7 +31,9 @@ jobs:
         run: npm run types
 
       - name: Run unit test
-        run: npm run test:unit
+        run: |
+          npx ganache-cli > /dev/null 2>&1 & sleep 10
+          npm run test:unit
 
-      - name: Run integration test
-        run: npm run test:integration
+      # - name: Run integration test
+      #   run: npm run test:integration
