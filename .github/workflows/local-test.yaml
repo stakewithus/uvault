@@ -21,6 +21,8 @@ jobs:
         uses: actions/setup-node@v1
 
       - name: Npm install
+        env:
+          NODE_OPTIONS: --max-old-space-size=4096
         run: npm install
 
       - name: Start Ganache
