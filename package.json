@@ -8,7 +8,7 @@
   },
   "scripts": {
     "compile": "truffle compile",
-    "clean": "rm -rf cache artifacts build types",
+    "clean": "rm -rf cache artifacts build types cache",
     "solhint": "solhint 'contracts/**/*.sol'",
     "lint": "prettier --write contracts/*.sol contracts/**/*.sol",
     "lint:check": "prettier --check contracts/*.sol contracts/**/*.sol",
