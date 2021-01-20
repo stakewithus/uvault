@@ -14,6 +14,7 @@
 ```shell
 npm i
 npm run compile
+npm run types
 ```
 
 ### Test
