@@ -33,7 +33,7 @@ jobs:
       - name: Run unit test
         run: |
           ganache-cli > /dev/null 2>&1 &
-          sleep 10
+          sleep 15
           npm run test:unit
       #   # env:
       #   #   NODE_OPTIONS: --max-old-space-size=1024
