@@ -78,7 +78,7 @@ contract StrategyYV2 is StrategyBaseV2, UseUniswap {
             */
             uint pricePerShare = StableSwapY(SWAP).get_virtual_price();
             uint shares = bal.mul(PRECISION_DIVS[_index]).mul(1e18).div(pricePerShare);
-            uint min = shares.mul(SLIPPAGE_MAX - slippage).div(SLIPPAGE_MAX);
+            uint min = shares.mul(SLIPPAGE_MAX - slippage) / SLIPPAGE_MAX;
 
             DepositY(POOL).add_liquidity(amounts, min);
         }
