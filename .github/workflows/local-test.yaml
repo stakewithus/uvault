@@ -30,10 +30,13 @@ jobs:
       - name: Generate types
         run: npm run types
 
+      # use ganache to speed up truffle test
       - name: Run unit test
         run: |
           npx ganache-cli > /dev/null 2>&1 & sleep 10
           npm run test:unit
 
-      # - name: Run integration test
-      #   run: npm run test:integration
+      - name: Run integration test
+        run: |
+          npx ganache-cli > /dev/null 2>&1 & sleep 10
+          npm run test:integration
