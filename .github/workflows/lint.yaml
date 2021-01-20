@@ -45,8 +45,10 @@ jobs:
       - name: Run Slither
         env:
           INFURA_API_KEY: ${{ secrets.INFURA_API_KEY }}
+        # generate .secret, store placeholder private.
+        # NEVER USE THIS private key IN PROD
         run: |
-          touch .secret
+          echo 0x06802b60b0c116d3f58f1b3c0fa69c636b1c61913b5f068863b048252236d8ec > .secret
           slither .
 
 # TODO: Add Slither Static Analyzer
