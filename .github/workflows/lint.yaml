@@ -50,19 +50,3 @@ jobs:
         run: |
           echo 06802b60b0c116d3f58f1b3c0fa69c636b1c61913b5f068863b048252236d8ec > .secret
           slither . 2>&1
-
-# TODO: Add Slither Static Analyzer
-# EACCES: permission denied, mkdir '/__w/uvault/uvault/code'
-# slither:
-#   runs-on: ubuntu-latest
-#   container:
-#     image: trailofbits/eth-security-toolbox
-#     # volumes:
-#     #   - .:/code
-#   steps:
-#     - uses: actions/checkout@v2
-#       with:
-#         path: code
-#         fetch-depth: 1
-#     - name: What OS is running
-#       run: uname -a
