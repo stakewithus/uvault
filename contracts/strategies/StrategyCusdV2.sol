@@ -60,7 +60,7 @@ contract StrategyCusdV2 is StrategyBaseV2, UseUniswap {
     /*
     @notice deposit token into curve
     */
-    function _deposit(address _token, uint _index) internal {
+    function _deposit(address _token, uint _index) private {
         // token to LP
         uint bal = IERC20(_token).balanceOf(address(this));
         if (bal > 0) {
