@@ -12,6 +12,7 @@ import "./protocol/IControllerV2.sol";
 /*
 Changes from StrategyBase V1
 - performance fee capped at 20%
+- add slippage gaurd
 - update skim(), does not withdraw underlying token, instead increments total debt
 */
 
@@ -31,6 +32,10 @@ abstract contract StrategyBaseV2 is IStrategyV2 {
     uint public override performanceFee = 500;
     uint private constant PERFORMANCE_FEE_CAP = 2000; // upper limit to performance fee
     uint internal constant PERFORMANCE_FEE_MAX = 10000;
+
+    // prevent slippage from deposit / withdraw
+    uint public override slippage = 100;
+    uint internal constant SLIPPAGE_MAX = 10000;
 
     // valuable tokens that cannot be swept
     mapping(address => bool) public override assets;
@@ -78,6 +83,11 @@ abstract contract StrategyBaseV2 is IStrategyV2 {
     function setPerformanceFee(uint _fee) external override onlyAdmin {
         require(_fee <= PERFORMANCE_FEE_CAP, "performance fee > cap");
         performanceFee = _fee;
+    }
+
+    function setSlippage(uint _slippage) external override onlyAdmin {
+        require(_slippage <= SLIPPAGE_MAX, "slippage > max");
+        slippage = _slippage;
     }
 
     function _increaseDebt(uint _underlyingAmount) private {

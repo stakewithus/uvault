@@ -18,6 +18,7 @@ contract StrategyNoOpV2 is IStrategyV2 {
 
     uint public override totalDebt;
     uint public override performanceFee;
+    uint public override slippage;
 
     mapping(address => bool) public override assets;
 
@@ -63,6 +64,11 @@ contract StrategyNoOpV2 is IStrategyV2 {
 
     // @dev variable name is removed to silence compiler warning
     function setPerformanceFee(uint) external override {
+        revert("no-op");
+    }
+
+    // @dev variable name is removed to silence compiler warning
+    function setSlippage(uint) external override {
         revert("no-op");
     }
 

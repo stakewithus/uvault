@@ -20,6 +20,8 @@ interface IStrategyV2 {
 
     function performanceFee() external view returns (uint);
 
+    function slippage() external view returns (uint);
+
     /*
     @notice Returns true if token cannot be swept
     */
@@ -30,6 +32,8 @@ interface IStrategyV2 {
     function setController(address _controller) external;
 
     function setPerformanceFee(uint _fee) external;
+
+    function setSlippage(uint _slippage) external;
 
     /*
     @notice Returns amount of underlying stable coin locked in this contract

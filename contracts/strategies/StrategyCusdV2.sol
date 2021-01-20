@@ -31,20 +31,11 @@ contract StrategyCusdV2 is StrategyBaseV2, UseUniswap {
     // DAO
     address private constant CRV = 0xD533a949740bb3306d119CC777fa900bA034cd52;
 
-    // prevent slippage from deposit / withdraw into Curve ppol
-    uint public slippage = 100;
-    uint private constant SLIPPAGE_MAX = 10000;
-
     constructor(
         address _controller,
         address _vault,
         address _underlying
     ) public StrategyBaseV2(_controller, _vault, _underlying) {}
-
-    function setSlippage(uint _slippage) external onlyAdmin {
-        require(_slippage <= SLIPPAGE_MAX, "slippage > max");
-        slippage = _slippage;
-    }
 
     function _totalAssets() internal view override returns (uint) {
         uint lpBal = LiquidityGauge(GAUGE).balanceOf(address(this));
