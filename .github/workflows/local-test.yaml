@@ -21,12 +21,11 @@ jobs:
         uses: actions/setup-node@v1
 
       - name: Npm install
-        run:
-          npm install
+        run: npm install
 
       - name: Start Ganache
         run: |
-        ganache-cli > /dev/null 2>&1 & sleep 10
+          ganache-cli > /dev/null 2>&1 & sleep 10
 
       - name: Run unit test
         run: npm run test:unit
