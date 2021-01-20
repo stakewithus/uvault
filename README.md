@@ -22,13 +22,15 @@ npm run types
 ```shell
 cp .env.sample .env
 
-# start ganache
+# start ganache (used to speed up test, truffle test without ganache is slow)
 npx ganache-cli
 
 # unit test
 npm run test:unit
+npm run typecheck && npx truffle test --network dev test/unit/**/test-*.ts
 # integration test
 npm run test:integration
+npm run typecheck && npx truffle test --network dev test/integration/test-*.ts
 
 # test mainnet fork
 source .env
