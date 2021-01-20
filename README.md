@@ -21,6 +21,10 @@ npm run types
 
 ```shell
 cp .env.sample .env
+
+# start ganache
+npx ganache-cli
+
 # unit test
 npm run test:unit
 # integration test
