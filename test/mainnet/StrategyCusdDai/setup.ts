@@ -1,5 +1,5 @@
 import _setup from "../StrategyCurve/setup"
-import { CUSD, CGAUGE, DAI, DAI_WHALE } from "../config"
+import { CUSD, CUSD_GAUGE, DAI, DAI_WHALE } from "../config"
 
 const StrategyCusdDai = artifacts.require("StrategyCusdDai")
 
@@ -8,7 +8,7 @@ export default (accounts: Truffle.Accounts) => {
     Strategy: StrategyCusdDai,
     underlying: DAI,
     lp: CUSD,
-    gauge: CGAUGE,
+    gauge: CUSD_GAUGE,
     whale: DAI_WHALE,
   })
 }

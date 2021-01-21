@@ -8,7 +8,7 @@ contract StrategyCusdUsdcV2 is StrategyCusdV2 {
         public
         StrategyCusdV2(_controller, _vault, USDC)
     {
-        // usdc
+        // USDC
         underlyingIndex = 1;
     }
 }
