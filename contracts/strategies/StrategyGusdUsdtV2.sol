@@ -8,7 +8,7 @@ contract StrategyGusdUsdtV2 is StrategyGusdV2 {
         public
         StrategyGusdV2(_controller, _vault, USDT)
     {
-        // usdt
+        // USDT
         underlyingIndex = 3;
     }
 }
