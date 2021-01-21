@@ -9,8 +9,6 @@ import "../interfaces/curve/StableSwapCompound.sol";
 import "../interfaces/curve/DepositCompound.sol";
 
 contract StrategyCusdV2 is StrategyBaseV2, UseUniswap {
-    // StableSwapCompound
-    address private constant SWAP = 0xA2B47E3D5c44877cca798226B7B8118F9BFb7A56;
     address internal constant DAI = 0x6B175474E89094C44Da98b954EedeAC495271d0F;
     address internal constant USDC = 0xA0b86991c6218b36c1d19D4a2e9Eb0cE3606eB48;
 
@@ -20,6 +18,8 @@ contract StrategyCusdV2 is StrategyBaseV2, UseUniswap {
     uint[2] private PRECISION_DIVS = [1, 1e12];
 
     // Curve //
+    // StableSwapCompound
+    address private constant SWAP = 0xA2B47E3D5c44877cca798226B7B8118F9BFb7A56;
     // liquidity provider token (cDAI/cUSDC)
     address private constant LP = 0x845838DF265Dcd2c412A1Dc9e959c7d08537f8a2;
     // DepositCompound

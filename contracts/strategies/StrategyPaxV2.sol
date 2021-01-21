@@ -9,8 +9,6 @@ import "../interfaces/curve/StableSwapPax.sol";
 import "../interfaces/curve/DepositPax.sol";
 
 contract StrategyPaxV2 is StrategyBaseV2, UseUniswap {
-    // StableSwapPax
-    address private constant SWAP = 0x06364f10B501e868329afBc005b3492902d6C763;
     address private constant PAX = 0x8E870D67F660D95d5be530380D0eC0bd388289E1;
     address internal constant DAI = 0x6B175474E89094C44Da98b954EedeAC495271d0F;
     address internal constant USDC = 0xA0b86991c6218b36c1d19D4a2e9Eb0cE3606eB48;
@@ -22,6 +20,8 @@ contract StrategyPaxV2 is StrategyBaseV2, UseUniswap {
     uint[4] private PRECISION_DIVS = [1, 1e12, 1e12, 1];
 
     // Curve //
+    // StableSwapPax
+    address private constant SWAP = 0x06364f10B501e868329afBc005b3492902d6C763;
     // liquidity provider token (ypaxCrv DAI/USDC/USDT/PAX)
     address private constant LP = 0xD905e2eaeBe188fc92179b6350807D8bd91Db0D8;
     // DepositPax

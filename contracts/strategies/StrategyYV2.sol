@@ -9,8 +9,6 @@ import "../interfaces/curve/StableSwapY.sol";
 import "../interfaces/curve/DepositY.sol";
 
 contract StrategyYV2 is StrategyBaseV2, UseUniswap {
-    // StableSwapY
-    address private constant SWAP = 0x45F783CCE6B7FF23B2ab2D70e416cdb7D6055f51;
     address private constant TUSD = 0x0000000000085d4780B73119b644AE5ecd22b376;
     address internal constant DAI = 0x6B175474E89094C44Da98b954EedeAC495271d0F;
     address internal constant USDC = 0xA0b86991c6218b36c1d19D4a2e9Eb0cE3606eB48;
@@ -22,6 +20,8 @@ contract StrategyYV2 is StrategyBaseV2, UseUniswap {
     uint[4] private PRECISION_DIVS = [1, 1e12, 1e12, 1];
 
     // Curve //
+    // StableSwapY
+    address private constant SWAP = 0x45F783CCE6B7FF23B2ab2D70e416cdb7D6055f51;
     // liquidity provider token (yDAI/yUSDC/yUSDT/yTUSD)
     address private constant LP = 0xdF5e0e81Dff6FAF3A7e52BA697820c5e32D806A8;
     // DepositY

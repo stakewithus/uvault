@@ -10,10 +10,6 @@ import "../interfaces/curve/StableSwap3Pool.sol";
 import "../interfaces/curve/DepositGusd.sol";
 
 contract StrategyGusdV2 is StrategyBaseV2, UseUniswap {
-    // StableSwap3Pool
-    address private constant BASE_POOL = 0xbEbc44782C7dB0a1A60Cb6fe97d0b483032FF1C7;
-    // StableSwapGusd
-    address private constant SWAP = 0x4f062658EaAF2C1ccf8C8e36D6824CDf41167956;
     address private constant GUSD = 0x056Fd409E1d7A124BD7017459dFEa2F387b6d5Cd;
     address internal constant DAI = 0x6B175474E89094C44Da98b954EedeAC495271d0F;
     address internal constant USDC = 0xA0b86991c6218b36c1d19D4a2e9Eb0cE3606eB48;
@@ -25,6 +21,10 @@ contract StrategyGusdV2 is StrategyBaseV2, UseUniswap {
     uint[4] private PRECISION_DIVS = [1e16, 1, 1e12, 1e12];
 
     // Curve //
+    // StableSwap3Pool
+    address private constant BASE_POOL = 0xbEbc44782C7dB0a1A60Cb6fe97d0b483032FF1C7;
+    // StableSwapGusd
+    address private constant SWAP = 0x4f062658EaAF2C1ccf8C8e36D6824CDf41167956;
     // liquidity provider token (GUSD / 3CRV)
     address private constant LP = 0xD2967f45c4f384DEEa880F807Be904762a3DeA07;
     // DepositGusd
