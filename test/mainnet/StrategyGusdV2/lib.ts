@@ -1,6 +1,6 @@
 import {
   IERC20Instance,
-  StableSwapCompoundInstance,
+  StableSwapGusdInstance,
   LiquidityGaugeInstance,
   ControllerV2Instance,
   StrategyGusdDaiV2Contract,
@@ -28,7 +28,7 @@ export interface Refs {
   treasury: string
   underlying: IERC20Instance
   lp: IERC20Instance
-  stableSwap: StableSwapCompoundInstance
+  stableSwap: StableSwapGusdInstance
   gauge: LiquidityGaugeInstance
   crv: IERC20Instance
   controller: ControllerV2Instance

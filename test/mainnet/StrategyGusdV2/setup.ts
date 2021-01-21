@@ -4,7 +4,7 @@ import { CRV, GUSD_3CRV, GUSD_GAUGE, STABLE_SWAP_GUSD } from "../config"
 import { Refs, StrategyContract } from "./lib"
 
 const IERC20 = artifacts.require("IERC20")
-const StableSwapCompound = artifacts.require("StableSwapCompound")
+const StableSwapGusd = artifacts.require("StableSwapGusd")
 const LiquidityGauge = artifacts.require("LiquidityGauge")
 const ControllerV2 = artifacts.require("ControllerV2")
 
@@ -54,7 +54,7 @@ export default (
   beforeEach(async () => {
     refs.underlying = await IERC20.at(underlying)
     refs.lp = await IERC20.at(LP)
-    refs.stableSwap = await StableSwapCompound.at(STABLE_SWAP)
+    refs.stableSwap = await StableSwapGusd.at(STABLE_SWAP)
     refs.gauge = await LiquidityGauge.at(GAUGE)
     refs.crv = await IERC20.at(CRV)
     refs.controller = await ControllerV2.new(treasury)
