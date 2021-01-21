@@ -107,7 +107,7 @@ contract StrategyPaxV2 is StrategyBaseV2, UseUniswap {
         uint pricePerShare = StableSwapPax(SWAP).get_virtual_price();
         uint underlyingAmount =
             lpBal.mul(pricePerShare).div(PRECISION_DIVS[underlyingIndex]) / 1e18;
-        uint min = underlyingAmount.mul(SLIPPAGE_MAX - slippage).div(SLIPPAGE_MAX);
+        uint min = underlyingAmount.mul(SLIPPAGE_MAX - slippage) / SLIPPAGE_MAX;
         // withdraw creates LP dust
         DepositPax(POOL).remove_liquidity_one_coin(
             lpBal,
