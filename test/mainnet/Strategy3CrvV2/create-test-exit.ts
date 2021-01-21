@@ -1,10 +1,5 @@
 import BN from "bn.js"
-import {
-  IERC20Instance,
-  StableSwap3PoolInstance,
-  ControllerV2Instance,
-  LiquidityGaugeInstance,
-} from "../../../types"
+import { IERC20Instance } from "../../../types"
 import { pow } from "../../util"
 import { StrategyInstance, Setup, getSnapshot } from "./lib"
 
@@ -17,19 +12,9 @@ export default (name: string, _setup: Setup, params: { DECIMALS: BN }) => {
     const { vault, treasury, whale } = refs
 
     let underlying: IERC20Instance
-    let lp: IERC20Instance
-    let stableSwap: StableSwap3PoolInstance
-    let gauge: LiquidityGaugeInstance
-    let crv: IERC20Instance
-    let controller: ControllerV2Instance
     let strategy: StrategyInstance
     beforeEach(async () => {
       underlying = refs.underlying
-      lp = refs.lp
-      stableSwap = refs.stableSwap
-      gauge = refs.gauge
-      crv = refs.crv
-      controller = refs.controller
       strategy = refs.strategy
 
       // deposit underlying into vault
