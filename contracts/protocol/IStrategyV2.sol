@@ -22,6 +22,12 @@ interface IStrategyV2 {
 
     function slippage() external view returns (uint);
 
+    /* 
+    @notice Multiplier used to check 
+            total underlying is <= total debt * delta / DELTA_DENOM
+    */
+    function delta() external view returns (uint);
+
     function setAdmin(address _admin) external;
 
     function setController(address _controller) external;
@@ -29,6 +35,8 @@ interface IStrategyV2 {
     function setPerformanceFee(uint _fee) external;
 
     function setSlippage(uint _slippage) external;
+
+    function setDelta(uint _delta) external;
 
     /*
     @notice Returns amount of underlying stable coin locked in this contract
@@ -60,13 +68,12 @@ interface IStrategyV2 {
     function harvest() external;
 
     /*
-    @notice Increase total debt if profit > 0
-    @param _min Min total assets observed offchain
-    @param _max Max total assets observed offchain
+    @notice Increase total debt if profit > 0 and total assets <= max,
+            otherwise transfers profit to vault.
     @dev Guard against manipulation of external price feed by checking that
-         total assets is between `_min` and `_max` 
+         total assets is below factor of total debt
     */
-    function skim(uint _min, uint _max) external;
+    function skim() external;
 
     /*
     @notice Exit from strategy

@@ -13,7 +13,8 @@ import "./protocol/IControllerV2.sol";
 Changes from StrategyBase V1
 - performance fee capped at 20%
 - add slippage gaurd
-- update skim(), does not withdraw underlying token, instead increments total debt
+- update skim(), increments total debt withoud withdrawing if total assets
+  close to total debt
 - sweep - delete mapping "assets" and use require to explicitly check protected tokens
 */
 
@@ -39,6 +40,12 @@ abstract contract StrategyBaseV2 is IStrategyV2 {
     // prevent slippage from deposit / withdraw
     uint public override slippage = 100;
     uint internal constant SLIPPAGE_MAX = 10000;
+
+    /* 
+    Multiplier used to check total underlying is <= total debt * delta / DELTA_DENOM
+    */
+    uint public override delta = 10050;
+    uint private constant DELTA_DENOM = 10000;
 
     constructor(
         address _controller,
@@ -86,6 +93,11 @@ abstract contract StrategyBaseV2 is IStrategyV2 {
     function setSlippage(uint _slippage) external override onlyAdmin {
         require(_slippage <= SLIPPAGE_MAX, "slippage > max");
         slippage = _slippage;
+    }
+
+    function setDelta(uint _delta) external override onlyAdmin {
+        require(_delta >= DELTA_DENOM, "delta < denominator");
+        delta = _delta;
     }
 
     function _increaseDebt(uint _underlyingAmount) private {
@@ -211,28 +223,49 @@ abstract contract StrategyBaseV2 is IStrategyV2 {
     function harvest() external virtual override;
 
     /*
-    @notice Increase total debt if profit > 0
-    @param _min Min total assets observed offchain
-    @param _max Max total assets observed offchain
+    @notice Increase total debt if profit > 0 and total assets <= max,
+            otherwise transfers profit to vault.
     @dev Guard against manipulation of external price feed by checking that
-         total assets is between `_min` and `_max` 
+         total assets is below factor of total debt
     */
-    function skim(uint _min, uint _max) external override onlyAuthorized {
-        uint total = _totalAssets();
-        // protect against price manipulation
-        require(total >= _min, "total < min");
-        require(total <= _max, "total > max");
+    function skim() external override onlyAuthorized {
+        uint totalUnderlying = _totalAssets();
+        require(totalUnderlying > totalDebt, "total underlying < debt");
 
-        if (total > totalDebt) {
+        uint profit = totalUnderlying - totalDebt;
+
+        // protect against price manipulation
+        uint max = totalDebt.mul(delta) / DELTA_DENOM;
+        if (totalUnderlying <= max) {
             /*
-            If we were to withdraw profit (total - totalDebt) followed
-            by deposit, this would increase the total debt roughly by the
-            profit.
+            total underlying is within reasonable bounds, probaly no price
+            manipulation occured.
+            */
+
+            /*
+            If we were to withdraw profit followed by deposit, this would
+            increase the total debt roughly by the profit.
 
             Withdrawing consumes high gas, so here we omit it and
             directly increase debt, as if withdraw and deposit were called.
             */
-            totalDebt = totalDebt.add(total - totalDebt);
+            totalDebt = totalDebt.add(profit);
+        } else {
+            /*
+            Possible reasons for total underlying > max
+            1. total debt = 0
+            2. total underlying really did increase over max
+            3. price was manipulated
+            */
+            uint shares = _getShares(profit, totalUnderlying);
+            if (shares > 0) {
+                _withdrawUnderlying(shares);
+
+                uint bal = IERC20(underlying).balanceOf(address(this));
+                if (bal > 0) {
+                    IERC20(underlying).safeTransfer(vault, bal);
+                }
+            }
         }
     }
 

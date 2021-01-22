@@ -43,15 +43,9 @@ interface IControllerV2 {
     function harvest(address _strategy) external;
 
     /*
-    @notice Update total debt if profit > 0. Does not withdraw profit.
-    @param _min Min total assets observed offchain
-    @param _max Max total assets observed offchain
+    @notice Claim profit from strategy.
     */
-    function skim(
-        address _strategy,
-        uint _min,
-        uint _max
-    ) external;
+    function skim(address _strategy) external;
 
     /*
     @notice Withdraw from strategy to vault

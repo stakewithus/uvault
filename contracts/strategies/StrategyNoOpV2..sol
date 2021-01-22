@@ -19,6 +19,7 @@ contract StrategyNoOpV2 is IStrategyV2 {
     uint public override totalDebt;
     uint public override performanceFee;
     uint public override slippage;
+    uint public override delta;
 
     constructor(
         address _controller,
@@ -68,6 +69,11 @@ contract StrategyNoOpV2 is IStrategyV2 {
         revert("no-op");
     }
 
+    // @dev variable name is removed to silence compiler warning
+    function setDelta(uint) external override {
+        revert("no-op");
+    }
+
     function totalAssets() external view override returns (uint) {
         return 0;
     }
@@ -90,7 +96,7 @@ contract StrategyNoOpV2 is IStrategyV2 {
         revert("no-op");
     }
 
-    function skim(uint, uint) external override {
+    function skim() external override {
         revert("no-op");
     }
 

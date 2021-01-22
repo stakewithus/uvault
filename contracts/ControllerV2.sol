@@ -101,12 +101,13 @@ contract ControllerV2 is IControllerV2, AccessControl {
         IStrategyV2(_strategy).harvest();
     }
 
-    function skim(
-        address _strategy,
-        uint _min,
-        uint _max
-    ) external override isCurrentStrategy(_strategy) onlyAuthorized(HARVESTER_ROLE) {
-        IStrategyV2(_strategy).skim(_min, _max);
+    function skim(address _strategy)
+        external
+        override
+        isCurrentStrategy(_strategy)
+        onlyAuthorized(HARVESTER_ROLE)
+    {
+        IStrategyV2(_strategy).skim();
     }
 
     modifier checkWithdraw(address _strategy, uint _min) {
@@ -153,4 +154,6 @@ contract ControllerV2 is IControllerV2, AccessControl {
     {
         IStrategyV2(_strategy).exit();
     }
+
+    // TODO set strategy and invest in single tx (avoid front running)
 }
