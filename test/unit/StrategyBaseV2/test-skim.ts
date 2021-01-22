@@ -45,16 +45,13 @@ contract("StrategyBaseV2", (accounts) => {
       }
     }
 
-    it("should skim", async () => {
+    it("should skim - increments total debt", async () => {
       // simulate profit
       const profit = new BN(123)
       await strategy._mintToPool_(profit)
 
-      const min = frac(await strategy.totalAssets(), 99, 100)
-      const max = frac(await strategy.totalAssets(), 101, 100)
-
       const before = await snapshot()
-      await strategy.skim(min, max, { from: admin })
+      await strategy.skim({ from: admin })
       const after = await snapshot()
 
       assert(after.strategy.totalAssets.eq(before.strategy.totalAssets), "total assets")
@@ -64,31 +61,33 @@ contract("StrategyBaseV2", (accounts) => {
       )
     })
 
-    it("should reject if caller not authorized", async () => {
-      const min = frac(await strategy.totalAssets(), 99, 100)
-      const max = frac(await strategy.totalAssets(), 101, 100)
+    it("should skim - transfer to vault", async () => {
+      // simulate profit
+      const profit = frac(await strategy.totalAssets(), 10, 100)
+      await strategy._mintToPool_(profit)
 
+      const before = await snapshot()
+      await strategy.skim({ from: admin })
+      const after = await snapshot()
+
+      assert(
+        after.strategy.totalAssets.eq(before.strategy.totalAssets.sub(profit)),
+        "total assets"
+      )
+      assert(after.strategy.totalDebt.eq(before.strategy.totalDebt), "total debt")
+      assert(after.underlying.vault.eq(before.underlying.vault.add(profit)), "vault")
+    })
+
+    it("should reject if caller not authorized", async () => {
       await chai
-        .expect(strategy.skim(min, max, { from: accounts[1] }))
+        .expect(strategy.skim({ from: accounts[1] }))
         .to.be.rejectedWith("!authorized")
     })
 
-    it("should reject if total assets < min", async () => {
-      const min = frac(await strategy.totalAssets(), 101, 100)
-      const max = frac(await strategy.totalAssets(), 101, 100)
-
+    it("should reject if total assets <= debt", async () => {
       await chai
-        .expect(strategy.skim(min, max, { from: admin }))
-        .to.be.rejectedWith("total < min")
-    })
-
-    it("should reject if total assets > max", async () => {
-      const min = frac(await strategy.totalAssets(), 99, 100)
-      const max = frac(await strategy.totalAssets(), 99, 100)
-
-      await chai
-        .expect(strategy.skim(min, max, { from: admin }))
-        .to.be.rejectedWith("total > max")
+        .expect(strategy.skim({ from: admin }))
+        .to.be.rejectedWith("total underlying < debt")
     })
   })
 })

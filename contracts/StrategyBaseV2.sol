@@ -14,7 +14,7 @@ Changes from StrategyBase V1
 - performance fee capped at 20%
 - add slippage gaurd
 - update skim(), increments total debt withoud withdrawing if total assets
-  close to total debt
+  is near total debt
 - sweep - delete mapping "assets" and use require to explicitly check protected tokens
 */
 
@@ -259,11 +259,13 @@ abstract contract StrategyBaseV2 is IStrategyV2 {
             */
             uint shares = _getShares(profit, totalUnderlying);
             if (shares > 0) {
+                uint balBefore = IERC20(underlying).balanceOf(address(this));
                 _withdrawUnderlying(shares);
+                uint balAfter = IERC20(underlying).balanceOf(address(this));
 
-                uint bal = IERC20(underlying).balanceOf(address(this));
-                if (bal > 0) {
-                    IERC20(underlying).safeTransfer(vault, bal);
+                uint diff = balAfter.sub(balBefore);
+                if (diff > 0) {
+                    IERC20(underlying).safeTransfer(vault, diff);
                 }
             }
         }
