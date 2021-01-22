@@ -24,10 +24,7 @@ contract("Controller", (accounts) => {
 
   describe("skim", () => {
     it("should skim", async () => {
-      const min = 0
-      const max = await strategy.totalAssets()
-
-      await controller.skim(strategy.address, min, max, { from: admin })
+      await controller.skim(strategy.address, { from: admin })
     })
 
     it("should reject if not current strategy", async () => {
@@ -35,19 +32,18 @@ contract("Controller", (accounts) => {
       await vault.setStrategy(accounts[1], new BN(0))
 
       await chai
-        .expect(controller.skim(strategy.address, 0, 0, { from: admin }))
+        .expect(controller.skim(strategy.address, { from: admin }))
         .to.be.rejectedWith("!strategy")
     })
 
     it("should reject if caller not authorized", async () => {
       await chai
-        .expect(controller.skim(strategy.address, 0, 0, { from: accounts[1] }))
+        .expect(controller.skim(strategy.address, { from: accounts[1] }))
         .to.be.rejectedWith("!authorized")
     })
 
     it("should reject invalid strategy address", async () => {
-      await chai.expect(controller.skim(accounts[1], 0, 0, { from: admin })).to.be
-        .rejected
+      await chai.expect(controller.skim(accounts[1], { from: admin })).to.be.rejected
     })
   })
 })
