@@ -50,12 +50,9 @@ contract("StrategyBaseV2", (accounts) => {
     })
 
     it("should reject if asset", async () => {
-      await strategy._setAsset_(underlying.address)
-
-      assert(await strategy.assets(underlying.address), "asset")
       await chai
         .expect(strategy.sweep(underlying.address, { from: admin }))
-        .to.be.rejectedWith("asset")
+        .to.be.rejectedWith("protected token")
     })
   })
 })
