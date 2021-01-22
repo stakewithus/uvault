@@ -14,7 +14,7 @@ Changes from StrategyBase V1
 - performance fee capped at 20%
 - add slippage gaurd
 - update skim(), does not withdraw underlying token, instead increments total debt
-- sweep - replace mapping assets with require
+- sweep - delete mapping "assets" and use require to explicitly check protected tokens
 */
 
 //TODO reentrancy protection
