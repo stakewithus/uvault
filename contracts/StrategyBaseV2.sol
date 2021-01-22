@@ -42,10 +42,10 @@ abstract contract StrategyBaseV2 is IStrategyV2 {
     uint internal constant SLIPPAGE_MAX = 10000;
 
     /* 
-    Multiplier used to check total underlying is <= total debt * delta / DELTA_DENOM
+    Multiplier used to check total underlying is <= total debt * delta / DELTA_MIN
     */
     uint public override delta = 10050;
-    uint private constant DELTA_DENOM = 10000;
+    uint private constant DELTA_MIN = 10000;
 
     constructor(
         address _controller,
@@ -96,7 +96,7 @@ abstract contract StrategyBaseV2 is IStrategyV2 {
     }
 
     function setDelta(uint _delta) external override onlyAdmin {
-        require(_delta >= DELTA_DENOM, "delta < denominator");
+        require(_delta >= DELTA_MIN, "delta < min");
         delta = _delta;
     }
 
@@ -235,7 +235,7 @@ abstract contract StrategyBaseV2 is IStrategyV2 {
         uint profit = totalUnderlying - totalDebt;
 
         // protect against price manipulation
-        uint max = totalDebt.mul(delta) / DELTA_DENOM;
+        uint max = totalDebt.mul(delta) / DELTA_MIN;
         if (totalUnderlying <= max) {
             /*
             total underlying is within reasonable bounds, probaly no price

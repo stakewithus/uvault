@@ -23,8 +23,7 @@ interface IStrategyV2 {
     function slippage() external view returns (uint);
 
     /* 
-    @notice Multiplier used to check 
-            total underlying is <= total debt * delta / DELTA_DENOM
+    @notice Multiplier used to check total underlying <= total debt * delta / DELTA_MIN
     */
     function delta() external view returns (uint);
 

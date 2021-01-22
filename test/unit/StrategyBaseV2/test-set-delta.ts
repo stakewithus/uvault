@@ -14,24 +14,24 @@ contract("StrategyBaseV2", (accounts) => {
   })
 
   describe("setSlippage", () => {
-    const slippage = new BN(500)
+    const delta = new BN(10000)
 
-    it("should set slippage", async () => {
-      await strategy.setSlippage(slippage, { from: admin })
+    it("should set delta", async () => {
+      await strategy.setDelta(delta, { from: admin })
 
-      assert(eq(await strategy.slippage(), slippage), "slippage")
+      assert(eq(await strategy.delta(), delta), "delta")
     })
 
     it("should reject if caller not admin", async () => {
       await chai
-        .expect(strategy.setSlippage(slippage, { from: accounts[1] }))
+        .expect(strategy.setDelta(delta, { from: accounts[1] }))
         .to.be.rejectedWith("!admin")
     })
 
-    it("should reject slippage > max", async () => {
+    it("should reject delta < min", async () => {
       await chai
-        .expect(strategy.setSlippage(10001, { from: admin }))
-        .to.be.rejectedWith("slippage > max")
+        .expect(strategy.setDelta(9999, { from: admin }))
+        .to.be.rejectedWith("delta < min")
     })
   })
 })
