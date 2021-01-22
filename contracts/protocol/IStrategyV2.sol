@@ -22,11 +22,6 @@ interface IStrategyV2 {
 
     function slippage() external view returns (uint);
 
-    /*
-    @notice Returns true if token cannot be swept
-    */
-    function assets(address _token) external view returns (bool);
-
     function setAdmin(address _admin) external;
 
     function setController(address _controller) external;

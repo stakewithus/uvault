@@ -57,6 +57,11 @@ contract StrategyTestV2 is StrategyBaseV2 {
         _withdrawAll();
     }
 
+    function sweep(address _token) external override onlyAdmin {
+        require(_token != underlying, "protected token");
+        IERC20(_token).safeTransfer(admin, IERC20(_token).balanceOf(address(this)));
+    }
+
     // test helpers
     function _setVault_(address _vault) external {
         vault = _vault;
@@ -64,10 +69,6 @@ contract StrategyTestV2 is StrategyBaseV2 {
 
     function _setUnderlying_(address _token) external {
         underlying = _token;
-    }
-
-    function _setAsset_(address _token) external {
-        assets[_token] = true;
     }
 
     function _mintToPool_(uint _amount) external {

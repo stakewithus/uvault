@@ -14,6 +14,8 @@ Changes from Controller V1
 - function skim is updated to pass min, max inputs
 */
 
+// TODO whitelist strategies and vaults
+// TODO reentrancy
 contract ControllerV2 is IControllerV2, AccessControl {
     using SafeMath for uint;
 

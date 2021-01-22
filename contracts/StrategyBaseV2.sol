@@ -14,7 +14,10 @@ Changes from StrategyBase V1
 - performance fee capped at 20%
 - add slippage gaurd
 - update skim(), does not withdraw underlying token, instead increments total debt
+- sweep - replace mapping assets with require
 */
+
+//TODO reentrancy protection
 
 abstract contract StrategyBaseV2 is IStrategyV2 {
     using SafeERC20 for IERC20;
@@ -37,9 +40,6 @@ abstract contract StrategyBaseV2 is IStrategyV2 {
     uint public override slippage = 100;
     uint internal constant SLIPPAGE_MAX = 10000;
 
-    // valuable tokens that cannot be swept
-    mapping(address => bool) public override assets;
-
     constructor(
         address _controller,
         address _vault,
@@ -53,8 +53,6 @@ abstract contract StrategyBaseV2 is IStrategyV2 {
         controller = _controller;
         vault = _vault;
         underlying = _underlying;
-
-        assets[underlying] = true;
     }
 
     modifier onlyAdmin() {
@@ -240,9 +238,5 @@ abstract contract StrategyBaseV2 is IStrategyV2 {
 
     function exit() external virtual override;
 
-    function sweep(address _token) external override onlyAdmin {
-        require(!assets[_token], "asset");
-
-        IERC20(_token).safeTransfer(admin, IERC20(_token).balanceOf(address(this)));
-    }
+    function sweep(address) external virtual override;
 }

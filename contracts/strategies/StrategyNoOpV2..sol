@@ -20,8 +20,6 @@ contract StrategyNoOpV2 is IStrategyV2 {
     uint public override performanceFee;
     uint public override slippage;
 
-    mapping(address => bool) public override assets;
-
     constructor(
         address _controller,
         address _vault,
@@ -35,8 +33,6 @@ contract StrategyNoOpV2 is IStrategyV2 {
         controller = _controller;
         vault = _vault;
         underlying = _underlying;
-
-        assets[underlying] = true;
     }
 
     modifier onlyAdmin() {
@@ -107,7 +103,7 @@ contract StrategyNoOpV2 is IStrategyV2 {
     }
 
     function sweep(address _token) external override onlyAdmin {
-        require(!assets[_token], "asset");
+        require(_token != underlying, "protected token");
         IERC20(_token).safeTransfer(admin, IERC20(_token).balanceOf(address(this)));
     }
 }
