@@ -61,6 +61,9 @@ export default (accounts: Truffle.Accounts) => {
       refs.underlying.address
     )
 
+    await refs.controller.approveVault(refs.vault.address)
+    await refs.controller.approveStrategy(refs.strategy.address)
+
     // set vault.strategy
     await refs.vault.setStrategy(refs.strategy.address, new BN(0))
     // fund strategy

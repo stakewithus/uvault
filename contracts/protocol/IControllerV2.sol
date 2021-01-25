@@ -19,6 +19,24 @@ interface IControllerV2 {
     function revokeRole(bytes32 _role, address _addr) external;
 
     /*
+    @notice Returns true if vault is approved
+    */
+    function vaults(address _vault) external view returns (bool);
+
+    /*
+    @notice Returns true if strategy is approved
+    */
+    function strategies(address _strategy) external view returns (bool);
+
+    function approveVault(address _vault) external;
+
+    function revokeVault(address _vault) external;
+
+    function approveStrategy(address _strategy) external;
+
+    function revokeStrategy(address _strategy) external;
+
+    /*
     @notice Set strategy for vault
     @param _vault Address of vault
     @param _strategy Address of strategy

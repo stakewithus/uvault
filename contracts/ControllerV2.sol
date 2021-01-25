@@ -11,13 +11,16 @@ import "./AccessControl.sol";
 
 /*
 Changes from Controller V1
-- function skim is updated to pass min, max inputs
+- Check vault and strategy are approved by admin.
+  Protect from arbitrary contract to be passed into invest, harvest, skim, etc...
 */
 
-// TODO whitelist strategies and vaults
 // TODO reentrancy
 contract ControllerV2 is IControllerV2, AccessControl {
     using SafeMath for uint;
+
+    event ApproveVault(address vault, bool approved);
+    event ApproveStrategy(address strategy, bool approved);
 
     // keccak256(abi.encodePacked("ADMIN"));
     bytes32 public constant override ADMIN_ROLE =
@@ -28,6 +31,11 @@ contract ControllerV2 is IControllerV2, AccessControl {
 
     address public override admin;
     address public override treasury;
+
+    // approved vaults
+    mapping(address => bool) public override vaults;
+    // approved strategies
+    mapping(address => bool) public override strategies;
 
     constructor(address _treasury) public {
         require(_treasury != address(0), "treasury = zero address");
@@ -41,6 +49,16 @@ contract ControllerV2 is IControllerV2, AccessControl {
 
     modifier onlyAdmin() {
         require(msg.sender == admin, "!admin");
+        _;
+    }
+
+    modifier onlyApprovedVault(address _vault) {
+        require(vaults[_vault], "!approve vault");
+        _;
+    }
+
+    modifier onlyApprovedStrategy(address _strategy) {
+        require(strategies[_strategy], "!approve strategy");
         _;
     }
 
@@ -78,6 +96,30 @@ contract ControllerV2 is IControllerV2, AccessControl {
     function revokeRole(bytes32 _role, address _addr) external override onlyAdmin {
         require(_role == ADMIN_ROLE || _role == HARVESTER_ROLE, "invalid role");
         _revokeRole(_role, _addr);
+    }
+
+    function approveVault(address _vault) external override onlyAdmin {
+        require(!vaults[_vault], "already approved vault");
+        vaults[_vault] = true;
+        emit ApproveVault(_vault, true);
+    }
+
+    function revokeVault(address _vault) external override onlyAdmin {
+        require(vaults[_vault], "!approved vault");
+        vaults[_vault] = false;
+        emit ApproveVault(_vault, false);
+    }
+
+    function approveStrategy(address _strategy) external override onlyAdmin {
+        require(!strategies[_strategy], "already approved strategy");
+        strategies[_strategy] = true;
+        emit ApproveStrategy(_strategy, true);
+    }
+
+    function revokeStrategy(address _strategy) external override onlyAdmin {
+        require(strategies[_strategy], "!approved strategy");
+        strategies[_strategy] = false;
+        emit ApproveStrategy(_strategy, false);
     }
 
     function setStrategy(

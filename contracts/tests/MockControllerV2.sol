@@ -15,6 +15,11 @@ contract MockControllerV2 is IControllerV2 {
     address public override admin;
     address public override treasury;
 
+    // approved vaults
+    mapping(address => bool) public override vaults;
+    // approved strategies
+    mapping(address => bool) public override strategies;
+
     constructor(address _treasury) public {
         admin = msg.sender;
         treasury = _treasury;
@@ -27,6 +32,14 @@ contract MockControllerV2 is IControllerV2 {
     function grantRole(bytes32 _role, address _addr) external override {}
 
     function revokeRole(bytes32 _role, address _addr) external override {}
+
+    function approveVault(address _vault) external override {}
+
+    function revokeVault(address _vault) external override {}
+
+    function approveStrategy(address _strategy) external override {}
+
+    function revokeStrategy(address _strategy) external override {}
 
     function invest(address _vault) external override {}
 
