@@ -48,13 +48,26 @@ interface IControllerV2 {
         uint _min
     ) external;
 
-    // calls to strategy
     /*
     @notice Invest token in vault into strategy
     @param _vault Address of vault
     */
     function invest(address _vault) external;
 
+    /*
+    @notice Set strategy for vault and invest
+    @param _vault Address of vault
+    @param _strategy Address of strategy
+    @param _min Minimum undelying token current strategy must return. Prevents slippage
+    @dev Set strategy and invest in single transaction to avoid front running
+    */
+    function setStrategyAndInvest(
+        address _vault,
+        address _strategy,
+        uint _min
+    ) external;
+
+    // calls to strategy //
     /*
     @notice Claim rewards and deposit into strategy
     */

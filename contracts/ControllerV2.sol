@@ -139,6 +139,15 @@ contract ControllerV2 is IControllerV2, AccessControl {
         IVault(_vault).invest();
     }
 
+    function setStrategyAndInvest(
+        address _vault,
+        address _strategy,
+        uint _min
+    ) external override onlyAuthorized(ADMIN_ROLE) {
+        IVault(_vault).setStrategy(_strategy, _min);
+        IVault(_vault).invest();
+    }
+
     function harvest(address _strategy)
         external
         override
@@ -206,6 +215,4 @@ contract ControllerV2 is IControllerV2, AccessControl {
     {
         IStrategyV2(_strategy).exit();
     }
-
-    // TODO set strategy and invest in single tx (avoid front running)
 }

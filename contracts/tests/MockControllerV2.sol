@@ -49,6 +49,12 @@ contract MockControllerV2 is IControllerV2 {
         uint _min
     ) external override {}
 
+    function setStrategyAndInvest(
+        address _vault,
+        address _strategy,
+        uint _min
+    ) external override {}
+
     function harvest(address _strategy) external override {}
 
     function skim(address _strategy) external override {}
