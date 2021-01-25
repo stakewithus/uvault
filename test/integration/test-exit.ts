@@ -9,8 +9,6 @@ import {
 import { eq, add } from "../util"
 import _setup from "./setup"
 
-const StrategyTest = artifacts.require("StrategyTest")
-
 contract("integration - exit", (accounts) => {
   const refs = _setup(accounts)
   const { admin } = refs
@@ -60,32 +58,12 @@ contract("integration - exit", (accounts) => {
     assert(eq(after.underlying.strategy, new BN(0)), "strategy")
   })
 
-  it("should reject if not currenty strategy", async () => {
-    const strategy = await StrategyTest.new(
-      controller.address,
-      vault.address,
-      underlying.address
-    )
-    await chai
-      .expect(controller.exit(strategy.address, 0, { from: admin }))
-      .to.be.rejectedWith("!strategy")
-  })
-
-  it("should reject if not authorized", async () => {
-    const amount = await underlying.balanceOf(strategy.address)
-    const min = amount
-
-    await chai
-      .expect(controller.exit(strategy.address, min, { from: accounts[1] }))
-      .to.be.rejectedWith("!authorized")
-  })
-
   it("should reject if transferred amount < min", async () => {
     const amount = await strategy.totalAssets()
     const min = add(amount, 1)
 
     await chai
-      .expect(controller.exit(strategy.address, min, { from: accounts[1] }))
-      .to.be.rejectedWith("!authorized")
+      .expect(controller.exit(strategy.address, min, { from: admin }))
+      .to.be.rejectedWith("withdraw < min")
   })
 })

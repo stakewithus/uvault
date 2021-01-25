@@ -1,18 +1,15 @@
-import chai from "chai"
 import {
   TestTokenInstance,
   ControllerV2Instance,
   VaultInstance,
   StrategyTestV2Instance,
 } from "../../types"
-import { eq, sub, ZERO_ADDRESS } from "../util"
+import { eq, sub } from "../util"
 import _setup from "./setup"
-
-const Vault = artifacts.require("Vault")
 
 contract("integration - invest", (accounts) => {
   const refs = _setup(accounts)
-  const { admin, timeLock } = refs
+  const { admin } = refs
 
   let controller: ControllerV2Instance
   let vault: VaultInstance
@@ -59,20 +56,5 @@ contract("integration - invest", (accounts) => {
       ),
       "balance in strategy"
     )
-  })
-
-  it("should reject if not authorized", async () => {
-    await chai
-      .expect(controller.invest(vault.address, { from: accounts[1] }))
-      .to.be.rejectedWith("!authorized")
-  })
-
-  it("should reject if not currenty strategy", async () => {
-    const vault = await Vault.new(controller.address, timeLock, underlying.address)
-    assert.equal(await vault.strategy(), ZERO_ADDRESS, "strategy")
-
-    await chai
-      .expect(controller.invest(vault.address, { from: admin }))
-      .to.be.rejectedWith("strategy = zero address")
   })
 })

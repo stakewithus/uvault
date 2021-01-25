@@ -26,7 +26,10 @@ contract StrategyTestV2 is StrategyBaseV2 {
     }
 
     function _totalAssets() internal view override returns (uint) {
-        return IERC20(underlying).balanceOf(_POOL_);
+        return
+            IERC20(underlying).balanceOf(address(this)).add(
+                IERC20(underlying).balanceOf(_POOL_)
+            );
     }
 
     function _depositUnderlying() internal override {

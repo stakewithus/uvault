@@ -9,8 +9,6 @@ import {
 import { eq } from "../util"
 import _setup from "./setup"
 
-const StrategyTest = artifacts.require("StrategyTest")
-
 contract("integration - withdraw", (accounts) => {
   const refs = _setup(accounts)
   const { admin } = refs
@@ -53,32 +51,12 @@ contract("integration - withdraw", (accounts) => {
     assert(eq(after.underlying.vault, before.underlying.vault.add(amount)), "vault")
   })
 
-  it("should reject if not currenty strategy", async () => {
-    const strategy = await StrategyTest.new(
-      controller.address,
-      vault.address,
-      underlying.address
-    )
-    await chai
-      .expect(controller.withdraw(strategy.address, 0, 0, { from: admin }))
-      .to.be.rejectedWith("!strategy")
-  })
-
-  it("should reject if not authorized", async () => {
-    const amount = await underlying.balanceOf(strategy.address)
-    const min = amount
-
-    await chai
-      .expect(controller.withdraw(strategy.address, amount, min, { from: accounts[1] }))
-      .to.be.rejectedWith("!authorized")
-  })
-
   it("should reject if transferred amount < min", async () => {
     const amount = await strategy.totalAssets()
     const min = amount.add(new BN(1))
 
     await chai
-      .expect(controller.withdraw(strategy.address, amount, min, { from: accounts[1] }))
-      .to.be.rejectedWith("!authorized")
+      .expect(controller.withdraw(strategy.address, amount, min, { from: admin }))
+      .to.be.rejectedWith("withdraw < min")
   })
 })

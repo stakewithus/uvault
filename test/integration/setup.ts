@@ -113,6 +113,8 @@ export default (accounts: Truffle.Accounts) => {
     await vault.approveStrategy(strategyNoOp.address, { from: timeLock })
 
     // set strategy
+    await controller.approveVault(vault.address, { from: admin })
+    await controller.approveStrategy(strategy.address, { from: admin })
     await vault.approveStrategy(strategy.address, { from: timeLock })
     await controller.setStrategy(vault.address, strategy.address, new BN(0), {
       from: admin,

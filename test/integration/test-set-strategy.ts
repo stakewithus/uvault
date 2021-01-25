@@ -77,14 +77,4 @@ contract("integration - set strategy", (accounts) => {
     // check vault.strategy
     assert.equal(after.vault.strategy, newStrategy.address, "new strategy")
   })
-
-  it("should reject if not authorized", async () => {
-    await chai
-      .expect(
-        controller.setStrategy(vault.address, newStrategy.address, new BN(0), {
-          from: accounts[1],
-        })
-      )
-      .to.be.rejectedWith("!authorized")
-  })
 })
