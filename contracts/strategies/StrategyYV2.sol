@@ -40,7 +40,6 @@ contract StrategyYV2 is StrategyBaseV2, UseUniswap {
     ) public StrategyBaseV2(_controller, _vault, _underlying) {}
 
     function _totalAssets() internal view override returns (uint) {
-        uint bal = IERC20(underlying).balanceOf(address(this));
         uint lpBal = LiquidityGauge(GAUGE).balanceOf(address(this));
         /*
         get_virtual_price is calculated with exchange rate of wrapped token to underlying.
@@ -48,10 +47,7 @@ contract StrategyYV2 is StrategyBaseV2, UseUniswap {
         */
         uint pricePerShare = StableSwapY(SWAP).get_virtual_price();
 
-        return
-            bal.add(
-                lpBal.mul(pricePerShare).div(PRECISION_DIVS[underlyingIndex]) / 1e18
-            );
+        return lpBal.mul(pricePerShare).div(PRECISION_DIVS[underlyingIndex]) / 1e18;
     }
 
     /*
