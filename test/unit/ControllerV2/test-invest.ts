@@ -26,6 +26,14 @@ contract("Controller", (accounts) => {
         .to.be.rejectedWith("!authorized")
     })
 
+    it("should reject if vault not approved", async () => {
+      await controller.revokeVault(vault.address, { from: admin })
+
+      await chai
+        .expect(controller.invest(vault.address, { from: admin }))
+        .to.be.rejectedWith("!approved vault")
+    })
+
     it("should reject invalid vault address", async () => {
       await chai.expect(controller.invest(accounts[1], { from: admin })).to.be.rejected
     })

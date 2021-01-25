@@ -42,8 +42,20 @@ contract("Controller", (accounts) => {
         .to.be.rejectedWith("!authorized")
     })
 
+    it("should reject if strategy not approved", async () => {
+      await controller.revokeStrategy(strategy.address, { from: admin })
+
+      await chai
+        .expect(controller.skim(strategy.address, { from: admin }))
+        .to.be.rejectedWith("!approved strategy")
+    })
+
     it("should reject invalid strategy address", async () => {
-      await chai.expect(controller.skim(accounts[1], { from: admin })).to.be.rejected
+      // mock strategy address
+      const strategy = accounts[1]
+      await controller.approveStrategy(strategy, { from: admin })
+
+      await chai.expect(controller.skim(strategy, { from: admin })).to.be.rejected
     })
   })
 })

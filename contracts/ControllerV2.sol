@@ -53,12 +53,12 @@ contract ControllerV2 is IControllerV2, AccessControl {
     }
 
     modifier onlyApprovedVault(address _vault) {
-        require(vaults[_vault], "!approve vault");
+        require(vaults[_vault], "!approved vault");
         _;
     }
 
     modifier onlyApprovedStrategy(address _strategy) {
-        require(strategies[_strategy], "!approve strategy");
+        require(strategies[_strategy], "!approved strategy");
         _;
     }
 
@@ -130,15 +130,21 @@ contract ControllerV2 is IControllerV2, AccessControl {
         IVault(_vault).setStrategy(_strategy, _min);
     }
 
-    function invest(address _vault) external override onlyAuthorized(HARVESTER_ROLE) {
+    function invest(address _vault)
+        external
+        override
+        onlyAuthorized(HARVESTER_ROLE)
+        onlyApprovedVault(_vault)
+    {
         IVault(_vault).invest();
     }
 
     function harvest(address _strategy)
         external
         override
-        isCurrentStrategy(_strategy)
         onlyAuthorized(HARVESTER_ROLE)
+        onlyApprovedStrategy(_strategy)
+        isCurrentStrategy(_strategy)
     {
         IStrategyV2(_strategy).harvest();
     }
@@ -146,8 +152,9 @@ contract ControllerV2 is IControllerV2, AccessControl {
     function skim(address _strategy)
         external
         override
-        isCurrentStrategy(_strategy)
         onlyAuthorized(HARVESTER_ROLE)
+        onlyApprovedStrategy(_strategy)
+        isCurrentStrategy(_strategy)
     {
         IStrategyV2(_strategy).skim();
     }
@@ -170,8 +177,9 @@ contract ControllerV2 is IControllerV2, AccessControl {
     )
         external
         override
-        isCurrentStrategy(_strategy)
         onlyAuthorized(HARVESTER_ROLE)
+        onlyApprovedStrategy(_strategy)
+        isCurrentStrategy(_strategy)
         checkWithdraw(_strategy, _min)
     {
         IStrategyV2(_strategy).withdraw(_amount);
@@ -180,8 +188,9 @@ contract ControllerV2 is IControllerV2, AccessControl {
     function withdrawAll(address _strategy, uint _min)
         external
         override
-        isCurrentStrategy(_strategy)
         onlyAuthorized(HARVESTER_ROLE)
+        onlyApprovedStrategy(_strategy)
+        isCurrentStrategy(_strategy)
         checkWithdraw(_strategy, _min)
     {
         IStrategyV2(_strategy).withdrawAll();
@@ -190,8 +199,9 @@ contract ControllerV2 is IControllerV2, AccessControl {
     function exit(address _strategy, uint _min)
         external
         override
-        isCurrentStrategy(_strategy)
         onlyAuthorized(ADMIN_ROLE)
+        onlyApprovedStrategy(_strategy)
+        isCurrentStrategy(_strategy)
         checkWithdraw(_strategy, _min)
     {
         IStrategyV2(_strategy).exit();
