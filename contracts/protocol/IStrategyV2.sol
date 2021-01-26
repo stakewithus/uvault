@@ -62,7 +62,7 @@ interface IStrategyV2 {
     function withdrawAll() external;
 
     /*
-    @notice Sell any staking rewards for underlying, deposit undelying
+    @notice Sell any staking rewards for underlying and then deposit undelying
     */
     function harvest() external;
 
@@ -81,12 +81,10 @@ interface IStrategyV2 {
     function exit() external;
 
     /*
-    @notice Transfer token in strategy to admin
+    @notice Transfer token accidentally sent here to admin
     @param _token Address of token to transfer
     @dev Must transfer token to admin
     @dev _token must not be equal to underlying token
-    @dev Used to transfer token that was accidentally sent or
-         claim dust created from this strategy
     */
     function sweep(address _token) external;
 }
