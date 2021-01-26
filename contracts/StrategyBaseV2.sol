@@ -42,7 +42,7 @@ abstract contract StrategyBaseV2 is IStrategyV2 {
     uint internal constant SLIPPAGE_MAX = 10000;
 
     /* 
-    Multiplier used to check total underlying is <= total debt * delta / DELTA_MIN
+    Multiplier used to check totalAssets() is <= total debt * delta / DELTA_MIN
     */
     uint public override delta = 10050;
     uint private constant DELTA_MIN = 10000;
@@ -117,7 +117,7 @@ abstract contract StrategyBaseV2 is IStrategyV2 {
         if (diff > totalDebt) {
             totalDebt = 0;
         } else {
-            totalDebt = totalDebt - diff;
+            totalDebt -= diff;
         }
     }
 
@@ -137,7 +137,7 @@ abstract contract StrategyBaseV2 is IStrategyV2 {
     @param _underlyingAmount Amount of underlying token to deposit
     */
     function deposit(uint _underlyingAmount) external override onlyAuthorized {
-        require(_underlyingAmount > 0, "underlying = 0");
+        require(_underlyingAmount > 0, "deposit = 0");
 
         _increaseDebt(_underlyingAmount);
         _depositUnderlying();
@@ -177,12 +177,12 @@ abstract contract StrategyBaseV2 is IStrategyV2 {
     /*
     @notice Withdraw undelying token to vault
     @param _underlyingAmount Amount of underlying token to withdraw
-    @dev Caller should implement guard agains slippage
+    @dev Caller should implement guard against slippage
     */
     function withdraw(uint _underlyingAmount) external override onlyAuthorized {
-        require(_underlyingAmount > 0, "underlying = 0");
+        require(_underlyingAmount > 0, "withdraw = 0");
         uint totalUnderlying = _totalAssets();
-        require(_underlyingAmount <= totalUnderlying, "underlying > total");
+        require(_underlyingAmount <= totalUnderlying, "withdraw > total");
 
         uint shares = _getShares(_underlyingAmount, totalUnderlying);
         if (shares > 0) {
@@ -218,7 +218,7 @@ abstract contract StrategyBaseV2 is IStrategyV2 {
     }
 
     /*
-    @notice Sell any staking rewards for underlying, deposit undelying
+    @notice Sell any staking rewards for underlying and then deposit undelying
     */
     function harvest() external virtual override;
 
