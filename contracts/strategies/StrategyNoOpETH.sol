@@ -3,37 +3,33 @@ pragma solidity 0.6.11;
 
 import "@openzeppelin/contracts/token/ERC20/IERC20.sol";
 import "@openzeppelin/contracts/token/ERC20/SafeERC20.sol";
-import "../protocol/IStrategyV2.sol";
+import "../protocol/IStrategyETH.sol";
 
 /*
 This is a "placeholder" strategy used during emergency shutdown
 */
-contract StrategyNoOpV2 is IStrategyV2 {
+contract StrategyNoOpETH is IStrategyETH {
     using SafeERC20 for IERC20;
 
     address public override admin;
     address public override controller;
     address public override vault;
-    address public override underlying;
+    // Placeholder address of ETH, indicating this is strategy for ETH
+    address public immutable override underlying =
+        0xEeeeeEeeeEeEeeEeEeEeeEEEeeeeEeeeeeeeEEeE;
 
     uint public override totalDebt;
     uint public override performanceFee;
     uint public override slippage;
     uint public override delta;
 
-    constructor(
-        address _controller,
-        address _vault,
-        address _underlying
-    ) public {
+    constructor(address _controller, address _vault) public {
         require(_controller != address(0), "controller = zero address");
         require(_vault != address(0), "vault = zero address");
-        require(_underlying != address(0), "underlying = zero address");
 
         admin = msg.sender;
         controller = _controller;
         vault = _vault;
-        underlying = _underlying;
     }
 
     modifier onlyAdmin() {
@@ -78,8 +74,7 @@ contract StrategyNoOpV2 is IStrategyV2 {
         return 0;
     }
 
-    // @dev variable name is removed to silence compiler warning
-    function deposit(uint) external override {
+    function deposit() external payable override {
         revert("no-op");
     }
 
@@ -88,8 +83,13 @@ contract StrategyNoOpV2 is IStrategyV2 {
         revert("no-op");
     }
 
-    function withdrawAll() external override {
-        revert("no-op");
+    // @dev tranfser accidentally sent ETH back to vault
+    function withdrawAll() external override onlyAuthorized {
+        uint bal = address(this).balance;
+        if (bal > 0) {
+            (bool sent, ) = vault.call{value: bal}("");
+            require(sent, "Send ETH failed");
+        }
     }
 
     function harvest() external override {
@@ -100,12 +100,8 @@ contract StrategyNoOpV2 is IStrategyV2 {
         revert("no-op");
     }
 
-    // @dev tranfser accidentally sent underlying tokens back to vault
-    function exit() external override onlyAuthorized {
-        uint bal = IERC20(underlying).balanceOf(address(this));
-        if (bal > 0) {
-            IERC20(underlying).safeTransfer(vault, bal);
-        }
+    function exit() external override {
+        // this function must not fail for vault to exit this strategy
     }
 
     function sweep(address _token) external override onlyAdmin {

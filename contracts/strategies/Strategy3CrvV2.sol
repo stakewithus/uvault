@@ -1,13 +1,13 @@
 // SPDX-License-Identifier: AGPL-3.0-or-later
 pragma solidity 0.6.11;
 
-import "../StrategyBaseV2.sol";
+import "../StrategyERC20.sol";
 import "../UseUniswap.sol";
 import "../interfaces/curve/LiquidityGauge.sol";
 import "../interfaces/curve/Minter.sol";
 import "../interfaces/curve/StableSwap3Pool.sol";
 
-contract Strategy3CrvV2 is StrategyBaseV2, UseUniswap {
+contract Strategy3CrvV2 is StrategyERC20, UseUniswap {
     address internal constant DAI = 0x6B175474E89094C44Da98b954EedeAC495271d0F;
     address internal constant USDC = 0xA0b86991c6218b36c1d19D4a2e9Eb0cE3606eB48;
     address internal constant USDT = 0xdAC17F958D2ee523a2206206994597C13D831ec7;
@@ -33,7 +33,7 @@ contract Strategy3CrvV2 is StrategyBaseV2, UseUniswap {
         address _controller,
         address _vault,
         address _underlying
-    ) public StrategyBaseV2(_controller, _vault, _underlying) {}
+    ) public StrategyERC20(_controller, _vault, _underlying) {}
 
     function _totalAssets() internal view override returns (uint) {
         uint lpBal = LiquidityGauge(GAUGE).balanceOf(address(this));

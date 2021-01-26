@@ -1,15 +1,15 @@
 // SPDX-License-Identifier: AGPL-3.0-or-later
 pragma solidity 0.6.11;
 
-import "../StrategyBaseEth.sol";
+import "../StrategyETH.sol";
 // import "../UseUniswap.sol";
 import "../interfaces/curve/LiquidityGaugeV2.sol";
 import "../interfaces/curve/Minter.sol";
-import "../interfaces/curve/StableSwapStEth.sol";
-import "../interfaces/lido/StEth.sol";
+import "../interfaces/curve/StableSwapSTETH.sol";
+import "../interfaces/lido/StETH.sol";
 import "../interfaces/uniswap/Uniswap.sol";
 
-contract StrategyStEth is StrategyBaseEth {
+contract StrategyStEth is StrategyETH {
     // Curve //
     // liquidity provider token (Curve ETH/STETH)
     address private constant LP = 0x06325440D014e39736583c165C2963BA99fAf14E;
@@ -32,7 +32,7 @@ contract StrategyStEth is StrategyBaseEth {
 
     constructor(address _controller, address _vault)
         public
-        StrategyBaseEth(_controller, _vault)
+        StrategyETH(_controller, _vault)
     {
         // TODO inifinity approval?
 
@@ -51,7 +51,7 @@ contract StrategyStEth is StrategyBaseEth {
     function _totalAssets() internal view override returns (uint) {
         uint bal = address(this).balance;
         uint shares = LiquidityGaugeV2(GAUGE).balanceOf(address(this));
-        uint pricePerShare = StableSwapStEth(POOL).get_virtual_price();
+        uint pricePerShare = StableSwapSTETH(POOL).get_virtual_price();
 
         return bal.add(shares.mul(pricePerShare) / 1e18);
     }
@@ -64,12 +64,12 @@ contract StrategyStEth is StrategyBaseEth {
         if (bal > 0) {
             uint half = bal / 2;
             if (half > 0) {
-                uint dy = StableSwapStEth(POOL).get_dy(0, 1, half);
+                uint dy = StableSwapSTETH(POOL).get_dy(0, 1, half);
                 /*
-                if stEth more valuable than ETH, buy StEth
+                if stETH more valuable than ETH, buy stETH
                 */
                 if (dy < half) {
-                    StEth(ST_ETH).submit{value: half}(address(this));
+                    StETH(ST_ETH).submit{value: half}(address(this));
                 }
             }
 
@@ -79,11 +79,11 @@ contract StrategyStEth is StrategyBaseEth {
             /*
             shares = eth amount * 1e18 / price per share
             */
-            uint pricePerShare = StableSwapStEth(POOL).get_virtual_price();
+            uint pricePerShare = StableSwapSTETH(POOL).get_virtual_price();
             uint shares = bal.mul(1e18).div(pricePerShare);
             uint min = shares.mul(SLIPPAGE_MAX - slippage) / SLIPPAGE_MAX;
 
-            StableSwapStEth(POOL).add_liquidity{value: ethBal}([ethBal, stEthBal], min);
+            StableSwapSTETH(POOL).add_liquidity{value: ethBal}([ethBal, stEthBal], min);
         }
 
         // stake into LiquidityGaugeV2
@@ -106,11 +106,11 @@ contract StrategyStEth is StrategyBaseEth {
         /*
         eth amount = (shares * price per shares) / 1e18
         */
-        uint pricePerShare = StableSwapStEth(POOL).get_virtual_price();
+        uint pricePerShare = StableSwapSTETH(POOL).get_virtual_price();
         uint ethAmount = lpBal.mul(pricePerShare) / 1e18;
         uint min = ethAmount.mul(SLIPPAGE_MAX - slippage) / SLIPPAGE_MAX;
 
-        StableSwapStEth(POOL).remove_liquidity_one_coin(lpBal, 0, min);
+        StableSwapSTETH(POOL).remove_liquidity_one_coin(lpBal, 0, min);
         // Now we have ETH
     }
 

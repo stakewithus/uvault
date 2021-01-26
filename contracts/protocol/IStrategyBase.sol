@@ -1,7 +1,7 @@
 // SPDX-License-Identifier: AGPL-3.0-or-later
 pragma solidity 0.6.11;
 
-interface IStrategyEth {
+interface IStrategyBase {
     function admin() external view returns (address);
 
     function controller() external view returns (address);
@@ -9,13 +9,13 @@ interface IStrategyEth {
     function vault() external view returns (address);
 
     /*
-    @notice Must return 0xEeeeeEeeeEeEeeEeEeEeeEEEeeeeEeeeeeeeEEeE indicating
-            that this is a strategy for ETH
+    @notice Returns address of underlying asset (ETH or ERC20)
+    @dev Must return 0xEeeeeEeeeEeEeeEeEeEeeEEEeeeeEeeeeeeeEEeE for ETH strategy
     */
     function underlying() external view returns (address);
 
     /*
-    @notice Returns total amount of ETH transferred from vault
+    @notice Returns total amount of underlying transferred from vault
     */
     function totalDebt() external view returns (uint);
 
@@ -24,7 +24,7 @@ interface IStrategyEth {
     function slippage() external view returns (uint);
 
     /* 
-    @notice Multiplier used to check total ETH <= total debt * delta / DELTA_MIN
+    @notice Multiplier used to check total underlying <= total debt * delta / DELTA_MIN
     */
     function delta() external view returns (uint);
 
@@ -39,33 +39,25 @@ interface IStrategyEth {
     function setDelta(uint _delta) external;
 
     /*
-    @notice Returns amount of ETH locked in this contract
+    @notice Returns amount of underlying asset locked in this contract
     @dev Output may vary depending on price of liquidity provider token
-         where ETH is invested
+         where the underlying asset is invested
     */
     function totalAssets() external view returns (uint);
 
     /*
-    @notice Deposit ETH
-    @param _amount Amount must be 0
-    @dev `_amount` is present so that this function can be called by
-         ControllerV2
-    */
-    function deposit(uint _amount) external payable;
-
-    /*
-    @notice Withdraw `_amount` ETH
-    @param amount Amount of ETH to withdraw
+    @notice Withdraw `_amount` underlying asset
+    @param amount Amount of underlying asset to withdraw
     */
     function withdraw(uint _amount) external;
 
     /*
-    @notice Withdraw all ETH from strategy
+    @notice Withdraw all underlying asset from strategy
     */
     function withdrawAll() external;
 
     /*
-    @notice Sell any staking rewards for ETH and then deposit ETH
+    @notice Sell any staking rewards for underlying and then deposit undelying
     */
     function harvest() external;
 
@@ -79,13 +71,14 @@ interface IStrategyEth {
 
     /*
     @notice Exit from strategy
-    @dev Must transfer all ETH back to vault
+    @dev Must transfer all underlying tokens back to vault
     */
     function exit() external;
 
     /*
     @notice Transfer token accidentally sent here to admin
     @param _token Address of token to transfer
+    @dev _token must not be equal to underlying token
     */
     function sweep(address _token) external;
 }

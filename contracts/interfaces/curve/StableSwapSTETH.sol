@@ -1,7 +1,7 @@
 // SPDX-License-Identifier: AGPL-3.0-or-later
 pragma solidity 0.6.11;
 
-interface StableSwapStEth {
+interface StableSwapSTETH {
     function get_virtual_price() external view returns (uint);
 
     /*

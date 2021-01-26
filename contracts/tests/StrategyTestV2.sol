@@ -1,11 +1,11 @@
 // SPDX-License-Identifier: AGPL-3.0-or-later
 pragma solidity 0.6.11;
 
-import "../StrategyBaseV2.sol";
+import "../StrategyERC20.sol";
 import "./TestToken.sol";
 
 /* solium-disable */
-contract StrategyTestV2 is StrategyBaseV2 {
+contract StrategyTestV2 is StrategyERC20 {
     // test helper
     uint public _depositAmount_;
     uint public _withdrawAmount_;
@@ -20,7 +20,7 @@ contract StrategyTestV2 is StrategyBaseV2 {
         address _controller,
         address _vault,
         address _underlying
-    ) public StrategyBaseV2(_controller, _vault, _underlying) {
+    ) public StrategyERC20(_controller, _vault, _underlying) {
         // allow this contract to freely withdraw from POOL
         TestToken(underlying)._approve_(_POOL_, address(this), uint(-1));
     }
