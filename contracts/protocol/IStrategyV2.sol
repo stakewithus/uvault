@@ -83,7 +83,6 @@ interface IStrategyV2 {
     /*
     @notice Transfer token accidentally sent here to admin
     @param _token Address of token to transfer
-    @dev Must transfer token to admin
     @dev _token must not be equal to underlying token
     */
     function sweep(address _token) external;
