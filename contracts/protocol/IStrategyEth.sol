@@ -47,8 +47,8 @@ interface IStrategyEth {
 
     /*
     @notice Deposit ETH
-    @param amount Amount must be 0
-    @dev Input `_amount` is present so that this function can be called by
+    @param _amount Amount must be 0
+    @dev `_amount` is present so that this function can be called by
          ControllerV2
     */
     function deposit(uint _amount) external payable;
