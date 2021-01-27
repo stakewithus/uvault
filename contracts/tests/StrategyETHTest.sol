@@ -17,13 +17,13 @@ contract StrategyETHTest is StrategyETH {
         return address(this).balance;
     }
 
-    function _depositEth() internal override {}
+    function _deposit() internal override {}
 
     function _getTotalShares() internal view override returns (uint) {
         return address(this).balance;
     }
 
-    function _withdrawEth(uint _shares) internal override {}
+    function _withdraw(uint _shares) internal override {}
 
     function harvest() external override onlyAuthorized {}
 

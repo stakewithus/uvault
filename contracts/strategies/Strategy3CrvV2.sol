@@ -53,7 +53,7 @@ contract Strategy3CrvV2 is StrategyERC20 {
     /*
     @notice deposit token into curve
     */
-    function _deposit(address _token, uint _index) private {
+    function _depositIntoCurve(address _token, uint _index) private {
         // token to LP
         uint bal = IERC20(_token).balanceOf(address(this));
         if (bal > 0) {
@@ -86,15 +86,15 @@ contract Strategy3CrvV2 is StrategyERC20 {
     /*
     @notice Deposits underlying to LiquidityGauge
     */
-    function _depositUnderlying() internal override {
-        _deposit(underlying, underlyingIndex);
+    function _deposit() internal override {
+        _depositIntoCurve(underlying, underlyingIndex);
     }
 
     function _getTotalShares() internal view override returns (uint) {
         return LiquidityGauge(GAUGE).balanceOf(address(this));
     }
 
-    function _withdrawUnderlying(uint _lpAmount) internal override {
+    function _withdraw(uint _lpAmount) internal override {
         // withdraw LP from  LiquidityGauge
         LiquidityGauge(GAUGE).withdraw(_lpAmount);
 
@@ -195,7 +195,7 @@ contract Strategy3CrvV2 is StrategyERC20 {
                 IERC20(token).safeTransfer(treasury, fee);
             }
 
-            _deposit(token, index);
+            _depositIntoCurve(token, index);
         }
     }
 

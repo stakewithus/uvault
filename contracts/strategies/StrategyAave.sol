@@ -53,7 +53,7 @@ contract StrategyAave is StrategyERC20 {
     /*
     @notice deposit token into curve
     */
-    function _deposit(address _token, uint _index) private {
+    function _depositIntoCurve(address _token, uint _index) private {
         // token to LP
         uint bal = IERC20(_token).balanceOf(address(this));
         if (bal > 0) {
@@ -86,15 +86,15 @@ contract StrategyAave is StrategyERC20 {
     /*
     @notice Deposits underlying to LiquidityGaugeV2
     */
-    function _depositUnderlying() internal override {
-        _deposit(underlying, underlyingIndex);
+    function _deposit() internal override {
+        _depositIntoCurve(underlying, underlyingIndex);
     }
 
     function _getTotalShares() internal view override returns (uint) {
         return LiquidityGaugeV2(GAUGE).balanceOf(address(this));
     }
 
-    function _withdrawUnderlying(uint _lpAmount) internal override {
+    function _withdraw(uint _lpAmount) internal override {
         // withdraw LP from  LiquidityGaugeV2
         LiquidityGaugeV2(GAUGE).withdraw(_lpAmount);
 
@@ -200,7 +200,7 @@ contract StrategyAave is StrategyERC20 {
                 IERC20(token).safeTransfer(treasury, fee);
             }
 
-            _deposit(token, index);
+            _depositIntoCurve(token, index);
         }
     }
 

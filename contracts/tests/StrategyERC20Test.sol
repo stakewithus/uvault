@@ -5,7 +5,7 @@ import "../StrategyERC20.sol";
 import "./TestToken.sol";
 
 /* solium-disable */
-contract StrategyTestV2 is StrategyERC20 {
+contract StrategyERC20Test is StrategyERC20 {
     // test helper
     uint public _depositAmount_;
     uint public _withdrawAmount_;
@@ -32,7 +32,7 @@ contract StrategyTestV2 is StrategyERC20 {
             );
     }
 
-    function _depositUnderlying() internal override {
+    function _deposit() internal override {
         uint bal = IERC20(underlying).balanceOf(address(this));
         _depositAmount_ = bal;
         IERC20(underlying).transfer(_POOL_, bal);
@@ -42,7 +42,7 @@ contract StrategyTestV2 is StrategyERC20 {
         return IERC20(underlying).balanceOf(_POOL_);
     }
 
-    function _withdrawUnderlying(uint _shares) internal override {
+    function _withdraw(uint _shares) internal override {
         _withdrawAmount_ = _shares;
 
         if (_shares > _maxWithdrawAmount_) {

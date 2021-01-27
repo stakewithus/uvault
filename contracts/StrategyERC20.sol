@@ -132,7 +132,7 @@ abstract contract StrategyERC20 is IStrategyERC20 {
         return _totalAssets();
     }
 
-    function _depositUnderlying() internal virtual;
+    function _deposit() internal virtual;
 
     /*
     @notice Deposit underlying token into this strategy
@@ -142,7 +142,7 @@ abstract contract StrategyERC20 is IStrategyERC20 {
         require(_underlyingAmount > 0, "deposit = 0");
 
         _increaseDebt(_underlyingAmount);
-        _depositUnderlying();
+        _deposit();
     }
 
     /*
@@ -174,7 +174,7 @@ abstract contract StrategyERC20 is IStrategyERC20 {
         return 0;
     }
 
-    function _withdrawUnderlying(uint _shares) internal virtual;
+    function _withdraw(uint _shares) internal virtual;
 
     /*
     @notice Withdraw undelying token to vault
@@ -188,7 +188,7 @@ abstract contract StrategyERC20 is IStrategyERC20 {
 
         uint shares = _getShares(_underlyingAmount, totalUnderlying);
         if (shares > 0) {
-            _withdrawUnderlying(shares);
+            _withdraw(shares);
         }
 
         // transfer underlying token to vault
@@ -201,7 +201,7 @@ abstract contract StrategyERC20 is IStrategyERC20 {
     function _withdrawAll() internal {
         uint totalShares = _getTotalShares();
         if (totalShares > 0) {
-            _withdrawUnderlying(totalShares);
+            _withdraw(totalShares);
         }
 
         uint underlyingBal = IERC20(underlying).balanceOf(address(this));
@@ -262,7 +262,7 @@ abstract contract StrategyERC20 is IStrategyERC20 {
             uint shares = _getShares(profit, totalUnderlying);
             if (shares > 0) {
                 uint balBefore = IERC20(underlying).balanceOf(address(this));
-                _withdrawUnderlying(shares);
+                _withdraw(shares);
                 uint balAfter = IERC20(underlying).balanceOf(address(this));
 
                 uint diff = balAfter.sub(balBefore);

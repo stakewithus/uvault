@@ -56,9 +56,9 @@ contract StrategyStEth is StrategyETH {
     }
 
     /*
-    @notice Deposits underlying to LiquidityGaugeV2
+    @notice Deposits ETH to LiquidityGaugeV2
     */
-    function _depositEth() internal override {
+    function _deposit() internal override {
         uint bal = address(this).balance;
         if (bal > 0) {
             uint half = bal / 2;
@@ -97,7 +97,7 @@ contract StrategyStEth is StrategyETH {
         return LiquidityGaugeV2(GAUGE).balanceOf(address(this));
     }
 
-    function _withdrawEth(uint _lpAmount) internal override {
+    function _withdraw(uint _lpAmount) internal override {
         // withdraw LP from  LiquidityGaugeV2
         LiquidityGaugeV2(GAUGE).withdraw(_lpAmount);
 
@@ -165,7 +165,7 @@ contract StrategyStEth is StrategyETH {
                 (bool sent, ) = treasury.call{value: fee}("");
                 require(sent, "Send ETH failed");
             }
-            _depositEth();
+            _deposit();
         }
     }
 

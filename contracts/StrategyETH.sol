@@ -125,7 +125,7 @@ abstract contract StrategyETH is IStrategyETH {
         return _totalAssets();
     }
 
-    function _depositEth() internal virtual;
+    function _deposit() internal virtual;
 
     /*
     @notice Deposit ETH into this strategy
@@ -134,7 +134,7 @@ abstract contract StrategyETH is IStrategyETH {
         require(msg.value > 0, "msg.value = 0");
 
         _increaseDebt();
-        _depositEth();
+        _deposit();
     }
 
     /*
@@ -162,7 +162,7 @@ abstract contract StrategyETH is IStrategyETH {
         return 0;
     }
 
-    function _withdrawEth(uint _shares) internal virtual;
+    function _withdraw(uint _shares) internal virtual;
 
     /*
     @notice Withdraw ETH to vault
@@ -176,7 +176,7 @@ abstract contract StrategyETH is IStrategyETH {
 
         uint shares = _getShares(_ethAmount, totalEth);
         if (shares > 0) {
-            _withdrawEth(shares);
+            _withdraw(shares);
         }
 
         // transfer ETH to vault
@@ -189,7 +189,7 @@ abstract contract StrategyETH is IStrategyETH {
     function _withdrawAll() internal {
         uint totalShares = _getTotalShares();
         if (totalShares > 0) {
-            _withdrawEth(totalShares);
+            _withdraw(totalShares);
         }
 
         // transfer ETH to vault
@@ -251,7 +251,7 @@ abstract contract StrategyETH is IStrategyETH {
             uint shares = _getShares(profit, totalEth);
             if (shares > 0) {
                 uint balBefore = address(this).balance;
-                _withdrawEth(shares);
+                _withdraw(shares);
                 uint balAfter = address(this).balance;
 
                 uint diff = balAfter.sub(balBefore);
