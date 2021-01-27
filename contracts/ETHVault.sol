@@ -12,6 +12,10 @@ import "./protocol/IStrategyETH.sol";
 import "./protocol/IETHVault.sol";
 import "./protocol/IController.sol";
 
+/*
+version 1.0.0
+*/
+
 contract ETHVault is IETHVault, ERC20, ReentrancyGuard {
     using SafeERC20 for IERC20;
     using SafeMath for uint;

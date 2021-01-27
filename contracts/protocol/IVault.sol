@@ -8,6 +8,9 @@ interface IVault {
 
     function timeLock() external view returns (address);
 
+    /*
+    @notice For EthVault, must return 0xEeeeeEeeeEeEeeEeEeEeeEEEeeeeEeeeeeeeEEeE
+    */
     function token() external view returns (address);
 
     function strategy() external view returns (address);
@@ -37,14 +40,14 @@ interface IVault {
     function setWithdrawFee(uint _fee) external;
 
     /*
-    @notice Returns the amount of token in the vault
+    @notice Returns the amount of asset (ETH or ERC20) in the vault
     */
     function balanceInVault() external view returns (uint);
 
     /*
-    @notice Returns the estimate amount of token in strategy
+    @notice Returns the estimate amount of asset in strategy
     @dev Output may vary depending on price of liquidity provider token
-         where the underlying token is invested
+         where the underlying asset is invested
     */
     function balanceInStrategy() external view returns (uint);
 
@@ -54,7 +57,7 @@ interface IVault {
     function totalDebtInStrategy() external view returns (uint);
 
     /*
-    @notice Returns the total amount of token in vault + total debt
+    @notice Returns the total amount of asset in vault + total debt
     */
     function totalAssets() external view returns (uint);
 
@@ -84,39 +87,33 @@ interface IVault {
 
     /*
     @notice Set strategy
-    @param _min Minimum undelying token current strategy must return. Prevents slippage
+    @param _min Minimum undelying asset current strategy must return. Prevents slippage
     */
     function setStrategy(address _strategy, uint _min) external;
 
     /*
-    @notice Transfers token in vault to strategy
+    @notice Transfers asset in vault to strategy
     */
     function invest() external;
 
     /*
-    @notice Deposit undelying token into this vault
-    @param _amount Amount of token to deposit
-    */
-    function deposit(uint _amount) external;
-
-    /*
-    @notice Calculate amount of token that can be withdrawn
+    @notice Calculate amount of asset that can be withdrawn
     @param _shares Amount of shares
-    @return Amount of token that can be withdrawn
+    @return Amount of asset that can be withdrawn
     */
     function getExpectedReturn(uint _shares) external view returns (uint);
 
     /*
-    @notice Withdraw token
+    @notice Withdraw asset
     @param _shares Amount of shares to burn
-    @param _min Minimum amount of token expected to return
+    @param _min Minimum amount of asset expected to return
     */
     function withdraw(uint _shares, uint _min) external;
 
     /*
-    @notice Transfer token in vault to admin
-    @param _token Address of token to transfer
-    @dev _token must not be equal to vault token
+    @notice Transfer asset in vault to admin
+    @param _token Address of asset to transfer
+    @dev _token must not be equal to vault asset
     */
     function sweep(address _token) external;
 }

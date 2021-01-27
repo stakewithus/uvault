@@ -1,10 +1,10 @@
 // SPDX-License-Identifier: AGPL-3.0-or-later
 pragma solidity 0.6.11;
 
-import "../protocol/IVault.sol";
+import "../protocol/IERC20Vault.sol";
 
 /* solium-disable */
-contract MockVault is IVault {
+contract MockVault is IERC20Vault {
     address public override admin;
     address public override controller;
     address public override token;

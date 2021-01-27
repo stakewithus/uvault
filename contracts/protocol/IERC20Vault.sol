@@ -1,9 +1,9 @@
 // SPDX-License-Identifier: AGPL-3.0-or-later
 pragma solidity 0.6.11;
 
-import "./IVaultBase.sol";
+import "./IVault.sol";
 
-interface IERC20Vault is IVaultBase {
+interface IERC20Vault is IVault {
     /*
     @notice Deposit undelying token into this vault
     @param _amount Amount of token to deposit

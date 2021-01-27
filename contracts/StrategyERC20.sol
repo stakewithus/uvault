@@ -10,6 +10,8 @@ import "./protocol/IStrategyERC20.sol";
 import "./protocol/IController.sol";
 
 /*
+version 1.1.0
+
 Changes from StrategyBase V1
 - performance fee capped at 20%
 - add slippage gaurd

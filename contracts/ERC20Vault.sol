@@ -7,11 +7,20 @@ import "@openzeppelin/contracts/token/ERC20/SafeERC20.sol";
 import "@openzeppelin/contracts/token/ERC20/IERC20.sol";
 import "@openzeppelin/contracts/token/ERC20/ERC20.sol";
 
-import "./protocol/IStrategy.sol";
-import "./protocol/IVault.sol";
+import "./protocol/IStrategyERC20.sol";
+import "./protocol/IERC20Vault.sol";
 import "./protocol/IController.sol";
 
-contract Vault is IVault, ERC20, ReentrancyGuard {
+/*
+version 1.1.0
+- renamed from Vault to ERC20Vault
+- switch interface IVault to IERC20Vault
+- switch interface IStrategy to IStrategyERC20
+
+@dev Code logic has not changed since version 1.0.0
+*/
+
+contract ERC20Vault is IERC20Vault, ERC20, ReentrancyGuard {
     using SafeERC20 for IERC20;
     using SafeMath for uint;
 
@@ -156,7 +165,7 @@ contract Vault is IVault, ERC20, ReentrancyGuard {
             return 0;
         }
 
-        return IStrategy(strategy).totalAssets();
+        return IStrategyERC20(strategy).totalAssets();
     }
 
     /*
@@ -172,7 +181,7 @@ contract Vault is IVault, ERC20, ReentrancyGuard {
         if (strategy == address(0)) {
             return 0;
         }
-        return IStrategy(strategy).totalDebt();
+        return IStrategyERC20(strategy).totalDebt();
     }
 
     /*
@@ -265,11 +274,11 @@ contract Vault is IVault, ERC20, ReentrancyGuard {
         require(strategies[_strategy], "!approved");
         require(_strategy != strategy, "new strategy = current strategy");
         require(
-            IStrategy(_strategy).underlying() == token,
+            IStrategyERC20(_strategy).underlying() == token,
             "strategy.token != vault.token"
         );
         require(
-            IStrategy(_strategy).vault() == address(this),
+            IStrategyERC20(_strategy).vault() == address(this),
             "strategy.vault != vault"
         );
 
@@ -278,7 +287,7 @@ contract Vault is IVault, ERC20, ReentrancyGuard {
             IERC20(token).safeApprove(strategy, 0);
 
             uint balBefore = _balanceInVault();
-            IStrategy(strategy).exit();
+            IStrategyERC20(strategy).exit();
             uint balAfter = _balanceInVault();
 
             require(balAfter.sub(balBefore) >= _min, "withdraw < min");
@@ -306,7 +315,7 @@ contract Vault is IVault, ERC20, ReentrancyGuard {
         IERC20(token).safeApprove(strategy, 0);
         IERC20(token).safeApprove(strategy, amount);
 
-        IStrategy(strategy).deposit(amount);
+        IStrategyERC20(strategy).deposit(amount);
 
         IERC20(token).safeApprove(strategy, 0);
     }
@@ -412,7 +421,7 @@ contract Vault is IVault, ERC20, ReentrancyGuard {
                 amountFromStrat = balInStrat;
             }
 
-            IStrategy(strategy).withdraw(amountFromStrat);
+            IStrategyERC20(strategy).withdraw(amountFromStrat);
 
             uint balAfter = _balanceInVault();
             uint diff = balAfter.sub(balInVault);
