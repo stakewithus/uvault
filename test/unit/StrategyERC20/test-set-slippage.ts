@@ -1,14 +1,14 @@
 import chai from "chai"
 import BN from "bn.js"
-import { StrategyTestV2Instance } from "../../../types"
+import { StrategyERC20TestInstance } from "../../../types"
 import { eq } from "../../util"
 import _setup from "./setup"
 
-contract("StrategyBaseV2", (accounts) => {
+contract("StrategyERC20", (accounts) => {
   const refs = _setup(accounts)
   const { admin } = refs
 
-  let strategy: StrategyTestV2Instance
+  let strategy: StrategyERC20TestInstance
   beforeEach(() => {
     strategy = refs.strategy
   })

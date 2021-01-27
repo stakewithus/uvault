@@ -1,16 +1,16 @@
 import chai from "chai"
-import { StrategyTestV2Instance, TestTokenInstance } from "../../../types"
+import { StrategyERC20TestInstance, TestTokenInstance } from "../../../types"
 import { eq, add } from "../../util"
 import _setup from "./setup"
 import BN from "bn.js"
 
 const TestToken = artifacts.require("TestToken")
 
-contract("StrategyBaseV2", (accounts) => {
+contract("StrategyERC20", (accounts) => {
   const refs = _setup(accounts)
   const { admin } = refs
 
-  let strategy: StrategyTestV2Instance
+  let strategy: StrategyERC20TestInstance
   let underlying: TestTokenInstance
   // not asset
   let token: TestTokenInstance
@@ -49,7 +49,7 @@ contract("StrategyBaseV2", (accounts) => {
         .to.be.rejectedWith("!admin")
     })
 
-    it("should reject if asset", async () => {
+    it("should reject if protected", async () => {
       await chai
         .expect(strategy.sweep(underlying.address, { from: admin }))
         .to.be.rejectedWith("protected token")

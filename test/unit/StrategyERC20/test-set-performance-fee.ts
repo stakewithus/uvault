@@ -1,14 +1,14 @@
 import chai from "chai"
 import BN from "bn.js"
-import {StrategyTestInstance} from "../../../types/StrategyTest"
-import {eq} from "../../util"
+import { StrategyERC20TestInstance } from "../../../types"
+import { eq } from "../../util"
 import _setup from "./setup"
 
-contract("StrategyBase", (accounts) => {
+contract("StrategyERC20", (accounts) => {
   const refs = _setup(accounts)
-  const {admin} = refs
+  const { admin } = refs
 
-  let strategy: StrategyTestInstance
+  let strategy: StrategyERC20TestInstance
   beforeEach(() => {
     strategy = refs.strategy
   })
@@ -17,21 +17,21 @@ contract("StrategyBase", (accounts) => {
     const fee = new BN(500)
 
     it("should set performance fee", async () => {
-      await strategy.setPerformanceFee(fee, {from: admin})
+      await strategy.setPerformanceFee(fee, { from: admin })
 
       assert(eq(await strategy.performanceFee(), fee), "fee")
     })
 
     it("should reject if caller not admin", async () => {
       await chai
-        .expect(strategy.setPerformanceFee(fee, {from: accounts[1]}))
+        .expect(strategy.setPerformanceFee(fee, { from: accounts[1] }))
         .to.be.rejectedWith("!admin")
     })
 
-    it("should reject fee > max", async () => {
+    it("should reject fee > cap", async () => {
       await chai
-        .expect(strategy.setPerformanceFee(10001, {from: admin}))
-        .to.be.rejectedWith("performance fee > max")
+        .expect(strategy.setPerformanceFee(2001, { from: admin }))
+        .to.be.rejectedWith("performance fee > cap")
     })
   })
 })

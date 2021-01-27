@@ -1,16 +1,15 @@
 import chai from "chai"
-import {TestTokenInstance, MockVaultInstance} from "../../../types"
-import {StrategyTestInstance} from "../../../types/StrategyTest"
-import {pow} from "../../util"
+import { TestTokenInstance, StrategyERC20TestInstance } from "../../../types"
+import { eq, pow } from "../../util"
 import _setup from "./setup"
 
-contract("StrategyBase", (accounts) => {
+contract("StrategyERC20", (accounts) => {
   const refs = _setup(accounts)
-  const {admin} = refs
+  const { admin } = refs
 
-  let strategy: StrategyTestInstance
+  let strategy: StrategyERC20TestInstance
   let underlying: TestTokenInstance
-  let vault: MockVaultInstance
+  let vault: string
   beforeEach(() => {
     strategy = refs.strategy
     underlying = refs.underlying
@@ -21,15 +20,15 @@ contract("StrategyBase", (accounts) => {
     const amount = pow(10, 18)
 
     beforeEach(async () => {
-      await underlying._mint_(vault.address, amount)
-      await underlying._approve_(vault.address, strategy.address, amount)
+      await underlying._mint_(vault, amount)
+      await underlying._approve_(vault, strategy.address, amount)
     })
 
     it("should deposit", async () => {
       const snapshot = async () => {
         return {
           underlying: {
-            vault: await underlying.balanceOf(vault.address),
+            vault: await underlying.balanceOf(vault),
             strategy: await underlying.balanceOf(strategy.address),
           },
           strategy: {
@@ -40,45 +39,41 @@ contract("StrategyBase", (accounts) => {
       }
 
       const before = await snapshot()
-      await strategy.deposit(amount, {from: admin})
+      await strategy.deposit(amount, { from: admin })
       const after = await snapshot()
 
       // check underlying balance
-      assert.equal(
-        after.underlying.strategy.eq(before.underlying.strategy),
-        true,
+      assert(
+        after.underlying.strategy.eq(before.underlying.strategy.add(amount)),
         "underlying strategy"
       )
-      assert.equal(
+      assert(
         after.underlying.vault.eq(before.underlying.vault.sub(amount)),
-        true,
         "underlying vault"
       )
 
       // check total assets
-      assert.equal(
+      assert(
         after.strategy.totalAssets.eq(before.strategy.totalAssets.add(amount)),
-        true,
         "total assets"
       )
       // check total debt
-      assert.equal(
+      assert(
         after.strategy.totalDebt.eq(before.strategy.totalDebt.add(amount)),
-        true,
         "total debt"
       )
     })
 
     it("should reject if caller not authorized", async () => {
       await chai
-        .expect(strategy.deposit(amount, {from: accounts[1]}))
+        .expect(strategy.deposit(amount, { from: accounts[1] }))
         .to.be.rejectedWith("!authorized")
     })
 
     it("should reject if amount = 0", async () => {
       await chai
-        .expect(strategy.deposit(0, {from: admin}))
-        .to.be.rejectedWith("underlying = 0")
+        .expect(strategy.deposit(0, { from: admin }))
+        .to.be.rejectedWith("deposit = 0")
     })
   })
 })

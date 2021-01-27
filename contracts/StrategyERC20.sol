@@ -4,7 +4,7 @@ pragma solidity 0.6.11;
 /*
 version 1.2.0
 
-Changes from StrategyBase V1
+Changes from StrategyBase
 - performance fee capped at 20%
 - add slippage gaurd
 - update skim(), increments total debt withoud withdrawing if total assets
