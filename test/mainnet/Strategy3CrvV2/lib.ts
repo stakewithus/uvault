@@ -21,6 +21,8 @@ export type StrategyInstance =
   | Strategy3CrvUsdcV2Instance
   | Strategy3CrvUsdtV2Instance
 
+export type StableSwapInstance = StableSwap3PoolInstance
+
 // references to return
 export interface Refs {
   admin: string
@@ -28,7 +30,7 @@ export interface Refs {
   treasury: string
   underlying: IERC20Instance
   lp: IERC20Instance
-  stableSwap: StableSwap3PoolInstance
+  stableSwap: StableSwapInstance
   gauge: LiquidityGaugeInstance
   crv: IERC20Instance
   controller: ControllerV2Instance
@@ -42,7 +44,7 @@ export function getSnapshot(params: {
   strategy: StrategyInstance
   underlying: IERC20Instance
   lp: IERC20Instance
-  stableSwap: StableSwap3PoolInstance
+  stableSwap: StableSwapInstance
   gauge: LiquidityGaugeInstance
   crv: IERC20Instance
   vault: string

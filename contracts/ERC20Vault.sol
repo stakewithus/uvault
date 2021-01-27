@@ -1,6 +1,15 @@
 // SPDX-License-Identifier: AGPL-3.0-or-later
 pragma solidity 0.6.11;
 
+/*
+version 1.2.0
+- renamed from Vault to ERC20Vault
+- switch interface IVault to IERC20Vault
+- switch interface IStrategy to IStrategyERC20
+
+@dev Code logic has not changed since version 1.1.0
+*/
+
 import "@openzeppelin/contracts/math/SafeMath.sol";
 import "@openzeppelin/contracts/utils/ReentrancyGuard.sol";
 import "@openzeppelin/contracts/token/ERC20/SafeERC20.sol";
@@ -10,15 +19,6 @@ import "@openzeppelin/contracts/token/ERC20/ERC20.sol";
 import "./protocol/IStrategyERC20.sol";
 import "./protocol/IERC20Vault.sol";
 import "./protocol/IController.sol";
-
-/*
-version 1.1.0
-- renamed from Vault to ERC20Vault
-- switch interface IVault to IERC20Vault
-- switch interface IStrategy to IStrategyERC20
-
-@dev Code logic has not changed since version 1.0.0
-*/
 
 contract ERC20Vault is IERC20Vault, ERC20, ReentrancyGuard {
     using SafeERC20 for IERC20;

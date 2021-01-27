@@ -1,6 +1,10 @@
 // SPDX-License-Identifier: AGPL-3.0-or-later
 pragma solidity 0.6.11;
 
+/*
+version 1.2.0
+*/
+
 import "@openzeppelin/contracts/token/ERC20/IERC20.sol";
 import "@openzeppelin/contracts/token/ERC20/SafeERC20.sol";
 import "@openzeppelin/contracts/math/SafeMath.sol";
@@ -8,10 +12,6 @@ import "@openzeppelin/contracts/math/SafeMath.sol";
 import "./protocol/IStrategyETH.sol";
 // used inside harvest
 import "./protocol/IController.sol";
-
-/*
-version 1.0.0
-*/
 
 //TODO reentrancy protection
 abstract contract StrategyETH is IStrategyETH {

@@ -1,16 +1,8 @@
 // SPDX-License-Identifier: AGPL-3.0-or-later
 pragma solidity 0.6.11;
 
-import "@openzeppelin/contracts/token/ERC20/IERC20.sol";
-import "@openzeppelin/contracts/token/ERC20/SafeERC20.sol";
-import "@openzeppelin/contracts/math/SafeMath.sol";
-
-import "./protocol/IStrategyERC20.sol";
-// used inside harvest
-import "./protocol/IController.sol";
-
 /*
-version 1.1.0
+version 1.2.0
 
 Changes from StrategyBase V1
 - performance fee capped at 20%
@@ -19,6 +11,14 @@ Changes from StrategyBase V1
   is near total debt
 - sweep - delete mapping "assets" and use require to explicitly check protected tokens
 */
+
+import "@openzeppelin/contracts/token/ERC20/IERC20.sol";
+import "@openzeppelin/contracts/token/ERC20/SafeERC20.sol";
+import "@openzeppelin/contracts/math/SafeMath.sol";
+
+import "./protocol/IStrategyERC20.sol";
+// used inside harvest
+import "./protocol/IController.sol";
 
 //TODO reentrancy protection
 

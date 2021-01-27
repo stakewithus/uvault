@@ -42,7 +42,7 @@ export function getSnapshot(params: {
   strategy: StrategyInstance
   underlying: IERC20Instance
   lp: IERC20Instance
-  stableSwap: StableSwapCompoundInstance
+  stableSwap: StableSwapGusdInstance
   gauge: LiquidityGaugeInstance
   crv: IERC20Instance
   vault: string

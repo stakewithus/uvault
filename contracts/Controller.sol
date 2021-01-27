@@ -1,16 +1,8 @@
 // SPDX-License-Identifier: AGPL-3.0-or-later
 pragma solidity 0.6.11;
 
-import "@openzeppelin/contracts/math/SafeMath.sol";
-import "@openzeppelin/contracts/token/ERC20/IERC20.sol";
-
-import "./protocol/IController.sol";
-import "./protocol/IVault.sol";
-import "./protocol/IStrategy.sol";
-import "./AccessControl.sol";
-
 /*
-version 1.1.0
+version 1.2.0
 
 Changes from Controller V1
 - Check vault and strategy are approved by admin.
@@ -19,6 +11,14 @@ Changes from Controller V1
   (checks withdraw min for ERC20 and ETH strategies)
 - add setStrategyAndInvest
 */
+
+import "@openzeppelin/contracts/math/SafeMath.sol";
+import "@openzeppelin/contracts/token/ERC20/IERC20.sol";
+
+import "./protocol/IController.sol";
+import "./protocol/IVault.sol";
+import "./protocol/IStrategy.sol";
+import "./AccessControl.sol";
 
 // TODO reentrancy
 contract Controller is IController, AccessControl {

@@ -1,6 +1,10 @@
 // SPDX-License-Identifier: AGPL-3.0-or-later
 pragma solidity 0.6.11;
 
+/*
+version 1.2.0
+*/
+
 import "@openzeppelin/contracts/math/SafeMath.sol";
 import "@openzeppelin/contracts/utils/ReentrancyGuard.sol";
 import "@openzeppelin/contracts/token/ERC20/SafeERC20.sol";
@@ -11,10 +15,6 @@ import "@openzeppelin/contracts/token/ERC20/ERC20.sol";
 import "./protocol/IStrategyETH.sol";
 import "./protocol/IETHVault.sol";
 import "./protocol/IController.sol";
-
-/*
-version 1.0.0
-*/
 
 contract ETHVault is IETHVault, ERC20, ReentrancyGuard {
     using SafeERC20 for IERC20;

@@ -1,6 +1,6 @@
 import BN from "bn.js"
 import { IERC20Instance } from "../../../types"
-import { pow, frac } from "../../util"
+import { pow } from "../../util"
 import { StrategyInstance, Setup, getSnapshot } from "./lib"
 
 export default (name: string, _setup: Setup, params: { DECIMALS: BN }) => {
@@ -30,11 +30,8 @@ export default (name: string, _setup: Setup, params: { DECIMALS: BN }) => {
     it("should skim", async () => {
       const snapshot = getSnapshot(refs)
 
-      const min = frac(await strategy.totalAssets(), 99, 100)
-      const max = frac(await strategy.totalAssets(), 101, 100)
-
       const before = await snapshot()
-      await strategy.skim(min, max, { from: admin })
+      await strategy.skim({ from: admin })
       const after = await snapshot()
 
       assert(
