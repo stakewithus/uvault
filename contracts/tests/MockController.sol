@@ -5,9 +5,12 @@ import "../protocol/IController.sol";
 
 /* solium-disable */
 contract MockController is IController {
-    bytes32 public constant override ADMIN_ROLE = keccak256(abi.encodePacked("ADMIN"));
+    // keccak256(abi.encodePacked("ADMIN"));
+    bytes32 public constant override ADMIN_ROLE =
+        0xdf8b4c520ffe197c5343c6f5aec59570151ef9a492f2c624fd45ddde6135ec42;
+    // keccak256(abi.encodePacked("HARVESTER"));
     bytes32 public constant override HARVESTER_ROLE =
-        keccak256(abi.encodePacked("HARVESTER"));
+        0x27e3e4d29d60af3ae6456513164bb5db737d6fc8610aa36ad458736c9efb884c;
 
     address public override admin;
     address public override treasury;
@@ -25,6 +28,14 @@ contract MockController is IController {
 
     function revokeRole(bytes32 _role, address _addr) external override {}
 
+    function approveVault(address _vault) external {}
+
+    function revokeVault(address _vault) external {}
+
+    function approveStrategy(address _strategy) external {}
+
+    function revokeStrategy(address _strategy) external {}
+
     function invest(address _vault) external override {}
 
     function setStrategy(
@@ -32,6 +43,12 @@ contract MockController is IController {
         address _strategy,
         uint _min
     ) external override {}
+
+    function setStrategyAndInvest(
+        address _vault,
+        address _strategy,
+        uint _min
+    ) external {}
 
     function harvest(address _strategy) external override {}
 
