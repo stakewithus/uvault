@@ -1,10 +1,10 @@
 // SPDX-License-Identifier: AGPL-3.0-or-later
 pragma solidity 0.6.11;
 
-import "../protocol/IControllerV2.sol";
+import "../protocol/IController.sol";
 
 /* solium-disable */
-contract MockControllerV2 is IControllerV2 {
+contract MockControllerV2 is IController {
     // keccak256(abi.encodePacked("ADMIN"));
     bytes32 public constant override ADMIN_ROLE =
         0xdf8b4c520ffe197c5343c6f5aec59570151ef9a492f2c624fd45ddde6135ec42;
@@ -16,9 +16,9 @@ contract MockControllerV2 is IControllerV2 {
     address public override treasury;
 
     // approved vaults
-    mapping(address => bool) public override vaults;
+    mapping(address => bool) public vaults;
     // approved strategies
-    mapping(address => bool) public override strategies;
+    mapping(address => bool) public strategies;
 
     constructor(address _treasury) public {
         admin = msg.sender;
@@ -33,13 +33,13 @@ contract MockControllerV2 is IControllerV2 {
 
     function revokeRole(bytes32 _role, address _addr) external override {}
 
-    function approveVault(address _vault) external override {}
+    function approveVault(address _vault) external {}
 
-    function revokeVault(address _vault) external override {}
+    function revokeVault(address _vault) external {}
 
-    function approveStrategy(address _strategy) external override {}
+    function approveStrategy(address _strategy) external {}
 
-    function revokeStrategy(address _strategy) external override {}
+    function revokeStrategy(address _strategy) external {}
 
     function invest(address _vault) external override {}
 
@@ -53,7 +53,7 @@ contract MockControllerV2 is IControllerV2 {
         address _vault,
         address _strategy,
         uint _min
-    ) external override {}
+    ) external {}
 
     function harvest(address _strategy) external override {}
 

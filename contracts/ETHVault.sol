@@ -10,7 +10,7 @@ import "@openzeppelin/contracts/token/ERC20/ERC20.sol";
 // TODO update interfaces
 import "./protocol/IStrategyETH.sol";
 import "./protocol/IETHVault.sol";
-import "./protocol/IControllerV2.sol";
+import "./protocol/IController.sol";
 
 contract ETHVault is IETHVault, ERC20, ReentrancyGuard {
     using SafeERC20 for IERC20;
@@ -433,7 +433,7 @@ contract ETHVault is IETHVault, ERC20, ReentrancyGuard {
             // transfer to treasury
             uint fee = withdrawAmount.mul(withdrawFee) / FEE_MAX;
             if (fee > 0) {
-                address treasury = IControllerV2(controller).treasury();
+                address treasury = IController(controller).treasury();
                 require(treasury != address(0), "treasury = zero address");
 
                 withdrawAmount = withdrawAmount - fee;

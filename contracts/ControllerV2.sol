@@ -4,7 +4,7 @@ pragma solidity 0.6.11;
 import "@openzeppelin/contracts/math/SafeMath.sol";
 import "@openzeppelin/contracts/token/ERC20/IERC20.sol";
 
-import "./protocol/IControllerV2.sol";
+import "./protocol/IController.sol";
 import "./protocol/IVaultBase.sol";
 import "./protocol/IStrategyBase.sol";
 import "./AccessControl.sol";
@@ -18,7 +18,7 @@ Changes from Controller V1
 */
 
 // TODO reentrancy
-contract ControllerV2 is IControllerV2, AccessControl {
+contract ControllerV2 is IController, AccessControl {
     using SafeMath for uint;
 
     event ApproveVault(address vault, bool approved);
@@ -38,9 +38,9 @@ contract ControllerV2 is IControllerV2, AccessControl {
     address public override treasury;
 
     // approved vaults
-    mapping(address => bool) public override vaults;
+    mapping(address => bool) public vaults;
     // approved strategies
-    mapping(address => bool) public override strategies;
+    mapping(address => bool) public strategies;
 
     constructor(address _treasury) public {
         require(_treasury != address(0), "treasury = zero address");
@@ -103,25 +103,25 @@ contract ControllerV2 is IControllerV2, AccessControl {
         _revokeRole(_role, _addr);
     }
 
-    function approveVault(address _vault) external override onlyAdmin {
+    function approveVault(address _vault) external onlyAdmin {
         require(!vaults[_vault], "already approved vault");
         vaults[_vault] = true;
         emit ApproveVault(_vault, true);
     }
 
-    function revokeVault(address _vault) external override onlyAdmin {
+    function revokeVault(address _vault) external onlyAdmin {
         require(vaults[_vault], "!approved vault");
         vaults[_vault] = false;
         emit ApproveVault(_vault, false);
     }
 
-    function approveStrategy(address _strategy) external override onlyAdmin {
+    function approveStrategy(address _strategy) external onlyAdmin {
         require(!strategies[_strategy], "already approved strategy");
         strategies[_strategy] = true;
         emit ApproveStrategy(_strategy, true);
     }
 
-    function revokeStrategy(address _strategy) external override onlyAdmin {
+    function revokeStrategy(address _strategy) external onlyAdmin {
         require(strategies[_strategy], "!approved strategy");
         strategies[_strategy] = false;
         emit ApproveStrategy(_strategy, false);
@@ -144,11 +144,18 @@ contract ControllerV2 is IControllerV2, AccessControl {
         IVaultBase(_vault).invest();
     }
 
+    /*
+    @notice Set strategy for vault and invest
+    @param _vault Address of vault
+    @param _strategy Address of strategy
+    @param _min Minimum undelying token current strategy must return. Prevents slippage
+    @dev Set strategy and invest in single transaction to avoid front running
+    */
     function setStrategyAndInvest(
         address _vault,
         address _strategy,
         uint _min
-    ) external override onlyAuthorized(ADMIN_ROLE) {
+    ) external onlyAuthorized(ADMIN_ROLE) {
         IVaultBase(_vault).setStrategy(_strategy, _min);
         IVaultBase(_vault).invest();
     }

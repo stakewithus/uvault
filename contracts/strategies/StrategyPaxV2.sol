@@ -170,7 +170,7 @@ contract StrategyPaxV2 is StrategyERC20, UseUniswap {
             // transfer fee to treasury
             uint fee = bal.mul(performanceFee) / PERFORMANCE_FEE_MAX;
             if (fee > 0) {
-                address treasury = IControllerV2(controller).treasury();
+                address treasury = IController(controller).treasury();
                 require(treasury != address(0), "treasury = zero address");
 
                 IERC20(token).safeTransfer(treasury, fee);

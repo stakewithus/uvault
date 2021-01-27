@@ -7,7 +7,7 @@ import "@openzeppelin/contracts/math/SafeMath.sol";
 
 import "./protocol/IStrategyERC20.sol";
 // used inside harvest
-import "./protocol/IControllerV2.sol";
+import "./protocol/IController.sol";
 
 /*
 Changes from StrategyBase V1

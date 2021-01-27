@@ -7,7 +7,7 @@ import "@openzeppelin/contracts/math/SafeMath.sol";
 
 import "./protocol/IStrategyETH.sol";
 // used inside harvest
-import "./protocol/IControllerV2.sol";
+import "./protocol/IController.sol";
 
 //TODO reentrancy protection
 
