@@ -2,14 +2,17 @@
 pragma solidity 0.6.11;
 
 import "../StrategyETH.sol";
-// import "../UseUniswap.sol";
+import "../interfaces/uniswap/Uniswap.sol";
 import "../interfaces/curve/LiquidityGaugeV2.sol";
 import "../interfaces/curve/Minter.sol";
 import "../interfaces/curve/StableSwapSTETH.sol";
 import "../interfaces/lido/StETH.sol";
-import "../interfaces/uniswap/Uniswap.sol";
 
 contract StrategyStEth is StrategyETH {
+    // Uniswap //
+    address private constant UNISWAP = 0x7a250d5630B4cF539739dF2C5dAcb4c659F2488D;
+    address private constant WETH = 0xC02aaA39b223FE8D0A0e5C4F27eAD9083C756Cc2;
+
     // Curve //
     // liquidity provider token (Curve ETH/STETH)
     address private constant LP = 0x06325440D014e39736583c165C2963BA99fAf14E;
@@ -25,10 +28,6 @@ contract StrategyStEth is StrategyETH {
     // LIDO //
     address private constant ST_ETH = 0xae7ab96520DE3A18E5e111B5EaAb095312D7fE84;
     address private constant LDO = 0x5A98FcBEA516Cf06857215779Fd812CA3beF1B32;
-
-    // Uniswap //
-    address private constant UNISWAP = 0x7a250d5630B4cF539739dF2C5dAcb4c659F2488D;
-    address private constant WETH = 0xC02aaA39b223FE8D0A0e5C4F27eAD9083C756Cc2;
 
     constructor(address _controller, address _vault)
         public
@@ -115,9 +114,9 @@ contract StrategyStEth is StrategyETH {
     }
 
     /*
-    @dev Uniswap fails when with zero address so no check is necessary here
+    @dev Uniswap fails with zero address so no check is necessary here
     */
-    function _swapToEth(address _from, uint _amount) internal {
+    function _swapToEth(address _from, uint _amount) private {
         // create dynamic array with 2 elements
         address[] memory path = new address[](2);
         path[0] = _from;

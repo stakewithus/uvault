@@ -2,14 +2,18 @@
 pragma solidity 0.6.11;
 
 import "../StrategyERC20.sol";
-import "../UseUniswap.sol";
+import "../interfaces/uniswap/Uniswap.sol";
 import "../interfaces/curve/LiquidityGauge.sol";
 import "../interfaces/curve/Minter.sol";
 import "../interfaces/curve/StableSwapGusd.sol";
 import "../interfaces/curve/StableSwap3Pool.sol";
 import "../interfaces/curve/DepositGusd.sol";
 
-contract StrategyGusdV2 is StrategyERC20, UseUniswap {
+contract StrategyGusdV2 is StrategyERC20 {
+    // Uniswap //
+    address private constant UNISWAP = 0x7a250d5630B4cF539739dF2C5dAcb4c659F2488D;
+    address private constant WETH = 0xC02aaA39b223FE8D0A0e5C4F27eAD9083C756Cc2;
+
     address private constant GUSD = 0x056Fd409E1d7A124BD7017459dFEa2F387b6d5Cd;
     address internal constant DAI = 0x6B175474E89094C44Da98b954EedeAC495271d0F;
     address internal constant USDC = 0xA0b86991c6218b36c1d19D4a2e9Eb0cE3606eB48;
@@ -40,7 +44,11 @@ contract StrategyGusdV2 is StrategyERC20, UseUniswap {
         address _controller,
         address _vault,
         address _underlying
-    ) public StrategyERC20(_controller, _vault, _underlying) {}
+    ) public StrategyERC20(_controller, _vault, _underlying) {
+        // These tokens are never stored inside this contract
+        // so risk of them being stolen is minimal
+        IERC20(CRV).safeApprove(UNISWAP, uint(-1));
+    }
 
     function _totalAssets() internal view override returns (uint) {
         uint lpBal = LiquidityGauge(GAUGE).balanceOf(address(this));
@@ -157,7 +165,30 @@ contract StrategyGusdV2 is StrategyERC20, UseUniswap {
         return (USDT, 3);
     }
 
-    function _swapCrvFor(address _token) private {
+    /*
+    @dev Uniswap fails with zero address so no check is necessary here
+    */
+    function _swap(
+        address _from,
+        address _to,
+        uint _amount
+    ) private {
+        // create dynamic array with 3 elements
+        address[] memory path = new address[](3);
+        path[0] = _from;
+        path[1] = WETH;
+        path[2] = _to;
+
+        Uniswap(UNISWAP).swapExactTokensForTokens(
+            _amount,
+            1,
+            path,
+            address(this),
+            block.timestamp
+        );
+    }
+
+    function _claimRewards(address _token) private {
         Minter(MINTER).mint(GAUGE);
 
         uint crvBal = IERC20(CRV).balanceOf(address(this));
@@ -173,7 +204,7 @@ contract StrategyGusdV2 is StrategyERC20, UseUniswap {
     function harvest() external override onlyAuthorized {
         (address token, uint index) = _getMostPremiumToken();
 
-        _swapCrvFor(token);
+        _claimRewards(token);
 
         uint bal = IERC20(token).balanceOf(address(this));
         if (bal > 0) {
@@ -197,7 +228,7 @@ contract StrategyGusdV2 is StrategyERC20, UseUniswap {
     @dev Caller should implement guard agains slippage
     */
     function exit() external override onlyAuthorized {
-        _swapCrvFor(underlying);
+        _claimRewards(underlying);
         _withdrawAll();
     }
 
