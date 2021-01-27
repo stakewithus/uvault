@@ -6,10 +6,10 @@ import "./TestToken.sol";
 
 /* solium-disable */
 contract StrategyETHTest is StrategyETH {
-    constructor(
-        address _controller,
-        address _vault,
-    ) public StrategyETH(_controller, _vault) {}
+    constructor(address _controller, address _vault)
+        public
+        StrategyETH(_controller, _vault)
+    {}
 
     receive() external payable {}
 
