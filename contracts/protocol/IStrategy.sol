@@ -1,6 +1,15 @@
 // SPDX-License-Identifier: AGPL-3.0-or-later
 pragma solidity 0.6.11;
 
+/*
+version 1.2.0
+
+Changes
+- removed function assets(address _token) external view returns (bool);
+  this does not affect other contracts (Vault and Controller)
+- function deposit(uint) declared in IStrategyERC20
+*/
+
 interface IStrategy {
     function admin() external view returns (address);
 

@@ -1,6 +1,13 @@
 // SPDX-License-Identifier: AGPL-3.0-or-later
 pragma solidity 0.6.11;
 
+/*
+version 1.2.0
+
+Changes
+- function deposit(uint) declared in IERC20Vault
+*/
+
 interface IVault {
     function admin() external view returns (address);
 
