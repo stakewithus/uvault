@@ -16,6 +16,7 @@ Changes from Controller V1
 - Check vault and strategy are approved by admin.
   Protect from arbitrary contract to be passed into invest, harvest, skim, etc...
 - compatible with ERC20 and ETH vault / strategy
+  (checks withdraw min for ERC20 and ETH strategies)
 - add setStrategyAndInvest
 */
 
