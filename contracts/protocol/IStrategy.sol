@@ -5,9 +5,12 @@ pragma solidity 0.6.11;
 version 1.2.0
 
 Changes
+
+Changes listed here do not affect interaction with other contracts (Vault and Controller)
 - removed function assets(address _token) external view returns (bool);
-  this does not affect other contracts (Vault and Controller)
-- function deposit(uint) declared in IStrategyERC20
+- remove function deposit(uint), declared in IStrategyERC20
+- add function setSlippage(uint _slippage);
+- add function setDelta(uint _delta);
 */
 
 interface IStrategy {
