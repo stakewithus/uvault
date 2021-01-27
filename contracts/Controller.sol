@@ -4,7 +4,7 @@ pragma solidity 0.6.11;
 /*
 version 1.2.0
 
-Changes from Controller V1
+Changes from Controller 1.1.0
 - Check vault and strategy are approved by admin.
   Protect from arbitrary contract to be passed into invest, harvest, skim, etc...
 - compatible with ERC20 and ETH vault / strategy
