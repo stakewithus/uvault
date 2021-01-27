@@ -5,11 +5,13 @@ import "@openzeppelin/contracts/math/SafeMath.sol";
 import "@openzeppelin/contracts/token/ERC20/IERC20.sol";
 
 import "./protocol/IController.sol";
-import "./protocol/IVaultBase.sol";
-import "./protocol/IStrategyBase.sol";
+import "./protocol/IVault.sol";
+import "./protocol/IStrategy.sol";
 import "./AccessControl.sol";
 
 /*
+version 1.1.0
+
 Changes from Controller V1
 - Check vault and strategy are approved by admin.
   Protect from arbitrary contract to be passed into invest, harvest, skim, etc...
@@ -18,7 +20,7 @@ Changes from Controller V1
 */
 
 // TODO reentrancy
-contract ControllerV2 is IController, AccessControl {
+contract Controller is IController, AccessControl {
     using SafeMath for uint;
 
     event ApproveVault(address vault, bool approved);
@@ -68,11 +70,11 @@ contract ControllerV2 is IController, AccessControl {
     }
 
     modifier isCurrentStrategy(address _strategy) {
-        address vault = IStrategyBase(_strategy).vault();
+        address vault = IStrategy(_strategy).vault();
         /*
         Check that _strategy is the current strategy used by the vault.
         */
-        require(IVaultBase(vault).strategy() == _strategy, "!strategy");
+        require(IVault(vault).strategy() == _strategy, "!strategy");
         _;
     }
 
@@ -132,7 +134,7 @@ contract ControllerV2 is IController, AccessControl {
         address _strategy,
         uint _min
     ) external override onlyAuthorized(ADMIN_ROLE) {
-        IVaultBase(_vault).setStrategy(_strategy, _min);
+        IVault(_vault).setStrategy(_strategy, _min);
     }
 
     function invest(address _vault)
@@ -141,7 +143,7 @@ contract ControllerV2 is IController, AccessControl {
         onlyAuthorized(HARVESTER_ROLE)
         onlyApprovedVault(_vault)
     {
-        IVaultBase(_vault).invest();
+        IVault(_vault).invest();
     }
 
     /*
@@ -156,8 +158,8 @@ contract ControllerV2 is IController, AccessControl {
         address _strategy,
         uint _min
     ) external onlyAuthorized(ADMIN_ROLE) {
-        IVaultBase(_vault).setStrategy(_strategy, _min);
-        IVaultBase(_vault).invest();
+        IVault(_vault).setStrategy(_strategy, _min);
+        IVault(_vault).invest();
     }
 
     function harvest(address _strategy)
@@ -167,7 +169,7 @@ contract ControllerV2 is IController, AccessControl {
         onlyApprovedStrategy(_strategy)
         isCurrentStrategy(_strategy)
     {
-        IStrategyBase(_strategy).harvest();
+        IStrategy(_strategy).harvest();
     }
 
     function skim(address _strategy)
@@ -177,12 +179,12 @@ contract ControllerV2 is IController, AccessControl {
         onlyApprovedStrategy(_strategy)
         isCurrentStrategy(_strategy)
     {
-        IStrategyBase(_strategy).skim();
+        IStrategy(_strategy).skim();
     }
 
     modifier checkWithdraw(address _strategy, uint _min) {
-        address vault = IStrategyBase(_strategy).vault();
-        address token = IVaultBase(vault).token();
+        address vault = IStrategy(_strategy).vault();
+        address token = IVault(vault).token();
 
         uint balBefore;
         uint balAfter;
@@ -211,7 +213,7 @@ contract ControllerV2 is IController, AccessControl {
         isCurrentStrategy(_strategy)
         checkWithdraw(_strategy, _min)
     {
-        IStrategyBase(_strategy).withdraw(_amount);
+        IStrategy(_strategy).withdraw(_amount);
     }
 
     function withdrawAll(address _strategy, uint _min)
@@ -222,7 +224,7 @@ contract ControllerV2 is IController, AccessControl {
         isCurrentStrategy(_strategy)
         checkWithdraw(_strategy, _min)
     {
-        IStrategyBase(_strategy).withdrawAll();
+        IStrategy(_strategy).withdrawAll();
     }
 
     function exit(address _strategy, uint _min)
@@ -233,6 +235,6 @@ contract ControllerV2 is IController, AccessControl {
         isCurrentStrategy(_strategy)
         checkWithdraw(_strategy, _min)
     {
-        IStrategyBase(_strategy).exit();
+        IStrategy(_strategy).exit();
     }
 }
