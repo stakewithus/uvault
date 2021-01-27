@@ -4,7 +4,7 @@ pragma solidity 0.6.11;
 import "../protocol/IERC20Vault.sol";
 
 /* solium-disable */
-contract MockVault is IERC20Vault {
+contract MockERC20Vault is IERC20Vault {
     address public override admin;
     address public override controller;
     address public override token;
