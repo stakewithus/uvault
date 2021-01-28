@@ -1,7 +1,7 @@
 import chai from "chai"
 import BN from "bn.js"
 import { StrategyNoOpETHInstance } from "../../../types"
-import { eq, add } from "../../util"
+import { eq } from "../../util"
 import _setup from "./setup"
 
 contract("StrategyNoOpETH", (accounts) => {

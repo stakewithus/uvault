@@ -1,7 +1,6 @@
 import "../../setup"
 import { StrategyNoOpETHInstance } from "../../../types"
 
-const TestToken = artifacts.require("TestToken")
 const StrategyNoOpETH = artifacts.require("StrategyNoOpETH")
 
 export default (accounts: Truffle.Accounts) => {
