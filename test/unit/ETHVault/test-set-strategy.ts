@@ -1,30 +1,27 @@
 import chai from "chai"
 import BN from "bn.js"
 import {
-  TestTokenInstance,
-  ERC20VaultInstance,
+  ETHVaultInstance,
   MockControllerInstance,
-  StrategyERC20TestInstance,
+  StrategyETHTestInstance,
 } from "../../../types"
 import { eq, add } from "../../util"
 import _setup from "./setup"
 
-const StrategyERC20Test = artifacts.require("StrategyERC20Test")
+const StrategyETHTest = artifacts.require("StrategyETHTest")
 
-contract("ERC20Vault", (accounts) => {
+contract("ETHVault", (accounts) => {
   const refs = _setup(accounts)
   const { admin } = refs
 
   let controller: MockControllerInstance
   let timeLock: string
-  let vault: ERC20VaultInstance
-  let token: TestTokenInstance
-  let strategy: StrategyERC20TestInstance
+  let vault: ETHVaultInstance
+  let strategy: StrategyETHTestInstance
   beforeEach(() => {
     controller = refs.controller
     timeLock = refs.timeLock
     vault = refs.vault
-    token = refs.token
     strategy = refs.strategy
   })
 
@@ -52,16 +49,13 @@ contract("ERC20Vault", (accounts) => {
     })
 
     describe("update", () => {
-      let oldStrategy: StrategyERC20TestInstance
-      let newStrategy: StrategyERC20TestInstance
+      let oldStrategy: StrategyETHTestInstance
+      let newStrategy: StrategyETHTestInstance
       beforeEach(async () => {
         oldStrategy = strategy
-        newStrategy = await StrategyERC20Test.new(
-          controller.address,
-          vault.address,
-          token.address,
-          { from: admin }
-        )
+        newStrategy = await StrategyETHTest.new(controller.address, vault.address, {
+          from: admin,
+        })
 
         const min = await vault.balanceInStrategy()
         await vault.setStrategy(oldStrategy.address, min, { from: admin })
@@ -74,12 +68,6 @@ contract("ERC20Vault", (accounts) => {
 
         // check state
         assert.equal(await vault.strategy(), newStrategy.address, "new strategy")
-        // check external calls
-        assert.equal(
-          eq(await token.allowance(vault.address, oldStrategy.address), new BN(0)),
-          true,
-          "allowance"
-        )
       })
 
       it("should reject if exit amount < min", async () => {
@@ -105,27 +93,11 @@ contract("ERC20Vault", (accounts) => {
         .to.be.rejectedWith("new strategy = current strategy")
     })
 
-    it("should reject if vault.token != strategy.token", async () => {
-      const strategy = await StrategyERC20Test.new(
-        controller.address,
-        vault.address,
-        // token address
-        accounts[0],
-        { from: admin }
-      )
-      await vault.approveStrategy(strategy.address, { from: timeLock })
-
-      await chai
-        .expect(vault.setStrategy(strategy.address, new BN(0), { from: admin }))
-        .to.be.rejectedWith("strategy.token != vault.token")
-    })
-
     it("should reject if strategy.vault != vault", async () => {
-      const strategy = await StrategyERC20Test.new(
+      const strategy = await StrategyETHTest.new(
         controller.address,
         // vault address
         accounts[0],
-        token.address,
         { from: admin }
       )
       await vault.approveStrategy(strategy.address, { from: timeLock })
@@ -136,14 +108,9 @@ contract("ERC20Vault", (accounts) => {
     })
 
     it("should reject if strategy not approved", async () => {
-      const strategy = await StrategyERC20Test.new(
-        controller.address,
-        vault.address,
-        token.address,
-        {
-          from: admin,
-        }
-      )
+      const strategy = await StrategyETHTest.new(controller.address, vault.address, {
+        from: admin,
+      })
 
       await chai
         .expect(vault.setStrategy(strategy.address, new BN(0), { from: admin }))

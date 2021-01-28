@@ -11,11 +11,13 @@ import "@openzeppelin/contracts/token/ERC20/SafeERC20.sol";
 import "@openzeppelin/contracts/token/ERC20/IERC20.sol";
 import "@openzeppelin/contracts/token/ERC20/ERC20.sol";
 
-// TODO update interfaces
 import "./protocol/IStrategyETH.sol";
 import "./protocol/IETHVault.sol";
 import "./protocol/IController.sol";
 
+// TODO reentrancy
+// TODO denial of service?
+// TODO force ETH
 contract ETHVault is IETHVault, ERC20, ReentrancyGuard {
     using SafeERC20 for IERC20;
     using SafeMath for uint;
@@ -314,11 +316,10 @@ contract ETHVault is IETHVault, ERC20, ReentrancyGuard {
     @notice Deposit ETH into vault
     */
     function deposit() external payable override whenNotPaused nonReentrant guard {
-        require(msg.value > 0, "msg.value = 0");
+        require(msg.value > 0, "deposit = 0");
 
         /*
-        need to subtract msg.value to get total underlying before deposit
-
+        need to subtract msg.value to get total ETH before deposit
         totalAssets >= msg.value, since address(this).balance >= msg.value
         */
         uint totalEth = _totalAssets() - msg.value;

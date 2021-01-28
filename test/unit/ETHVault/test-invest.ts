@@ -1,28 +1,25 @@
 import chai from "chai"
 import BN from "bn.js"
 import {
-  TestTokenInstance,
-  ERC20VaultInstance,
+  ETHVaultInstance,
   MockControllerInstance,
-  StrategyERC20TestInstance,
+  StrategyETHTestInstance,
 } from "../../../types"
 import { ZERO_ADDRESS, pow } from "../../util"
 import _setup from "./setup"
 
-contract("ERC20Vault", (accounts) => {
+contract("ETHVault", (accounts) => {
   const refs = _setup(accounts)
   const { admin } = refs
 
   let controller: MockControllerInstance
   let timeLock: string
-  let vault: ERC20VaultInstance
-  let token: TestTokenInstance
-  let strategy: StrategyERC20TestInstance
+  let vault: ETHVaultInstance
+  let strategy: StrategyETHTestInstance
   beforeEach(() => {
     controller = refs.controller
     timeLock = refs.timeLock
     vault = refs.vault
-    token = refs.token
     strategy = refs.strategy
   })
 
@@ -32,9 +29,7 @@ contract("ERC20Vault", (accounts) => {
       const amount = pow(10, 18)
 
       beforeEach(async () => {
-        await token._mint_(user, amount)
-        await token.approve(vault.address, amount, { from: user })
-        await vault.deposit(amount, { from: user })
+        await vault.deposit({ from: user, value: amount })
 
         await vault.approveStrategy(strategy.address, { from: timeLock })
         await vault.setStrategy(strategy.address, new BN(0), { from: admin })
@@ -46,9 +41,9 @@ contract("ERC20Vault", (accounts) => {
             vault: {
               availableToInvest: await vault.availableToInvest(),
             },
-            token: {
-              vault: await token.balanceOf(vault.address),
-              strategy: await token.balanceOf(strategy.address),
+            eth: {
+              vault: new BN(await web3.eth.getBalance(vault.address)),
+              strategy: new BN(await web3.eth.getBalance(strategy.address)),
             },
           }
         }
@@ -57,11 +52,11 @@ contract("ERC20Vault", (accounts) => {
         await vault.invest({ from: admin })
         const after = await snapshot()
 
-        // check token transfer to strategy
+        // check eth transfer to strategy
         assert.equal(
-          after.token.vault.eq(before.token.vault.sub(before.vault.availableToInvest)),
+          after.eth.vault.eq(before.eth.vault.sub(before.vault.availableToInvest)),
           true,
-          "token vault"
+          "eth vault"
         )
       })
 

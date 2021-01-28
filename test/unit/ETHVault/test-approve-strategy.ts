@@ -1,14 +1,14 @@
 import chai from "chai"
-import { ERC20VaultInstance, StrategyERC20TestInstance } from "../../../types"
+import { ETHVaultInstance, StrategyETHTestInstance } from "../../../types"
 import { ZERO_ADDRESS } from "../../util"
 import _setup from "./setup"
 
-contract("ERC20Vault", (accounts) => {
+contract("ETHVault", (accounts) => {
   const refs = _setup(accounts)
 
   let timeLock: string
-  let vault: ERC20VaultInstance
-  let strategy: StrategyERC20TestInstance
+  let vault: ETHVaultInstance
+  let strategy: StrategyETHTestInstance
   beforeEach(() => {
     timeLock = refs.timeLock
     vault = refs.vault
