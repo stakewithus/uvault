@@ -11,9 +11,6 @@ contract StrategyERC20Test is StrategyERC20 {
         address _underlying
     ) public StrategyERC20(_controller, _vault, _underlying) {}
 
-    // allow anyone to send ETH. used for simulating profit
-    receive() external payable {}
-
     function _totalAssets() internal view override returns (uint) {
         return IERC20(underlying).balanceOf(address(this));
     }

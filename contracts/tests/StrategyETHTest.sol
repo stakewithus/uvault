@@ -10,6 +10,7 @@ contract StrategyETHTest is StrategyETH {
         StrategyETH(_controller, _vault)
     {}
 
+    // allow anyone to send ETH. used for simulating profit
     receive() external payable {}
 
     function _totalAssets() internal view override returns (uint) {

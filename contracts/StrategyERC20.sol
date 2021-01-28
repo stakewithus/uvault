@@ -10,6 +10,8 @@ Changes from StrategyBase
 - update skim(), increments total debt withoud withdrawing if total assets
   is near total debt
 - sweep - delete mapping "assets" and use require to explicitly check protected tokens
+- add immutable to vault
+- add immutable to underlying
 */
 
 import "@openzeppelin/contracts/token/ERC20/IERC20.sol";
@@ -28,8 +30,8 @@ abstract contract StrategyERC20 is IStrategyERC20 {
 
     address public override admin;
     address public override controller;
-    address public override vault;
-    address public override underlying;
+    address public immutable override vault;
+    address public immutable override underlying;
 
     // total amount of underlying transferred from vault
     uint public override totalDebt;

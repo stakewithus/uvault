@@ -20,7 +20,7 @@ abstract contract StrategyETH is IStrategyETH {
 
     address public override admin;
     address public override controller;
-    address public override vault;
+    address public immutable override vault;
     // Placeholder address to indicate that this is ETH strategy
     address public immutable override underlying =
         0xEeeeeEeeeEeEeeEeEeEeeEEEeeeeEeeeeeeeEEeE;
