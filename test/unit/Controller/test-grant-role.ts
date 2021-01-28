@@ -1,10 +1,10 @@
 import chai from "chai"
-import {ControllerInstance} from "../../../types/Controller"
+import { ControllerInstance } from "../../../types"
 import _setup from "./setup"
 
 contract("Controller", (accounts) => {
   const refs = _setup(accounts)
-  const {admin} = refs
+  const { admin } = refs
 
   let controller: ControllerInstance
   beforeEach(() => {
@@ -14,14 +14,14 @@ contract("Controller", (accounts) => {
   describe("grantRole", () => {
     it("should grant admin role", async () => {
       const adminRole = await controller.ADMIN_ROLE()
-      await controller.grantRole(adminRole, accounts[1], {from: admin})
+      await controller.grantRole(adminRole, accounts[1], { from: admin })
 
       assert.equal(await controller.hasRole(adminRole, accounts[1]), true, "admin role")
     })
 
     it("should grant harvester role", async () => {
       const harvesterRole = await controller.HARVESTER_ROLE()
-      await controller.grantRole(harvesterRole, accounts[1], {from: admin})
+      await controller.grantRole(harvesterRole, accounts[1], { from: admin })
 
       assert.equal(
         await controller.hasRole(harvesterRole, accounts[1]),
@@ -34,7 +34,7 @@ contract("Controller", (accounts) => {
       const adminRole = await controller.ADMIN_ROLE()
 
       await chai
-        .expect(controller.grantRole(adminRole, accounts[1], {from: accounts[1]}))
+        .expect(controller.grantRole(adminRole, accounts[1], { from: accounts[1] }))
         .to.be.rejectedWith("!admin")
     })
   })

@@ -1,18 +1,18 @@
 import chai from "chai"
-import { ControllerV2Instance, StrategyTestV2Instance } from "../../../types"
+import { ControllerInstance, StrategyERC20TestInstance } from "../../../types"
 import _setup from "./setup"
 
-const StrategyTestV2 = artifacts.require("StrategyTestV2")
+const StrategyERC20Test = artifacts.require("StrategyERC20Test")
 
 contract("Controller", (accounts) => {
   const refs = _setup(accounts)
   const { admin } = refs
 
-  let controller: ControllerV2Instance
-  let strategy: StrategyTestV2Instance
+  let controller: ControllerInstance
+  let strategy: StrategyERC20TestInstance
   beforeEach(async () => {
     controller = refs.controller
-    strategy = await StrategyTestV2.new(
+    strategy = await StrategyERC20Test.new(
       refs.controller.address,
       refs.vault.address,
       refs.underlying.address

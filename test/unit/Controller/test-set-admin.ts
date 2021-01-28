@@ -1,6 +1,5 @@
 import chai from "chai"
-import { ControllerInstance } from "../../../types/Controller"
-import { StrategyTestInstance } from "../../../types/StrategyTest"
+import { ControllerInstance } from "../../../types"
 import { ZERO_ADDRESS } from "../../util"
 import _setup from "./setup"
 
@@ -9,10 +8,8 @@ contract("Controller", (accounts) => {
   const { admin } = refs
 
   let controller: ControllerInstance
-  let strategy: StrategyTestInstance
   beforeEach(() => {
     controller = refs.controller
-    strategy = refs.strategy
   })
 
   describe("setAdmin", () => {

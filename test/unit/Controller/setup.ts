@@ -1,14 +1,16 @@
 import "../../setup"
-import { TestTokenInstance } from "../../../types/TestToken"
-import { ControllerInstance } from "../../../types/Controller"
-import { StrategyTestInstance } from "../../../types/StrategyTest"
-import { MockVaultInstance } from "../../../types/MockVault"
-import { MockTimeLockInstance } from "../../../types"
+import {
+  TestTokenInstance,
+  ControllerInstance,
+  StrategyERC20TestInstance,
+  MockVaultInstance,
+  MockTimeLockInstance,
+} from "../../../types"
 import BN from "bn.js"
 
 const TestToken = artifacts.require("TestToken")
 const Controller = artifacts.require("Controller")
-const StrategyTest = artifacts.require("StrategyTest")
+const StrategyERC20Test = artifacts.require("StrategyERC20Test")
 const MockTimeLock = artifacts.require("MockTimeLock")
 const MockVault = artifacts.require("MockVault")
 
@@ -24,7 +26,7 @@ export default (accounts: Truffle.Accounts) => {
     controller: ControllerInstance
     timeLock: MockTimeLockInstance
     vault: MockVaultInstance
-    strategy: StrategyTestInstance
+    strategy: StrategyERC20TestInstance
   }
 
   const refs: Refs = {
@@ -53,11 +55,14 @@ export default (accounts: Truffle.Accounts) => {
       refs.timeLock.address,
       refs.underlying.address
     )
-    refs.strategy = await StrategyTest.new(
+    refs.strategy = await StrategyERC20Test.new(
       refs.controller.address,
       refs.vault.address,
       refs.underlying.address
     )
+
+    await refs.controller.approveVault(refs.vault.address)
+    await refs.controller.approveStrategy(refs.strategy.address)
 
     // set vault.strategy
     await refs.vault.setStrategy(refs.strategy.address, new BN(0))

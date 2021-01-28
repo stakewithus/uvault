@@ -1,5 +1,5 @@
 import chai from "chai"
-import { ControllerV2Instance, MockVaultInstance } from "../../../types"
+import { ControllerInstance, MockVaultInstance } from "../../../types"
 import _setup from "./setup"
 
 const MockVault = artifacts.require("MockVault")
@@ -8,7 +8,7 @@ contract("Controller", (accounts) => {
   const refs = _setup(accounts)
   const { admin } = refs
 
-  let controller: ControllerV2Instance
+  let controller: ControllerInstance
   let vault: MockVaultInstance
   beforeEach(async () => {
     controller = refs.controller

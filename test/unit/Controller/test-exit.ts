@@ -2,7 +2,7 @@ import BN from "bn.js"
 import chai from "chai"
 import {
   ControllerInstance,
-  StrategyTestInstance,
+  StrategyERC20TestInstance,
   MockVaultInstance,
 } from "../../../types"
 import { add } from "../../util"
@@ -13,7 +13,7 @@ contract("Controller", (accounts) => {
   const { admin } = refs
 
   let controller: ControllerInstance
-  let strategy: StrategyTestInstance
+  let strategy: StrategyERC20TestInstance
   let vault: MockVaultInstance
   beforeEach(() => {
     controller = refs.controller
@@ -52,8 +52,20 @@ contract("Controller", (accounts) => {
         .to.be.rejectedWith("!authorized")
     })
 
+    it("should reject if strategy not approved", async () => {
+      await controller.revokeStrategy(strategy.address, { from: admin })
+
+      await chai
+        .expect(controller.exit(strategy.address, 0, { from: admin }))
+        .to.be.rejectedWith("!approved strategy")
+    })
+
     it("should reject invalid strategy address", async () => {
-      await chai.expect(controller.exit(accounts[1], 0, { from: admin })).to.be.rejected
+      // mock strategy address
+      const strategy = accounts[1]
+      await controller.approveStrategy(strategy, { from: admin })
+
+      await chai.expect(controller.exit(strategy, 0, { from: admin })).to.be.rejected
     })
   })
 })

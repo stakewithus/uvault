@@ -2,7 +2,7 @@ import BN from "bn.js"
 import chai from "chai"
 import {
   ControllerInstance,
-  StrategyTestInstance,
+  StrategyERC20TestInstance,
   MockVaultInstance,
 } from "../../../types"
 import _setup from "./setup"
@@ -12,25 +12,25 @@ contract("Controller", (accounts) => {
   const { admin } = refs
 
   let controller: ControllerInstance
-  let strategy: StrategyTestInstance
+  let strategy: StrategyERC20TestInstance
   let vault: MockVaultInstance
-  beforeEach(() => {
+  beforeEach(async () => {
     controller = refs.controller
     strategy = refs.strategy
     vault = refs.vault
+
+    await vault.setStrategy(strategy.address, new BN(0))
   })
 
   describe("harvest", () => {
     it("should harvest", async () => {
       await controller.harvest(strategy.address, { from: admin })
-
       assert(await strategy._harvestWasCalled_(), "harvest")
     })
 
     it("should reject if not current strategy", async () => {
       // mock strategy address
       await vault.setStrategy(accounts[1], new BN(0))
-
       await chai
         .expect(controller.harvest(strategy.address, { from: admin }))
         .to.be.rejectedWith("!strategy")
@@ -42,8 +42,20 @@ contract("Controller", (accounts) => {
         .to.be.rejectedWith("!authorized")
     })
 
+    it("should reject if strategy not approved", async () => {
+      await controller.revokeStrategy(strategy.address, { from: admin })
+
+      await chai
+        .expect(controller.harvest(strategy.address, { from: admin }))
+        .to.be.rejectedWith("!approved strategy")
+    })
+
     it("should reject invalid strategy address", async () => {
-      await chai.expect(controller.harvest(accounts[1], { from: admin })).to.be.rejected
+      // mock strategy address
+      const strategy = accounts[1]
+      await controller.approveStrategy(strategy, { from: admin })
+
+      await chai.expect(controller.harvest(strategy, { from: admin })).to.be.rejected
     })
   })
 })
