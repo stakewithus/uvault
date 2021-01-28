@@ -1,8 +1,8 @@
 import "../../setup"
-import { StrategyNoOpInstance, TestTokenInstance } from "../../../types"
+import { StrategyNoOpERC20Instance, TestTokenInstance } from "../../../types"
 
 const TestToken = artifacts.require("TestToken")
-const StrategyNoOp = artifacts.require("StrategyNoOp")
+const StrategyNoOpERC20 = artifacts.require("StrategyNoOpERC20")
 
 export default (accounts: Truffle.Accounts) => {
   const admin = accounts[0]
@@ -13,7 +13,7 @@ export default (accounts: Truffle.Accounts) => {
   interface Refs {
     admin: string
     vault: string
-    strategy: StrategyNoOpInstance
+    strategy: StrategyNoOpERC20Instance
     underlying: TestTokenInstance
   }
 
@@ -28,7 +28,11 @@ export default (accounts: Truffle.Accounts) => {
 
   beforeEach(async () => {
     refs.underlying = await TestToken.new()
-    refs.strategy = await StrategyNoOp.new(controller, vault, refs.underlying.address)
+    refs.strategy = await StrategyNoOpERC20.new(
+      controller,
+      vault,
+      refs.underlying.address
+    )
   })
 
   return refs

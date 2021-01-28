@@ -1,6 +1,16 @@
 // SPDX-License-Identifier: AGPL-3.0-or-later
 pragma solidity 0.6.11;
 
+/*
+version 1.2.0
+
+Changes from StrategyNoOp
+- enable setController
+- move code to withdraw all token from exit() to withdrawAll()
+  Under no circumstance should exit() fail. This prevents vault being stuck to
+  this strategy.
+*/
+
 import "@openzeppelin/contracts/token/ERC20/IERC20.sol";
 import "@openzeppelin/contracts/token/ERC20/SafeERC20.sol";
 import "../protocol/IStrategyERC20.sol";
@@ -54,9 +64,9 @@ contract StrategyNoOpERC20 is IStrategyERC20 {
         admin = _admin;
     }
 
-    // @dev variable name is removed to silence compiler warning
-    function setController(address) external override {
-        revert("no-op");
+    function setController(address _controller) external override onlyAdmin {
+        require(_controller != address(0), "controller = zero address");
+        controller = _controller;
     }
 
     // @dev variable name is removed to silence compiler warning

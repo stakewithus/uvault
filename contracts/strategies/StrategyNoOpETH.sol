@@ -1,9 +1,9 @@
 // SPDX-License-Identifier: AGPL-3.0-or-later
 pragma solidity 0.6.11;
 
-import "@openzeppelin/contracts/token/ERC20/IERC20.sol";
-import "@openzeppelin/contracts/token/ERC20/SafeERC20.sol";
-import "../protocol/IStrategyETH.sol";
+/*
+version 1.2.0
+*/
 
 /*
 This is a "placeholder" strategy used during emergency shutdown
@@ -50,9 +50,9 @@ contract StrategyNoOpETH is IStrategyETH {
         admin = _admin;
     }
 
-    // @dev variable name is removed to silence compiler warning
-    function setController(address) external override {
-        revert("no-op");
+    function setController(address _controller) external override onlyAdmin {
+        require(_controller != address(0), "controller = zero address");
+        controller = _controller;
     }
 
     // @dev variable name is removed to silence compiler warning

@@ -1,14 +1,14 @@
 import chai from "chai"
-import { StrategyNoOpInstance, TestTokenInstance } from "../../../types"
+import { StrategyNoOpERC20Instance, TestTokenInstance } from "../../../types"
 import { eq, add } from "../../util"
 import _setup from "./setup"
 import BN from "bn.js"
 
-contract("StrategyNoOp", (accounts) => {
+contract("StrategyNoOpERC20", (accounts) => {
   const refs = _setup(accounts)
   const { admin, vault } = refs
 
-  let strategy: StrategyNoOpInstance
+  let strategy: StrategyNoOpERC20Instance
   let underlying: TestTokenInstance
   beforeEach(async () => {
     strategy = refs.strategy
@@ -17,8 +17,8 @@ contract("StrategyNoOp", (accounts) => {
     await underlying._mint_(strategy.address, 123)
   })
 
-  describe("exit", () => {
-    it("should exit", async () => {
+  describe("withdrawAll", () => {
+    it("should withdraw all", async () => {
       const snapshot = async () => {
         return {
           underlying: {
@@ -29,7 +29,7 @@ contract("StrategyNoOp", (accounts) => {
       }
 
       const before = await snapshot()
-      await strategy.exit({ from: admin })
+      await strategy.withdrawAll({ from: admin })
       const after = await snapshot()
 
       assert(
@@ -41,7 +41,7 @@ contract("StrategyNoOp", (accounts) => {
 
     it("should reject if not authorized", async () => {
       await chai
-        .expect(strategy.exit({ from: accounts[3] }))
+        .expect(strategy.withdrawAll({ from: accounts[3] }))
         .to.be.rejectedWith("!authorized")
     })
   })

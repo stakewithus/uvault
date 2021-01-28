@@ -1,3 +1,5 @@
+export const ETH = "0xEeeeeEeeeEeEeeEeEeEeeEEEeeeeEeeeeeeeEEeE"
+
 export function encodeCallMe(web3: Web3, data: string) {
   return web3.eth.abi.encodeFunctionCall(
     {
