@@ -5,6 +5,8 @@ pragma solidity 0.6.11;
 version 1.2.0
 */
 
+import "@openzeppelin/contracts/token/ERC20/IERC20.sol";
+import "@openzeppelin/contracts/token/ERC20/SafeERC20.sol";
 import "../protocol/IStrategyETH.sol";
 
 /*
