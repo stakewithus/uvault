@@ -2,7 +2,6 @@
 pragma solidity 0.6.11;
 
 import "../StrategyETH.sol";
-import "./TestToken.sol";
 
 /* solium-disable */
 contract StrategyETHTest is StrategyETH {

@@ -1,36 +1,28 @@
 import chai from "chai"
-import { TestTokenInstance, StrategyERC20TestInstance } from "../../../types"
+import BN from "bn.js"
+import { StrategyETHTestInstance } from "../../../types"
 import { pow } from "../../util"
 import _setup from "./setup"
 
-contract("StrategyERC20", (accounts) => {
+contract("StrategyETH", (accounts) => {
   const refs = _setup(accounts)
   const { admin } = refs
 
-  let strategy: StrategyERC20TestInstance
-  let underlying: TestTokenInstance
+  let strategy: StrategyETHTestInstance
   let vault: string
   beforeEach(() => {
     strategy = refs.strategy
-    underlying = refs.underlying
     vault = refs.vault
   })
 
   describe("deposit", () => {
     const amount = pow(10, 18)
 
-    beforeEach(async () => {
-      await underlying._mint_(vault, amount)
-      await underlying._approve_(vault, strategy.address, amount)
-    })
+    beforeEach(async () => {})
 
     it("should deposit", async () => {
       const snapshot = async () => {
         return {
-          underlying: {
-            vault: await underlying.balanceOf(vault),
-            strategy: await underlying.balanceOf(strategy.address),
-          },
           strategy: {
             totalAssets: await strategy.totalAssets(),
             totalDebt: await strategy.totalDebt(),
@@ -39,18 +31,8 @@ contract("StrategyERC20", (accounts) => {
       }
 
       const before = await snapshot()
-      await strategy.deposit(amount, { from: admin })
+      await strategy.deposit({ from: vault, value: amount })
       const after = await snapshot()
-
-      // check underlying balance
-      assert(
-        after.underlying.strategy.eq(before.underlying.strategy.add(amount)),
-        "underlying strategy"
-      )
-      assert(
-        after.underlying.vault.eq(before.underlying.vault.sub(amount)),
-        "underlying vault"
-      )
 
       // check total assets
       assert(
@@ -66,13 +48,13 @@ contract("StrategyERC20", (accounts) => {
 
     it("should reject if caller not authorized", async () => {
       await chai
-        .expect(strategy.deposit(amount, { from: accounts[1] }))
+        .expect(strategy.deposit({ from: accounts[1], value: amount }))
         .to.be.rejectedWith("!authorized")
     })
 
     it("should reject if amount = 0", async () => {
       await chai
-        .expect(strategy.deposit(0, { from: admin }))
+        .expect(strategy.deposit({ from: admin, value: new BN(0) }))
         .to.be.rejectedWith("deposit = 0")
     })
   })

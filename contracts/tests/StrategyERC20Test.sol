@@ -2,7 +2,6 @@
 pragma solidity 0.6.11;
 
 import "../StrategyERC20.sol";
-import "./TestToken.sol";
 
 /* solium-disable */
 contract StrategyERC20Test is StrategyERC20 {
@@ -11,6 +10,9 @@ contract StrategyERC20Test is StrategyERC20 {
         address _vault,
         address _underlying
     ) public StrategyERC20(_controller, _vault, _underlying) {}
+
+    // allow anyone to send ETH. used for simulating profit
+    receive() external payable {}
 
     function _totalAssets() internal view override returns (uint) {
         return IERC20(underlying).balanceOf(address(this));

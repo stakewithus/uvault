@@ -21,6 +21,7 @@ abstract contract StrategyETH is IStrategyETH {
     address public override admin;
     address public override controller;
     address public override vault;
+    // Placeholder address to indicate that this is ETH strategy
     address public immutable override underlying =
         0xEeeeeEeeeEeEeeEeEeEeeEEEeeeeEeeeeeeeEEeE;
 
@@ -102,17 +103,17 @@ abstract contract StrategyETH is IStrategyETH {
         require(sent, "Send ETH failed");
     }
 
-    function _increaseDebt() private {
-        totalDebt = totalDebt.add(msg.value);
+    function _increaseDebt(uint _ethAmount) private {
+        totalDebt = totalDebt.add(_ethAmount);
     }
 
-    function _decreaseDebt(uint _amount) private {
-        _sendEthToVault(_amount);
+    function _decreaseDebt(uint _ethAmount) private {
+        _sendEthToVault(_ethAmount);
 
-        if (_amount > totalDebt) {
+        if (_ethAmount > totalDebt) {
             totalDebt = 0;
         } else {
-            totalDebt -= _amount;
+            totalDebt -= _ethAmount;
         }
     }
 
@@ -131,9 +132,9 @@ abstract contract StrategyETH is IStrategyETH {
     @notice Deposit ETH into this strategy
     */
     function deposit() external payable override onlyAuthorized {
-        require(msg.value > 0, "msg.value = 0");
+        require(msg.value > 0, "deposit = 0");
 
-        _increaseDebt();
+        _increaseDebt(msg.value);
         _deposit();
     }
 

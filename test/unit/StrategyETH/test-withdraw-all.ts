@@ -1,19 +1,17 @@
-import BN from "bn.js"
 import chai from "chai"
-import { TestTokenInstance, StrategyERC20TestInstance } from "../../../types"
+import BN from "bn.js"
+import { StrategyETHTestInstance } from "../../../types"
 import { pow } from "../../util"
 import _setup from "./setup"
 
-contract("StrategyERC20", (accounts) => {
+contract("StrategyETH", (accounts) => {
   const refs = _setup(accounts)
   const { admin } = refs
 
-  let strategy: StrategyERC20TestInstance
-  let underlying: TestTokenInstance
+  let strategy: StrategyETHTestInstance
   let vault: string
   beforeEach(() => {
     strategy = refs.strategy
-    underlying = refs.underlying
     vault = refs.vault
   })
 
@@ -21,17 +19,15 @@ contract("StrategyERC20", (accounts) => {
     const amount = pow(10, 18)
 
     beforeEach(async () => {
-      await underlying._mint_(vault, amount)
-      await underlying._approve_(vault, strategy.address, amount)
-      await strategy.deposit(amount, { from: admin })
+      await strategy.deposit({ from: admin, value: amount })
     })
 
     it("should withdraw all", async () => {
       const snapshot = async () => {
         return {
-          underlying: {
-            vault: await underlying.balanceOf(vault),
-            strategy: await underlying.balanceOf(strategy.address),
+          eth: {
+            vault: new BN(await web3.eth.getBalance(vault)),
+            strategy: new BN(await web3.eth.getBalance(strategy.address)),
           },
           strategy: {
             totalAssets: await strategy.totalAssets(),
@@ -44,13 +40,11 @@ contract("StrategyERC20", (accounts) => {
       await strategy.withdrawAll({ from: admin })
       const after = await snapshot()
 
-      // check underlying balance
-      assert(after.underlying.strategy.eq(new BN(0)), "underlying strategy")
+      // check eth balance
+      assert(after.eth.strategy.eq(new BN(0)), "eth strategy")
       assert(
-        after.underlying.vault.eq(
-          before.underlying.vault.add(before.strategy.totalAssets)
-        ),
-        "underlying vault"
+        after.eth.vault.eq(before.eth.vault.add(before.strategy.totalAssets)),
+        "eth vault"
       )
       // check total assets
       assert(after.strategy.totalAssets.eq(new BN(0)), "total assets")
