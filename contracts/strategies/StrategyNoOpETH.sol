@@ -5,6 +5,8 @@ pragma solidity 0.6.11;
 version 1.2.0
 */
 
+import "../protocol/IStrategyETH.sol";
+
 /*
 This is a "placeholder" strategy used during emergency shutdown
 */
