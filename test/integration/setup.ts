@@ -2,22 +2,24 @@ import "../setup"
 import BN from "bn.js"
 import {
   TestTokenInstance,
-  MockGasTokenInstance,
-  GasRelayerInstance,
-  ControllerV2Instance,
-  VaultInstance,
-  StrategyTestV2Instance,
-  StrategyNoOpV2Instance,
+  ControllerInstance,
+  ERC20VaultInstance,
+  ETHVaultInstance,
+  StrategyERC20TestInstance,
+  StrategyETHTestInstance,
+  StrategyNoOpERC20Instance,
+  StrategyNoOpETHInstance,
 } from "../../types"
 import { pow } from "../util"
 
 const TestToken = artifacts.require("TestToken")
-const MockGasToken = artifacts.require("MockGasToken")
-const GasRelayer = artifacts.require("GasRelayer")
-const ControllerV2 = artifacts.require("ControllerV2")
-const Vault = artifacts.require("Vault")
-const StrategyTestV2 = artifacts.require("StrategyTestV2")
-const StrategyNoOpV2 = artifacts.require("StrategyNoOpV2")
+const Controller = artifacts.require("Controller")
+const ERC20Vault = artifacts.require("ERC20Vault")
+const ETHVault = artifacts.require("ETHVault")
+const StrategyERC20Test = artifacts.require("StrategyERC20Test")
+const StrategyETHTest = artifacts.require("StrategyETHTest")
+const StrategyNoOpERC20 = artifacts.require("StrategyNoOpERC20")
+const StrategyNoOpETH = artifacts.require("StrategyNoOpETH")
 
 export default (accounts: Truffle.Accounts) => {
   const admin = accounts[0]
@@ -33,12 +35,13 @@ export default (accounts: Truffle.Accounts) => {
     treasury: string
     timeLock: string
     underlying: TestTokenInstance
-    gasToken: MockGasTokenInstance
-    gasRelayer: GasRelayerInstance
-    controller: ControllerV2Instance
-    vault: VaultInstance
-    strategy: StrategyTestV2Instance
-    strategyNoOp: StrategyNoOpV2Instance
+    controller: ControllerInstance
+    erc20Vault: ERC20VaultInstance
+    ethVault: ETHVaultInstance
+    strategyErc20: StrategyERC20TestInstance
+    strategyNoOpErc20: StrategyNoOpERC20Instance
+    strategyEth: StrategyETHTestInstance
+    strategyNoOpEth: StrategyNoOpETHInstance
     whale: string
   }
 
@@ -49,74 +52,110 @@ export default (accounts: Truffle.Accounts) => {
     // @ts-ignore
     underlying: null,
     // @ts-ignore
-    gasToken: null,
-    // @ts-ignore
-    gasRelayer: null,
-    // @ts-ignore
     controller: null,
     // @ts-ignore
-    vault: null,
+    erc20Vault: null,
     // @ts-ignore
-    strategy: null,
+    ethVault: null,
     // @ts-ignore
-    strategyNoOp: null,
+    strategyErc20: null,
+    // @ts-ignore
+    strategyNoOpErc20: null,
+    // @ts-ignore
+    strategyEth: null,
+    // @ts-ignore
+    strategyNoOpEth: null,
     whale,
   }
 
-  beforeEach(async () => {
+  before(async () => {
     const underlying = await TestToken.new()
-    const gasToken = await MockGasToken.new()
-    const gasRelayer = await GasRelayer.new(gasToken.address, {
+    const controller = await Controller.new(treasury, {
       from: admin,
     })
-    const controller = await ControllerV2.new(treasury, {
-      from: admin,
-    })
-    const vault = await Vault.new(controller.address, timeLock, underlying.address, {
-      from: admin,
-    })
-    const strategy = await StrategyTestV2.new(
+    // vaults
+    const erc20Vault = await ERC20Vault.new(
       controller.address,
-      vault.address,
+      timeLock,
       underlying.address,
       {
         from: admin,
       }
     )
-    const strategyNoOp = await StrategyNoOpV2.new(
+    const ethVault = await ETHVault.new(controller.address, timeLock, {
+      from: admin,
+    })
+
+    // strategies
+    const strategyErc20 = await StrategyERC20Test.new(
       controller.address,
-      vault.address,
+      erc20Vault.address,
       underlying.address,
+      {
+        from: admin,
+      }
+    )
+    const strategyNoOpErc20 = await StrategyNoOpERC20.new(
+      controller.address,
+      erc20Vault.address,
+      underlying.address,
+      {
+        from: admin,
+      }
+    )
+    const strategyEth = await StrategyETHTest.new(
+      controller.address,
+      ethVault.address,
+      {
+        from: admin,
+      }
+    )
+    const strategyNoOpEth = await StrategyNoOpETH.new(
+      controller.address,
+      ethVault.address,
       {
         from: admin,
       }
     )
 
     refs.underlying = underlying
-    refs.gasToken = gasToken
-    refs.gasRelayer = gasRelayer
     refs.controller = controller
-    refs.vault = vault
-    refs.strategy = strategy
-    refs.strategyNoOp = strategyNoOp
+    refs.erc20Vault = erc20Vault
+    refs.ethVault = ethVault
+    refs.strategyErc20 = strategyErc20
+    refs.strategyNoOpErc20 = strategyNoOpErc20
+    refs.strategyEth = strategyEth
+    refs.strategyNoOpEth = strategyNoOpEth
 
-    const adminRole = await controller.ADMIN_ROLE()
-    await controller.grantRole(adminRole, gasRelayer.address, { from: admin })
-
-    // deposit into vault
-    const amount = pow(10, 18).mul(new BN(100))
+    // deposit into vaults //
+    const amount = pow(10, 18)
+    // erc20 vault
     await underlying._mint_(whale, amount)
-    await underlying.approve(vault.address, amount, { from: whale })
-    await vault.deposit(amount, { from: whale })
+    await underlying.approve(erc20Vault.address, amount, { from: whale })
+    await erc20Vault.deposit(amount, { from: whale })
+    // eth vault
+    await ethVault.deposit({ from: whale, value: amount })
 
-    // approve StrategyNoOp
-    await vault.approveStrategy(strategyNoOp.address, { from: timeLock })
+    // strategies //
+    // approve
+    await erc20Vault.approveStrategy(strategyErc20.address, { from: timeLock })
+    await erc20Vault.approveStrategy(strategyNoOpErc20.address, { from: timeLock })
+    await ethVault.approveStrategy(strategyEth.address, { from: timeLock })
+    await ethVault.approveStrategy(strategyNoOpEth.address, { from: timeLock })
+
+    await controller.approveVault(erc20Vault.address, { from: admin })
+    await controller.approveVault(ethVault.address, { from: admin })
+
+    await controller.approveStrategy(strategyErc20.address, { from: admin })
+    await controller.approveStrategy(strategyNoOpErc20.address, { from: admin })
+    await controller.approveStrategy(strategyEth.address, { from: admin })
+    await controller.approveStrategy(strategyNoOpEth.address, { from: admin })
 
     // set strategy
-    await controller.approveVault(vault.address, { from: admin })
-    await controller.approveStrategy(strategy.address, { from: admin })
-    await vault.approveStrategy(strategy.address, { from: timeLock })
-    await controller.setStrategy(vault.address, strategy.address, new BN(0), {
+    await controller.setStrategy(erc20Vault.address, strategyErc20.address, new BN(0), {
+      from: admin,
+    })
+    await controller.setStrategy(ethVault.address, strategyEth.address, new BN(0), {
       from: admin,
     })
   })

@@ -1,19 +1,32 @@
-import { ControllerV2Instance, StrategyTestV2Instance } from "../../types"
+import {
+  ControllerInstance,
+  StrategyERC20TestInstance,
+  StrategyETHTestInstance,
+} from "../../types"
 import _setup from "./setup"
 
 contract("integration - harvest", (accounts) => {
   const refs = _setup(accounts)
   const { admin } = refs
 
-  let controller: ControllerV2Instance
-  let strategy: StrategyTestV2Instance
-  beforeEach(async () => {
+  let controller: ControllerInstance
+  let strategyErc20: StrategyERC20TestInstance
+  let strategyEth: StrategyETHTestInstance
+  before(async () => {
     controller = refs.controller
-    strategy = refs.strategy
+    strategyErc20 = refs.strategyErc20
+    strategyEth = refs.strategyEth
   })
 
-  it("should harvest", async () => {
-    await controller.harvest(strategy.address, { from: admin })
-    assert(await strategy._harvestWasCalled_(), "harvest")
+  describe("erc20", () => {
+    it("should harvest", async () => {
+      await controller.harvest(strategyErc20.address, { from: admin })
+    })
+  })
+
+  describe("eth", () => {
+    it("should harvest", async () => {
+      await controller.harvest(strategyEth.address, { from: admin })
+    })
   })
 })
