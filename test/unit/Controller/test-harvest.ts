@@ -3,7 +3,7 @@ import chai from "chai"
 import {
   ControllerInstance,
   StrategyERC20TestInstance,
-  MockVaultInstance,
+  MockERC20VaultInstance,
 } from "../../../types"
 import _setup from "./setup"
 
@@ -13,11 +13,11 @@ contract("Controller", (accounts) => {
 
   let controller: ControllerInstance
   let strategy: StrategyERC20TestInstance
-  let vault: MockVaultInstance
+  let vault: MockERC20VaultInstance
   beforeEach(async () => {
     controller = refs.controller
-    strategy = refs.strategy
-    vault = refs.vault
+    strategy = refs.strategyErc20
+    vault = refs.erc20Vault
 
     await vault.setStrategy(strategy.address, new BN(0))
   })
@@ -25,7 +25,6 @@ contract("Controller", (accounts) => {
   describe("harvest", () => {
     it("should harvest", async () => {
       await controller.harvest(strategy.address, { from: admin })
-      assert(await strategy._harvestWasCalled_(), "harvest")
     })
 
     it("should reject if not current strategy", async () => {

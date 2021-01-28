@@ -14,7 +14,7 @@ contract("Controller", (accounts) => {
     controller = refs.controller
     strategy = await StrategyERC20Test.new(
       refs.controller.address,
-      refs.vault.address,
+      refs.erc20Vault.address,
       refs.underlying.address
     )
   })

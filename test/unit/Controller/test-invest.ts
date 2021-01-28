@@ -1,5 +1,5 @@
 import chai from "chai"
-import { MockVaultInstance, ControllerInstance } from "../../../types"
+import { MockERC20VaultInstance, ControllerInstance } from "../../../types"
 import _setup from "./setup"
 
 contract("Controller", (accounts) => {
@@ -7,10 +7,10 @@ contract("Controller", (accounts) => {
   const { admin } = refs
 
   let controller: ControllerInstance
-  let vault: MockVaultInstance
+  let vault: MockERC20VaultInstance
   beforeEach(() => {
     controller = refs.controller
-    vault = refs.vault
+    vault = refs.erc20Vault
   })
 
   describe("invest", () => {

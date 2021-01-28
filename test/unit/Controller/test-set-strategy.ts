@@ -3,7 +3,7 @@ import BN from "bn.js"
 import {
   ControllerInstance,
   StrategyERC20TestInstance,
-  MockVaultInstance,
+  MockERC20VaultInstance,
 } from "../../../types"
 import { eq } from "../../util"
 import _setup from "./setup"
@@ -13,12 +13,12 @@ contract("Controller", (accounts) => {
   const { admin } = refs
 
   let controller: ControllerInstance
-  let vault: MockVaultInstance
+  let vault: MockERC20VaultInstance
   let strategy: StrategyERC20TestInstance
   beforeEach(() => {
     controller = refs.controller
-    vault = refs.vault
-    strategy = refs.strategy
+    vault = refs.erc20Vault
+    strategy = refs.strategyErc20
   })
 
   describe("setStrategy", () => {

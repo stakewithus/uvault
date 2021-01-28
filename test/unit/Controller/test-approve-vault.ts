@@ -1,20 +1,20 @@
 import chai from "chai"
-import { ControllerInstance, MockVaultInstance } from "../../../types"
+import { ControllerInstance, MockERC20VaultInstance } from "../../../types"
 import _setup from "./setup"
 
-const MockVault = artifacts.require("MockVault")
+const MockERC20Vault = artifacts.require("MockERC20Vault")
 
 contract("Controller", (accounts) => {
   const refs = _setup(accounts)
   const { admin } = refs
 
   let controller: ControllerInstance
-  let vault: MockVaultInstance
+  let vault: MockERC20VaultInstance
   beforeEach(async () => {
     controller = refs.controller
-    vault = await MockVault.new(
+    vault = await MockERC20Vault.new(
       refs.controller.address,
-      refs.timeLock.address,
+      refs.timeLock,
       refs.underlying.address
     )
   })

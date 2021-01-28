@@ -38,6 +38,7 @@ contract Controller is IController, AccessControl {
         0x27e3e4d29d60af3ae6456513164bb5db737d6fc8610aa36ad458736c9efb884c;
 
     address public override admin;
+    // treasury must be able to receive ETH from ETH vault and strategy
     address public override treasury;
 
     // approved vaults

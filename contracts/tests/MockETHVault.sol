@@ -7,7 +7,7 @@ import "../protocol/IETHVault.sol";
 contract MockETHVault is IETHVault {
     address public override admin;
     address public override controller;
-    address public override token;
+    address public override token = 0xEeeeeEeeeEeEeeEeEeEeeEEEeeeeEeeeeeeeEEeE;
     address public override strategy;
     address public override timeLock;
     uint public override reserveMin;
@@ -24,15 +24,10 @@ contract MockETHVault is IETHVault {
     uint public _withdrawAmount_;
     uint public _withdrawMin_;
 
-    constructor(
-        address _controller,
-        address _timeLock,
-        address _token
-    ) public {
+    constructor(address _controller, address _timeLock) public {
         admin = msg.sender;
         controller = _controller;
         timeLock = _timeLock;
-        token = _token;
     }
 
     receive() external payable {}
