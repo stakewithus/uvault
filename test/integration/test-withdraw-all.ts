@@ -21,16 +21,14 @@ contract("integration - withdraw all", (accounts) => {
   let ethVault: ETHVaultInstance
   let strategyErc20: StrategyERC20TestInstance
   let strategyEth: StrategyETHTestInstance
-  before(async () => {
+  beforeEach(async () => {
     underlying = refs.underlying
     controller = refs.controller
     erc20Vault = refs.erc20Vault
     ethVault = refs.ethVault
     strategyErc20 = refs.strategyErc20
     strategyEth = refs.strategyEth
-  })
 
-  beforeEach(async () => {
     // force strategy balance > 0
     await underlying._mint_(strategyErc20.address, 100)
     await strategyEth.sendTransaction({ from: admin, value: 100 })

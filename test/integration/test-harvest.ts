@@ -12,7 +12,7 @@ contract("integration - harvest", (accounts) => {
   let controller: ControllerInstance
   let strategyErc20: StrategyERC20TestInstance
   let strategyEth: StrategyETHTestInstance
-  before(async () => {
+  beforeEach(async () => {
     controller = refs.controller
     strategyErc20 = refs.strategyErc20
     strategyEth = refs.strategyEth

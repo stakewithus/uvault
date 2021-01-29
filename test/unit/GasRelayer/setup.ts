@@ -1,7 +1,7 @@
 import "../../setup"
-import {GasRelayerInstance} from "../../../types/GasRelayer"
-import {MockGasTokenInstance} from "../../../types/MockGasToken"
-import {TxReceiverInstance} from "../../../types/TxReceiver"
+import { GasRelayerInstance } from "../../../types/GasRelayer"
+import { MockGasTokenInstance } from "../../../types/MockGasToken"
+import { TxReceiverInstance } from "../../../types/TxReceiver"
 
 const GasRelayer = artifacts.require("GasRelayer")
 const MockGasToken = artifacts.require("MockGasToken")

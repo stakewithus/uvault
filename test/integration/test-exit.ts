@@ -21,7 +21,7 @@ contract("integration - exit", (accounts) => {
   let strategyErc20: StrategyERC20TestInstance
   let strategyEth: StrategyETHTestInstance
   let underlying: TestTokenInstance
-  before(async () => {
+  beforeEach(async () => {
     controller = refs.controller
     erc20Vault = refs.erc20Vault
     ethVault = refs.ethVault

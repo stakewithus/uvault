@@ -1,7 +1,7 @@
 import BN from "bn.js"
-import {GasRelayerInstance} from "../../../types/GasRelayer"
-import {MockGasTokenInstance} from "../../../types/MockGasToken"
-import {eq} from "../../util"
+import { GasRelayerInstance } from "../../../types/GasRelayer"
+import { MockGasTokenInstance } from "../../../types/MockGasToken"
+import { eq } from "../../util"
 import _setup from "./setup"
 
 contract("GasRelayer", (accounts) => {

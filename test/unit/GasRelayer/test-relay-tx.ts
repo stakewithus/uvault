@@ -1,15 +1,15 @@
 import chai from "chai"
 import BN from "bn.js"
-import {TxReceiverInstance} from "../../../types"
-import {GasRelayerInstance} from "../../../types/GasRelayer"
-import {MockGasTokenInstance} from "../../../types/MockGasToken"
-import {encodeCallMe} from "../../lib"
-import {eq} from "../../util"
+import { TxReceiverInstance } from "../../../types"
+import { GasRelayerInstance } from "../../../types/GasRelayer"
+import { MockGasTokenInstance } from "../../../types/MockGasToken"
+import { encodeCallMe } from "../../lib"
+import { eq } from "../../util"
 import _setup from "./setup"
 
 contract("GasRelayer", (accounts) => {
   const refs = _setup(accounts)
-  const {admin} = refs
+  const { admin } = refs
 
   let gasRelayer: GasRelayerInstance
   let gasToken: MockGasTokenInstance
@@ -26,14 +26,14 @@ contract("GasRelayer", (accounts) => {
 
     it("should relay tx use gas token = max", async () => {
       const maxGasToken = new BN(1)
-      gasRelayer.relayTx(txReceiver.address, data, maxGasToken, {from: admin})
+      gasRelayer.relayTx(txReceiver.address, data, maxGasToken, { from: admin })
 
       assert(eq(await gasToken._freeUpToAmount_(), maxGasToken), "free up to amount")
       assert.equal(await txReceiver._data_(), "0x1212", "tx data")
     })
 
     it("should relay tx use gas token <= max", async () => {
-      gasRelayer.relayTx(txReceiver.address, data, maxGasToken, {from: admin})
+      gasRelayer.relayTx(txReceiver.address, data, maxGasToken, { from: admin })
 
       assert((await gasToken._freeUpToAmount_()).lte(maxGasToken), "free up to amount")
       assert.equal(await txReceiver._data_(), "0x1212", "tx data")
@@ -54,7 +54,7 @@ contract("GasRelayer", (accounts) => {
 
       await chai
         .expect(
-          gasRelayer.relayTx(txReceiver.address, data, maxGasToken, {from: admin})
+          gasRelayer.relayTx(txReceiver.address, data, maxGasToken, { from: admin })
         )
         .to.be.rejectedWith("failed")
     })

@@ -14,7 +14,7 @@ contract("integration - skim", (accounts) => {
   let controller: ControllerInstance
   let strategyErc20: StrategyERC20TestInstance
   let strategyEth: StrategyETHTestInstance
-  before(async () => {
+  beforeEach(async () => {
     underlying = refs.underlying
     controller = refs.controller
     strategyErc20 = refs.strategyErc20

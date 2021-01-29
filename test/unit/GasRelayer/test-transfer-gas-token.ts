@@ -1,8 +1,8 @@
 import chai from "chai"
 import BN from "bn.js"
-import {GasRelayerInstance} from "../../../types/GasRelayer"
-import {MockGasTokenInstance} from "../../../types/MockGasToken"
-import {eq} from "../../util"
+import { GasRelayerInstance } from "../../../types/GasRelayer"
+import { MockGasTokenInstance } from "../../../types/MockGasToken"
+import { eq } from "../../util"
 import _setup from "./setup"
 
 contract("GasRelayer", (accounts) => {
@@ -28,7 +28,7 @@ contract("GasRelayer", (accounts) => {
 
     it("should reject if caller not admin", async () => {
       await chai
-        .expect(gasRelayer.transferGasToken(accounts[0], 123, {from: accounts[1]}))
+        .expect(gasRelayer.transferGasToken(accounts[0], 123, { from: accounts[1] }))
         .to.be.rejectedWith("!admin")
     })
   })

@@ -68,7 +68,7 @@ export default (accounts: Truffle.Accounts) => {
     whale,
   }
 
-  before(async () => {
+  beforeEach(async () => {
     const underlying = await TestToken.new()
     const controller = await Controller.new(treasury, {
       from: admin,

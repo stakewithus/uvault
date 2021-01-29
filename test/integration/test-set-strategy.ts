@@ -25,7 +25,7 @@ contract("integration - set strategy", (accounts) => {
   let newStrategyErc20: StrategyERC20TestInstance
   let strategyEth: StrategyETHTestInstance
   let newStrategyEth: StrategyETHTestInstance
-  before(async () => {
+  beforeEach(async () => {
     underlying = refs.underlying
     controller = refs.controller
     erc20Vault = refs.erc20Vault
