@@ -17,6 +17,30 @@ export function eq(x: BN | number, y: BN | number): Boolean {
   return x.eq(y)
 }
 
+export function gt(x: BN | number, y: BN | number): Boolean {
+  x = cast(x)
+  y = cast(y)
+  return x.gt(y)
+}
+
+export function gte(x: BN | number, y: BN | number): Boolean {
+  x = cast(x)
+  y = cast(y)
+  return x.gte(y)
+}
+
+export function lt(x: BN | number, y: BN | number): Boolean {
+  x = cast(x)
+  y = cast(y)
+  return x.lt(y)
+}
+
+export function lte(x: BN | number, y: BN | number): Boolean {
+  x = cast(x)
+  y = cast(y)
+  return x.lte(y)
+}
+
 export function pow(x: BN | number, y: BN | number): BN {
   x = cast(x)
   y = cast(y)

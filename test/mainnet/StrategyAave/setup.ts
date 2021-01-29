@@ -6,7 +6,7 @@ import { Refs, StrategyContract } from "./lib"
 const IERC20 = artifacts.require("IERC20")
 const StableSwapAave = artifacts.require("StableSwapAave")
 const LiquidityGaugeV2 = artifacts.require("LiquidityGaugeV2")
-const ControllerV2 = artifacts.require("ControllerV2")
+const Controller = artifacts.require("Controller")
 
 export default (
   accounts: Truffle.Accounts,
@@ -57,7 +57,7 @@ export default (
     refs.stableSwap = await StableSwapAave.at(STABLE_SWAP)
     refs.gauge = await LiquidityGaugeV2.at(GAUGE)
     refs.crv = await IERC20.at(CRV)
-    refs.controller = await ControllerV2.new(treasury)
+    refs.controller = await Controller.new(treasury)
     refs.strategy = await Strategy.new(refs.controller.address, vault)
   })
 

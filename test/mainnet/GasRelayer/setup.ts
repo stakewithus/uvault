@@ -1,5 +1,3 @@
-import BN from "bn.js"
-import { sendEther } from "../../util"
 import { CHI } from "../config"
 import { Refs } from "./lib"
 

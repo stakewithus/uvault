@@ -2,7 +2,7 @@ import {
   IERC20Instance,
   StableSwapAaveInstance,
   LiquidityGaugeV2Instance,
-  ControllerV2Instance,
+  ControllerInstance,
   StrategyAaveDaiContract,
   StrategyAaveDaiInstance,
   StrategyAaveUsdcContract,
@@ -31,7 +31,7 @@ export interface Refs {
   stableSwap: StableSwapAaveInstance
   gauge: LiquidityGaugeV2Instance
   crv: IERC20Instance
-  controller: ControllerV2Instance
+  controller: ControllerInstance
   strategy: StrategyInstance
   whale: string
 }
