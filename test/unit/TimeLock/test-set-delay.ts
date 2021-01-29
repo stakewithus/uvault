@@ -1,7 +1,7 @@
 import chai from "chai"
 //@ts-ignore
-import {time} from "@openzeppelin/test-helpers"
-import {TimeLockInstance} from "../../../types/TimeLock"
+import { time } from "@openzeppelin/test-helpers"
+import { TimeLockInstance } from "../../../types/TimeLock"
 import _setup from "./setup"
 
 export function encodeSetDelay(web3: Web3, delay: number) {
@@ -22,7 +22,7 @@ export function encodeSetDelay(web3: Web3, delay: number) {
 
 contract("TimeLock", (accounts) => {
   const refs = _setup(accounts)
-  const {admin, DELAY} = refs
+  const { admin, DELAY } = refs
 
   let timeLock: TimeLockInstance
   beforeEach(() => {
@@ -67,7 +67,7 @@ contract("TimeLock", (accounts) => {
 
     it("should reject if caller not this contract", async () => {
       await chai
-        .expect(timeLock.setDelay(123, {from: admin}))
+        .expect(timeLock.setDelay(123, { from: admin }))
         .to.be.rejectedWith("!timelock")
     })
 
@@ -87,7 +87,7 @@ contract("TimeLock", (accounts) => {
       await time.increase(DELAY + 1000)
 
       await chai
-        .expect(timeLock.execute(timeLock.address, value, data, eta, {from: admin}))
+        .expect(timeLock.execute(timeLock.address, value, data, eta, { from: admin }))
         .to.be.rejectedWith("tx failed")
     })
 
@@ -107,7 +107,7 @@ contract("TimeLock", (accounts) => {
       await time.increase(DELAY + 1000)
 
       await chai
-        .expect(timeLock.execute(timeLock.address, value, data, eta, {from: admin}))
+        .expect(timeLock.execute(timeLock.address, value, data, eta, { from: admin }))
         .to.be.rejectedWith("tx failed")
     })
   })

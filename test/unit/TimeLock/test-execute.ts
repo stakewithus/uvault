@@ -1,13 +1,13 @@
 import chai from "chai"
 //@ts-ignore
-import {time} from "@openzeppelin/test-helpers"
-import {TxReceiverInstance} from "../../../types"
-import {TimeLockInstance} from "../../../types/TimeLock"
+import { time } from "@openzeppelin/test-helpers"
+import { TxReceiverInstance } from "../../../types"
+import { TimeLockInstance } from "../../../types/TimeLock"
 import _setup from "./setup"
 
 contract("TimeLock", (accounts) => {
   const refs = _setup(accounts)
-  const {admin, DELAY, DATA} = refs
+  const { admin, DELAY, DATA } = refs
 
   let timeLock: TimeLockInstance
   let txReceiver: TxReceiverInstance
@@ -61,7 +61,7 @@ contract("TimeLock", (accounts) => {
     it("should reject if caller not admin", async () => {
       await chai
         .expect(
-          timeLock.execute(txReceiver.address, value, DATA, eta, {from: accounts[3]})
+          timeLock.execute(txReceiver.address, value, DATA, eta, { from: accounts[3] })
         )
         .to.be.rejectedWith("!admin")
     })
@@ -70,13 +70,13 @@ contract("TimeLock", (accounts) => {
       // change eta to get different tx hash
       const eta = now + DELAY + 1000
       await chai
-        .expect(timeLock.execute(txReceiver.address, value, DATA, eta, {from: admin}))
+        .expect(timeLock.execute(txReceiver.address, value, DATA, eta, { from: admin }))
         .to.be.rejectedWith("!queued")
     })
 
     it("should reject if now < eta", async () => {
       await chai
-        .expect(timeLock.execute(txReceiver.address, value, DATA, eta, {from: admin}))
+        .expect(timeLock.execute(txReceiver.address, value, DATA, eta, { from: admin }))
         .to.be.rejectedWith("eta < now")
     })
 
@@ -84,7 +84,7 @@ contract("TimeLock", (accounts) => {
       await time.increase(DELAY + 100 + 60 * 60 * 24 * 14 + 1)
 
       await chai
-        .expect(timeLock.execute(txReceiver.address, value, DATA, eta, {from: admin}))
+        .expect(timeLock.execute(txReceiver.address, value, DATA, eta, { from: admin }))
         .to.be.rejectedWith("eta expired")
     })
 
@@ -93,7 +93,7 @@ contract("TimeLock", (accounts) => {
       await txReceiver._setFail_(true)
 
       await chai
-        .expect(timeLock.execute(txReceiver.address, value, DATA, eta, {from: admin}))
+        .expect(timeLock.execute(txReceiver.address, value, DATA, eta, { from: admin }))
         .to.be.rejectedWith("tx failed")
     })
   })

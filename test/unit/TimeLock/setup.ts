@@ -1,7 +1,7 @@
 import "../../setup"
-import {TimeLockInstance} from "../../../types/TimeLock"
-import {TxReceiverInstance} from "../../../types/TxReceiver"
-import {encodeCallMe} from "../../lib"
+import { TimeLockInstance } from "../../../types/TimeLock"
+import { TxReceiverInstance } from "../../../types/TxReceiver"
+import { encodeCallMe } from "../../lib"
 
 const TimeLock = artifacts.require("TimeLock")
 const TxReceiver = artifacts.require("TxReceiver")

@@ -1,13 +1,13 @@
 import chai from "chai"
 // @ts-ignore
-import {time} from "@openzeppelin/test-helpers"
-import {TxReceiverInstance} from "../../../types"
-import {TimeLockInstance} from "../../../types/TimeLock"
+import { time } from "@openzeppelin/test-helpers"
+import { TxReceiverInstance } from "../../../types"
+import { TimeLockInstance } from "../../../types/TimeLock"
 import _setup from "./setup"
 
 contract("TimeLock", (accounts) => {
   const refs = _setup(accounts)
-  const {admin, DELAY, DATA} = refs
+  const { admin, DELAY, DATA } = refs
 
   let timeLock: TimeLockInstance
   let txReceiver: TxReceiverInstance
@@ -53,7 +53,7 @@ contract("TimeLock", (accounts) => {
     it("should reject if caller not admin", async () => {
       await chai
         .expect(
-          timeLock.queue(txReceiver.address, value, DATA, eta, {from: accounts[1]})
+          timeLock.queue(txReceiver.address, value, DATA, eta, { from: accounts[1] })
         )
         .to.be.rejectedWith("!admin")
     })
@@ -62,7 +62,7 @@ contract("TimeLock", (accounts) => {
       eta = now + DELAY - 1
 
       await chai
-        .expect(timeLock.queue(txReceiver.address, value, DATA, eta, {from: admin}))
+        .expect(timeLock.queue(txReceiver.address, value, DATA, eta, { from: admin }))
         .to.be.rejectedWith("eta < now + delay")
     })
   })

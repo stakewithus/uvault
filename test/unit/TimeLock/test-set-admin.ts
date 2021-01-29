@@ -1,11 +1,11 @@
 import chai from "chai"
-import {TimeLockInstance} from "../../../types/TimeLock"
-import {ZERO_ADDRESS} from "../../util"
+import { TimeLockInstance } from "../../../types/TimeLock"
+import { ZERO_ADDRESS } from "../../util"
 import _setup from "./setup"
 
 contract("TimeLock", (accounts) => {
   const refs = _setup(accounts)
-  const {admin} = refs
+  const { admin } = refs
 
   let timeLock: TimeLockInstance
   beforeEach(() => {
@@ -14,7 +14,7 @@ contract("TimeLock", (accounts) => {
 
   describe("setAdmin", () => {
     it("should set admin", async () => {
-      const tx = await timeLock.setAdmin(accounts[1], {from: admin})
+      const tx = await timeLock.setAdmin(accounts[1], { from: admin })
 
       assert.equal(await timeLock.admin(), accounts[1])
       // check log
@@ -26,13 +26,13 @@ contract("TimeLock", (accounts) => {
 
     it("should reject if caller not admin", async () => {
       await chai
-        .expect(timeLock.setAdmin(accounts[1], {from: accounts[1]}))
+        .expect(timeLock.setAdmin(accounts[1], { from: accounts[1] }))
         .to.be.rejectedWith("!admin")
     })
 
     it("should reject zero address", async () => {
       await chai
-        .expect(timeLock.setAdmin(ZERO_ADDRESS, {from: admin}))
+        .expect(timeLock.setAdmin(ZERO_ADDRESS, { from: admin }))
         .to.be.rejectedWith("admin = zero address")
     })
   })
