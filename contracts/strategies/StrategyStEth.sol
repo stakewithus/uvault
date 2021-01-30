@@ -135,9 +135,9 @@ contract StrategyStEth is StrategyETH {
     }
 
     function _claimRewards() private {
-        // TODO how is LDO claimed from Gauge?
         // claims LDO
         LiquidityGaugeV2(GAUGE).claim_rewards();
+        // claim CRV
         Minter(MINTER).mint(GAUGE);
 
         // Infinity approval for Uniswap to spend on LDO and CRV set inside constructor
