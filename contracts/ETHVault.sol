@@ -15,9 +15,9 @@ import "./protocol/IStrategyETH.sol";
 import "./protocol/IETHVault.sol";
 import "./protocol/IController.sol";
 
-// TODO reentrancy
-// TODO denial of service?
-// TODO force ETH
+// TODO: reentrancy
+// TODO: denial of service?
+// TODO: force ETH
 contract ETHVault is IETHVault, ERC20, ReentrancyGuard {
     using SafeERC20 for IERC20;
     using SafeMath for uint;

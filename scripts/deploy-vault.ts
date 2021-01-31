@@ -5,9 +5,9 @@ import { deploy, getAddress } from "./lib"
 
 /*
 usage:
-env $(cat .env) npx hardhat deploy:vault --network ropsten --token testToken --dev false
+env $(cat .env) npx hardhat deploy:erc20-vault --network ropsten --token testToken --dev false
 */
-task("deploy:vault", "Deploy vault")
+task("deploy:vault", "Deploy ERC20 vault")
   .addParam("token", "Name of token")
   .addOptionalParam("dev", "Use mainnet dev", "false")
   .setAction(async (args, hre) => {

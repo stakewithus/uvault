@@ -8,9 +8,9 @@ import "../interfaces/curve/Minter.sol";
 import "../interfaces/curve/StableSwapSTETH.sol";
 import "../interfaces/lido/StETH.sol";
 
-// TODO reentrancy
-// TODO DOS
-// TODO force ETH
+// TODO: reentrancy
+// TODO: DOS
+// TODO: force ETH
 contract StrategyStEth is StrategyETH {
     // Uniswap //
     address private constant UNISWAP = 0x7a250d5630B4cF539739dF2C5dAcb4c659F2488D;
