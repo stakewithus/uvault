@@ -33,11 +33,8 @@ contract StrategyStEth is StrategyETH {
         public
         StrategyETH(_controller, _vault)
     {
-        // TODO inifinity approval?
-
         // These tokens are never stored inside this contract
         // so risk of them being stolen is minimal
-        IERC20(ST_ETH).safeApprove(POOL, uint(-1));
         IERC20(LDO).safeApprove(UNISWAP, uint(-1));
         IERC20(CRV).safeApprove(UNISWAP, uint(-1));
     }
@@ -73,6 +70,11 @@ contract StrategyStEth is StrategyETH {
 
             uint ethBal = address(this).balance;
             uint stEthBal = IERC20(ST_ETH).balanceOf(address(this));
+
+            if (stEthBal > 0) {
+                // ST_ETH is proxy so don't allow infinite approval
+                IERC20(ST_ETH).safeApprove(POOL, stEthBal);
+            }
 
             /*
             shares = eth amount * 1e18 / price per share

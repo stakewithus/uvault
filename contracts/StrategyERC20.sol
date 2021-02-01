@@ -22,8 +22,6 @@ import "./protocol/IStrategyERC20.sol";
 // used inside harvest
 import "./protocol/IController.sol";
 
-//TODO: reentrancy protection
-
 abstract contract StrategyERC20 is IStrategyERC20 {
     using SafeERC20 for IERC20;
     using SafeMath for uint;
