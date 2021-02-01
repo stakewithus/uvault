@@ -26,10 +26,10 @@ contract StrategyNoOpERC20 is IStrategyERC20 {
     address public override vault;
     address public override underlying;
 
-    uint public override totalDebt;
-    uint public override performanceFee;
-    uint public override slippage;
-    uint public override delta;
+    uint public constant override totalDebt = 0;
+    uint public constant override performanceFee = 0;
+    uint public constant override slippage = 0;
+    uint public constant override delta = 0;
 
     constructor(
         address _controller,

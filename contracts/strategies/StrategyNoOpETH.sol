@@ -19,13 +19,13 @@ contract StrategyNoOpETH is IStrategyETH {
     address public override controller;
     address public override vault;
     // Placeholder address of ETH, indicating this is strategy for ETH
-    address public immutable override underlying =
+    address public constant override underlying =
         0xEeeeeEeeeEeEeeEeEeEeeEEEeeeeEeeeeeeeEEeE;
 
-    uint public override totalDebt;
-    uint public override performanceFee;
-    uint public override slippage;
-    uint public override delta;
+    uint public constant override totalDebt = 0;
+    uint public constant override performanceFee = 0;
+    uint public constant override slippage = 0;
+    uint public constant override delta = 0;
 
     constructor(address _controller, address _vault) public {
         require(_controller != address(0), "controller = zero address");
