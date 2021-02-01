@@ -20,7 +20,6 @@ import "./protocol/IVault.sol";
 import "./protocol/IStrategy.sol";
 import "./AccessControl.sol";
 
-// TODO: reentrancy
 contract Controller is IController, AccessControl {
     using SafeMath for uint;
 
