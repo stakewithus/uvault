@@ -59,8 +59,7 @@ contract ETHVault is IETHVault, ERC20, ReentrancyGuard {
         require(_controller != address(0), "controller = zero address");
         require(_timeLock != address(0), "time lock = zero address");
 
-        // set to ETH decimals
-        // ERC20 defaults to 18 decimals
+        // ETH decimals = 18 and ERC20 defaults to 18 decimals
 
         admin = msg.sender;
         controller = _controller;
