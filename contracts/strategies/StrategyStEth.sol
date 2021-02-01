@@ -8,9 +8,6 @@ import "../interfaces/curve/Minter.sol";
 import "../interfaces/curve/StableSwapSTETH.sol";
 import "../interfaces/lido/StETH.sol";
 
-// TODO: reentrancy
-// TODO: DOS
-// TODO: force ETH
 contract StrategyStEth is StrategyETH {
     // Uniswap //
     address private constant UNISWAP = 0x7a250d5630B4cF539739dF2C5dAcb4c659F2488D;
@@ -51,11 +48,10 @@ contract StrategyStEth is StrategyETH {
     }
 
     function _totalAssets() internal view override returns (uint) {
-        uint bal = address(this).balance;
         uint shares = LiquidityGaugeV2(GAUGE).balanceOf(address(this));
         uint pricePerShare = StableSwapSTETH(POOL).get_virtual_price();
 
-        return bal.add(shares.mul(pricePerShare) / 1e18);
+        return shares.mul(pricePerShare) / 1e18;
     }
 
     /*
@@ -165,6 +161,7 @@ contract StrategyStEth is StrategyETH {
             if (fee > 0) {
                 address treasury = IController(controller).treasury();
                 require(treasury != address(0), "treasury = zero address");
+                // treasury must be able to receive ETH
                 (bool sent, ) = treasury.call{value: fee}("");
                 require(sent, "Send ETH failed");
             }

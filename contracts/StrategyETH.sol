@@ -13,7 +13,6 @@ import "./protocol/IStrategyETH.sol";
 // used inside harvest
 import "./protocol/IController.sol";
 
-//TODO: reentrancy protection
 abstract contract StrategyETH is IStrategyETH {
     using SafeERC20 for IERC20;
     using SafeMath for uint;
