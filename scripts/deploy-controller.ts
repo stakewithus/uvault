@@ -13,10 +13,10 @@ task("deploy:controller", "Deploy controller (v2)")
     assert(args.dev === "false" || args.dev === "true", `invalid arg dev: ${args.dev}`)
     const dev = args.dev === "true"
 
-    await deploy(hre, "ControllerV2", dev, async (_account, network) => {
+    await deploy(hre, "Controller", dev, async (_account, network) => {
       const treasury = getAddress(config, network, dev, "treasury")
 
-      const ControllerV2 = await hre.ethers.getContractFactory("ControllerV2")
-      return ControllerV2.deploy(treasury)
+      const Controller = await hre.ethers.getContractFactory("Controller")
+      return Controller.deploy(treasury)
     })
   })
