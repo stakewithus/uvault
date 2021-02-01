@@ -1,4 +1,4 @@
-import { USDC_DECIMALS } from "../../util"
+import { USDC_DECIMALS } from "../util"
 import _setup from "./setup"
 import test from "../StrategyAave/create-test-withdraw"
 

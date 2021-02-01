@@ -66,15 +66,6 @@ export function frac(x: BN | number, n: BN | number, d: BN | number): BN {
   return x.mul(n).div(d)
 }
 
-export const DAI_DECIMALS = new BN(18)
-export const DAI_TO_CURVE_DECIMALS = new BN(1)
-
-export const USDC_DECIMALS = new BN(6)
-export const USDC_TO_CURVE_DECIMALS = new BN(10).pow(new BN(12))
-
-export const USDT_DECIMALS = new BN(6)
-export const USDT_TO_CURVE_DECIMALS = new BN(10).pow(new BN(12))
-
 export function sendEther(web3: Web3, from: string, to: string, amount: BN) {
   return web3.eth.sendTransaction({
     from,

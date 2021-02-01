@@ -1,4 +1,4 @@
-import { USDC_DECIMALS, USDC_TO_CURVE_DECIMALS } from "../../util"
+import { USDC_DECIMALS, USDC_TO_CURVE_DECIMALS } from "../util"
 import _setup from "./setup"
 import test from "../StrategyPaxV2/create-test-deposit"
 

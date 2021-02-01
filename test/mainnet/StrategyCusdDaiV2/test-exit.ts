@@ -1,4 +1,4 @@
-import { DAI_DECIMALS } from "../../util"
+import { DAI_DECIMALS } from "../util"
 import _setup from "./setup"
 import test from "../StrategyCusdV2/create-test-exit"
 

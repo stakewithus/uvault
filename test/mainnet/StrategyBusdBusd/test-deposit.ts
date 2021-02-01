@@ -1,4 +1,4 @@
-import { BUSD_DECIMALS, BUSD_TO_CURVE_DECIMALS } from "../../util"
+import { BUSD_DECIMALS, BUSD_TO_CURVE_DECIMALS } from "../util"
 import _setup from "./setup"
 import test from "../StrategyBusdV2/create-test-deposit"
 
