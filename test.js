@@ -10,7 +10,7 @@ function sleep(ms) {
 
 function _glob(pattern) {
   return new Promise((resolve, reject) => {
-    glob(pattern, null, (err, files) => {
+    glob(pattern, {}, (err, files) => {
       if (err) {
         reject(err)
       } else {
@@ -20,13 +20,15 @@ function _glob(pattern) {
   })
 }
 
+const PATTERN = "test/mainnet/StrategyAave*/test-*.ts"
+
 async function main() {
   // test/mainnet/**/test-*.ts
-  const pattern = process.argv[2]
-
+  // const pattern = process.argv[2].trim()
   console.log(`Running mainnet tests...`)
 
-  const files = await _glob(pattern)
+  // BUG passing pattern from input does not return correct files
+  const files = await _glob(PATTERN)
 
   for (const file of files) {
     console.log(file)
