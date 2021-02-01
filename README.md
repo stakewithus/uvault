@@ -39,7 +39,7 @@ npx ganache-cli \
 --unlock $DAI_WHALE \
 --unlock $USDC_WHALE \
 --unlock $USDT_WHALE \
---unlock $CHI_WHALE \
+--unlock $BUSD_WHALE \
 --networkId 999
 
 # NOTE
