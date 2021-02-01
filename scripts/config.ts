@@ -17,14 +17,15 @@ export interface Config {
     treasury: string
     controller: string
     timeLock: string
-    // low risk vaults
+    // vaults
     daiSafeVault: string
     usdcSafeVault: string
     usdtSafeVault: string
-    // higher risk vaults
     daiGrowthVault: string
     usdcGrowthVault: string
     usdtGrowthVault: string
+    busdVault: string
+    ethVault: string
     // strategies
     strategyNoOpSafeDai: string
     strategyNoOpSafeUsdc: string
@@ -62,22 +63,24 @@ export interface Config {
     daiVault: string
     usdcVault: string
     usdtVault: string
-    strategyNoOpDai: string
-    strategyNoOpUsdc: string
-    strategyNoOpUsdt: string
-    strategyPaxDai: string
-    strategyPaxUsdc: string
-    strategyPaxUsdt: string
+    busdVault: string
+    ethVault: string
+    strategyAaveDai: string
+    strategyAaveUsdc: string
+    strategyAaveUsdt: string
+    strategyBusdBusd: string
     strategyBusdDai: string
     strategyBusdUsdc: string
     strategyBusdUsdt: string
     strategyGusdDai: string
     strategyGusdUsdc: string
     strategyGusdUsdt: string
-    // v2 strategies
-    strategyAaveDai: string
-    strategyAaveUsdc: string
-    strategyAaveUsdt: string
+    strategyNoOpDai: string
+    strategyNoOpUsdc: string
+    strategyNoOpUsdt: string
+    strategyPaxDai: string
+    strategyPaxUsdc: string
+    strategyPaxUsdt: string
     // others
     dai: string
     usdc: string
@@ -111,14 +114,15 @@ const config: Config = {
     treasury: "0x1C064EA662365c09c8E87242791dAcbb90002605",
     controller: "0x13195FA27De3FC1b5AdcFB9b005989157600EFCC",
     timeLock: "0x8dcb98361a49550593B57747Ab2825983EF43662",
-    // safe vaults //
+    // vaults //
     daiSafeVault: "0x4aD0b81f92B16624BBcF46FC0030cFBBf8d02376",
     usdcSafeVault: "0xBc5991cCd8cAcEba01edC44C2BB9832712c29cAB",
     usdtSafeVault: "0x178Bf8fD04b47D2De3eF3f6b3D112106375ad584",
-    // growth vaults //
     daiGrowthVault: "0x388029Bd38cf6CA61D3f74CA2984d37CFdB8e3fA",
     usdcGrowthVault: "0xEAa84fc94bCE3028050D185657eBcA4B3dcc232B",
     usdtGrowthVault: "0x0b3A87aFfbFe0F38490DA657a813A95e7844B38a",
+    busdVault: "",
+    ethVault: "",
     // strategies //
     strategyNoOpSafeDai: "0xB8B2d189DB65A50422A444cA284f04c6421F610B",
     strategyNoOpSafeUsdc: "0x63a72001F48e3bbd461C268b7Bb417374D0b19a1",
@@ -158,26 +162,29 @@ const config: Config = {
     treasury: "0x9a4c3Fc4683b95EBF11B535057B00812f6a549Bb",
     // time lock set to admin
     timeLock: "0x86d10751B18F3fE331C146546868a07224A8598B",
+    // vaults //
     daiVault: "0xFd9f501324c07613f8Fb4d73C798D764D0BFcdcC",
     usdcVault: "0x167E3254a9298ebF29F67e0AE0326d2018c9bC44",
     usdtVault: "0xdADa607772Ad29f5a90a8817532Ebf983709af15",
-    // strategies v1 (TODO redeploy v2) //
-    strategyNoOpDai: "0x1b79EbE1C9c128Eb30e6f6EBb0741991B696ab80",
-    strategyNoOpUsdc: "0x64d43B0D0EDfa8434059d12bCF861da7eE8dD4bc",
-    strategyNoOpUsdt: "0xc2e4e82853c28DCF81930852E5A055236364d8F6",
+    busdVault: "",
+    ethVault: "",
+    // strategies (TODO redeploy v2) //
+    strategyAaveDai: "0x156f47C98BEFee0Be232f26dcecA600C5D3496C5",
+    strategyAaveUsdc: "0xaE4BF42667A6cFc9B3C45b07fB63881077CB12C7",
+    strategyAaveUsdt: "0xFa76D3492B3D9EcdA2122DB84FAeCbf434684AF0",
+    strategyBusdBusd: "",
     strategyBusdDai: "0xffa01cA5FFd9e9F8a24CfdcA8C9157bD59D80405",
     strategyBusdUsdc: "0x042b298B30C67c8921d5376ad9a065E834280F26",
     strategyBusdUsdt: "0xedA38758d7Ea23adc780731d16A4382f17C9e59a",
     strategyGusdDai: "0xfd11221fE0E2c8e552afe8622946946428a17650",
     strategyGusdUsdc: "0x668973f5f8E47844bc75Bbe9BAd9C7AD0542B8bc",
     strategyGusdUsdt: "0xB295bEC46cF0141B7E011Dc19Ae0036796691083",
+    strategyNoOpDai: "0x1b79EbE1C9c128Eb30e6f6EBb0741991B696ab80",
+    strategyNoOpUsdc: "0x64d43B0D0EDfa8434059d12bCF861da7eE8dD4bc",
+    strategyNoOpUsdt: "0xc2e4e82853c28DCF81930852E5A055236364d8F6",
     strategyPaxDai: "0x2b3512efBeeb609CF9D49486b6e2DD9CF10Be6c9",
     strategyPaxUsdc: "0xb1F1AeD30dFe5787dFb65F6Cb96D90b3ae347F68",
     strategyPaxUsdt: "0x3032dBB5DB8aB5Bd85bf2Ca496e02Ce5378A5726",
-    // v2 strategies
-    strategyAaveDai: "0x156f47C98BEFee0Be232f26dcecA600C5D3496C5",
-    strategyAaveUsdc: "0xaE4BF42667A6cFc9B3C45b07fB63881077CB12C7",
-    strategyAaveUsdt: "0xFa76D3492B3D9EcdA2122DB84FAeCbf434684AF0",
     // others //
     dai: "0x6B175474E89094C44Da98b954EedeAC495271d0F",
     usdc: "0xA0b86991c6218b36c1d19D4a2e9Eb0cE3606eB48",
