@@ -33,8 +33,8 @@ contract StrategyStEth is StrategyETH {
         public
         StrategyETH(_controller, _vault)
     {
-        // These tokens are never stored inside this contract
-        // so risk of them being stolen is minimal
+        // These tokens are never held by this contract
+        // so the risk of them being stolen is minimal
         IERC20(LDO).safeApprove(UNISWAP, uint(-1));
         IERC20(CRV).safeApprove(UNISWAP, uint(-1));
     }

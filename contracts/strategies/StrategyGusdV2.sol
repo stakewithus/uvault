@@ -46,8 +46,8 @@ contract StrategyGusdV2 is StrategyERC20 {
         address _vault,
         address _underlying
     ) public StrategyERC20(_controller, _vault, _underlying) {
-        // These tokens are never stored inside this contract
-        // so risk of them being stolen is minimal
+        // These tokens are never held by this contract
+        // so the risk of them being stolen is minimal
         IERC20(CRV).safeApprove(UNISWAP, uint(-1));
     }
 
