@@ -8,11 +8,11 @@ usage:
 env $(cat .env) npx hardhat deploy:strategy \
 --network ropsten \
 --dev false \
---strategy StrategyNoOp \
+--strategy StrategyNoOpERC20 \
 --vault vault
 --token testToken
 */
-task("deploy:strategy", "Deploy vault")
+task("deploy:strategy", "Deploy ER20 / ETH strategy")
   .addParam("strategy", "Name of strategy")
   .addParam("vault", "Name of vault")
   .addOptionalParam("token", "Name of token", "")

@@ -68,7 +68,7 @@ export interface Config {
     strategyAaveDai: string
     strategyAaveUsdc: string
     strategyAaveUsdt: string
-    strategyBusdBusd: string
+    strategyBusdBusdV2: string
     strategyBusdDai: string
     strategyBusdUsdc: string
     strategyBusdUsdt: string
@@ -81,6 +81,7 @@ export interface Config {
     strategyPaxDai: string
     strategyPaxUsdc: string
     strategyPaxUsdt: string
+    strategyStEth: string
     // others
     dai: string
     usdc: string
@@ -169,7 +170,7 @@ const config: Config = {
     strategyAaveDai: "0x156f47C98BEFee0Be232f26dcecA600C5D3496C5",
     strategyAaveUsdc: "0xaE4BF42667A6cFc9B3C45b07fB63881077CB12C7",
     strategyAaveUsdt: "0xFa76D3492B3D9EcdA2122DB84FAeCbf434684AF0",
-    strategyBusdBusd: "",
+    strategyBusdBusdV2: "0x6A47Cc25C1803757E44FF6e1DB7dC39b93Cc8d6D",
     strategyBusdDai: "0xffa01cA5FFd9e9F8a24CfdcA8C9157bD59D80405",
     strategyBusdUsdc: "0x042b298B30C67c8921d5376ad9a065E834280F26",
     strategyBusdUsdt: "0xedA38758d7Ea23adc780731d16A4382f17C9e59a",
@@ -182,6 +183,7 @@ const config: Config = {
     strategyPaxDai: "0x2b3512efBeeb609CF9D49486b6e2DD9CF10Be6c9",
     strategyPaxUsdc: "0xb1F1AeD30dFe5787dFb65F6Cb96D90b3ae347F68",
     strategyPaxUsdt: "0x3032dBB5DB8aB5Bd85bf2Ca496e02Ce5378A5726",
+    strategyStEth: "",
     // others //
     dai: "0x6B175474E89094C44Da98b954EedeAC495271d0F",
     usdc: "0xA0b86991c6218b36c1d19D4a2e9Eb0cE3606eB48",
