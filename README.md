@@ -83,8 +83,8 @@ slither . --print cfg
 slither . --print function-summary
 slither . --print vars-and-auth
 
-# check ERC20
-slither-check-erc . Vault
+# save warnings / erros to ignore
+slither . --triage
 
 # reset Slither
 rm slither.db.json

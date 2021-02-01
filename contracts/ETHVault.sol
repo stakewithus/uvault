@@ -30,7 +30,7 @@ contract ETHVault is IETHVault, ERC20, ReentrancyGuard {
     address public override admin;
     address public override controller;
     address public override timeLock;
-    address public immutable override token = ETH;
+    address public constant override token = ETH;
     address public override strategy;
 
     // mapping of approved strategies
