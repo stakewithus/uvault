@@ -122,8 +122,7 @@ env $(cat .env) npx hardhat verify --network mainnet DEPLOYED_CONTRACT_ADDRESS C
 ##### Flatten Contracts
 
 ```shell
-npm i -g truffle-flattener
-truffle-flattener <solidity-files>
+npm run flat -- contracts/Contract.sol > flat.sol
 ```
 
 ##### Archived Contracts

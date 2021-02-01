@@ -16,7 +16,8 @@
     "test:unit": "npm run typecheck && truffle test test/unit/**/test-*.ts",
     "test:integration": "npm run typecheck && truffle test test/integration/test-*.ts",
     "types": "typechain --target=truffle-v5 --outDir types 'build/contracts/*.json'",
-    "typecheck": "tsc --noEmit"
+    "typecheck": "tsc --noEmit",
+    "flat": "truffle-flattener"
   },
   "dependencies": {
     "@openzeppelin/contracts": "3.3.0"
