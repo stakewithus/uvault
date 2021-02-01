@@ -21,14 +21,18 @@ function _glob(pattern) {
 }
 
 async function main() {
-  console.log("Running mainnet tests...")
+  // test/mainnet/**/test-*.ts
+  const pattern = process.argv[2]
 
-  const files = await _glob("test/unit/**/test-*.ts")
+  console.log(`Running mainnet tests...`)
+
+  const files = await _glob(pattern)
 
   for (const file of files) {
     console.log(file)
 
-    // test
+    // test //
+    // NOTE: test failures are printed to stdout, exit code = 0
     const { stdout } = await exec(`npx truffle --network mainnet_fork test  ${file}`)
     console.log(stdout)
 
