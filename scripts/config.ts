@@ -164,7 +164,7 @@ const config: Config = {
     usdcVault: "0x167E3254a9298ebF29F67e0AE0326d2018c9bC44",
     usdtVault: "0xdADa607772Ad29f5a90a8817532Ebf983709af15",
     busdVault: "0x45DD58a3Af5F283e819c5d2709Fe237422969150",
-    ethVault: "",
+    ethVault: "0x72E357f7635163493F153A0Bd3F03C15C14A51C6",
     // strategies (TODO redeploy v2) //
     strategyAaveDai: "0x156f47C98BEFee0Be232f26dcecA600C5D3496C5",
     strategyAaveUsdc: "0xaE4BF42667A6cFc9B3C45b07fB63881077CB12C7",
