@@ -163,7 +163,7 @@ const config: Config = {
     daiVault: "0xFd9f501324c07613f8Fb4d73C798D764D0BFcdcC",
     usdcVault: "0x167E3254a9298ebF29F67e0AE0326d2018c9bC44",
     usdtVault: "0xdADa607772Ad29f5a90a8817532Ebf983709af15",
-    busdVault: "",
+    busdVault: "0x45DD58a3Af5F283e819c5d2709Fe237422969150",
     ethVault: "",
     // strategies (TODO redeploy v2) //
     strategyAaveDai: "0x156f47C98BEFee0Be232f26dcecA600C5D3496C5",
