@@ -5,7 +5,8 @@ export interface Config {
     treasury: string
     controller: string
     timeLock: string
-    vault: string
+    erc20Vault: string
+    ethVault: string
     strategyTest: string
     strategyTestV2: string
     strategyNoOp: string
@@ -99,7 +100,8 @@ const config: Config = {
     controller: "0x736d2245e691efADc66ca60DC0a474C3121b939E",
     timeLock: "0xDb3906814Cc730ef4c8A5cf5C63A523494224150",
     // vaults //
-    vault: "0xc8E2357fA7f51e84beBFD4A0075c53D49d0A0D88",
+    erc20Vault: "0xc8E2357fA7f51e84beBFD4A0075c53D49d0A0D88",
+    ethVault: "0xaBCAf7CC375FB753fAf74C26E076DC4dea09Fc61",
     // strategies //
     strategyTest: "0x0dDA2b6D771789803803798cFD3C7Ea55BED7C2F",
     strategyTestV2: "0xc103Cab5CCBb54c61A46DD68438e1C28af074E16",
