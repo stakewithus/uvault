@@ -54,6 +54,8 @@ export interface Config {
     usdc: string
     usdt: string
     busd: string
+    gusd: string
+    wbtc: string
   }
   // mainnet dev
   dev: {
@@ -66,6 +68,8 @@ export interface Config {
     usdcVault: string
     usdtVault: string
     busdVault: string
+    gusdVault: string
+    wbtcVault: string
     ethVault: string
     strategyAaveDai: string
     strategyAaveUsdc: string
@@ -89,6 +93,8 @@ export interface Config {
     usdc: string
     usdt: string
     busd: string
+    gusd: string
+    wbtc: string
   }
 }
 
@@ -158,6 +164,8 @@ const config: Config = {
     usdc: "0xA0b86991c6218b36c1d19D4a2e9Eb0cE3606eB48",
     usdt: "0xdAC17F958D2ee523a2206206994597C13D831ec7",
     busd: "0x4Fabb145d64652a948d72533023f6E7A623C7C53",
+    gusd: "0x056Fd409E1d7A124BD7017459dFEa2F387b6d5Cd",
+    wbtc: "0x2260FAC5E5542a773Aa44fBCfeDf7C193bc2C599",
   },
   // mainnet dev
   dev: {
@@ -173,6 +181,8 @@ const config: Config = {
     usdcVault: "0x167E3254a9298ebF29F67e0AE0326d2018c9bC44",
     usdtVault: "0xdADa607772Ad29f5a90a8817532Ebf983709af15",
     busdVault: "0x45DD58a3Af5F283e819c5d2709Fe237422969150",
+    gusdVault: "0xC62b2aC62Ba74979132c14f5c655EdBA5e959111",
+    wbtcVault: "0x96281343406dEBf869bf100B733ffeEF23c852b7",
     ethVault: "0x72E357f7635163493F153A0Bd3F03C15C14A51C6",
     // strategies (TODO redeploy v2) //
     strategyAaveDai: "0x156f47C98BEFee0Be232f26dcecA600C5D3496C5",
@@ -197,6 +207,8 @@ const config: Config = {
     usdc: "0xA0b86991c6218b36c1d19D4a2e9Eb0cE3606eB48",
     usdt: "0xdAC17F958D2ee523a2206206994597C13D831ec7",
     busd: "0x4Fabb145d64652a948d72533023f6E7A623C7C53",
+    gusd: "0x056Fd409E1d7A124BD7017459dFEa2F387b6d5Cd",
+    wbtc: "0x2260FAC5E5542a773Aa44fBCfeDf7C193bc2C599",
   },
 }
 
