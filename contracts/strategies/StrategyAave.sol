@@ -30,7 +30,7 @@ contract StrategyAave is StrategyERC20 {
     address private constant GAUGE = 0xd662908ADA2Ea1916B3318327A97eB18aD588b5d;
     // Minter
     address private constant MINTER = 0xd061D61a4d941c39E5453435B6345Dc261C2fcE0;
-    // DAO
+    // CRV
     address private constant CRV = 0xD533a949740bb3306d119CC777fa900bA034cd52;
 
     constructor(

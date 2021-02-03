@@ -32,7 +32,7 @@ contract StrategyCusdV2 is StrategyERC20 {
     address private constant GAUGE = 0x7ca5b0a2910B33e9759DC7dDB0413949071D7575;
     // Minter
     address private constant MINTER = 0xd061D61a4d941c39E5453435B6345Dc261C2fcE0;
-    // DAO
+    // CRV
     address private constant CRV = 0xD533a949740bb3306d119CC777fa900bA034cd52;
 
     constructor(
