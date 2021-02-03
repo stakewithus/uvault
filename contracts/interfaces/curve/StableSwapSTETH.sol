@@ -17,10 +17,4 @@ interface StableSwapSTETH {
         int128 i,
         uint min_amount
     ) external;
-
-    function get_dy(
-        int128 i,
-        int128 j,
-        uint dx
-    ) external view returns (uint);
 }
