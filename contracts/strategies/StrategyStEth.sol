@@ -51,21 +51,73 @@ contract StrategyStEth is StrategyETH {
         return shares.mul(pricePerShare) / 1e18;
     }
 
+    function _getStEthDepositAmount(uint _ethBal) private view returns (uint) {
+        /*
+        Goal is to find a0 and a1 such that b0 + a0 is close to b1 + a1 
+
+        E = amount of ETH
+        b0 = balance of ETH in Curve
+        b1 = balance of stETH in Curve
+        a0 = amount of ETH to deposit into Curve
+        a1 = amount of stETH to deposit into Curve
+
+        d = |b0 - b1|
+
+        if d >= E
+            if b0 >= b1
+                a0 = 0
+                a1 = E
+            else
+                a0 = E
+                a1 = 0
+        else
+            if b0 >= b1
+                # add d to balance Curve pool, plus half of remaining
+                a1 = d + (E - d) / 2 = (E + d) / 2
+                a0 = E - a1
+            else
+                a0 = (E + d) / 2
+                a1 = E - a0
+        */
+        uint[2] memory balances;
+        balances[0] = StableSwapSTETH(POOL).balances(0);
+        balances[1] = StableSwapSTETH(POOL).balances(1);
+
+        uint diff;
+        if (balances[0] >= balances[1]) {
+            diff = balances[0] - balances[1];
+        } else {
+            diff = balances[1] - balances[0];
+        }
+
+        // a0 = ETH amount is ignored, recomputed after stEth is bought
+        // a1 = stETH amount
+        uint a1;
+        if (diff >= _ethBal) {
+            if (balances[0] >= balances[1]) {
+                a1 = _ethBal;
+            }
+        } else {
+            if (balances[0] >= balances[1]) {
+                a1 = (_ethBal.add(diff)) / 2;
+            } else {
+                a1 = _ethBal.sub((_ethBal.add(diff)) / 2);
+            }
+        }
+
+        // a0 is ignored, recomputed after stEth is bought
+        return a1;
+    }
+
     /*
     @notice Deposits ETH to LiquidityGaugeV2
     */
     function _deposit() internal override {
         uint bal = address(this).balance;
         if (bal > 0) {
-            uint half = bal / 2;
-            if (half > 0) {
-                uint dy = StableSwapSTETH(POOL).get_dy(0, 1, half);
-                /*
-                if stETH more valuable than ETH, buy stETH
-                */
-                if (dy < half) {
-                    StETH(ST_ETH).submit{value: half}(address(this));
-                }
+            uint stEthAmount = _getStEthDepositAmount(bal);
+            if (stEthAmount > 0) {
+                StETH(ST_ETH).submit{value: stEthAmount}(address(this));
             }
 
             uint ethBal = address(this).balance;
