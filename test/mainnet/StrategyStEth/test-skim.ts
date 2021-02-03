@@ -1,10 +1,11 @@
+import BN from "bn.js"
 import { StrategyStEthInstance } from "../../../types"
 import { pow, frac, gt } from "../../util"
 import { getSnapshot } from "./lib"
 import _setup from "./setup"
 
 contract("StrategyStEth", (accounts) => {
-  const DEPOSIT_AMOUNT = pow(10, 18)
+  const DEPOSIT_AMOUNT = pow(10, 18).mul(new BN(100))
 
   const refs = _setup(accounts)
   const { admin, vault } = refs
