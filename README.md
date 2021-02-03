@@ -34,6 +34,7 @@ npm run test:integration
 source .env
 
 npx ganache-cli \
+-e 10000 \
 --fork https://mainnet.infura.io/v3/$INFURA_API_KEY \
 --unlock $STABLE_COIN_HOLDER \
 --unlock $DAI_WHALE \
