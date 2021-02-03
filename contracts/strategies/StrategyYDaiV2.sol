@@ -8,7 +8,6 @@ contract StrategyYDaiV2 is StrategyYV2 {
         public
         StrategyYV2(_controller, _vault, DAI)
     {
-        // DAI
         underlyingIndex = 0;
     }
 }

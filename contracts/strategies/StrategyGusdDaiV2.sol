@@ -8,7 +8,6 @@ contract StrategyGusdDaiV2 is StrategyGusdV2 {
         public
         StrategyGusdV2(_controller, _vault, DAI)
     {
-        // DAI
         underlyingIndex = 1;
     }
 }

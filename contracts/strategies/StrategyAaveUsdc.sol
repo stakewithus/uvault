@@ -8,7 +8,6 @@ contract StrategyAaveUsdc is StrategyAave {
         public
         StrategyAave(_controller, _vault, USDC)
     {
-        // USDC
         underlyingIndex = 1;
     }
 }

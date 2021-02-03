@@ -8,7 +8,6 @@ contract StrategyBusdUsdcV2 is StrategyBusdV2 {
         public
         StrategyBusdV2(_controller, _vault, USDC)
     {
-        // USDC
         underlyingIndex = 1;
     }
 }

@@ -8,7 +8,6 @@ contract Strategy3CrvUsdcV2 is Strategy3CrvV2 {
         public
         Strategy3CrvV2(_controller, _vault, USDC)
     {
-        // USDC
         underlyingIndex = 1;
     }
 }

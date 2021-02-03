@@ -8,7 +8,6 @@ contract StrategyBusdDaiV2 is StrategyBusdV2 {
         public
         StrategyBusdV2(_controller, _vault, DAI)
     {
-        // DAI
         underlyingIndex = 0;
     }
 }

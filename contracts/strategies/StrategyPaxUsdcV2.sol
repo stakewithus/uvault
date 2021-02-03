@@ -8,7 +8,6 @@ contract StrategyPaxUsdcV2 is StrategyPaxV2 {
         public
         StrategyPaxV2(_controller, _vault, USDC)
     {
-        // USDC
         underlyingIndex = 1;
     }
 }

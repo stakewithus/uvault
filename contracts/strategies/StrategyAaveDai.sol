@@ -8,7 +8,6 @@ contract StrategyAaveDai is StrategyAave {
         public
         StrategyAave(_controller, _vault, DAI)
     {
-        // DAI
         underlyingIndex = 0;
     }
 }

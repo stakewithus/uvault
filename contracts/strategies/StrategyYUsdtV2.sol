@@ -8,7 +8,6 @@ contract StrategyYUsdtV2 is StrategyYV2 {
         public
         StrategyYV2(_controller, _vault, USDT)
     {
-        // USDT
         underlyingIndex = 2;
     }
 }

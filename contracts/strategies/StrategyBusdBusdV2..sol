@@ -8,7 +8,6 @@ contract StrategyBusdBusdV2 is StrategyBusdV2 {
         public
         StrategyBusdV2(_controller, _vault, BUSD)
     {
-        // BUSD
         underlyingIndex = 3;
     }
 }

@@ -8,7 +8,6 @@ contract Strategy3CrvDaiV2 is Strategy3CrvV2 {
         public
         Strategy3CrvV2(_controller, _vault, DAI)
     {
-        // DAI
         underlyingIndex = 0;
     }
 }
