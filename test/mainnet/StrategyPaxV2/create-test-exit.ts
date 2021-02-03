@@ -9,7 +9,7 @@ export default (name: string, _setup: Setup, params: { DECIMALS: BN }) => {
     const DEPOSIT_AMOUNT = pow(10, DECIMALS).mul(new BN(1000000))
 
     const refs = _setup(accounts)
-    const { vault, treasury, whale } = refs
+    const { vault, whale } = refs
 
     let underlying: IERC20Instance
     let strategy: StrategyInstance
