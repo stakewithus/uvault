@@ -41,6 +41,7 @@ npx ganache-cli \
 --unlock $USDC_WHALE \
 --unlock $USDT_WHALE \
 --unlock $BUSD_WHALE \
+--unlock $GUSD_WHALE \
 --networkId 999
 
 # NOTE

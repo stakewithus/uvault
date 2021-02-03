@@ -32,17 +32,25 @@ export default (name: string, _setup: Setup, params: { DECIMALS: BN }) => {
       await strategy.harvest({ from: admin })
       const after = await snapshot()
 
+      const CRV_DUST = pow(10, 18)
+
+      console.log(`${before.strategy.totalAssets}`)
+      console.log(`${after.strategy.totalAssets}`)
+
+      console.log(`${before.crv.strategy}`)
+      console.log(`${after.crv.strategy}`)
+
       assert(
         after.underlying.treasury.gte(before.underlying.treasury),
         "underlying treasury"
       )
       assert(
-        after.strategy.totalAssets.gt(before.strategy.totalAssets),
+        after.strategy.totalAssets.gte(before.strategy.totalAssets),
         "strategy total assets"
       )
-      assert(after.gauge.strategy.gt(before.gauge.strategy), "gauge strategy")
+      assert(after.gauge.strategy.gte(before.gauge.strategy), "gauge strategy")
       // Check CRV was liquidated
-      assert(after.crv.strategy.eq(new BN(0)), "crv strategy")
+      assert(after.crv.strategy.lte(CRV_DUST), "crv strategy")
     })
   })
 }

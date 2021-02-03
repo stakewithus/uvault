@@ -11,3 +11,6 @@ export const USDT_TO_CURVE_DECIMALS = new BN(10).pow(new BN(12))
 
 export const BUSD_DECIMALS = new BN(18)
 export const BUSD_TO_CURVE_DECIMALS = new BN(1)
+
+export const GUSD_DECIMALS = new BN(2)
+export const GUSD_TO_CURVE_DECIMALS = new BN(10).pow(new BN(16))

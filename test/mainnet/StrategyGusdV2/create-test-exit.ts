@@ -9,7 +9,7 @@ export default (name: string, _setup: Setup, params: { DECIMALS: BN }) => {
     const DEPOSIT_AMOUNT = pow(10, DECIMALS).mul(new BN(1000000))
 
     const refs = _setup(accounts)
-    const { vault, treasury, whale } = refs
+    const { vault, whale } = refs
 
     let underlying: IERC20Instance
     let strategy: StrategyInstance
@@ -32,11 +32,13 @@ export default (name: string, _setup: Setup, params: { DECIMALS: BN }) => {
       await strategy.exit({ from: vault })
       const after = await snapshot()
 
+      const CRV_DUST = pow(10, 18)
+
       assert(after.gauge.strategy.eq(new BN(0)), "gauge strategy")
       // check strategy dust is small
       assert(after.lp.strategy.lte(new BN(100)), "lp strategy")
       assert(after.underlying.strategy.eq(new BN(0)), "underlying strategy")
-      assert(after.crv.strategy.eq(new BN(0)), "crv strategy")
+      assert(after.crv.strategy.lte(CRV_DUST), "crv strategy")
       assert(after.strategy.totalDebt.eq(new BN(0)), "total debt")
       assert(after.underlying.vault.gte(before.underlying.vault), "underlying vault")
     })
