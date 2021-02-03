@@ -32,7 +32,7 @@ contract StrategyGusdV2 is StrategyERC20 {
     // liquidity provider token (GUSD / 3CRV)
     address private constant LP = 0xD2967f45c4f384DEEa880F807Be904762a3DeA07;
     // DepositGusd
-    address private constant POOL = 0x64448B78561690B70E17CBE8029a3e5c1bB7136e;
+    address private constant DEPOSIT = 0x64448B78561690B70E17CBE8029a3e5c1bB7136e;
     // LiquidityGauge
     address private constant GAUGE = 0xC5cfaDA84E902aD92DD40194f0883ad49639b023;
     // Minter
@@ -64,8 +64,8 @@ contract StrategyGusdV2 is StrategyERC20 {
         // token to LP
         uint bal = IERC20(_token).balanceOf(address(this));
         if (bal > 0) {
-            IERC20(_token).safeApprove(POOL, 0);
-            IERC20(_token).safeApprove(POOL, bal);
+            IERC20(_token).safeApprove(DEPOSIT, 0);
+            IERC20(_token).safeApprove(DEPOSIT, bal);
 
             // mint LP
             uint[4] memory amounts;
@@ -78,7 +78,7 @@ contract StrategyGusdV2 is StrategyERC20 {
             uint shares = bal.mul(PRECISION_DIVS[_index]).mul(1e18).div(pricePerShare);
             uint min = shares.mul(SLIPPAGE_MAX - slippage) / SLIPPAGE_MAX;
 
-            DepositGusd(POOL).add_liquidity(amounts, min);
+            DepositGusd(DEPOSIT).add_liquidity(amounts, min);
         }
 
         // stake into LiquidityGauge
@@ -109,8 +109,8 @@ contract StrategyGusdV2 is StrategyERC20 {
         uint lpBal = IERC20(LP).balanceOf(address(this));
 
         // remove liquidity
-        IERC20(LP).safeApprove(POOL, 0);
-        IERC20(LP).safeApprove(POOL, lpBal);
+        IERC20(LP).safeApprove(DEPOSIT, 0);
+        IERC20(LP).safeApprove(DEPOSIT, lpBal);
 
         /*
         underlying amount = (shares * price per shares) / (1e18 * precision div)
@@ -120,7 +120,7 @@ contract StrategyGusdV2 is StrategyERC20 {
             lpBal.mul(pricePerShare).div(PRECISION_DIVS[underlyingIndex]) / 1e18;
         uint min = underlyingAmount.mul(SLIPPAGE_MAX - slippage) / SLIPPAGE_MAX;
         // withdraw creates LP dust
-        DepositGusd(POOL).remove_liquidity_one_coin(
+        DepositGusd(DEPOSIT).remove_liquidity_one_coin(
             lpBal,
             int128(underlyingIndex),
             min
@@ -129,7 +129,7 @@ contract StrategyGusdV2 is StrategyERC20 {
     }
 
     /*
-    @notice Returns address and index of token with lowest balance in Curve POOL
+    @notice Returns address and index of token with lowest balance in Curve DEPOSIT
     */
 
     function _getMostPremiumToken() internal view returns (address, uint) {

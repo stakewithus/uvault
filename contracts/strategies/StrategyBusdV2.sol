@@ -29,7 +29,7 @@ contract StrategyBusdV2 is StrategyERC20 {
     // liquidity provider token (yDAI/yUSDC/yUSDT/yBUSD)
     address private constant LP = 0x3B3Ac5386837Dc563660FB6a0937DFAa5924333B;
     // DepositBusd
-    address private constant POOL = 0xb6c057591E073249F2D9D88Ba59a46CFC9B59EdB;
+    address private constant DEPOSIT = 0xb6c057591E073249F2D9D88Ba59a46CFC9B59EdB;
     // LiquidityGauge
     address private constant GAUGE = 0x69Fb7c45726cfE2baDeE8317005d3F94bE838840;
     // Minter
@@ -65,8 +65,8 @@ contract StrategyBusdV2 is StrategyERC20 {
         // token to LP
         uint bal = IERC20(_token).balanceOf(address(this));
         if (bal > 0) {
-            IERC20(_token).safeApprove(POOL, 0);
-            IERC20(_token).safeApprove(POOL, bal);
+            IERC20(_token).safeApprove(DEPOSIT, 0);
+            IERC20(_token).safeApprove(DEPOSIT, bal);
 
             // mint LP
             uint[4] memory amounts;
@@ -79,7 +79,7 @@ contract StrategyBusdV2 is StrategyERC20 {
             uint shares = bal.mul(PRECISION_DIVS[_index]).mul(1e18).div(pricePerShare);
             uint min = shares.mul(SLIPPAGE_MAX - slippage) / SLIPPAGE_MAX;
 
-            DepositBusd(POOL).add_liquidity(amounts, min);
+            DepositBusd(DEPOSIT).add_liquidity(amounts, min);
         }
 
         // stake into LiquidityGauge
@@ -110,8 +110,8 @@ contract StrategyBusdV2 is StrategyERC20 {
         uint lpBal = IERC20(LP).balanceOf(address(this));
 
         // remove liquidity
-        IERC20(LP).safeApprove(POOL, 0);
-        IERC20(LP).safeApprove(POOL, lpBal);
+        IERC20(LP).safeApprove(DEPOSIT, 0);
+        IERC20(LP).safeApprove(DEPOSIT, lpBal);
 
         /*
         underlying amount = (shares * price per shares) / (1e18 * precision div)
@@ -121,7 +121,7 @@ contract StrategyBusdV2 is StrategyERC20 {
             lpBal.mul(pricePerShare).div(PRECISION_DIVS[underlyingIndex]) / 1e18;
         uint min = underlyingAmount.mul(SLIPPAGE_MAX - slippage) / SLIPPAGE_MAX;
         // withdraw creates LP dust
-        DepositBusd(POOL).remove_liquidity_one_coin(
+        DepositBusd(DEPOSIT).remove_liquidity_one_coin(
             lpBal,
             int128(underlyingIndex),
             min,
@@ -131,7 +131,7 @@ contract StrategyBusdV2 is StrategyERC20 {
     }
 
     /*
-    @notice Returns address and index of token with lowest balance in Curve POOL
+    @notice Returns address and index of token with lowest balance in Curve DEPOSIT
     */
     function _getMostPremiumToken() internal view returns (address, uint) {
         uint[4] memory balances;

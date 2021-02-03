@@ -25,7 +25,7 @@ contract Strategy3CrvV2 is StrategyERC20 {
     // liquidity provider token (3CRV)
     address private constant LP = 0x6c3F90f043a72FA612cbac8115EE7e52BDe6E490;
     // StableSwap3Pool
-    address private constant POOL = 0xbEbc44782C7dB0a1A60Cb6fe97d0b483032FF1C7;
+    address private constant SWAP = 0xbEbc44782C7dB0a1A60Cb6fe97d0b483032FF1C7;
     // LiquidityGauge
     address private constant GAUGE = 0xbFcF63294aD7105dEa65aA58F8AE5BE2D9d0952A;
     // Minter
@@ -45,7 +45,7 @@ contract Strategy3CrvV2 is StrategyERC20 {
 
     function _totalAssets() internal view override returns (uint) {
         uint lpBal = LiquidityGauge(GAUGE).balanceOf(address(this));
-        uint pricePerShare = StableSwap3Pool(POOL).get_virtual_price();
+        uint pricePerShare = StableSwap3Pool(SWAP).get_virtual_price();
 
         return lpBal.mul(pricePerShare).div(PRECISION_DIVS[underlyingIndex]) / 1e18;
     }
@@ -57,8 +57,8 @@ contract Strategy3CrvV2 is StrategyERC20 {
         // token to LP
         uint bal = IERC20(_token).balanceOf(address(this));
         if (bal > 0) {
-            IERC20(_token).safeApprove(POOL, 0);
-            IERC20(_token).safeApprove(POOL, bal);
+            IERC20(_token).safeApprove(SWAP, 0);
+            IERC20(_token).safeApprove(SWAP, bal);
 
             // mint LP
             uint[3] memory amounts;
@@ -67,11 +67,11 @@ contract Strategy3CrvV2 is StrategyERC20 {
             /*
             shares = underlying amount * precision div * 1e18 / price per share
             */
-            uint pricePerShare = StableSwap3Pool(POOL).get_virtual_price();
+            uint pricePerShare = StableSwap3Pool(SWAP).get_virtual_price();
             uint shares = bal.mul(PRECISION_DIVS[_index]).mul(1e18).div(pricePerShare);
             uint min = shares.mul(SLIPPAGE_MAX - slippage) / SLIPPAGE_MAX;
 
-            StableSwap3Pool(POOL).add_liquidity(amounts, min);
+            StableSwap3Pool(SWAP).add_liquidity(amounts, min);
         }
 
         // stake into LiquidityGauge
@@ -105,12 +105,12 @@ contract Strategy3CrvV2 is StrategyERC20 {
         /*
         underlying amount = (shares * price per shares) / (1e18 * precision div)
         */
-        uint pricePerShare = StableSwap3Pool(POOL).get_virtual_price();
+        uint pricePerShare = StableSwap3Pool(SWAP).get_virtual_price();
         uint underlyingAmount =
             lpBal.mul(pricePerShare).div(PRECISION_DIVS[underlyingIndex]) / 1e18;
         uint min = underlyingAmount.mul(SLIPPAGE_MAX - slippage) / SLIPPAGE_MAX;
         // withdraw creates LP dust
-        StableSwap3Pool(POOL).remove_liquidity_one_coin(
+        StableSwap3Pool(SWAP).remove_liquidity_one_coin(
             lpBal,
             int128(underlyingIndex),
             min
@@ -119,13 +119,13 @@ contract Strategy3CrvV2 is StrategyERC20 {
     }
 
     /*
-    @notice Returns address and index of token with lowest balance in Curve POOL
+    @notice Returns address and index of token with lowest balance in Curve SWAP
     */
     function _getMostPremiumToken() private view returns (address, uint) {
         uint[3] memory balances;
-        balances[0] = StableSwap3Pool(POOL).balances(0); // DAI
-        balances[1] = StableSwap3Pool(POOL).balances(1).mul(1e12); // USDC
-        balances[2] = StableSwap3Pool(POOL).balances(2).mul(1e12); // USDT
+        balances[0] = StableSwap3Pool(SWAP).balances(0); // DAI
+        balances[1] = StableSwap3Pool(SWAP).balances(1).mul(1e12); // USDC
+        balances[2] = StableSwap3Pool(SWAP).balances(2).mul(1e12); // USDT
 
         uint minIndex = 0;
         for (uint i = 1; i < balances.length; i++) {

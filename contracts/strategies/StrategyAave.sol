@@ -25,7 +25,7 @@ contract StrategyAave is StrategyERC20 {
     // liquidity provider token (Curve aDAI/aUSDC/aUSDT)
     address private constant LP = 0xFd2a8fA60Abd58Efe3EeE34dd494cD491dC14900;
     // StableSwapAave
-    address private constant POOL = 0xDeBF20617708857ebe4F679508E7b7863a8A8EeE;
+    address private constant SWAP = 0xDeBF20617708857ebe4F679508E7b7863a8A8EeE;
     // LiquidityGaugeV2
     address private constant GAUGE = 0xd662908ADA2Ea1916B3318327A97eB18aD588b5d;
     // Minter
@@ -45,7 +45,7 @@ contract StrategyAave is StrategyERC20 {
 
     function _totalAssets() internal view override returns (uint) {
         uint lpBal = LiquidityGaugeV2(GAUGE).balanceOf(address(this));
-        uint pricePerShare = StableSwapAave(POOL).get_virtual_price();
+        uint pricePerShare = StableSwapAave(SWAP).get_virtual_price();
 
         return lpBal.mul(pricePerShare).div(PRECISION_DIVS[underlyingIndex]) / 1e18;
     }
@@ -57,8 +57,8 @@ contract StrategyAave is StrategyERC20 {
         // token to LP
         uint bal = IERC20(_token).balanceOf(address(this));
         if (bal > 0) {
-            IERC20(_token).safeApprove(POOL, 0);
-            IERC20(_token).safeApprove(POOL, bal);
+            IERC20(_token).safeApprove(SWAP, 0);
+            IERC20(_token).safeApprove(SWAP, bal);
 
             // mint LP
             uint[3] memory amounts;
@@ -67,11 +67,11 @@ contract StrategyAave is StrategyERC20 {
             /*
             shares = underlying amount * precision div * 1e18 / price per share
             */
-            uint pricePerShare = StableSwapAave(POOL).get_virtual_price();
+            uint pricePerShare = StableSwapAave(SWAP).get_virtual_price();
             uint shares = bal.mul(PRECISION_DIVS[_index]).mul(1e18).div(pricePerShare);
             uint min = shares.mul(SLIPPAGE_MAX - slippage) / SLIPPAGE_MAX;
 
-            StableSwapAave(POOL).add_liquidity(amounts, min, true);
+            StableSwapAave(SWAP).add_liquidity(amounts, min, true);
         }
 
         // stake into LiquidityGaugeV2
@@ -101,19 +101,15 @@ contract StrategyAave is StrategyERC20 {
         // withdraw underlying //
         uint lpBal = IERC20(LP).balanceOf(address(this));
 
-        // remove liquidity
-        IERC20(LP).safeApprove(POOL, 0);
-        IERC20(LP).safeApprove(POOL, lpBal);
-
         /*
         underlying amount = (shares * price per shares) / (1e18 * precision div)
         */
-        uint pricePerShare = StableSwapAave(POOL).get_virtual_price();
+        uint pricePerShare = StableSwapAave(SWAP).get_virtual_price();
         uint underlyingAmount =
             lpBal.mul(pricePerShare).div(PRECISION_DIVS[underlyingIndex]) / 1e18;
         uint min = underlyingAmount.mul(SLIPPAGE_MAX - slippage) / SLIPPAGE_MAX;
         // withdraw creates LP dust
-        StableSwapAave(POOL).remove_liquidity_one_coin(
+        StableSwapAave(SWAP).remove_liquidity_one_coin(
             lpBal,
             int128(underlyingIndex),
             min,
@@ -123,13 +119,13 @@ contract StrategyAave is StrategyERC20 {
     }
 
     /*
-    @notice Returns address and index of token with lowest balance in Curve POOL
+    @notice Returns address and index of token with lowest balance in Curve SWAP
     */
     function _getMostPremiumToken() private view returns (address, uint) {
         uint[3] memory balances;
-        balances[0] = StableSwapAave(POOL).balances(0); // DAI
-        balances[1] = StableSwapAave(POOL).balances(1).mul(1e12); // USDC
-        balances[2] = StableSwapAave(POOL).balances(2).mul(1e12); // USDT
+        balances[0] = StableSwapAave(SWAP).balances(0); // DAI
+        balances[1] = StableSwapAave(SWAP).balances(1).mul(1e12); // USDC
+        balances[2] = StableSwapAave(SWAP).balances(2).mul(1e12); // USDT
 
         uint minIndex = 0;
         for (uint i = 1; i < balances.length; i++) {

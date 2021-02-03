@@ -29,7 +29,7 @@ contract StrategyPaxV2 is StrategyERC20 {
     // liquidity provider token (ypaxCrv DAI/USDC/USDT/PAX)
     address private constant LP = 0xD905e2eaeBe188fc92179b6350807D8bd91Db0D8;
     // DepositPax
-    address private constant POOL = 0xA50cCc70b6a011CffDdf45057E39679379187287;
+    address private constant DEPOSIT = 0xA50cCc70b6a011CffDdf45057E39679379187287;
     // LiquidityGauge
     address private constant GAUGE = 0x64E3C23bfc40722d3B649844055F1D51c1ac041d;
     // Minter
@@ -61,8 +61,8 @@ contract StrategyPaxV2 is StrategyERC20 {
         // token to LP
         uint bal = IERC20(_token).balanceOf(address(this));
         if (bal > 0) {
-            IERC20(_token).safeApprove(POOL, 0);
-            IERC20(_token).safeApprove(POOL, bal);
+            IERC20(_token).safeApprove(DEPOSIT, 0);
+            IERC20(_token).safeApprove(DEPOSIT, bal);
 
             // mint LP
             uint[4] memory amounts;
@@ -75,7 +75,7 @@ contract StrategyPaxV2 is StrategyERC20 {
             uint shares = bal.mul(PRECISION_DIVS[_index]).mul(1e18).div(pricePerShare);
             uint min = shares.mul(SLIPPAGE_MAX - slippage) / SLIPPAGE_MAX;
 
-            DepositPax(POOL).add_liquidity(amounts, min);
+            DepositPax(DEPOSIT).add_liquidity(amounts, min);
         }
 
         // stake into LiquidityGauge
@@ -106,8 +106,8 @@ contract StrategyPaxV2 is StrategyERC20 {
         uint lpBal = IERC20(LP).balanceOf(address(this));
 
         // remove liquidity
-        IERC20(LP).safeApprove(POOL, 0);
-        IERC20(LP).safeApprove(POOL, lpBal);
+        IERC20(LP).safeApprove(DEPOSIT, 0);
+        IERC20(LP).safeApprove(DEPOSIT, lpBal);
 
         /*
         underlying amount = (shares * price per shares) / (1e18 * precision div)
@@ -117,7 +117,7 @@ contract StrategyPaxV2 is StrategyERC20 {
             lpBal.mul(pricePerShare).div(PRECISION_DIVS[underlyingIndex]) / 1e18;
         uint min = underlyingAmount.mul(SLIPPAGE_MAX - slippage) / SLIPPAGE_MAX;
         // withdraw creates LP dust
-        DepositPax(POOL).remove_liquidity_one_coin(
+        DepositPax(DEPOSIT).remove_liquidity_one_coin(
             lpBal,
             int128(underlyingIndex),
             min,
@@ -127,7 +127,7 @@ contract StrategyPaxV2 is StrategyERC20 {
     }
 
     /*
-    @notice Returns address and index of token with lowest balance in Curve POOL
+    @notice Returns address and index of token with lowest balance in Curve DEPOSIT
     */
     function _getMostPremiumToken() internal view returns (address, uint) {
         uint[4] memory balances;
