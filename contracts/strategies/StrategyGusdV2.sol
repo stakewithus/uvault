@@ -22,7 +22,7 @@ contract StrategyGusdV2 is StrategyERC20 {
     // GUSD = 0 | DAI = 1 | USDC = 2 | USDT = 3
     uint internal underlyingIndex;
     // precision to convert 10 ** 18  to underlying decimals
-    uint[4] private PRECISION_DIVS = [1e16, 1, 1e12, 1e12];
+    uint[4] private PRECISION_DIV = [1e16, 1, 1e12, 1e12];
 
     // Curve //
     // StableSwap3Pool
@@ -54,7 +54,7 @@ contract StrategyGusdV2 is StrategyERC20 {
         uint lpBal = LiquidityGauge(GAUGE).balanceOf(address(this));
         uint pricePerShare = StableSwapGusd(SWAP).get_virtual_price();
 
-        return lpBal.mul(pricePerShare).div(PRECISION_DIVS[underlyingIndex]) / 1e18;
+        return lpBal.mul(pricePerShare).div(PRECISION_DIV[underlyingIndex]) / 1e18;
     }
 
     /*
@@ -75,7 +75,7 @@ contract StrategyGusdV2 is StrategyERC20 {
             shares = underlying amount * precision div * 1e18 / price per share
             */
             uint pricePerShare = StableSwapGusd(SWAP).get_virtual_price();
-            uint shares = bal.mul(PRECISION_DIVS[_index]).mul(1e18).div(pricePerShare);
+            uint shares = bal.mul(PRECISION_DIV[_index]).mul(1e18).div(pricePerShare);
             uint min = shares.mul(SLIPPAGE_MAX - slippage) / SLIPPAGE_MAX;
 
             DepositGusd(DEPOSIT).add_liquidity(amounts, min);
@@ -117,7 +117,7 @@ contract StrategyGusdV2 is StrategyERC20 {
         */
         uint pricePerShare = StableSwapGusd(SWAP).get_virtual_price();
         uint underlyingAmount =
-            lpBal.mul(pricePerShare).div(PRECISION_DIVS[underlyingIndex]) / 1e18;
+            lpBal.mul(pricePerShare).div(PRECISION_DIV[underlyingIndex]) / 1e18;
         uint min = underlyingAmount.mul(SLIPPAGE_MAX - slippage) / SLIPPAGE_MAX;
         // withdraw creates LP dust
         DepositGusd(DEPOSIT).remove_liquidity_one_coin(
