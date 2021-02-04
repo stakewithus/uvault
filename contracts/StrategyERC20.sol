@@ -51,7 +51,7 @@ abstract contract StrategyERC20 is IStrategyERC20 {
     uint private constant DELTA_MIN = 10000;
 
     // Force exit, in case normal exit fails
-    bool public override forceExit = false;
+    bool public override forceExit;
 
     constructor(
         address _controller,

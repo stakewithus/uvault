@@ -43,7 +43,7 @@ abstract contract StrategyETH is IStrategyETH {
     uint private constant DELTA_MIN = 10000;
 
     // Force exit, in case normal exit fails
-    bool public override forceExit = false;
+    bool public override forceExit;
 
     constructor(address _controller, address _vault) public {
         require(_controller != address(0), "controller = zero address");
