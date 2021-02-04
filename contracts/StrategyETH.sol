@@ -42,6 +42,9 @@ abstract contract StrategyETH is IStrategyETH {
     uint public override delta = 10050;
     uint private constant DELTA_MIN = 10000;
 
+    // Force exit, in case normal exit fails
+    bool public override forceExit = false;
+
     constructor(address _controller, address _vault) public {
         require(_controller != address(0), "controller = zero address");
         require(_vault != address(0), "vault = zero address");
@@ -93,6 +96,10 @@ abstract contract StrategyETH is IStrategyETH {
     function setDelta(uint _delta) external override onlyAdmin {
         require(_delta >= DELTA_MIN, "delta < min");
         delta = _delta;
+    }
+
+    function setForceExit(bool _forceExit) external override onlyAdmin {
+        forceExit = _forceExit;
     }
 
     function _sendEthToVault(uint _amount) internal {

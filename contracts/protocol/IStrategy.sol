@@ -40,6 +40,11 @@ interface IStrategy {
     */
     function delta() external view returns (uint);
 
+    /*
+    @dev Flag to force exit in case normal exit fails
+    */
+    function forceExit() external view returns (bool);
+
     function setAdmin(address _admin) external;
 
     function setController(address _controller) external;
@@ -49,6 +54,8 @@ interface IStrategy {
     function setSlippage(uint _slippage) external;
 
     function setDelta(uint _delta) external;
+
+    function setForceExit(bool _forceExit) external;
 
     /*
     @notice Returns amount of underlying asset locked in this contract

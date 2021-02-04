@@ -30,6 +30,7 @@ contract StrategyNoOpERC20 is IStrategyERC20 {
     uint public constant override performanceFee = 0;
     uint public constant override slippage = 0;
     uint public constant override delta = 0;
+    bool public constant override forceExit = false;
 
     constructor(
         address _controller,
@@ -81,6 +82,11 @@ contract StrategyNoOpERC20 is IStrategyERC20 {
 
     // @dev variable name is removed to silence compiler warning
     function setDelta(uint) external override {
+        revert("no-op");
+    }
+
+    // @dev variable name is removed to silence compiler warning
+    function setForceExit(bool) external override {
         revert("no-op");
     }
 

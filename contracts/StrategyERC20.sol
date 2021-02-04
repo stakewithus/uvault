@@ -12,6 +12,7 @@ Changes from StrategyBase
 - sweep - delete mapping "assets" and use require to explicitly check protected tokens
 - add immutable to vault
 - add immutable to underlying
+- add force exit
 */
 
 import "@openzeppelin/contracts/token/ERC20/IERC20.sol";
@@ -48,6 +49,9 @@ abstract contract StrategyERC20 is IStrategyERC20 {
     */
     uint public override delta = 10050;
     uint private constant DELTA_MIN = 10000;
+
+    // Force exit, in case normal exit fails
+    bool public override forceExit = false;
 
     constructor(
         address _controller,
@@ -100,6 +104,10 @@ abstract contract StrategyERC20 is IStrategyERC20 {
     function setDelta(uint _delta) external override onlyAdmin {
         require(_delta >= DELTA_MIN, "delta < min");
         delta = _delta;
+    }
+
+    function setForceExit(bool _forceExit) external override onlyAdmin {
+        forceExit = _forceExit;
     }
 
     function _increaseDebt(uint _underlyingAmount) private {
