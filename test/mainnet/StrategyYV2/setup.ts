@@ -1,6 +1,6 @@
 import BN from "bn.js"
 import { sendEther } from "../../util"
-import { CRV, YDAI_YUSDC_YUSDT_YTUSD, Y_GAUGE, STABLE_SWAP_Y } from "../config"
+import { CRV, Y_LP, Y_GAUGE, STABLE_SWAP_Y } from "../config"
 import { Refs, StrategyContract } from "./lib"
 
 const IERC20 = artifacts.require("IERC20")
@@ -18,7 +18,7 @@ export default (
 ) => {
   const { Strategy, underlying, whale } = params
 
-  const LP = YDAI_YUSDC_YUSDT_YTUSD
+  const LP = Y_LP
   const GAUGE = Y_GAUGE
   const STABLE_SWAP = STABLE_SWAP_Y
 

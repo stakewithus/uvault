@@ -1,4 +1,4 @@
-import { CRV, ETH_STETH, STABLE_SWAP_STETH, STETH_GAUGE } from "../config"
+import { CRV, STETH_LP, STABLE_SWAP_STETH, STETH_GAUGE } from "../config"
 import { Refs } from "./lib"
 
 const IERC20 = artifacts.require("IERC20")
@@ -8,7 +8,7 @@ const Controller = artifacts.require("Controller")
 const StrategyStEth = artifacts.require("StrategyStEth")
 
 export default (accounts: Truffle.Accounts) => {
-  const LP = ETH_STETH
+  const LP = STETH_LP
   const GAUGE = STETH_GAUGE
   const STABLE_SWAP = STABLE_SWAP_STETH
 
