@@ -35,8 +35,10 @@ contract StrategyStEth is StrategyETH {
     {
         // These tokens are never held by this contract
         // so the risk of them being stolen is minimal
-        IERC20(LDO).safeApprove(UNISWAP, uint(-1));
         IERC20(CRV).safeApprove(UNISWAP, uint(-1));
+        // Minted on Gauge deposit, withdraw and claim_rewards
+        // only this contract can spend on UNISWAP
+        IERC20(LDO).safeApprove(UNISWAP, uint(-1));
     }
 
     receive() external payable {
@@ -185,12 +187,12 @@ contract StrategyStEth is StrategyETH {
     }
 
     function _claimRewards() private {
-        // claims LDO
+        // claim LDO
         LiquidityGaugeV2(GAUGE).claim_rewards();
         // claim CRV
         Minter(MINTER).mint(GAUGE);
 
-        // Infinity approval for Uniswap to spend on LDO and CRV set inside constructor
+        // Infinity approval for Uniswap set inside constructor
         uint ldoBal = IERC20(LDO).balanceOf(address(this));
         if (ldoBal > 0) {
             _swapToEth(LDO, ldoBal);

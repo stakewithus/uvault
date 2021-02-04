@@ -167,7 +167,10 @@ contract StrategyAave is StrategyERC20 {
     }
 
     function _claimRewards(address _token) private {
-        LiquidityGaugeV2(GAUGE).claim_rewards();
+        // no rewards to claim
+        // LiquidityGaugeV2(GAUGE).claim_rewards();
+
+        // claim CRV
         Minter(MINTER).mint(GAUGE);
 
         uint crvBal = IERC20(CRV).balanceOf(address(this));

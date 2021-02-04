@@ -172,6 +172,7 @@ contract StrategyCusdV2 is StrategyERC20 {
     }
 
     function _claimRewards(address _token) private {
+        // claim CRV
         Minter(MINTER).mint(GAUGE);
 
         uint crvBal = IERC20(CRV).balanceOf(address(this));
