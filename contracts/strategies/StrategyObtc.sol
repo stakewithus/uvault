@@ -40,6 +40,9 @@ contract StrategyObtc is StrategyERC20 {
     // CRV
     address private constant CRV = 0xD533a949740bb3306d119CC777fa900bA034cd52;
 
+    // BoringDAO //
+    address private constant BOR = 0x3c9d6c1C73b31c837832c72E04D3152f051fc1A9;
+
     constructor(
         address _controller,
         address _vault,
@@ -48,6 +51,9 @@ contract StrategyObtc is StrategyERC20 {
         // These tokens are never held by this contract
         // so the risk of them being stolen is minimal
         IERC20(CRV).safeApprove(UNISWAP, uint(-1));
+        // Minted on Gauge deposit, withdraw and claim_rewards
+        // only this contract can spend on UNISWAP
+        IERC20(BOR).safeApprove(UNISWAP, uint(-1));
     }
 
     function _totalAssets() internal view override returns (uint) {
@@ -181,8 +187,16 @@ contract StrategyObtc is StrategyERC20 {
     }
 
     function _claimRewards(address _token) private {
+        // claim BOR
         LiquidityGaugeV2(GAUGE).claim_rewards();
+        // claim CRV
         Minter(MINTER).mint(GAUGE);
+
+        // Infinity approval for Uniswap set inside constructor
+        uint borBal = IERC20(BOR).balanceOf(address(this));
+        if (borBal > 0) {
+            _swap(BOR, _token, borBal);
+        }
 
         uint crvBal = IERC20(CRV).balanceOf(address(this));
         if (crvBal > 0) {
