@@ -152,9 +152,9 @@ contract StrategyBbtc is StrategyERC20 {
             return (REN_BTC, 1);
         }
         if (minIndex == 2) {
-            return (WBTC, 1);
+            return (WBTC, 2);
         }
-        return (SBTC, 2);
+        return (SBTC, 3);
     }
 
     /*
