@@ -45,6 +45,7 @@ contract StrategyObtc is StrategyERC20 {
     BOR is rewarded on Gauge deposit, withdraw and claim_rewards
     selling BOR can fail so this operations is left to admin by calling sweep
     */
+    // TODO: code to sell BOR?
     // address private constant BOR = 0x3c9d6c1C73b31c837832c72E04D3152f051fc1A9;
 
     constructor(
