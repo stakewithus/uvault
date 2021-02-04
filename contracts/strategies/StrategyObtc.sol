@@ -188,8 +188,6 @@ contract StrategyObtc is StrategyERC20 {
     }
 
     function _claimRewards(address _token) private {
-        // claim BOR
-        LiquidityGaugeV2(GAUGE).claim_rewards();
         // claim CRV
         Minter(MINTER).mint(GAUGE);
 
