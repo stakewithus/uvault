@@ -17,6 +17,8 @@ abstract contract StrategyETH is IStrategyETH {
     using SafeERC20 for IERC20;
     using SafeMath for uint;
 
+    event Deposit(uint amount, uint balBefore, uint balAfter);
+
     address public override admin;
     address public override controller;
     address public immutable override vault;
@@ -133,8 +135,12 @@ abstract contract StrategyETH is IStrategyETH {
     function deposit() external payable override onlyAuthorized {
         require(msg.value > 0, "deposit = 0");
 
+        uint balBefore = _totalAssets();
         _increaseDebt(msg.value);
         _deposit();
+        uint balAfter = _totalAssets();
+
+        emit Deposit(msg.value, balBefore, balAfter);
     }
 
     /*

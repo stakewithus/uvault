@@ -12,6 +12,7 @@ Changes from StrategyBase
 - sweep - delete mapping "assets" and use require to explicitly check protected tokens
 - add immutable to vault
 - add immutable to underlying
+- add event Deposit
 */
 
 import "@openzeppelin/contracts/token/ERC20/IERC20.sol";
@@ -25,6 +26,8 @@ import "./protocol/IController.sol";
 abstract contract StrategyERC20 is IStrategyERC20 {
     using SafeERC20 for IERC20;
     using SafeMath for uint;
+
+    event Deposit(uint amount, uint balBefore, uint balAfter);
 
     address public override admin;
     address public override controller;
@@ -141,8 +144,12 @@ abstract contract StrategyERC20 is IStrategyERC20 {
     function deposit(uint _underlyingAmount) external override onlyAuthorized {
         require(_underlyingAmount > 0, "deposit = 0");
 
+        uint balBefore = _totalAssets();
         _increaseDebt(_underlyingAmount);
         _deposit();
+        uint balAfter = _totalAssets();
+
+        emit Deposit(_underlyingAmount, balBefore, balAfter);
     }
 
     /*
