@@ -212,6 +212,9 @@ contract StrategyCusdV2 is StrategyERC20 {
     @dev Caller should implement guard agains slippage
     */
     function exit() external override onlyAuthorized {
+        if (forceExit) {
+            return;
+        }
         _claimRewards(underlying);
         _withdrawAll();
     }

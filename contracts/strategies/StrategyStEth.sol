@@ -232,6 +232,9 @@ contract StrategyStEth is StrategyETH {
     @dev Caller should implement guard agains slippage
     */
     function exit() external override onlyAuthorized {
+        if (forceExit) {
+            return;
+        }
         _claimRewards();
         _withdrawAll();
     }
