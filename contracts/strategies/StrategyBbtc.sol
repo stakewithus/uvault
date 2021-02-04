@@ -181,7 +181,8 @@ contract StrategyBbtc is StrategyERC20 {
     }
 
     function _claimRewards(address _token) private {
-        LiquidityGaugeV2(GAUGE).claim_rewards();
+        // BBTC gauge has no rewards so don't call
+        // LiquidityGaugeV2(GAUGE).claim_rewards();
         Minter(MINTER).mint(GAUGE);
 
         uint crvBal = IERC20(CRV).balanceOf(address(this));
