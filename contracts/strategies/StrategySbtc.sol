@@ -166,7 +166,6 @@ contract StrategySbtc is StrategyERC20 {
     }
 
     function _claimRewards(address _token) private {
-        // TODO: claim BPT
         LiquidityGaugeReward(GAUGE).claim_rewards();
         // claim CRV
         Minter(MINTER).mint(GAUGE);
