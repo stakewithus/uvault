@@ -78,9 +78,10 @@ export interface Config {
     strategyBusdDai: string
     strategyBusdUsdc: string
     strategyBusdUsdt: string
-    strategyGusdDai: string
-    strategyGusdUsdc: string
-    strategyGusdUsdt: string
+    strategyGusdDaiV2: string
+    strategyGusdGusdV2: string
+    strategyGusdUsdcV2: string
+    strategyGusdUsdtV2: string
     strategyNoOpDai: string
     strategyNoOpUsdc: string
     strategyNoOpUsdt: string
@@ -184,24 +185,25 @@ const config: Config = {
     gusdVault: "0xC62b2aC62Ba74979132c14f5c655EdBA5e959111",
     wbtcVault: "0x96281343406dEBf869bf100B733ffeEF23c852b7",
     ethVault: "0x72E357f7635163493F153A0Bd3F03C15C14A51C6",
-    // strategies (TODO redeploy v2) //
-    strategyAaveDai: "0x156f47C98BEFee0Be232f26dcecA600C5D3496C5",
-    strategyAaveUsdc: "0xaE4BF42667A6cFc9B3C45b07fB63881077CB12C7",
-    strategyAaveUsdt: "0xFa76D3492B3D9EcdA2122DB84FAeCbf434684AF0",
+    // strategies //
+    strategyAaveDai: "0x9AA973C668f74B112bFF830a202cb3771e401Eb0",
+    strategyAaveUsdc: "0x33ec900B63E61E145fdD4c0cdE97AB1148CF4B47",
+    strategyAaveUsdt: "0xeC813E53Af13dDA77EAEF1a4B5804DB5f8208F2E",
     strategyBusdBusdV2: "0x6A47Cc25C1803757E44FF6e1DB7dC39b93Cc8d6D",
     strategyBusdDai: "0xffa01cA5FFd9e9F8a24CfdcA8C9157bD59D80405",
     strategyBusdUsdc: "0x042b298B30C67c8921d5376ad9a065E834280F26",
     strategyBusdUsdt: "0xedA38758d7Ea23adc780731d16A4382f17C9e59a",
-    strategyGusdDai: "0xfd11221fE0E2c8e552afe8622946946428a17650",
-    strategyGusdUsdc: "0x668973f5f8E47844bc75Bbe9BAd9C7AD0542B8bc",
-    strategyGusdUsdt: "0xB295bEC46cF0141B7E011Dc19Ae0036796691083",
+    strategyGusdDaiV2: "0x1D3139146e850c76AF79aD1Af0368f2af217A5F6",
+    strategyGusdGusdV2: "0x82375E59A7afE3a06F52f1B2ee68DE8d781E0006",
+    strategyGusdUsdcV2: "0x03ace9C69E33d6638c179545FF93439f3F591D44",
+    strategyGusdUsdtV2: "0xB5a1c7477A1f2c3aF4F56c633dA47a2521f18C6D",
     strategyNoOpDai: "0x1b79EbE1C9c128Eb30e6f6EBb0741991B696ab80",
     strategyNoOpUsdc: "0x64d43B0D0EDfa8434059d12bCF861da7eE8dD4bc",
     strategyNoOpUsdt: "0xc2e4e82853c28DCF81930852E5A055236364d8F6",
     strategyPaxDai: "0x2b3512efBeeb609CF9D49486b6e2DD9CF10Be6c9",
     strategyPaxUsdc: "0xb1F1AeD30dFe5787dFb65F6Cb96D90b3ae347F68",
     strategyPaxUsdt: "0x3032dBB5DB8aB5Bd85bf2Ca496e02Ce5378A5726",
-    strategyStEth: "0x08211Ad3381595cB190bDDe3Fe1DaA9eF15DAB0a",
+    strategyStEth: "0x6E1051876ea57e957FdB8A501c7445466Bb643bf",
     // others //
     dai: "0x6B175474E89094C44Da98b954EedeAC495271d0F",
     usdc: "0xA0b86991c6218b36c1d19D4a2e9Eb0cE3606eB48",
