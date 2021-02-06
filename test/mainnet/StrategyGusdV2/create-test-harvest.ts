@@ -34,12 +34,6 @@ export default (name: string, _setup: Setup, params: { DECIMALS: BN }) => {
 
       const CRV_DUST = pow(10, 18)
 
-      console.log(`${before.strategy.totalAssets}`)
-      console.log(`${after.strategy.totalAssets}`)
-
-      console.log(`${before.crv.strategy}`)
-      console.log(`${after.crv.strategy}`)
-
       assert(
         after.underlying.treasury.gte(before.underlying.treasury),
         "underlying treasury"
