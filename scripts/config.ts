@@ -75,9 +75,9 @@ export interface Config {
     strategyAaveUsdc: string
     strategyAaveUsdt: string
     strategyBusdBusdV2: string
-    strategyBusdDai: string
-    strategyBusdUsdc: string
-    strategyBusdUsdt: string
+    strategyBusdDaiV2: string
+    strategyBusdUsdcV2: string
+    strategyBusdUsdtV2: string
     strategyGusdDaiV2: string
     strategyGusdGusdV2: string
     strategyGusdUsdcV2: string
@@ -189,10 +189,10 @@ const config: Config = {
     strategyAaveDai: "0x9AA973C668f74B112bFF830a202cb3771e401Eb0",
     strategyAaveUsdc: "0x33ec900B63E61E145fdD4c0cdE97AB1148CF4B47",
     strategyAaveUsdt: "0xeC813E53Af13dDA77EAEF1a4B5804DB5f8208F2E",
-    strategyBusdBusdV2: "0x6A47Cc25C1803757E44FF6e1DB7dC39b93Cc8d6D",
-    strategyBusdDai: "0xffa01cA5FFd9e9F8a24CfdcA8C9157bD59D80405",
-    strategyBusdUsdc: "0x042b298B30C67c8921d5376ad9a065E834280F26",
-    strategyBusdUsdt: "0xedA38758d7Ea23adc780731d16A4382f17C9e59a",
+    strategyBusdBusdV2: "0x06BA23E98f79B856fa93cFB7a337dE359fc4d146",
+    strategyBusdDaiV2: "0x12934308F994cd6d7055480B7CB06c4630A57aEE",
+    strategyBusdUsdcV2: "0x7010F68e6e35f40116629B4C679c7e89D289a27E",
+    strategyBusdUsdtV2: "0x007246570B8D8Ca41efb348FfFDb767C60b4F8fE",
     strategyGusdDaiV2: "0x1D3139146e850c76AF79aD1Af0368f2af217A5F6",
     strategyGusdGusdV2: "0x82375E59A7afE3a06F52f1B2ee68DE8d781E0006",
     strategyGusdUsdcV2: "0x03ace9C69E33d6638c179545FF93439f3F591D44",
