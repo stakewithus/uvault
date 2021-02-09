@@ -7,7 +7,7 @@ version 1.2.0
 Changes from StrategyNoOp
 - enable setController
 - move code to withdraw all token from exit() to withdrawAll()
-  Under no circumstance should exit() fail. This prevents vault being stuck to
+  Under no circumstance should exit() fail. This prevents vault getting stuck to
   this strategy.
 */
 

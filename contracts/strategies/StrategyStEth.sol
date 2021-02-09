@@ -34,7 +34,7 @@ contract StrategyStEth is StrategyETH {
         StrategyETH(_controller, _vault)
     {
         // These tokens are never held by this contract
-        // so the risk of them being stolen is minimal
+        // so the risk of them getting stolen is minimal
         IERC20(CRV).safeApprove(UNISWAP, uint(-1));
         // Minted on Gauge deposit, withdraw and claim_rewards
         // only this contract can spend on UNISWAP

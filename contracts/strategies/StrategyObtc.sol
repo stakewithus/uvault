@@ -76,7 +76,7 @@ contract StrategyObtc is StrategyERC20 {
         address _underlying
     ) public StrategyERC20(_controller, _vault, _underlying) {
         // These tokens are never held by this contract
-        // so the risk of them being stolen is minimal
+        // so the risk of them getting stolen is minimal
         IERC20(CRV).safeApprove(UNISWAP, uint(-1));
         IERC20(CRV).safeApprove(SUSHI, uint(-1));
 
