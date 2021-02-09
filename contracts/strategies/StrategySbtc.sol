@@ -33,6 +33,9 @@ contract StrategySbtc is StrategyERC20 {
     // CRV
     address private constant CRV = 0xD533a949740bb3306d119CC777fa900bA034cd52;
 
+    // SBTC has low liquidity on DEX (Uniswap, Sushi, 1 Inch), so disable buying SBTC
+    bool public disableSbtc = true;
+
     constructor(
         address _controller,
         address _vault,
@@ -117,6 +120,10 @@ contract StrategySbtc is StrategyERC20 {
         // Now we have underlying
     }
 
+    function setDisableSbtc(bool _disable) external onlyAdmin {
+        disableSbtc = _disable;
+    }
+
     /*
     @notice Returns address and index of token with lowest balance in Curve SWAP
     */
@@ -133,13 +140,15 @@ contract StrategySbtc is StrategyERC20 {
             }
         }
 
+        // SBTC has low liquidity, so buying is disabled by default
+        if (minIndex == 2 && !disableSbtc) {
+            return (SBTC, 2);
+        }
+
         if (minIndex == 0) {
             return (REN_BTC, 0);
         }
-        if (minIndex == 1) {
-            return (WBTC, 1);
-        }
-        return (SBTC, 2);
+        return (WBTC, 1);
     }
 
     /*
