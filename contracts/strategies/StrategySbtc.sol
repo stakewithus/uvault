@@ -46,6 +46,10 @@ contract StrategySbtc is StrategyERC20 {
         IERC20(CRV).safeApprove(UNISWAP, uint(-1));
     }
 
+    function setDisableSbtc(bool _disable) external onlyAdmin {
+        disableSbtc = _disable;
+    }
+
     function _totalAssets() internal view override returns (uint) {
         uint lpBal = LiquidityGaugeReward(GAUGE).balanceOf(address(this));
         uint pricePerShare = StableSwapSBTC(SWAP).get_virtual_price();
@@ -118,10 +122,6 @@ contract StrategySbtc is StrategyERC20 {
             min
         );
         // Now we have underlying
-    }
-
-    function setDisableSbtc(bool _disable) external onlyAdmin {
-        disableSbtc = _disable;
     }
 
     /*

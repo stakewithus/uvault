@@ -40,6 +40,9 @@ contract StrategyBbtc is StrategyERC20 {
     // CRV
     address private constant CRV = 0xD533a949740bb3306d119CC777fa900bA034cd52;
 
+    // SBTC has low liquidity on DEX (Uniswap, Sushi, 1 Inch), so disable buying SBTC
+    bool public disableSbtc = true;
+
     constructor(
         address _controller,
         address _vault,
@@ -48,6 +51,10 @@ contract StrategyBbtc is StrategyERC20 {
         // These tokens are never held by this contract
         // so the risk of them being stolen is minimal
         IERC20(CRV).safeApprove(UNISWAP, uint(-1));
+    }
+
+    function setDisableSbtc(bool _disable) external onlyAdmin {
+        disableSbtc = _disable;
     }
 
     function _totalAssets() internal view override returns (uint) {
@@ -145,16 +152,18 @@ contract StrategyBbtc is StrategyERC20 {
             }
         }
 
+        // SBTC has low liquidity, so buying is disabled by default
+        if (minIndex == 3 && !disableSbtc) {
+            return (SBTC, 3);
+        }
+
         if (minIndex == 0) {
             return (BBTC, 0);
         }
         if (minIndex == 1) {
             return (REN_BTC, 1);
         }
-        if (minIndex == 2) {
-            return (WBTC, 2);
-        }
-        return (SBTC, 3);
+        return (WBTC, 2);
     }
 
     /*
