@@ -13,6 +13,8 @@ contract StrategyObtc is StrategyERC20 {
     // Uniswap //
     address private constant UNISWAP = 0x7a250d5630B4cF539739dF2C5dAcb4c659F2488D;
     address private constant WETH = 0xC02aaA39b223FE8D0A0e5C4F27eAD9083C756Cc2;
+    // SushiSwap //
+    address private constant SUSHI = 0xd9e1cE17f2641f24aE83637ab66a2cca9C378B9F;
 
     address internal constant OBTC = 0x8064d9Ae6cDf087b1bcd5BDf3531bD5d8C537a68;
     address internal constant REN_BTC = 0xEB4C2781e4ebA804CE9a9803C67d0893436bB27D;
@@ -43,10 +45,30 @@ contract StrategyObtc is StrategyERC20 {
     // BoringDAO //
     /*
     BOR is rewarded on Gauge deposit, withdraw and claim_rewards
-    selling BOR can fail so this operations is left to admin by calling sweep
     */
-    // TODO: code to sell BOR?
-    // address private constant BOR = 0x3c9d6c1C73b31c837832c72E04D3152f051fc1A9;
+    address private constant BOR = 0x3c9d6c1C73b31c837832c72E04D3152f051fc1A9;
+    // flag to enable / disable selling of BOR on SushiSwap
+    bool public shouldSellBor = true;
+
+    /*
+    Best exchange for swapping tokens
+
+    CRV OBTC    sushi
+    CRV REN_BTC uni
+    CRV WBTC    uni
+    CRV SBTC    n/a (1 inch) 
+
+    BOR  WETH    sushi
+
+    WETH OBTC    sushi
+    WETH REN_BTC uni
+    WETH WBTC    uni
+    WETH SBTC    n/a (1 inch)
+    */
+    bool public disableSbtc = true;
+    address[2] private ROUTERS = [UNISWAP, SUSHI];
+    // index from underlying index to ROUTERS index
+    uint[4] public wethBtcRouter = [1, 0, 0, 0];
 
     constructor(
         address _controller,
@@ -56,6 +78,29 @@ contract StrategyObtc is StrategyERC20 {
         // These tokens are never held by this contract
         // so the risk of them being stolen is minimal
         IERC20(CRV).safeApprove(UNISWAP, uint(-1));
+        IERC20(CRV).safeApprove(SUSHI, uint(-1));
+
+        IERC20(WETH).safeApprove(UNISWAP, uint(-1));
+        IERC20(WETH).safeApprove(SUSHI, uint(-1));
+
+        // Minted on Gauge deposit, withdraw and claim_rewards
+        // only this contract can spend on SUSHI
+        IERC20(BOR).safeApprove(SUSHI, uint(-1));
+    }
+
+    function setShouldSellBor(bool _shouldSellBor) external onlyAdmin {
+        shouldSellBor = _shouldSellBor;
+    }
+
+    function setDisableSbtc(bool _disable) external onlyAdmin {
+        disableSbtc = _disable;
+    }
+
+    function setWethBtcRouter(uint[4] calldata _wethBtcRouter) external onlyAdmin {
+        for (uint i = 0; i < _wethBtcRouter.length; i++) {
+            require(_wethBtcRouter[i] <= 1, "router index > 1");
+            wethBtcRouter[i] = _wethBtcRouter[i];
+        }
     }
 
     function _totalAssets() internal view override returns (uint) {
@@ -153,33 +198,45 @@ contract StrategyObtc is StrategyERC20 {
             }
         }
 
+        // SBTC has low liquidity, so buying is disabled by default
+        if (minIndex == 3 && !disableSbtc) {
+            return (SBTC, 3);
+        }
+
         if (minIndex == 0) {
             return (OBTC, 0);
         }
         if (minIndex == 1) {
             return (REN_BTC, 1);
         }
-        if (minIndex == 2) {
-            return (WBTC, 2);
-        }
-        return (SBTC, 3);
+        return (WBTC, 2);
     }
 
     /*
     @dev Uniswap fails with zero address so no check is necessary here
     */
     function _swap(
+        // uniswap or sushi
+        address _router,
         address _from,
         address _to,
         uint _amount
     ) private {
-        // create dynamic array with 3 elements
-        address[] memory path = new address[](3);
-        path[0] = _from;
-        path[1] = WETH;
-        path[2] = _to;
+        address[] memory path;
 
-        Uniswap(UNISWAP).swapExactTokensForTokens(
+        if (_from == WETH || _to == WETH) {
+            path = new address[](2);
+            path[0] = _from;
+            path[1] = _to;
+        } else {
+            path = new address[](3);
+            path[0] = _from;
+            path[1] = WETH;
+            path[2] = _to;
+        }
+
+        // NOTE: Uniswap and SushiSwap can be called with the same interface
+        Uniswap(_router).swapExactTokensForTokens(
             _amount,
             1,
             path,
@@ -188,14 +245,34 @@ contract StrategyObtc is StrategyERC20 {
         );
     }
 
-    function _claimRewards(address _token) private {
+    function _claimRewards(address _token, uint _tokenIndex) private {
         // claim CRV
         Minter(MINTER).mint(GAUGE);
 
-        // Infinity approval for Uniswap set inside constructor
+        uint routerIndex = wethBtcRouter[_tokenIndex];
+        address router = ROUTERS[routerIndex];
+
+        if (shouldSellBor) {
+            // claim BOR
+            LiquidityGaugeV2(GAUGE).claim_rewards();
+
+            uint borBal = IERC20(BOR).balanceOf(address(this));
+            if (borBal > 0) {
+                // BOR is available on SUSHI but not UNISWAP
+                _swap(SUSHI, BOR, WETH, borBal);
+
+                uint wethBal = IERC20(WETH).balanceOf(address(this));
+                if (wethBal > 0) {
+                    _swap(router, WETH, _token, wethBal);
+                    // Now this contract has token
+                }
+            }
+        }
+
+        // Infinity approval for Uniswap and Sushi set inside constructor
         uint crvBal = IERC20(CRV).balanceOf(address(this));
         if (crvBal > 0) {
-            _swap(CRV, _token, crvBal);
+            _swap(router, CRV, _token, crvBal);
             // Now this contract has token
         }
     }
@@ -206,7 +283,7 @@ contract StrategyObtc is StrategyERC20 {
     function harvest() external override onlyAuthorized {
         (address token, uint index) = _getMostPremiumToken();
 
-        _claimRewards(token);
+        _claimRewards(token, index);
 
         uint bal = IERC20(token).balanceOf(address(this));
         if (bal > 0) {
@@ -233,7 +310,7 @@ contract StrategyObtc is StrategyERC20 {
         if (forceExit) {
             return;
         }
-        _claimRewards(underlying);
+        _claimRewards(underlying, underlyingIndex);
         _withdrawAll();
     }
 
