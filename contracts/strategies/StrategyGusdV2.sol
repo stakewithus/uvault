@@ -129,40 +129,43 @@ contract StrategyGusdV2 is StrategyERC20 {
     }
 
     /*
-    @notice Returns address and index of token with lowest balance in Curve DEPOSIT
+    @notice Returns address and index of token with lowest balance in Curve StableSwap
     */
-
     function _getMostPremiumToken() internal view returns (address, uint) {
-        /*
-        Swapping small amount of CRV (< $0.01) with GUSD can cause Uniswap to fail
-        since 0 GUSD is returned from the trade.
-        So we skip buying GUSD
-        */
-        uint[3] memory balances;
-        balances[0] = StableSwap3Pool(BASE_POOL).balances(0); // DAI
-        balances[1] = StableSwap3Pool(BASE_POOL).balances(1).mul(1e12); // USDC
-        balances[2] = StableSwap3Pool(BASE_POOL).balances(2).mul(1e12); // USDT
+        // meta pool balances
+        uint[2] memory balances;
+        balances[0] = StableSwapGusd(SWAP).balances(0).mul(1e16); // GUSD
+        balances[1] = StableSwapGusd(SWAP).balances(1); // 3CRV
 
-        uint minIndex = 0;
-        for (uint i = 1; i < balances.length; i++) {
-            if (balances[i] <= balances[minIndex]) {
-                minIndex = i;
+        if (balances[0] <= balances[1]) {
+            return (GUSD, 0);
+        } else {
+            // base pool balances
+            uint[3] memory baseBalances;
+            baseBalances[0] = StableSwap3Pool(BASE_POOL).balances(0); // DAI
+            baseBalances[1] = StableSwap3Pool(BASE_POOL).balances(1).mul(1e12); // USDC
+            baseBalances[2] = StableSwap3Pool(BASE_POOL).balances(2).mul(1e12); // USDT
+
+            uint minIndex = 0;
+            for (uint i = 1; i < baseBalances.length; i++) {
+                if (baseBalances[i] <= baseBalances[minIndex]) {
+                    minIndex = i;
+                }
             }
-        }
 
-        /*
-        DAI  1
-        USDC 2
-        USDT 3
-        */
-
-        if (minIndex == 0) {
-            return (DAI, 1);
+            /*
+            DAI  1
+            USDC 2
+            USDT 3
+            */
+            if (minIndex == 0) {
+                return (DAI, 1);
+            }
+            if (minIndex == 1) {
+                return (USDC, 2);
+            }
+            return (USDT, 3);
         }
-        if (minIndex == 1) {
-            return (USDC, 2);
-        }
-        return (USDT, 3);
     }
 
     /*
