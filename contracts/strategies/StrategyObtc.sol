@@ -198,7 +198,7 @@ contract StrategyObtc is StrategyERC20 {
             baseBalances[2] = StableSwapSBTC(BASE_POOL).balances(2); // SBTC
 
             uint minIndex = 0;
-            for (uint i = 0; i < baseBalances.length; i++) {
+            for (uint i = 1; i < baseBalances.length; i++) {
                 if (baseBalances[i] <= baseBalances[minIndex]) {
                     minIndex = i;
                 }
