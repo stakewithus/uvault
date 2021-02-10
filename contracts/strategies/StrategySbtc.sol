@@ -140,13 +140,15 @@ contract StrategySbtc is StrategyERC20 {
             }
         }
 
-        // SBTC has low liquidity, so buying is disabled by default
-        if (minIndex == 2 && !disableSbtc) {
-            return (SBTC, 2);
-        }
-
         if (minIndex == 0) {
             return (REN_BTC, 0);
+        }
+        if (minIndex == 1) {
+            return (WBTC, 1);
+        }
+        // SBTC has low liquidity, so buying is disabled by default
+        if (!disableSbtc) {
+            return (SBTC, 2);
         }
         return (WBTC, 1);
     }

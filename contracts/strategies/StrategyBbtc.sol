@@ -139,31 +139,43 @@ contract StrategyBbtc is StrategyERC20 {
     @notice Returns address and index of token with lowest balance in Curve SWAP
     */
     function _getMostPremiumToken() private view returns (address, uint) {
-        uint[4] memory balances;
-        balances[0] = StableSwapBBTC(SWAP).balances(0).mul(1e10); // OBTC
-        balances[1] = StableSwapSBTC(BASE_POOL).balances(0).mul(1e10); // REN_BTC
-        balances[2] = StableSwapSBTC(BASE_POOL).balances(1).mul(1e10); // WBTC
-        balances[3] = StableSwapSBTC(BASE_POOL).balances(2); // SBTC
+        uint[2] memory balances;
+        balances[0] = StableSwapBBTC(SWAP).balances(0).mul(1e10); // BBTC
+        balances[1] = StableSwapBBTC(SWAP).balances(1); // SBTC pool
 
-        uint minIndex = 0;
-        for (uint i = 1; i < balances.length; i++) {
-            if (balances[i] <= balances[minIndex]) {
-                minIndex = i;
-            }
-        }
-
-        // SBTC has low liquidity, so buying is disabled by default
-        if (minIndex == 3 && !disableSbtc) {
-            return (SBTC, 3);
-        }
-
-        if (minIndex == 0) {
+        if (balances[0] <= balances[1]) {
             return (BBTC, 0);
+        } else {
+            uint[3] memory baseBalances;
+            baseBalances[0] = StableSwapSBTC(BASE_POOL).balances(0).mul(1e10); // REN_BTC
+            baseBalances[1] = StableSwapSBTC(BASE_POOL).balances(1).mul(1e10); // WBTC
+            baseBalances[2] = StableSwapSBTC(BASE_POOL).balances(2); // SBTC
+
+            uint minIndex = 0;
+            for (uint i = 0; i < baseBalances.length; i++) {
+                if (baseBalances[i] <= baseBalances[minIndex]) {
+                    minIndex = i;
+                }
+            }
+
+            /*
+            REN_BTC 1
+            WBTC    2
+            SBTC    3
+            */
+
+            if (minIndex == 0) {
+                return (REN_BTC, 1);
+            }
+            if (minIndex == 1) {
+                return (WBTC, 2);
+            }
+            // SBTC has low liquidity, so buying is disabled by default
+            if (!disableSbtc) {
+                return (SBTC, 3);
+            }
+            return (WBTC, 2);
         }
-        if (minIndex == 1) {
-            return (REN_BTC, 1);
-        }
-        return (WBTC, 2);
     }
 
     /*

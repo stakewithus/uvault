@@ -147,7 +147,7 @@ contract StrategyGusdV2 is StrategyERC20 {
             baseBalances[2] = StableSwap3Pool(BASE_POOL).balances(2).mul(1e12); // USDT
 
             uint minIndex = 0;
-            for (uint i = 1; i < baseBalances.length; i++) {
+            for (uint i = 0; i < baseBalances.length; i++) {
                 if (baseBalances[i] <= baseBalances[minIndex]) {
                     minIndex = i;
                 }
