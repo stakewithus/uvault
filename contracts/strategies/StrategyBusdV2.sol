@@ -131,7 +131,7 @@ contract StrategyBusdV2 is StrategyERC20 {
     }
 
     /*
-    @notice Returns address and index of token with lowest balance in Curve DEPOSIT
+    @notice Returns address and index of token with lowest balance in Curve StableSwap
     */
     function _getMostPremiumToken() internal view returns (address, uint) {
         uint[4] memory balances;
