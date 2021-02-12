@@ -96,7 +96,7 @@ rm slither.db.json
 ### Deploy
 
 ```shell
-rm -rf build artifacts cache
+npm run clean
 npx hardhat compile
 env $(cat .env) npx hardhat deploy:strategy --network mainnet --strategy StrategyGusdDai --dev true
 ```
