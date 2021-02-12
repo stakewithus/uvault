@@ -89,6 +89,7 @@ export interface Config {
     strategyPaxUsdc: string
     strategyPaxUsdt: string
     strategyStEth: string
+    strategyObtcWbtc: string
     // others
     dai: string
     usdc: string
@@ -204,6 +205,7 @@ const config: Config = {
     strategyPaxUsdc: "0xb1F1AeD30dFe5787dFb65F6Cb96D90b3ae347F68",
     strategyPaxUsdt: "0x3032dBB5DB8aB5Bd85bf2Ca496e02Ce5378A5726",
     strategyStEth: "0x6E1051876ea57e957FdB8A501c7445466Bb643bf",
+    strategyObtcWbtc: "0x83Db07ac03cB3d2FC5204507eA4b8c211E5B5383",
     // others //
     dai: "0x6B175474E89094C44Da98b954EedeAC495271d0F",
     usdc: "0xA0b86991c6218b36c1d19D4a2e9Eb0cE3606eB48",

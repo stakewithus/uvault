@@ -281,9 +281,9 @@ contract StrategyObtc is StrategyERC20 {
             }
         }
 
-        // Infinity approval for Uniswap and Sushi set inside constructor
         uint crvBal = IERC20(CRV).balanceOf(address(this));
-        if (crvBal > 0) {
+        // Swap only if CRV >= 1, otherwise swap may fail for small amount of BTC
+        if (crvBal >= 1e18) {
             _swap(router, CRV, _token, crvBal);
             // Now this contract has token
         }

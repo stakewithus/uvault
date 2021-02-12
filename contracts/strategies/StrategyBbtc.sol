@@ -209,7 +209,8 @@ contract StrategyBbtc is StrategyERC20 {
         Minter(MINTER).mint(GAUGE);
 
         uint crvBal = IERC20(CRV).balanceOf(address(this));
-        if (crvBal > 0) {
+        // Swap only if CRV >= 1, otherwise swap may fail for small amount of BTC
+        if (crvBal >= 1e18) {
             _swap(CRV, _token, crvBal);
             // Now this contract has token
         }
