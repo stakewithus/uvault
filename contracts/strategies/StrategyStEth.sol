@@ -43,7 +43,7 @@ contract StrategyStEth is StrategyETH {
 
     receive() external payable {
         // Don't allow vault to accidentally send ETH
-        require(msg.sender != vault, "msg.sender == vault");
+        require(msg.sender != vault, "msg.sender = vault");
     }
 
     function _totalAssets() internal view override returns (uint) {
