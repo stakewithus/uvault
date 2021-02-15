@@ -106,20 +106,16 @@ const config: Config = {
     gasToken: "0x063f83affbcf64d7d84d306f5b85ed65c865dca4",
     gasRelayer: "0xad2907C6aA26588f579e5D4bEeE6d945ba18BDb4",
     treasury: "0x9a4c3Fc4683b95EBF11B535057B00812f6a549Bb",
-    // controller: "0x736d2245e691efADc66ca60DC0a474C3121b939E",
     controller: "0x9015bEb1B80380e8733B449C9cD7f8C3A857d86a",
     timeLock: "0xDb3906814Cc730ef4c8A5cf5C63A523494224150",
     // vaults //
-    erc20Vault: "0xc8E2357fA7f51e84beBFD4A0075c53D49d0A0D88",
-    ethVault: "0xaBCAf7CC375FB753fAf74C26E076DC4dea09Fc61",
+    erc20Vault: "0x83698950B13d0B8B1eAF37D6f0f584E6D71D4964",
+    ethVault: "0x2405927Cfa0087C53593A9D97FEE8BcADDc6A008",
     // strategies //
-    // strategyTest: "0x0dDA2b6D771789803803798cFD3C7Ea55BED7C2F",
-    // strategyTestV2: "0xc103Cab5CCBb54c61A46DD68438e1C28af074E16",
-    // strategyNoOp: "0x90E5216F8aBf7B68cA7D4eC856476Ef2C0857Cb2",
-    strategyErc20Test: "0x6f6BD9A74462bdACb3E7990FBd5aD72D5d7Eb76e",
-    strategyNoOpErc20: "0xcaBbC22CC399Ba20DB1A5aD411f8ff56576Be380",
-    strategyEthTest: "0xc1FB4C7CFdD0C43408094A102e219CFfd2D7E3d6",
-    strategyNoOpEth: "0x4419dc944f28AD28f4D76AcD755095BF7Bbc628d",
+    strategyErc20Test: "0x3Dfd432250d319Aae738Ee0a1C454Ba58E39b7a7",
+    strategyNoOpErc20: "0xb2Fb90fC0e16DfeD26eD3169803847A52420Bdd9",
+    strategyEthTest: "0x30584B0354c918a7553f17c9E71ef2E355639210",
+    strategyNoOpEth: "0x73D4c6cF5EaBC4A7743bCffeA0c49F8495e85EF0",
     // others //
     // used for testinng
     testToken: "0x7F56619E1fAaF6c06B96225e6c8c737F0BBc91c5",
