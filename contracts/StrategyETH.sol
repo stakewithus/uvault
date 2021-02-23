@@ -116,7 +116,7 @@ abstract contract StrategyETH is IStrategyETH {
     function _decreaseDebt(uint _ethAmount) private {
         _sendEthToVault(_ethAmount);
 
-        if (_ethAmount > totalDebt) {
+        if (_ethAmount >= totalDebt) {
             totalDebt = 0;
         } else {
             totalDebt -= _ethAmount;
@@ -203,7 +203,6 @@ abstract contract StrategyETH is IStrategyETH {
         uint ethBal = address(this).balance;
         if (ethBal > 0) {
             _decreaseDebt(ethBal);
-            totalDebt = 0;
         }
     }
 
