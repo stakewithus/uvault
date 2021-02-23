@@ -124,7 +124,7 @@ abstract contract StrategyERC20 is IStrategyERC20 {
         uint balAfter = IERC20(underlying).balanceOf(address(this));
 
         uint diff = balBefore.sub(balAfter);
-        if (diff > totalDebt) {
+        if (diff >= totalDebt) {
             totalDebt = 0;
         } else {
             totalDebt -= diff;
@@ -202,7 +202,6 @@ abstract contract StrategyERC20 is IStrategyERC20 {
         // transfer underlying token to vault
         uint underlyingBal = IERC20(underlying).balanceOf(address(this));
         if (underlyingBal > 0) {
-            // TODO: inline code
             _decreaseDebt(underlyingBal);
         }
     }
@@ -215,9 +214,7 @@ abstract contract StrategyERC20 is IStrategyERC20 {
 
         uint underlyingBal = IERC20(underlying).balanceOf(address(this));
         if (underlyingBal > 0) {
-            // TODO: inline code
             _decreaseDebt(underlyingBal);
-            totalDebt = 0;
         }
     }
 
