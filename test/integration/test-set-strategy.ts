@@ -51,6 +51,11 @@ contract("integration - set strategy", (accounts) => {
       from: admin,
     })
 
+    await controller.approveStrategy(erc20Vault.address, { from: admin })
+    await controller.approveStrategy(ethVault.address, { from: admin })
+    await controller.approveStrategy(newStrategyErc20.address, { from: admin })
+    await controller.approveStrategy(newStrategyEth.address, { from: admin })
+
     await erc20Vault.approveStrategy(newStrategyErc20.address, { from: timeLock })
     await ethVault.approveStrategy(newStrategyEth.address, { from: timeLock })
   })
