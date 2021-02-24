@@ -17,9 +17,11 @@ contract StrategySbtc is StrategyERC20 {
     address internal constant SBTC = 0xfE18be6b3Bd88A2D2A7f928d00292E7a9963CfC6;
 
     // renBTC = 0 | wBTC = 1 | sBTC = 2
-    uint internal underlyingIndex;
+    uint private immutable UNDERLYING_INDEX;
     // precision to convert 10 ** 18  to underlying decimals
     uint[3] private PRECISION_DIV = [1e10, 1e10, 1];
+    // precision div of underlying token (used to save gas)
+    uint private immutable PRECISION_DIV_UNDERLYING;
 
     // Curve //
     // liquidity provider token (Curve renBTC / wBTC / sBTC)
@@ -39,8 +41,12 @@ contract StrategySbtc is StrategyERC20 {
     constructor(
         address _controller,
         address _vault,
-        address _underlying
+        address _underlying,
+        uint _underlyingIndex
     ) public StrategyERC20(_controller, _vault, _underlying) {
+        UNDERLYING_INDEX = _underlyingIndex;
+        PRECISION_DIV_UNDERLYING = PRECISION_DIV[_underlyingIndex];
+
         // These tokens are never held by this contract
         // so the risk of them getting stolen is minimal
         IERC20(CRV).safeApprove(UNISWAP, uint(-1));
@@ -54,7 +60,7 @@ contract StrategySbtc is StrategyERC20 {
         uint lpBal = LiquidityGaugeReward(GAUGE).balanceOf(address(this));
         uint pricePerShare = StableSwapSBTC(SWAP).get_virtual_price();
 
-        return lpBal.mul(pricePerShare).div(PRECISION_DIV[underlyingIndex]) / 1e18;
+        return lpBal.mul(pricePerShare) / (PRECISION_DIV_UNDERLYING * 1e18);
     }
 
     /*
@@ -94,7 +100,7 @@ contract StrategySbtc is StrategyERC20 {
     @notice Deposits underlying to LiquidityGaugeReward
     */
     function _deposit() internal override {
-        _depositIntoCurve(underlying, underlyingIndex);
+        _depositIntoCurve(underlying, UNDERLYING_INDEX);
     }
 
     function _getTotalShares() internal view override returns (uint) {
@@ -113,12 +119,12 @@ contract StrategySbtc is StrategyERC20 {
         */
         uint pricePerShare = StableSwapSBTC(SWAP).get_virtual_price();
         uint underlyingAmount =
-            lpBal.mul(pricePerShare).div(PRECISION_DIV[underlyingIndex]) / 1e18;
+            lpBal.mul(pricePerShare) / (PRECISION_DIV_UNDERLYING * 1e18);
         uint min = underlyingAmount.mul(SLIPPAGE_MAX - slippage) / SLIPPAGE_MAX;
         // withdraw creates LP dust
         StableSwapSBTC(SWAP).remove_liquidity_one_coin(
             lpBal,
-            int128(underlyingIndex),
+            int128(UNDERLYING_INDEX),
             min
         );
         // Now we have underlying

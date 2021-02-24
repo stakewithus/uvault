@@ -6,8 +6,6 @@ import "./StrategyGusdV2.sol";
 contract StrategyGusdDaiV2 is StrategyGusdV2 {
     constructor(address _controller, address _vault)
         public
-        StrategyGusdV2(_controller, _vault, DAI)
-    {
-        underlyingIndex = 1;
-    }
+        StrategyGusdV2(_controller, _vault, DAI, 1)
+    {}
 }

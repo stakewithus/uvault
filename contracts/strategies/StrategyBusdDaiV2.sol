@@ -6,8 +6,6 @@ import "./StrategyBusdV2.sol";
 contract StrategyBusdDaiV2 is StrategyBusdV2 {
     constructor(address _controller, address _vault)
         public
-        StrategyBusdV2(_controller, _vault, DAI)
-    {
-        underlyingIndex = 0;
-    }
+        StrategyBusdV2(_controller, _vault, DAI, 0)
+    {}
 }

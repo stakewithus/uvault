@@ -6,8 +6,6 @@ import "./StrategyYV2.sol";
 contract StrategyYDaiV2 is StrategyYV2 {
     constructor(address _controller, address _vault)
         public
-        StrategyYV2(_controller, _vault, DAI)
-    {
-        underlyingIndex = 0;
-    }
+        StrategyYV2(_controller, _vault, DAI, 0)
+    {}
 }

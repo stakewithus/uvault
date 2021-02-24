@@ -6,8 +6,6 @@ import "./StrategyPaxV2.sol";
 contract StrategyPaxUsdcV2 is StrategyPaxV2 {
     constructor(address _controller, address _vault)
         public
-        StrategyPaxV2(_controller, _vault, USDC)
-    {
-        underlyingIndex = 1;
-    }
+        StrategyPaxV2(_controller, _vault, USDC, 1)
+    {}
 }

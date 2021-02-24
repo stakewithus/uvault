@@ -17,9 +17,11 @@ contract StrategyAave is StrategyERC20 {
     address internal constant USDT = 0xdAC17F958D2ee523a2206206994597C13D831ec7;
 
     // DAI = 0 | USDC = 1 | USDT = 2
-    uint internal underlyingIndex;
+    uint private immutable UNDERLYING_INDEX;
     // precision to convert 10 ** 18  to underlying decimals
     uint[3] private PRECISION_DIV = [1, 1e12, 1e12];
+    // precision div of underlying token (used to save gas)
+    uint private immutable PRECISION_DIV_UNDERLYING;
 
     // Curve //
     // liquidity provider token (Curve aDAI/aUSDC/aUSDT)
@@ -36,8 +38,12 @@ contract StrategyAave is StrategyERC20 {
     constructor(
         address _controller,
         address _vault,
-        address _underlying
+        address _underlying,
+        uint _underlyingIndex
     ) public StrategyERC20(_controller, _vault, _underlying) {
+        UNDERLYING_INDEX = _underlyingIndex;
+        PRECISION_DIV_UNDERLYING = PRECISION_DIV[_underlyingIndex];
+
         // These tokens are never held by this contract
         // so the risk of them getting stolen is minimal
         IERC20(CRV).safeApprove(UNISWAP, uint(-1));
@@ -47,7 +53,7 @@ contract StrategyAave is StrategyERC20 {
         uint lpBal = LiquidityGaugeV2(GAUGE).balanceOf(address(this));
         uint pricePerShare = StableSwapAave(SWAP).get_virtual_price();
 
-        return lpBal.mul(pricePerShare).div(PRECISION_DIV[underlyingIndex]) / 1e18;
+        return lpBal.mul(pricePerShare) / (PRECISION_DIV_UNDERLYING * 1e18);
     }
 
     /*
@@ -87,7 +93,7 @@ contract StrategyAave is StrategyERC20 {
     @notice Deposits underlying to LiquidityGaugeV2
     */
     function _deposit() internal override {
-        _depositIntoCurve(underlying, underlyingIndex);
+        _depositIntoCurve(underlying, UNDERLYING_INDEX);
     }
 
     function _getTotalShares() internal view override returns (uint) {
@@ -106,12 +112,12 @@ contract StrategyAave is StrategyERC20 {
         */
         uint pricePerShare = StableSwapAave(SWAP).get_virtual_price();
         uint underlyingAmount =
-            lpBal.mul(pricePerShare).div(PRECISION_DIV[underlyingIndex]) / 1e18;
+            lpBal.mul(pricePerShare) / (PRECISION_DIV_UNDERLYING * 1e18);
         uint min = underlyingAmount.mul(SLIPPAGE_MAX - slippage) / SLIPPAGE_MAX;
         // withdraw creates LP dust
         StableSwapAave(SWAP).remove_liquidity_one_coin(
             lpBal,
-            int128(underlyingIndex),
+            int128(UNDERLYING_INDEX),
             min,
             true
         );

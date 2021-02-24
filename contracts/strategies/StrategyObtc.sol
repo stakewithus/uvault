@@ -22,9 +22,11 @@ contract StrategyObtc is StrategyERC20 {
     address internal constant SBTC = 0xfE18be6b3Bd88A2D2A7f928d00292E7a9963CfC6;
 
     // oBTC = 0 | renBTC = 1 | wBTC = 2 | sBTC = 3
-    uint internal underlyingIndex;
+    uint private immutable UNDERLYING_INDEX;
     // precision to convert 10 ** 18  to underlying decimals
     uint[4] private PRECISION_DIV = [1, 1e10, 1e10, 1];
+    // precision div of underlying token (used to save gas)
+    uint private immutable PRECISION_DIV_UNDERLYING;
 
     // Curve //
     // liquidity provider token (Curve oBTC / sBTC)
@@ -73,8 +75,12 @@ contract StrategyObtc is StrategyERC20 {
     constructor(
         address _controller,
         address _vault,
-        address _underlying
+        address _underlying,
+        uint _underlyingIndex
     ) public StrategyERC20(_controller, _vault, _underlying) {
+        UNDERLYING_INDEX = _underlyingIndex;
+        PRECISION_DIV_UNDERLYING = PRECISION_DIV[_underlyingIndex];
+
         // These tokens are never held by this contract
         // so the risk of them getting stolen is minimal
         IERC20(CRV).safeApprove(UNISWAP, uint(-1));
@@ -107,7 +113,7 @@ contract StrategyObtc is StrategyERC20 {
         uint lpBal = LiquidityGaugeV2(GAUGE).balanceOf(address(this));
         uint pricePerShare = StableSwapOBTC(SWAP).get_virtual_price();
 
-        return lpBal.mul(pricePerShare).div(PRECISION_DIV[underlyingIndex]) / 1e18;
+        return lpBal.mul(pricePerShare) / (PRECISION_DIV_UNDERLYING * 1e18);
     }
 
     /*
@@ -147,7 +153,7 @@ contract StrategyObtc is StrategyERC20 {
     @notice Deposits underlying to LiquidityGaugeV2
     */
     function _deposit() internal override {
-        _depositIntoCurve(underlying, underlyingIndex);
+        _depositIntoCurve(underlying, UNDERLYING_INDEX);
     }
 
     function _getTotalShares() internal view override returns (uint) {
@@ -170,12 +176,12 @@ contract StrategyObtc is StrategyERC20 {
         */
         uint pricePerShare = StableSwapOBTC(SWAP).get_virtual_price();
         uint underlyingAmount =
-            lpBal.mul(pricePerShare).div(PRECISION_DIV[underlyingIndex]) / 1e18;
+            lpBal.mul(pricePerShare) / (PRECISION_DIV_UNDERLYING * 1e18);
         uint min = underlyingAmount.mul(SLIPPAGE_MAX - slippage) / SLIPPAGE_MAX;
         // withdraw creates LP dust
         DepositOBTC(DEPOSIT).remove_liquidity_one_coin(
             lpBal,
-            int128(underlyingIndex),
+            int128(UNDERLYING_INDEX),
             min
         );
         // Now we have underlying
@@ -322,7 +328,7 @@ contract StrategyObtc is StrategyERC20 {
         if (forceExit) {
             return;
         }
-        _claimRewards(underlying, underlyingIndex);
+        _claimRewards(underlying, UNDERLYING_INDEX);
         _withdrawAll();
     }
 

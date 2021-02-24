@@ -6,8 +6,6 @@ import "./StrategyAave.sol";
 contract StrategyAaveUsdt is StrategyAave {
     constructor(address _controller, address _vault)
         public
-        StrategyAave(_controller, _vault, USDT)
-    {
-        underlyingIndex = 2;
-    }
+        StrategyAave(_controller, _vault, USDT, 2)
+    {}
 }

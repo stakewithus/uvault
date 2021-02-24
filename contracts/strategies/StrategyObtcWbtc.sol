@@ -6,8 +6,6 @@ import "./StrategyObtc.sol";
 contract StrategyObtcWbtc is StrategyObtc {
     constructor(address _controller, address _vault)
         public
-        StrategyObtc(_controller, _vault, WBTC)
-    {
-        underlyingIndex = 2;
-    }
+        StrategyObtc(_controller, _vault, WBTC, 2)
+    {}
 }
