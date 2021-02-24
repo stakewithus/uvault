@@ -6,6 +6,7 @@ import _setup from "./setup"
 
 contract("StrategyStEth", (accounts) => {
   const DEPOSIT_AMOUNT = pow(10, 18).mul(new BN(100))
+  const DUST = frac(DEPOSIT_AMOUNT, 1, 1000)
 
   const refs = _setup(accounts)
   const { vault } = refs
@@ -29,7 +30,7 @@ contract("StrategyStEth", (accounts) => {
     // check balance of eth transferred to vault
     assert(after.eth.vault.gte(before.eth.vault.add(minEth)), "eth vault")
     // check total debt
-    assert(after.strategy.totalDebt.eq(new BN(0)), "total debt")
+    assert(after.strategy.totalDebt.lte(DUST), "total debt")
     // check strategy does not have any eth
     assert(after.eth.strategy.eq(new BN(0)), "eth strategy")
     // check strategy dust is small

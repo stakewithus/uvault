@@ -7,6 +7,7 @@ export default (name: string, _setup: Setup, params: { DECIMALS: BN }) => {
   contract(name, (accounts) => {
     const { DECIMALS } = params
     const DEPOSIT_AMOUNT = pow(10, DECIMALS).mul(new BN(10))
+    const DUST = frac(DEPOSIT_AMOUNT, 1, 1000)
 
     const refs = _setup(accounts)
     const { vault, whale } = refs
@@ -41,7 +42,7 @@ export default (name: string, _setup: Setup, params: { DECIMALS: BN }) => {
         "underlying vault"
       )
       // check total debt
-      assert(after.strategy.totalDebt.eq(new BN(0)), "total debt")
+      assert(after.strategy.totalDebt.lte(DUST), "total debt")
       // check strategy does not have any underlying
       assert(after.underlying.strategy.eq(new BN(0)), "underlying strategy")
       // check strategy dust is small

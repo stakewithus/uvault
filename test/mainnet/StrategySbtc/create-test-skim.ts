@@ -37,7 +37,7 @@ export default (name: string, _setup: Setup, params: { DECIMALS: BN }) => {
       // calculate max using default delta
       const max = frac(await strategy.totalDebt(), 10050, 10000)
       if (lte(await strategy.totalAssets(), max)) {
-        console.log("skip - total assets <= max")
+        console.log("Skipping test: total assets <= max")
         return
       }
 

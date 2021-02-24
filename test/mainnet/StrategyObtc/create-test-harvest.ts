@@ -46,8 +46,6 @@ export default (name: string, _setup: Setup, params: { DECIMALS: BN }) => {
         "strategy total assets"
       )
       assert(after.gauge.strategy.gte(before.gauge.strategy), "gauge strategy")
-      // Check CRV was liquidated
-      assert(after.crv.strategy.eq(new BN(0)), "crv strategy")
     })
   })
 }
