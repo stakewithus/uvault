@@ -241,6 +241,7 @@ contract StrategyStEth is StrategyETH {
 
     function sweep(address _token) external override onlyAdmin {
         require(_token != GAUGE, "protected token");
+        require(_token != LDO, "protected token");
         IERC20(_token).safeTransfer(admin, IERC20(_token).balanceOf(address(this)));
     }
 }
