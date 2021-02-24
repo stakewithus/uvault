@@ -115,7 +115,6 @@ contract StrategyNoOpETH is IStrategyETH {
     }
 
     function sweep(address _token) external override onlyAdmin {
-        require(_token != underlying, "protected token");
         IERC20(_token).safeTransfer(admin, IERC20(_token).balanceOf(address(this)));
     }
 }
