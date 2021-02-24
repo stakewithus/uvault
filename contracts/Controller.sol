@@ -134,7 +134,13 @@ contract Controller is IController, AccessControl {
         address _vault,
         address _strategy,
         uint _min
-    ) external override onlyAuthorized(ADMIN_ROLE) {
+    )
+        external
+        override
+        onlyAuthorized(ADMIN_ROLE)
+        onlyApprovedVault(_vault)
+        onlyApprovedStrategy(_strategy)
+    {
         IVault(_vault).setStrategy(_strategy, _min);
     }
 
@@ -158,7 +164,12 @@ contract Controller is IController, AccessControl {
         address _vault,
         address _strategy,
         uint _min
-    ) external onlyAuthorized(ADMIN_ROLE) {
+    )
+        external
+        onlyAuthorized(ADMIN_ROLE)
+        onlyApprovedVault(_vault)
+        onlyApprovedStrategy(_strategy)
+    {
         IVault(_vault).setStrategy(_strategy, _min);
         IVault(_vault).invest();
     }
