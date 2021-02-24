@@ -214,7 +214,8 @@ abstract contract StrategyERC20 is IStrategyERC20 {
 
         uint underlyingBal = IERC20(underlying).balanceOf(address(this));
         if (underlyingBal > 0) {
-            _decreaseDebt(underlyingBal);
+            IERC20(underlying).safeTransfer(vault, underlyingBal);
+            totalDebt = 0;
         }
     }
 
