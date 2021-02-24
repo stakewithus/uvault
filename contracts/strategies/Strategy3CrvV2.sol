@@ -133,19 +133,16 @@ contract Strategy3CrvV2 is StrategyERC20 {
         balances[1] = StableSwap3Pool(SWAP).balances(1).mul(1e12); // USDC
         balances[2] = StableSwap3Pool(SWAP).balances(2).mul(1e12); // USDT
 
-        uint minIndex = 0;
-        for (uint i = 1; i < balances.length; i++) {
-            if (balances[i] <= balances[minIndex]) {
-                minIndex = i;
-            }
-        }
-
-        if (minIndex == 0) {
+        // DAI
+        if (balances[0] <= balances[1] && balances[0] <= balances[2]) {
             return (DAI, 0);
         }
-        if (minIndex == 1) {
+
+        // USDC
+        if (balances[1] <= balances[0] && balances[1] <= balances[2]) {
             return (USDC, 1);
         }
+
         return (USDT, 2);
     }
 
