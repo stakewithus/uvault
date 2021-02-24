@@ -202,7 +202,8 @@ abstract contract StrategyETH is IStrategyETH {
         // transfer ETH to vault
         uint ethBal = address(this).balance;
         if (ethBal > 0) {
-            _decreaseDebt(ethBal);
+            _sendEthToVault(ethBal);
+            totalDebt = 0;
         }
     }
 
