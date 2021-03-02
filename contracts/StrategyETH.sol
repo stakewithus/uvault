@@ -187,6 +187,12 @@ abstract contract StrategyETH is IStrategyETH {
         }
 
         // transfer ETH to vault
+        /*
+        WARNING: Here we are transferring all funds in this contract.
+                 This operation is safe under 2 conditions:
+        1. This contract does not hold any funds at rest.
+        2. Vault does not allow user to withdraw excess > _underlyingAmount
+        */
         uint ethBal = address(this).balance;
         if (ethBal > 0) {
             _decreaseDebt(ethBal);
