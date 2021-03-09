@@ -17,6 +17,7 @@ interface StableSwapSTETH:
     def exchange(_i: int128, _j: int128, _dx: uint256, _min_dy: uint256): nonpayable
 
 interface StEth:
+    # returns amount of StEth minted
     def submit(_referral: address) -> uint256: payable 
 
 ETH: constant(address) = 0xEeeeeEeeeEeEeeEeEeEeeEEEeeeeEeeeeeeeEEeE
@@ -49,9 +50,9 @@ def zapStEthIn(_stEthAmount: uint256, _minEth: uint256, _minShares: uint256):
     """
     assert msg.sender == tx.origin, "!EOA"
 
-    ERC20(ST_ETH).transferFrom(msg.sender, self, _stEthAmount)
+    assert ERC20(ST_ETH).transferFrom(msg.sender, self, _stEthAmount), "stEth transfer from failed"
 
-    ERC20(ST_ETH).approve(SWAP, _stEthAmount)
+    assert ERC20(ST_ETH).approve(SWAP, _stEthAmount), "stEth approve failed"
     StableSwapSTETH(SWAP).exchange(1, 0, _stEthAmount, _minEth)
 
     ETHVault(self.vault).deposit(value=self.balance)
@@ -59,7 +60,7 @@ def zapStEthIn(_stEthAmount: uint256, _minEth: uint256, _minShares: uint256):
     shares: uint256 = ERC20(self.vault).balanceOf(self)
     assert shares >= _minShares, "shares < min"
 
-    ERC20(self.vault).transfer(msg.sender, shares)
+    assert ERC20(self.vault).transfer(msg.sender, shares), "uEth transfer failed"
 
 @external
 @nonreentrant("lock")
@@ -72,11 +73,13 @@ def zapStEthOut(_shares: uint256, _ethMin: uint256, _stEthMin: uint256):
     """
     assert msg.sender == tx.origin, "!EOA"
 
-    ERC20(self.vault).transferFrom(msg.sender, self, _shares)
+    assert ERC20(self.vault).transferFrom(msg.sender, self, _shares), "uEth transfer from failed"
     ETHVault(self.vault).withdraw(_shares, _ethMin)
 
+    # ignore amount of StEth minted
     StEth(ST_ETH).submit(self, value=self.balance)
+    # get balance to transfer all StEth including any dust
     stEthBal: uint256 = ERC20(ST_ETH).balanceOf(self) 
     
     assert stEthBal >= _stEthMin, "StEth < min"
-    ERC20(ST_ETH).transfer(msg.sender, stEthBal)
+    assert ERC20(ST_ETH).transfer(msg.sender, stEthBal), "stEth transfer failed"
