@@ -27,6 +27,7 @@ export interface Config {
     usdcGrowthVault: string
     usdtGrowthVault: string
     busdVault: string
+    wbtcVault: string
     ethVault: string
     // strategies //
     // ETH
@@ -124,6 +125,7 @@ const config: Config = {
     usdcGrowthVault: "0xEAa84fc94bCE3028050D185657eBcA4B3dcc232B",
     usdtGrowthVault: "0x0b3A87aFfbFe0F38490DA657a813A95e7844B38a",
     busdVault: "",
+    wbtcVault: "0x3aF5Ba94C29a8407785f5f6d90eF5d69a8EB2436",
     ethVault: "0x77607588222e01bf892a29Abab45796A2047fc7b",
     // strategies //
     // ETH
