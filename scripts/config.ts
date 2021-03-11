@@ -39,6 +39,9 @@ export interface Config {
     strategyNoOpUsdcSafe: string
     // USDT
     strategyNoOpUsdtSafe: string
+    // WBTC
+    strategyNoOpWbtc: string
+    strategyObtcWbtc: string
     // others
     dai: string
     usdc: string
@@ -137,6 +140,10 @@ const config: Config = {
     strategyNoOpUsdcSafe: "0xc63942159F8aDf59D180EAB1333F23495aEF12Ad",
     // USDT
     strategyNoOpUsdtSafe: "0x8c8C11C0caE2e5Da0407c7B2A823167B5436c746",
+    // WBTC
+    strategyNoOpWbtc: "",
+    strategyObtcWbtc: "0x1eda1B993860E2EEC59Bae8E0D8F646Ea9dd154F",
+
     // others //
     dai: "0x6B175474E89094C44Da98b954EedeAC495271d0F",
     usdc: "0xA0b86991c6218b36c1d19D4a2e9Eb0cE3606eB48",
