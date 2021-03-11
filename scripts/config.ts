@@ -135,7 +135,7 @@ const config: Config = {
     usdcGrowthVault: "0xEAa84fc94bCE3028050D185657eBcA4B3dcc232B",
     usdtGrowthVault: "0x0b3A87aFfbFe0F38490DA657a813A95e7844B38a",
     busdVault: "",
-    ethVault: "",
+    ethVault: "0x77607588222e01bf892a29Abab45796A2047fc7b",
     // strategies //
     strategyNoOpSafeDai: "0xB8B2d189DB65A50422A444cA284f04c6421F610B",
     strategyNoOpSafeUsdc: "0x63a72001F48e3bbd461C268b7Bb417374D0b19a1",
