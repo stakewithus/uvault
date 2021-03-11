@@ -132,9 +132,9 @@ const config: Config = {
     // DAI
     strategyNoOpDaiSafe: "0xC13A321d800d2477D35BFE342f14368752Bdc82f",
     // USDC
-    strategyNoOpUsdcSafe: "",
+    strategyNoOpUsdcSafe: "0xc63942159F8aDf59D180EAB1333F23495aEF12Ad",
     // USDT
-    strategyNoOpUsdtSafe: "",
+    strategyNoOpUsdtSafe: "0x8c8C11C0caE2e5Da0407c7B2A823167B5436c746",
     // others //
     dai: "0x6B175474E89094C44Da98b954EedeAC495271d0F",
     usdc: "0xA0b86991c6218b36c1d19D4a2e9Eb0cE3606eB48",
