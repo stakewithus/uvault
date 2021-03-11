@@ -7,7 +7,7 @@ import { deploy, getAddress } from "./lib"
 usage:
 env $(cat .env) npx hardhat deploy:strategy \
 --network ropsten \
---dev false \
+--dev true \
 --strategy StrategyNoOpERC20 \
 --vault vault
 --token testToken

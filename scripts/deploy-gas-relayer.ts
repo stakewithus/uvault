@@ -5,7 +5,7 @@ import { deploy, getAddress } from "./lib"
 
 /*
 usage:
-env $(cat .env) npx hardhat deploy:gas-relayer --network ropsten
+env $(cat .env) npx hardhat deploy:gas-relayer --network true
 */
 task("deploy:gas-relayer", "Deploy gas relayer")
   .addOptionalParam("dev", "Use mainnet dev", "false")
