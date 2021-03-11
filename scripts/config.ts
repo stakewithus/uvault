@@ -23,9 +23,6 @@ export interface Config {
     daiSafeVault: string
     usdcSafeVault: string
     usdtSafeVault: string
-    daiGrowthVault: string
-    usdcGrowthVault: string
-    usdtGrowthVault: string
     busdVault: string
     wbtcVault: string
     ethVault: string
@@ -127,9 +124,9 @@ const config: Config = {
     daiSafeVault: "0x4aD0b81f92B16624BBcF46FC0030cFBBf8d02376",
     usdcSafeVault: "0xBc5991cCd8cAcEba01edC44C2BB9832712c29cAB",
     usdtSafeVault: "0x178Bf8fD04b47D2De3eF3f6b3D112106375ad584",
-    daiGrowthVault: "0x388029Bd38cf6CA61D3f74CA2984d37CFdB8e3fA",
-    usdcGrowthVault: "0xEAa84fc94bCE3028050D185657eBcA4B3dcc232B",
-    usdtGrowthVault: "0x0b3A87aFfbFe0F38490DA657a813A95e7844B38a",
+    // daiGrowthVault: "0x388029Bd38cf6CA61D3f74CA2984d37CFdB8e3fA",
+    // usdcGrowthVault: "0xEAa84fc94bCE3028050D185657eBcA4B3dcc232B",
+    // usdtGrowthVault: "0x0b3A87aFfbFe0F38490DA657a813A95e7844B38a",
     busdVault: "",
     wbtcVault: "0x3aF5Ba94C29a8407785f5f6d90eF5d69a8EB2436",
     ethVault: "0x77607588222e01bf892a29Abab45796A2047fc7b",
