@@ -35,10 +35,13 @@ export interface Config {
     strategyStEth: string
     // DAI
     strategyNoOpDaiSafe: string
+    strategyGusdDaiV2: string
     // USDC
     strategyNoOpUsdcSafe: string
+    strategyGusdUsdcV2: string
     // USDT
     strategyNoOpUsdtSafe: string
+    strategyGusdUsdtV2: string
     // WBTC
     strategyNoOpWbtc: string
     strategyObtcWbtc: string
@@ -136,10 +139,13 @@ const config: Config = {
     strategyStEth: "0xcF10DDfEd92d9538cA15ba5c1e89E5c6619a5d3c",
     // DAI
     strategyNoOpDaiSafe: "0xC13A321d800d2477D35BFE342f14368752Bdc82f",
+    strategyGusdDaiV2: "0xAa6a0f286A0DEF717e9167B770C795Cb4D72c15B",
     // USDC
     strategyNoOpUsdcSafe: "0xc63942159F8aDf59D180EAB1333F23495aEF12Ad",
+    strategyGusdUsdcV2: "0x85cb4Da19994f20cdd55527155C650CB3E613CA3",
     // USDT
     strategyNoOpUsdtSafe: "0x8c8C11C0caE2e5Da0407c7B2A823167B5436c746",
+    strategyGusdUsdtV2: "0x7C420415803BEb2B8BE06973a1488f2F5cB02551",
     // WBTC
     strategyNoOpWbtc: "0xeB49133796491205ac324D7b796D5ebD852377e3",
     strategyObtcWbtc: "0x1eda1B993860E2EEC59Bae8E0D8F646Ea9dd154F",
