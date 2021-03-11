@@ -141,7 +141,7 @@ const config: Config = {
     // USDT
     strategyNoOpUsdtSafe: "0x8c8C11C0caE2e5Da0407c7B2A823167B5436c746",
     // WBTC
-    strategyNoOpWbtc: "",
+    strategyNoOpWbtc: "0xeB49133796491205ac324D7b796D5ebD852377e3",
     strategyObtcWbtc: "0x1eda1B993860E2EEC59Bae8E0D8F646Ea9dd154F",
 
     // others //
