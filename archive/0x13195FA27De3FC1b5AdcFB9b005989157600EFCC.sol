@@ -1,9 +1,185 @@
-/**
- *Submitted for verification at Etherscan.io on 2021-02-01
- */
+// SPDX-License-Identifier: AGPL-3.0-or-later
+pragma solidity 0.6.11;
+
+contract AccessControl {
+    event GrantRole(bytes32 indexed role, address indexed addr);
+    event RevokeRole(bytes32 indexed role, address indexed addr);
+
+    mapping(bytes32 => mapping(address => bool)) public hasRole;
+
+    modifier onlyAuthorized(bytes32 _role) {
+        require(hasRole[_role][msg.sender], "!authorized");
+        _;
+    }
+
+    function _grantRole(bytes32 _role, address _addr) internal {
+        require(_addr != address(0), "address = zero");
+
+        hasRole[_role][_addr] = true;
+
+        emit GrantRole(_role, _addr);
+    }
+
+    function _revokeRole(bytes32 _role, address _addr) internal {
+        require(_addr != address(0), "address = zero");
+
+        hasRole[_role][_addr] = false;
+
+        emit RevokeRole(_role, _addr);
+    }
+}
 
 // SPDX-License-Identifier: AGPL-3.0-or-later
 pragma solidity 0.6.11;
+
+import "@openzeppelin/contracts/math/SafeMath.sol";
+import "@openzeppelin/contracts/token/ERC20/IERC20.sol";
+
+import "./protocol/IController.sol";
+import "./protocol/IVault.sol";
+import "./protocol/IStrategy.sol";
+import "./AccessControl.sol";
+
+contract Controller is IController, AccessControl {
+    using SafeMath for uint;
+
+    bytes32 public constant override ADMIN_ROLE = keccak256(abi.encodePacked("ADMIN"));
+    bytes32 public constant override HARVESTER_ROLE =
+        keccak256(abi.encodePacked("HARVESTER"));
+
+    address public override admin;
+    address public override treasury;
+
+    constructor(address _treasury) public {
+        require(_treasury != address(0), "treasury = zero address");
+
+        admin = msg.sender;
+        treasury = _treasury;
+
+        _grantRole(ADMIN_ROLE, admin);
+        _grantRole(HARVESTER_ROLE, admin);
+    }
+
+    modifier onlyAdmin() {
+        require(msg.sender == admin, "!admin");
+        _;
+    }
+
+    modifier isCurrentStrategy(address _strategy) {
+        address vault = IStrategy(_strategy).vault();
+        /*
+        Check that _strategy is the current strategy used by the vault.
+        */
+        require(IVault(vault).strategy() == _strategy, "!strategy");
+        _;
+    }
+
+    function setAdmin(address _admin) external override onlyAdmin {
+        require(_admin != address(0), "admin = zero address");
+
+        _revokeRole(ADMIN_ROLE, admin);
+        _revokeRole(HARVESTER_ROLE, admin);
+
+        _grantRole(ADMIN_ROLE, _admin);
+        _grantRole(HARVESTER_ROLE, _admin);
+
+        admin = _admin;
+    }
+
+    function setTreasury(address _treasury) external override onlyAdmin {
+        require(_treasury != address(0), "treasury = zero address");
+        treasury = _treasury;
+    }
+
+    function grantRole(bytes32 _role, address _addr) external override onlyAdmin {
+        require(_role == ADMIN_ROLE || _role == HARVESTER_ROLE, "invalid role");
+        _grantRole(_role, _addr);
+    }
+
+    function revokeRole(bytes32 _role, address _addr) external override onlyAdmin {
+        require(_role == ADMIN_ROLE || _role == HARVESTER_ROLE, "invalid role");
+        _revokeRole(_role, _addr);
+    }
+
+    function setStrategy(
+        address _vault,
+        address _strategy,
+        uint _min
+    ) external override onlyAuthorized(ADMIN_ROLE) {
+        IVault(_vault).setStrategy(_strategy, _min);
+    }
+
+    function invest(address _vault) external override onlyAuthorized(HARVESTER_ROLE) {
+        IVault(_vault).invest();
+    }
+
+    function harvest(address _strategy)
+        external
+        override
+        isCurrentStrategy(_strategy)
+        onlyAuthorized(HARVESTER_ROLE)
+    {
+        IStrategy(_strategy).harvest();
+    }
+
+    function skim(address _strategy)
+        external
+        override
+        isCurrentStrategy(_strategy)
+        onlyAuthorized(HARVESTER_ROLE)
+    {
+        IStrategy(_strategy).skim();
+    }
+
+    modifier checkWithdraw(address _strategy, uint _min) {
+        address vault = IStrategy(_strategy).vault();
+        address token = IVault(vault).token();
+
+        uint balBefore = IERC20(token).balanceOf(vault);
+        _;
+        uint balAfter = IERC20(token).balanceOf(vault);
+
+        require(balAfter.sub(balBefore) >= _min, "withdraw < min");
+    }
+
+    function withdraw(
+        address _strategy,
+        uint _amount,
+        uint _min
+    )
+        external
+        override
+        isCurrentStrategy(_strategy)
+        onlyAuthorized(HARVESTER_ROLE)
+        checkWithdraw(_strategy, _min)
+    {
+        IStrategy(_strategy).withdraw(_amount);
+    }
+
+    function withdrawAll(address _strategy, uint _min)
+        external
+        override
+        isCurrentStrategy(_strategy)
+        onlyAuthorized(HARVESTER_ROLE)
+        checkWithdraw(_strategy, _min)
+    {
+        IStrategy(_strategy).withdrawAll();
+    }
+
+    function exit(address _strategy, uint _min)
+        external
+        override
+        isCurrentStrategy(_strategy)
+        onlyAuthorized(ADMIN_ROLE)
+        checkWithdraw(_strategy, _min)
+    {
+        IStrategy(_strategy).exit();
+    }
+}
+
+// SPDX-License-Identifier: MIT
+
+pragma solidity ^0.6.0;
 
 /**
  * @dev Wrappers over Solidity's arithmetic operations with added overflow
@@ -173,7 +349,9 @@ library SafeMath {
     }
 }
 
-// File: @openzeppelin/contracts/token/ERC20/IERC20.sol
+// SPDX-License-Identifier: MIT
+
+pragma solidity ^0.6.0;
 
 /**
  * @dev Interface of the ERC20 standard as defined in the EIP.
@@ -253,7 +431,8 @@ interface IERC20 {
     event Approval(address indexed owner, address indexed spender, uint value);
 }
 
-// File: contracts/protocol/IController.sol
+// SPDX-License-Identifier: AGPL-3.0-or-later
+pragma solidity 0.6.11;
 
 interface IController {
     function ADMIN_ROLE() external view returns (bytes32);
@@ -322,14 +501,8 @@ interface IController {
     function exit(address _strategy, uint _min) external;
 }
 
-// File: contracts/protocol/IVault.sol
-
-/*
-version 1.2.0
-
-Changes
-- function deposit(uint) declared in IERC20Vault
-*/
+// SPDX-License-Identifier: AGPL-3.0-or-later
+pragma solidity 0.6.11;
 
 interface IVault {
     function admin() external view returns (address);
@@ -338,9 +511,6 @@ interface IVault {
 
     function timeLock() external view returns (address);
 
-    /*
-    @notice For EthVault, must return 0xEeeeeEeeeEeEeeEeEeEeeEEEeeeeEeeeeeeeEEeE
-    */
     function token() external view returns (address);
 
     function strategy() external view returns (address);
@@ -370,14 +540,14 @@ interface IVault {
     function setWithdrawFee(uint _fee) external;
 
     /*
-    @notice Returns the amount of asset (ETH or ERC20) in the vault
+    @notice Returns the amount of token in the vault
     */
     function balanceInVault() external view returns (uint);
 
     /*
-    @notice Returns the estimate amount of asset in strategy
+    @notice Returns the estimate amount of token in strategy
     @dev Output may vary depending on price of liquidity provider token
-         where the underlying asset is invested
+         where the underlying token is invested
     */
     function balanceInStrategy() external view returns (uint);
 
@@ -387,7 +557,7 @@ interface IVault {
     function totalDebtInStrategy() external view returns (uint);
 
     /*
-    @notice Returns the total amount of asset in vault + total debt
+    @notice Returns the total amount of token in vault + total debt
     */
     function totalAssets() external view returns (uint);
 
@@ -417,50 +587,45 @@ interface IVault {
 
     /*
     @notice Set strategy
-    @param _min Minimum undelying asset current strategy must return. Prevents slippage
+    @param _min Minimum undelying token current strategy must return. Prevents slippage
     */
     function setStrategy(address _strategy, uint _min) external;
 
     /*
-    @notice Transfers asset in vault to strategy
+    @notice Transfers token in vault to strategy
     */
     function invest() external;
 
     /*
-    @notice Calculate amount of asset that can be withdrawn
+    @notice Deposit undelying token into this vault
+    @param _amount Amount of token to deposit
+    */
+    function deposit(uint _amount) external;
+
+    /*
+    @notice Calculate amount of token that can be withdrawn
     @param _shares Amount of shares
-    @return Amount of asset that can be withdrawn
+    @return Amount of token that can be withdrawn
     */
     function getExpectedReturn(uint _shares) external view returns (uint);
 
     /*
-    @notice Withdraw asset
+    @notice Withdraw token
     @param _shares Amount of shares to burn
-    @param _min Minimum amount of asset expected to return
+    @param _min Minimum amount of token expected to return
     */
     function withdraw(uint _shares, uint _min) external;
 
     /*
-    @notice Transfer asset in vault to admin
-    @param _token Address of asset to transfer
-    @dev _token must not be equal to vault asset
+    @notice Transfer token in vault to admin
+    @param _token Address of token to transfer
+    @dev _token must not be equal to vault token
     */
     function sweep(address _token) external;
 }
 
-// File: contracts/protocol/IStrategy.sol
-
-/*
-version 1.2.0
-
-Changes
-
-Changes listed here do not affect interaction with other contracts (Vault and Controller)
-- removed function assets(address _token) external view returns (bool);
-- remove function deposit(uint), declared in IStrategyERC20
-- add function setSlippage(uint _slippage);
-- add function setDelta(uint _delta);
-*/
+// SPDX-License-Identifier: AGPL-3.0-or-later
+pragma solidity 0.6.11;
 
 interface IStrategy {
     function admin() external view returns (address);
@@ -470,8 +635,7 @@ interface IStrategy {
     function vault() external view returns (address);
 
     /*
-    @notice Returns address of underlying asset (ETH or ERC20)
-    @dev Must return 0xEeeeeEeeeEeEeeEeEeEeeEEEeeeeEeeeeeeeEEeE for ETH strategy
+    @notice Returns address of underlying token
     */
     function underlying() external view returns (address);
 
@@ -482,12 +646,10 @@ interface IStrategy {
 
     function performanceFee() external view returns (uint);
 
-    function slippage() external view returns (uint);
-
-    /* 
-    @notice Multiplier used to check total underlying <= total debt * delta / DELTA_MIN
+    /*
+    @notice Returns true if token cannot be swept
     */
-    function delta() external view returns (uint);
+    function assets(address _token) external view returns (bool);
 
     function setAdmin(address _admin) external;
 
@@ -495,40 +657,31 @@ interface IStrategy {
 
     function setPerformanceFee(uint _fee) external;
 
-    function setSlippage(uint _slippage) external;
-
-    function setDelta(uint _delta) external;
-
     /*
-    @notice Returns amount of underlying asset locked in this contract
+    @notice Returns amount of underlying stable coin locked in this contract
     @dev Output may vary depending on price of liquidity provider token
-         where the underlying asset is invested
+         where the underlying token is invested
     */
     function totalAssets() external view returns (uint);
 
     /*
-    @notice Withdraw `_amount` underlying asset
-    @param amount Amount of underlying asset to withdraw
+    @notice Deposit `amount` underlying token for yield token
+    @param amount Amount of underlying token to deposit
+    */
+    function deposit(uint _amount) external;
+
+    /*
+    @notice Withdraw `amount` yield token to withdraw
+    @param amount Amount of yield token to withdraw
     */
     function withdraw(uint _amount) external;
 
     /*
-    @notice Withdraw all underlying asset from strategy
+    @notice Withdraw all underlying token from strategy
     */
     function withdrawAll() external;
 
-    /*
-    @notice Sell any staking rewards for underlying and then deposit undelying
-    */
     function harvest() external;
-
-    /*
-    @notice Increase total debt if profit > 0 and total assets <= max,
-            otherwise transfers profit to vault.
-    @dev Guard against manipulation of external price feed by checking that
-         total assets is below factor of total debt
-    */
-    function skim() external;
 
     /*
     @notice Exit from strategy
@@ -537,272 +690,17 @@ interface IStrategy {
     function exit() external;
 
     /*
-    @notice Transfer token accidentally sent here to admin
-    @param _token Address of token to transfer
-    @dev _token must not be equal to underlying token
+    @notice Transfer profit over total debt to vault
     */
-    function sweep(address _token) external;
-}
-
-// File: contracts/AccessControl.sol
-
-contract AccessControl {
-    event GrantRole(bytes32 indexed role, address indexed addr);
-    event RevokeRole(bytes32 indexed role, address indexed addr);
-
-    mapping(bytes32 => mapping(address => bool)) public hasRole;
-
-    modifier onlyAuthorized(bytes32 _role) {
-        require(hasRole[_role][msg.sender], "!authorized");
-        _;
-    }
-
-    function _grantRole(bytes32 _role, address _addr) internal {
-        require(_addr != address(0), "address = zero");
-
-        hasRole[_role][_addr] = true;
-
-        emit GrantRole(_role, _addr);
-    }
-
-    function _revokeRole(bytes32 _role, address _addr) internal {
-        require(_addr != address(0), "address = zero");
-
-        hasRole[_role][_addr] = false;
-
-        emit RevokeRole(_role, _addr);
-    }
-}
-
-// File: contracts/Controller.sol
-
-/*
-version 1.2.0
-
-Changes from Controller 1.1.0
-- Check vault and strategy are approved by admin.
-  Protect from arbitrary contract to be passed into invest, harvest, skim, etc...
-- compatible with ERC20 and ETH vault / strategy
-  (checks withdraw min for ERC20 and ETH strategies)
-- add setStrategyAndInvest
-*/
-
-contract Controller is IController, AccessControl {
-    using SafeMath for uint;
-
-    event ApproveVault(address vault, bool approved);
-    event ApproveStrategy(address strategy, bool approved);
-
-    // WARNING: not address of ETH, used as placeholder
-    address private constant ETH = 0xEeeeeEeeeEeEeeEeEeEeeEEEeeeeEeeeeeeeEEeE;
-
-    // keccak256(abi.encodePacked("ADMIN"));
-    bytes32 public constant override ADMIN_ROLE =
-        0xdf8b4c520ffe197c5343c6f5aec59570151ef9a492f2c624fd45ddde6135ec42;
-    // keccak256(abi.encodePacked("HARVESTER"));
-    bytes32 public constant override HARVESTER_ROLE =
-        0x27e3e4d29d60af3ae6456513164bb5db737d6fc8610aa36ad458736c9efb884c;
-
-    address public override admin;
-    // treasury must be able to receive ETH from ETH vault and strategy
-    address public override treasury;
-
-    // approved vaults
-    mapping(address => bool) public vaults;
-    // approved strategies
-    mapping(address => bool) public strategies;
-
-    constructor(address _treasury) public {
-        require(_treasury != address(0), "treasury = zero address");
-
-        admin = msg.sender;
-        treasury = _treasury;
-
-        _grantRole(ADMIN_ROLE, admin);
-        _grantRole(HARVESTER_ROLE, admin);
-    }
-
-    modifier onlyAdmin() {
-        require(msg.sender == admin, "!admin");
-        _;
-    }
-
-    modifier onlyApprovedVault(address _vault) {
-        require(vaults[_vault], "!approved vault");
-        _;
-    }
-
-    modifier onlyApprovedStrategy(address _strategy) {
-        require(strategies[_strategy], "!approved strategy");
-        _;
-    }
-
-    modifier isCurrentStrategy(address _strategy) {
-        address vault = IStrategy(_strategy).vault();
-        /*
-        Check that _strategy is the current strategy used by the vault.
-        */
-        require(IVault(vault).strategy() == _strategy, "!strategy");
-        _;
-    }
-
-    function setAdmin(address _admin) external override onlyAdmin {
-        require(_admin != address(0), "admin = zero address");
-
-        _revokeRole(ADMIN_ROLE, admin);
-        _revokeRole(HARVESTER_ROLE, admin);
-
-        _grantRole(ADMIN_ROLE, _admin);
-        _grantRole(HARVESTER_ROLE, _admin);
-
-        admin = _admin;
-    }
-
-    function setTreasury(address _treasury) external override onlyAdmin {
-        require(_treasury != address(0), "treasury = zero address");
-        treasury = _treasury;
-    }
-
-    function grantRole(bytes32 _role, address _addr) external override onlyAdmin {
-        require(_role == ADMIN_ROLE || _role == HARVESTER_ROLE, "invalid role");
-        _grantRole(_role, _addr);
-    }
-
-    function revokeRole(bytes32 _role, address _addr) external override onlyAdmin {
-        require(_role == ADMIN_ROLE || _role == HARVESTER_ROLE, "invalid role");
-        _revokeRole(_role, _addr);
-    }
-
-    function approveVault(address _vault) external onlyAdmin {
-        require(!vaults[_vault], "already approved vault");
-        vaults[_vault] = true;
-        emit ApproveVault(_vault, true);
-    }
-
-    function revokeVault(address _vault) external onlyAdmin {
-        require(vaults[_vault], "!approved vault");
-        vaults[_vault] = false;
-        emit ApproveVault(_vault, false);
-    }
-
-    function approveStrategy(address _strategy) external onlyAdmin {
-        require(!strategies[_strategy], "already approved strategy");
-        strategies[_strategy] = true;
-        emit ApproveStrategy(_strategy, true);
-    }
-
-    function revokeStrategy(address _strategy) external onlyAdmin {
-        require(strategies[_strategy], "!approved strategy");
-        strategies[_strategy] = false;
-        emit ApproveStrategy(_strategy, false);
-    }
-
-    function setStrategy(
-        address _vault,
-        address _strategy,
-        uint _min
-    ) external override onlyAuthorized(ADMIN_ROLE) {
-        IVault(_vault).setStrategy(_strategy, _min);
-    }
-
-    function invest(address _vault)
-        external
-        override
-        onlyAuthorized(HARVESTER_ROLE)
-        onlyApprovedVault(_vault)
-    {
-        IVault(_vault).invest();
-    }
+    function skim() external;
 
     /*
-    @notice Set strategy for vault and invest
-    @param _vault Address of vault
-    @param _strategy Address of strategy
-    @param _min Minimum undelying token current strategy must return. Prevents slippage
-    @dev Set strategy and invest in single transaction to avoid front running
+    @notice Transfer token in strategy to admin
+    @param _token Address of token to transfer
+    @dev Must transfer token to admin
+    @dev _token must not be equal to underlying token
+    @dev Used to transfer token that was accidentally sent or
+         claim dust created from this strategy
     */
-    function setStrategyAndInvest(
-        address _vault,
-        address _strategy,
-        uint _min
-    ) external onlyAuthorized(ADMIN_ROLE) {
-        IVault(_vault).setStrategy(_strategy, _min);
-        IVault(_vault).invest();
-    }
-
-    function harvest(address _strategy)
-        external
-        override
-        onlyAuthorized(HARVESTER_ROLE)
-        onlyApprovedStrategy(_strategy)
-        isCurrentStrategy(_strategy)
-    {
-        IStrategy(_strategy).harvest();
-    }
-
-    function skim(address _strategy)
-        external
-        override
-        onlyAuthorized(HARVESTER_ROLE)
-        onlyApprovedStrategy(_strategy)
-        isCurrentStrategy(_strategy)
-    {
-        IStrategy(_strategy).skim();
-    }
-
-    modifier checkWithdraw(address _strategy, uint _min) {
-        address vault = IStrategy(_strategy).vault();
-        address token = IVault(vault).token();
-
-        uint balBefore;
-        uint balAfter;
-        if (token == ETH) {
-            balBefore = address(vault).balance;
-            _;
-            balAfter = address(vault).balance;
-        } else {
-            balBefore = IERC20(token).balanceOf(vault);
-            _;
-            balAfter = IERC20(token).balanceOf(vault);
-        }
-
-        require(balAfter.sub(balBefore) >= _min, "withdraw < min");
-    }
-
-    function withdraw(
-        address _strategy,
-        uint _amount,
-        uint _min
-    )
-        external
-        override
-        onlyAuthorized(HARVESTER_ROLE)
-        onlyApprovedStrategy(_strategy)
-        isCurrentStrategy(_strategy)
-        checkWithdraw(_strategy, _min)
-    {
-        IStrategy(_strategy).withdraw(_amount);
-    }
-
-    function withdrawAll(address _strategy, uint _min)
-        external
-        override
-        onlyAuthorized(HARVESTER_ROLE)
-        onlyApprovedStrategy(_strategy)
-        isCurrentStrategy(_strategy)
-        checkWithdraw(_strategy, _min)
-    {
-        IStrategy(_strategy).withdrawAll();
-    }
-
-    function exit(address _strategy, uint _min)
-        external
-        override
-        onlyAuthorized(ADMIN_ROLE)
-        onlyApprovedStrategy(_strategy)
-        isCurrentStrategy(_strategy)
-        checkWithdraw(_strategy, _min)
-    {
-        IStrategy(_strategy).exit();
-    }
+    function sweep(address _token) external;
 }
