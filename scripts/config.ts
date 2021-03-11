@@ -29,6 +29,7 @@ export interface Config {
     busdVault: string
     ethVault: string
     // strategies
+    strategyNoOpEth: string
     strategyNoOpSafeDai: string
     strategyNoOpSafeUsdc: string
     strategyNoOpSafeUsdt: string
@@ -137,6 +138,7 @@ const config: Config = {
     busdVault: "",
     ethVault: "0x77607588222e01bf892a29Abab45796A2047fc7b",
     // strategies //
+    strategyNoOpEth: "0xF4Fe5Cc9425B58544AFd24D8a2b14D7EBa261019",
     strategyNoOpSafeDai: "0xB8B2d189DB65A50422A444cA284f04c6421F610B",
     strategyNoOpSafeUsdc: "0x63a72001F48e3bbd461C268b7Bb417374D0b19a1",
     strategyNoOpSafeUsdt: "0x9120EC076162d464eeEFB058f3376E770d325335",
