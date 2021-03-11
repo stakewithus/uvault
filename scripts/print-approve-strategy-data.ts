@@ -2,7 +2,7 @@ import Web3 from "web3"
 import config from "./config"
 import { getAddress } from "./lib"
 
-// npx ts-node scripts/print-approve-strategy-data.ts network strategy-name false
+// npx ts-node scripts/print-approve-strategy-data.ts network strategy-name true
 function main() {
   const network = process.argv[2]
   const strategy = process.argv[3]

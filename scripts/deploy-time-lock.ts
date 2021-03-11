@@ -6,7 +6,7 @@ const MIN_DELAY = 60 * 60 * 24
 
 /*
 usage:
-env $(cat .env) npx hardhat deploy:time-lock --network ropsten --dev false
+env $(cat .env) npx hardhat deploy:time-lock --network ropsten --dev true
 */
 task("deploy:time-lock", "Deploy time lock")
   .addOptionalParam("dev", "Use mainnet dev", "false")

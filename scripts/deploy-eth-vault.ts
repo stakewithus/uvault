@@ -5,7 +5,7 @@ import { deploy, getAddress } from "./lib"
 
 /*
 usage:
-env $(cat .env) npx hardhat deploy:eth-vault --network ropsten --dev false
+env $(cat .env) npx hardhat deploy:eth-vault --network ropsten --dev true
 */
 task("deploy:eth-vault", "Deploy ETH vault")
   .addOptionalParam("dev", "Use mainnet dev", "false")

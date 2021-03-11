@@ -5,7 +5,7 @@ import { deploy, getAddress } from "./lib"
 
 /*
 usage:
-env $(cat .env) npx hardhat deploy:controller --network ropsten --dev false
+env $(cat .env) npx hardhat deploy:controller --network ropsten --dev true
 */
 task("deploy:controller", "Deploy controller (v2)")
   .addOptionalParam("dev", "Use mainnet dev", "false")
