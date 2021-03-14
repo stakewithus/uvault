@@ -150,6 +150,30 @@ const config: Config = {
     strategyNoOpWbtc: "0xeB49133796491205ac324D7b796D5ebD852377e3",
     strategyObtcWbtc: "0x1eda1B993860E2EEC59Bae8E0D8F646Ea9dd154F",
 
+    // v1 strategies //
+    /*
+    strategyNoOpSafeDai: "0xB8B2d189DB65A50422A444cA284f04c6421F610B",
+    strategyNoOpSafeUsdc: "0x63a72001F48e3bbd461C268b7Bb417374D0b19a1",
+    strategyNoOpSafeUsdt: "0x9120EC076162d464eeEFB058f3376E770d325335",
+    strategyNoOpGrowthDai: "0x3FA09208a066853DB14be80d93A440Ffa529D0ea",
+    strategyNoOpGrowthUsdc: "0x87E0F7400FeBe60f7361a5F5533327278Adb84DE",
+    strategyNoOpGrowthUsdt: "0x7Ff2f6A01980d8b80c17269Eb9cBb23694Ffb10D",
+    strategyCusdDai: "0x9459cD762eA42C7B4e0Dea24d5f427D5a07094D7",
+    strategyCusdUsdc: "0xd050bd4F1f4E5Bc7E864333E367099BAd5cA0B3D",
+    strategy3CrvDai: "0xbc33957CC1Ef9E99D86f06A8af3f5fe22753ec93",
+    strategy3CrvUsdc: "0x549452631ec594C0580d0bf313D2dF22304f574F",
+    strategy3CrvUsdt: "0xAC6B27B9A57E0d1BDd2c471f83F3D91Ab36df980",
+    strategyBusdDai: "0x982cfc1598e8A4e473601DDBEC3699d7C7947717",
+    strategyBusdUsdc: "0xE4bF8c52FF170Bed33E52530A103C21ad5f638f9",
+    strategyBusdUsdt: "0xAa8fB748fDC8dc72bF278505d9e535aF44208442",
+    strategyGusdDai: "0x45f88290f4f5aEB345728542E3074d700AA93b93",
+    strategyGusdUsdc: "0xd4F486EA3C68A307c3E8420232eE44d7604a4e99",
+    strategyGusdUsdt: "0x58B5Bc0683f22eBb617AE1a504BD12528BE4FB9F",
+    strategyPaxDai: "0xF7F6919d1Ae0B075cFb8033F41dAc5C982C8f257",
+    strategyPaxUsdc: "0xaEe92DC91d8572482Dc30C344c979fDef843DFcd",
+    strategyPaxUsdt: "0xFe08F6D37FCD1ed1CB7f357b23Bfdf77cD1f6A8e",
+    */
+
     // others //
     dai: "0x6B175474E89094C44Da98b954EedeAC495271d0F",
     usdc: "0xA0b86991c6218b36c1d19D4a2e9Eb0cE3606eB48",
