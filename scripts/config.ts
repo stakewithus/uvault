@@ -1,7 +1,5 @@
 export interface Config {
   ropsten: {
-    gasToken: string
-    gasRelayer: string
     treasury: string
     controller: string
     timeLock: string
@@ -14,8 +12,6 @@ export interface Config {
     testToken: string
   }
   mainnet: {
-    gasToken: string
-    gasRelayer: string
     treasury: string
     controller: string
     timeLock: string
@@ -52,8 +48,6 @@ export interface Config {
   }
   // mainnet dev
   dev: {
-    gasToken: string
-    gasRelayer: string
     controller: string
     treasury: string
     timeLock: string
@@ -96,8 +90,6 @@ export interface Config {
 const config: Config = {
   ropsten: {
     // CHI gas token
-    gasToken: "0x063f83affbcf64d7d84d306f5b85ed65c865dca4",
-    gasRelayer: "0xad2907C6aA26588f579e5D4bEeE6d945ba18BDb4",
     treasury: "0x9a4c3Fc4683b95EBF11B535057B00812f6a549Bb",
     controller: "0x9015bEb1B80380e8733B449C9cD7f8C3A857d86a",
     timeLock: "0xDb3906814Cc730ef4c8A5cf5C63A523494224150",
@@ -115,8 +107,6 @@ const config: Config = {
   },
   mainnet: {
     // CHI gas token
-    gasToken: "0x0000000000004946c0e9F43F4Dee607b0eF1fA1c",
-    gasRelayer: "0x3d85984C88fA9a75Ad0F341CC279A6BCdB54767e",
     treasury: "0x1C064EA662365c09c8E87242791dAcbb90002605",
     controller: "0x7D55C795359eB049FF482c8Bd5E0523F0fB40B6f",
     timeLock: "0x8dcb98361a49550593B57747Ab2825983EF43662",
@@ -182,8 +172,6 @@ const config: Config = {
   // mainnet dev
   dev: {
     // CHI gas token
-    gasToken: "0x0000000000004946c0e9F43F4Dee607b0eF1fA1c",
-    gasRelayer: "0xC946321C467e6865942dfdb2C55d1c78F0A55338",
     controller: "0x19Db7587b1ebcF1320cBf55626027365BCC8de27",
     treasury: "0x9a4c3Fc4683b95EBF11B535057B00812f6a549Bb",
     // time lock set to admin
