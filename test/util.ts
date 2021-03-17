@@ -66,6 +66,12 @@ export function frac(x: BN | number, n: BN | number, d: BN | number): BN {
   return x.mul(n).div(d)
 }
 
+export function mul(x: BN | number, y: BN | number): BN {
+  x = cast(x)
+  y = cast(y)
+  return x.mul(y)
+}
+
 export function sendEther(web3: Web3, from: string, to: string, amount: BN) {
   return web3.eth.sendTransaction({
     from,

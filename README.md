@@ -128,6 +128,13 @@ env $(cat .env) npx hardhat verify --network mainnet DEPLOYED_CONTRACT_ADDRESS C
 npm run flat -- contracts/Contract.sol > flat.sol
 ```
 
+##### Get Contract Size
+
+```shell
+cat build/contracts/Contract.json | jq -r '.deployedBytecode' | wc -c
+# divide output by 2 to get size in bytes
+```
+
 ##### Archived Contracts
 
 [./archive](./archive)

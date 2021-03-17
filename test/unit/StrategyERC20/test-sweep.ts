@@ -20,7 +20,7 @@ contract("StrategyERC20", (accounts) => {
     token = await TestToken.new()
   })
 
-  describe("setController", () => {
+  describe("sweep", () => {
     beforeEach(async () => {
       await token._mint_(strategy.address, 123)
     })
