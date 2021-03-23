@@ -5,11 +5,10 @@ import "@openzeppelin/contracts/token/ERC20/IERC20.sol";
 import "@openzeppelin/contracts/token/ERC20/SafeERC20.sol";
 import "@openzeppelin/contracts/math/SafeMath.sol";
 
-import "./protocol/IStrategyERC20Split.sol";
-import "./protocol/IStrategyERC20.sol";
+import "./protocol/IStrategyERC20_V3.sol";
 
 // WARNING: This contract size is very close to max size (24k)
-contract StrategyERC20Split is IStrategyERC20Split {
+contract StrategyERC20Split is IStrategyERC20_V3 {
     using SafeERC20 for IERC20;
     using SafeMath for uint;
 
@@ -25,8 +24,8 @@ contract StrategyERC20Split is IStrategyERC20Split {
     event RevokeStrategy(address strategy);
 
     address public timeLock;
-    address public admin;
-    address public controller;
+    address public override admin;
+    address public override controller;
     address public immutable override vault;
     address public immutable override underlying;
     // Allow bot to call functions
@@ -136,9 +135,12 @@ contract StrategyERC20Split is IStrategyERC20Split {
 
         require(!strategy.approved, "approved");
 
-        require(IStrategyERC20(_strategy).vault() == address(this), "!strategy.vault");
         require(
-            IStrategyERC20(_strategy).underlying() == underlying,
+            IStrategyERC20_V3(_strategy).vault() == address(this),
+            "!strategy.vault"
+        );
+        require(
+            IStrategyERC20_V3(_strategy).underlying() == underlying,
             "!strategy.underlying"
         );
 
@@ -232,7 +234,7 @@ contract StrategyERC20Split is IStrategyERC20Split {
         }
 
         uint balBefore = IERC20(underlying).balanceOf(address(this));
-        IStrategy(_strategy).exit();
+        IStrategyERC20_V3(_strategy).exit();
         uint balAfter = IERC20(underlying).balanceOf(address(this));
 
         require(balAfter.sub(balBefore) >= _min, "exit < min");
@@ -309,7 +311,7 @@ contract StrategyERC20Split is IStrategyERC20Split {
         // TODO: save gas?
         uint total = IERC20(underlying).balanceOf(address(this));
         for (uint i = 0; i < activeStrategies.length; i++) {
-            total = total.add(IStrategyERC20(activeStrategies[i]).totalAssets());
+            total = total.add(IStrategyERC20_V3(activeStrategies[i]).totalAssets());
         }
         return total;
         /*
@@ -333,7 +335,7 @@ contract StrategyERC20Split is IStrategyERC20Split {
         IERC20(underlying).safeApprove(_strategy, 0);
         IERC20(underlying).safeApprove(_strategy, _amount);
 
-        IStrategyERC20(_strategy).deposit(_amount);
+        IStrategyERC20_V3(_strategy).deposit(_amount);
     }
 
     /*
@@ -357,14 +359,14 @@ contract StrategyERC20Split is IStrategyERC20Split {
             for (uint i = 0; i < activeStrategies.length; i++) {
                 address strategy = activeStrategies[i];
                 // TODO: redundant (totalAssets() called inside Strategy.withdraw())
-                // TODO: implement withdraw(amount >= totalAssets) to withdraw all inside IStrategyERC20?
-                uint total = IStrategyERC20(strategy).totalAssets();
+                // TODO: implement withdraw(amount >= totalAssets) to withdraw all inside IStrategyERC20_V3?
+                uint total = IStrategyERC20_V3(strategy).totalAssets();
 
                 uint balBefore = IERC20(underlying).balanceOf(address(this));
                 if (remaining >= total) {
-                    IStrategyERC20(strategy).withdrawAll();
+                    IStrategyERC20_V3(strategy).withdrawAll();
                 } else {
-                    IStrategyERC20(strategy).withdraw(remaining);
+                    IStrategyERC20_V3(strategy).withdraw(remaining);
                 }
                 uint balAfter = IERC20(underlying).balanceOf(address(this));
 
@@ -400,7 +402,7 @@ contract StrategyERC20Split is IStrategyERC20Split {
 
     function withdrawAll() external override onlyAuthorized {
         for (uint i = 0; i < activeStrategies.length; i++) {
-            IStrategyERC20(activeStrategies[i]).withdrawAll();
+            IStrategyERC20_V3(activeStrategies[i]).withdrawAll();
         }
 
         uint underlyingBal = IERC20(underlying).balanceOf(address(this));
@@ -413,7 +415,7 @@ contract StrategyERC20Split is IStrategyERC20Split {
     function harvest() external override onlyAuthorized {
         for (uint i = 0; i < activeStrategies.length; i++) {
             // NOTE: This possibly wastes gas if 0 underlying invested in strategy
-            IStrategyERC20(activeStrategies[i]).harvest();
+            IStrategyERC20_V3(activeStrategies[i]).harvest();
         }
     }
 
@@ -467,7 +469,7 @@ contract StrategyERC20Split is IStrategyERC20Split {
         uint total = bal;
         // sum total debt in strategies
         for (uint i = 0; i < activeStrategies.length; i++) {
-            total = total.add(IStrategyERC20(activeStrategies[i]).totalDebt());
+            total = total.add(IStrategyERC20_V3(activeStrategies[i]).totalDebt());
         }
 
         require(total > totalDebt, "total <= debt");
@@ -482,7 +484,7 @@ contract StrategyERC20Split is IStrategyERC20Split {
 
         for (uint i = 0; i < activeStrategies.length; i++) {
             // Call from controller to guard against slippage
-            IStrategyERC20(activeStrategies[i]).exit();
+            IStrategyERC20_V3(activeStrategies[i]).exit();
         }
 
         uint underlyingBal = IERC20(underlying).balanceOf(address(this));
@@ -492,7 +494,7 @@ contract StrategyERC20Split is IStrategyERC20Split {
         }
     }
 
-    function sweep(address _token) external onlyAdmin {
+    function sweep(address _token) external override onlyAdmin {
         require(_token != underlying, "protected token");
         IERC20(_token).safeTransfer(admin, IERC20(_token).balanceOf(address(this)));
     }

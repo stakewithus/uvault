@@ -4,11 +4,14 @@ import "@nomiclabs/hardhat-ethers"
 import "@nomiclabs/hardhat-etherscan"
 // tasks
 import "./scripts/deploy-time-lock"
-import "./scripts/deploy-gas-relayer"
 import "./scripts/deploy-controller"
 import "./scripts/deploy-erc20-vault"
 import "./scripts/deploy-eth-vault"
 import "./scripts/deploy-strategy"
+import "./scripts/deploy-strategy-comp-lev-dai"
+import "./scripts/deploy-strategy-comp-lev-usdc"
+import "./scripts/deploy-strategy-comp-lev-wbtc"
+import "./scripts/deploy-strategy-comp-lev-eth"
 
 const PRIVATE_KEY = fs.readFileSync(".secret").toString().trim()
 

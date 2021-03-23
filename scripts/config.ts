@@ -77,6 +77,11 @@ export interface Config {
     strategyPaxUsdt: string
     strategyStEth: string
     strategyObtcWbtc: string
+    // comp lev
+    strategyCompLevDai: string
+    strategyCompLevUsdc: string
+    strategyCompLevWbtc: string
+    strategyCompLevEth: string
     // others
     dai: string
     usdc: string
@@ -204,6 +209,10 @@ const config: Config = {
     strategyPaxUsdt: "0x3032dBB5DB8aB5Bd85bf2Ca496e02Ce5378A5726",
     strategyStEth: "0x6E1051876ea57e957FdB8A501c7445466Bb643bf",
     strategyObtcWbtc: "0x83Db07ac03cB3d2FC5204507eA4b8c211E5B5383",
+    strategyCompLevDai: "0x9B1519CD6e44d19Ac243Ce0310117B10a4c33B27",
+    strategyCompLevUsdc: "0x5846D4af5a7257cfCaf428BccFB2346996034921",
+    strategyCompLevWbtc: "0x93AAc447f77a94D87Bcc9F74c850A55b89884914",
+    strategyCompLevEth: "0xD4039d16D3E501759C2b1776BFe2E1e7b0981eb5",
     // others //
     dai: "0x6B175474E89094C44Da98b954EedeAC495271d0F",
     usdc: "0xA0b86991c6218b36c1d19D4a2e9Eb0cE3606eB48",
@@ -215,3 +224,31 @@ const config: Config = {
 }
 
 export default config
+
+export const DAI = "0x6B175474E89094C44Da98b954EedeAC495271d0F"
+export const USDC = "0xA0b86991c6218b36c1d19D4a2e9Eb0cE3606eB48"
+export const USDT = "0xdAC17F958D2ee523a2206206994597C13D831ec7"
+export const BUSD = "0x4Fabb145d64652a948d72533023f6E7A623C7C53"
+export const GUSD = "0x056Fd409E1d7A124BD7017459dFEa2F387b6d5Cd"
+export const WBTC = "0x2260FAC5E5542a773Aa44fBCfeDf7C193bc2C599"
+
+// Compound
+export const CDAI = "0x5d3a536E4D6DbD6114cc1Ead35777bAB948E3643"
+export const CUSDC = "0xA0b86991c6218b36c1d19D4a2e9Eb0cE3606eB48"
+export const CWBTC = "0x2260FAC5E5542a773Aa44fBCfeDf7C193bc2C599"
+export const CETH = "0x4Ddc2D193948926D02f9B1fE9e1daa0718270ED5"
+
+export const TOKEN_TO_VAULT = {
+  mainnet: {
+    [DAI]: config.mainnet.daiSafeVault,
+    [USDC]: config.mainnet.usdcSafeVault,
+    [USDT]: config.mainnet.usdtSafeVault,
+    [WBTC]: config.mainnet.wbtcVault,
+  },
+  dev: {
+    [DAI]: config.dev.daiVault,
+    [USDC]: config.dev.usdcVault,
+    [USDT]: config.dev.usdtVault,
+    [WBTC]: config.dev.wbtcVault,
+  },
+}

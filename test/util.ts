@@ -72,11 +72,12 @@ export function mul(x: BN | number, y: BN | number): BN {
   return x.mul(y)
 }
 
-export function sendEther(web3: Web3, from: string, to: string, amount: BN) {
+export function sendEther(web3: Web3, from: string, to: string, amount: BN | number) {
+  const value = cast(amount)
   return web3.eth.sendTransaction({
     from,
     to,
-    value: web3.utils.toWei(amount.toString(), "ether"),
+    value: web3.utils.toWei(value.toString(), "ether"),
   })
 }
 
