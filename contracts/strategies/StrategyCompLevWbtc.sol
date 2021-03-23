@@ -7,8 +7,8 @@ contract StrategyCompLevWbtc is StrategyCompLev {
     constructor(
         address _controller,
         address _vault,
-        address _keeper,
-        address _cToken
+        address _cToken,
+        address _keeper
     )
         public
         StrategyCompLev(

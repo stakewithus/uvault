@@ -45,7 +45,7 @@ export default (
     refs.underlying = await IERC20.at(underlying)
     refs.cToken = await IERC20.at(cToken)
     refs.controller = await Controller.new(treasury)
-    refs.strategy = await Strategy.new(refs.controller.address, vault, keeper, cToken)
+    refs.strategy = await Strategy.new(refs.controller.address, vault, cToken, keeper)
   })
 
   return refs
