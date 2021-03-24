@@ -46,41 +46,41 @@ export interface Config {
     strategyNoOpWbtc: string
     strategyObtcWbtc: string
     // dev //
-    devController: string
-    devTreasury: string
-    devTimeLock: string
+    dev_controller: string
+    dev_treasury: string
+    dev_timeLock: string
     // dev vaults //
-    devDaiVault: string
-    devUsdcVault: string
-    devUsdtVault: string
-    devBusdVault: string
-    devGusdVault: string
-    devWbtcVault: string
-    devEthVault: string
+    dev_daiVault: string
+    dev_usdcVault: string
+    dev_usdtVault: string
+    dev_busdVault: string
+    dev_gusdVault: string
+    dev_wbtcVault: string
+    dev_ethVault: string
     // dev strategies //
-    devStrategyAaveDai: string
-    devStrategyAaveUsdc: string
-    devStrategyAaveUsdt: string
-    devStrategyBusdBusdV2: string
-    devStrategyBusdDaiV2: string
-    devStrategyBusdUsdcV2: string
-    devStrategyBusdUsdtV2: string
-    devStrategyGusdDaiV2: string
-    devStrategyGusdGusdV2: string
-    devStrategyGusdUsdcV2: string
-    devStrategyGusdUsdtV2: string
-    devStrategyNoOpDai: string
-    devStrategyNoOpUsdc: string
-    devStrategyNoOpUsdt: string
-    devStrategyPaxDai: string
-    devStrategyPaxUsdc: string
-    devStrategyPaxUsdt: string
-    devStrategyStEth: string
-    devStrategyObtcWbtc: string
-    devStrategyCompLevDai: string
-    devStrategyCompLevUsdc: string
-    devStrategyCompLevWbtc: string
-    devStrategyCompLevEth: string
+    dev_strategyAaveDai: string
+    dev_strategyAaveUsdc: string
+    dev_strategyAaveUsdt: string
+    dev_strategyBusdBusdV2: string
+    dev_strategyBusdDaiV2: string
+    dev_strategyBusdUsdcV2: string
+    dev_strategyBusdUsdtV2: string
+    dev_strategyGusdDaiV2: string
+    dev_strategyGusdGusdV2: string
+    dev_strategyGusdUsdcV2: string
+    dev_strategyGusdUsdtV2: string
+    dev_strategyNoOpDai: string
+    dev_strategyNoOpUsdc: string
+    dev_strategyNoOpUsdt: string
+    dev_strategyPaxDai: string
+    dev_strategyPaxUsdc: string
+    dev_strategyPaxUsdt: string
+    dev_strategyStEth: string
+    dev_strategyObtcWbtc: string
+    dev_strategyCompLevDai: string
+    dev_strategyCompLevUsdc: string
+    dev_strategyCompLevWbtc: string
+    dev_strategyCompLevEth: string
   }
 }
 
@@ -157,42 +157,42 @@ const config: Config = {
     strategyPaxUsdt: "0xFe08F6D37FCD1ed1CB7f357b23Bfdf77cD1f6A8e",
     */
     // dev //
-    devController: "0x19Db7587b1ebcF1320cBf55626027365BCC8de27",
-    devTreasury: "0x9a4c3Fc4683b95EBF11B535057B00812f6a549Bb",
+    dev_controller: "0x19Db7587b1ebcF1320cBf55626027365BCC8de27",
+    dev_treasury: "0x9a4c3Fc4683b95EBF11B535057B00812f6a549Bb",
     // time lock set to admin
-    devTimeLock: "0x86d10751B18F3fE331C146546868a07224A8598B",
+    dev_timeLock: "0x86d10751B18F3fE331C146546868a07224A8598B",
     // dev vaults //
-    devDaiVault: "0xFd9f501324c07613f8Fb4d73C798D764D0BFcdcC",
-    devUsdcVault: "0x167E3254a9298ebF29F67e0AE0326d2018c9bC44",
-    devUsdtVault: "0xdADa607772Ad29f5a90a8817532Ebf983709af15",
-    devBusdVault: "0x45DD58a3Af5F283e819c5d2709Fe237422969150",
-    devGusdVault: "0xC62b2aC62Ba74979132c14f5c655EdBA5e959111",
-    devWbtcVault: "0x96281343406dEBf869bf100B733ffeEF23c852b7",
-    devEthVault: "0x72E357f7635163493F153A0Bd3F03C15C14A51C6",
+    dev_daiVault: "0xFd9f501324c07613f8Fb4d73C798D764D0BFcdcC",
+    dev_usdcVault: "0x167E3254a9298ebF29F67e0AE0326d2018c9bC44",
+    dev_usdtVault: "0xdADa607772Ad29f5a90a8817532Ebf983709af15",
+    dev_busdVault: "0x45DD58a3Af5F283e819c5d2709Fe237422969150",
+    dev_gusdVault: "0xC62b2aC62Ba74979132c14f5c655EdBA5e959111",
+    dev_wbtcVault: "0x96281343406dEBf869bf100B733ffeEF23c852b7",
+    dev_ethVault: "0x72E357f7635163493F153A0Bd3F03C15C14A51C6",
     // dev strategies //
-    devStrategyAaveDai: "0x9AA973C668f74B112bFF830a202cb3771e401Eb0",
-    devStrategyAaveUsdc: "0x33ec900B63E61E145fdD4c0cdE97AB1148CF4B47",
-    devStrategyAaveUsdt: "0xeC813E53Af13dDA77EAEF1a4B5804DB5f8208F2E",
-    devStrategyBusdBusdV2: "0x06BA23E98f79B856fa93cFB7a337dE359fc4d146",
-    devStrategyBusdDaiV2: "0x12934308F994cd6d7055480B7CB06c4630A57aEE",
-    devStrategyBusdUsdcV2: "0x7010F68e6e35f40116629B4C679c7e89D289a27E",
-    devStrategyBusdUsdtV2: "0x007246570B8D8Ca41efb348FfFDb767C60b4F8fE",
-    devStrategyGusdDaiV2: "0x1D3139146e850c76AF79aD1Af0368f2af217A5F6",
-    devStrategyGusdGusdV2: "0x82375E59A7afE3a06F52f1B2ee68DE8d781E0006",
-    devStrategyGusdUsdcV2: "0x03ace9C69E33d6638c179545FF93439f3F591D44",
-    devStrategyGusdUsdtV2: "0xB5a1c7477A1f2c3aF4F56c633dA47a2521f18C6D",
-    devStrategyNoOpDai: "0x1b79EbE1C9c128Eb30e6f6EBb0741991B696ab80",
-    devStrategyNoOpUsdc: "0x64d43B0D0EDfa8434059d12bCF861da7eE8dD4bc",
-    devStrategyNoOpUsdt: "0xc2e4e82853c28DCF81930852E5A055236364d8F6",
-    devStrategyPaxDai: "0x2b3512efBeeb609CF9D49486b6e2DD9CF10Be6c9",
-    devStrategyPaxUsdc: "0xb1F1AeD30dFe5787dFb65F6Cb96D90b3ae347F68",
-    devStrategyPaxUsdt: "0x3032dBB5DB8aB5Bd85bf2Ca496e02Ce5378A5726",
-    devStrategyStEth: "0x6E1051876ea57e957FdB8A501c7445466Bb643bf",
-    devStrategyObtcWbtc: "0x83Db07ac03cB3d2FC5204507eA4b8c211E5B5383",
-    devStrategyCompLevDai: "0x6Fa810B5D14e2a4859FDBff3BA7E81761b395bDA",
-    devStrategyCompLevUsdc: "",
-    devStrategyCompLevWbtc: "",
-    devStrategyCompLevEth: "0xD4039d16D3E501759C2b1776BFe2E1e7b0981eb5",
+    dev_strategyAaveDai: "0x9AA973C668f74B112bFF830a202cb3771e401Eb0",
+    dev_strategyAaveUsdc: "0x33ec900B63E61E145fdD4c0cdE97AB1148CF4B47",
+    dev_strategyAaveUsdt: "0xeC813E53Af13dDA77EAEF1a4B5804DB5f8208F2E",
+    dev_strategyBusdBusdV2: "0x06BA23E98f79B856fa93cFB7a337dE359fc4d146",
+    dev_strategyBusdDaiV2: "0x12934308F994cd6d7055480B7CB06c4630A57aEE",
+    dev_strategyBusdUsdcV2: "0x7010F68e6e35f40116629B4C679c7e89D289a27E",
+    dev_strategyBusdUsdtV2: "0x007246570B8D8Ca41efb348FfFDb767C60b4F8fE",
+    dev_strategyGusdDaiV2: "0x1D3139146e850c76AF79aD1Af0368f2af217A5F6",
+    dev_strategyGusdGusdV2: "0x82375E59A7afE3a06F52f1B2ee68DE8d781E0006",
+    dev_strategyGusdUsdcV2: "0x03ace9C69E33d6638c179545FF93439f3F591D44",
+    dev_strategyGusdUsdtV2: "0xB5a1c7477A1f2c3aF4F56c633dA47a2521f18C6D",
+    dev_strategyNoOpDai: "0x1b79EbE1C9c128Eb30e6f6EBb0741991B696ab80",
+    dev_strategyNoOpUsdc: "0x64d43B0D0EDfa8434059d12bCF861da7eE8dD4bc",
+    dev_strategyNoOpUsdt: "0xc2e4e82853c28DCF81930852E5A055236364d8F6",
+    dev_strategyPaxDai: "0x2b3512efBeeb609CF9D49486b6e2DD9CF10Be6c9",
+    dev_strategyPaxUsdc: "0xb1F1AeD30dFe5787dFb65F6Cb96D90b3ae347F68",
+    dev_strategyPaxUsdt: "0x3032dBB5DB8aB5Bd85bf2Ca496e02Ce5378A5726",
+    dev_strategyStEth: "0x6E1051876ea57e957FdB8A501c7445466Bb643bf",
+    dev_strategyObtcWbtc: "0x83Db07ac03cB3d2FC5204507eA4b8c211E5B5383",
+    dev_strategyCompLevDai: "0x6Fa810B5D14e2a4859FDBff3BA7E81761b395bDA",
+    dev_strategyCompLevUsdc: "",
+    dev_strategyCompLevWbtc: "",
+    dev_strategyCompLevEth: "0xD4039d16D3E501759C2b1776BFe2E1e7b0981eb5",
   },
 }
 
