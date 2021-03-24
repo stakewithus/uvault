@@ -17,7 +17,7 @@ task("deploy:erc20-vault", "Deploy ERC20 vault")
     await deploy(hre, "ERC20Vault", dev, async (_account, network) => {
       console.log(`Token: ${args.token}`)
 
-      const token = getAddress(config, network, dev, args.token)
+      const token = getAddress(config, network, false, args.token)
       const controller = getAddress(config, network, dev, "controller")
       const timeLock = getAddress(config, network, dev, "timeLock")
 

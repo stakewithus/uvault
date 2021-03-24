@@ -81,6 +81,13 @@ export interface Config {
     dev_strategyCompLevUsdc: string
     dev_strategyCompLevWbtc: string
     dev_strategyCompLevEth: string
+    // misc //
+    dai: string
+    usdc: string
+    usdt: string
+    busd: string
+    gusd: string
+    wbtc: string
   }
 }
 
@@ -193,6 +200,13 @@ const config: Config = {
     dev_strategyCompLevUsdc: "",
     dev_strategyCompLevWbtc: "",
     dev_strategyCompLevEth: "0xD4039d16D3E501759C2b1776BFe2E1e7b0981eb5",
+    // misc //
+    dai: DAI,
+    usdc: USDC,
+    usdt: USDT,
+    busd: BUSD,
+    gusd: GUSD,
+    wbtc: WBTC,
   },
 }
 

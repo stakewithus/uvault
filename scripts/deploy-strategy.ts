@@ -31,7 +31,7 @@ task("deploy:strategy", "Deploy ER20 / ETH strategy")
 
       const Strategy = await hre.ethers.getContractFactory(args.strategy)
       if (args.token) {
-        const token = getAddress(config, network, dev, args.token)
+        const token = getAddress(config, network, false, args.token)
         return Strategy.deploy(controller, vault, token)
       } else {
         return Strategy.deploy(controller, vault)
