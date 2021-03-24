@@ -5,10 +5,16 @@ import { Config } from "./config"
 
 type Network = "mainnet" | "ropsten"
 
-export function getAddress(config: Config, network: Network, name: string): string {
+export function getAddress(
+  config: Config,
+  network: Network,
+  dev: boolean,
+  name: string
+): string {
+  const _name = dev ? `dev_${name}` : name
   // @ts-ignore
-  const addr = config[network][name]
-  assert(addr, `${network} ${name} is undefined`)
+  const addr = config[network][_name]
+  assert(addr, `${network} ${_name} is undefined`)
 
   return addr
 }
