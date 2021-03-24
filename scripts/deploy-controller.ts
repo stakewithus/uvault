@@ -14,7 +14,7 @@ task("deploy:controller", "Deploy controller (v2)")
     const dev = args.dev === "true"
 
     await deploy(hre, "Controller", dev, async (_account, network) => {
-      const treasury = getAddress(config, network, dev, "treasury")
+      const treasury = getAddress(config, network, dev ? "dev_treasury" : "treasury")
 
       const Controller = await hre.ethers.getContractFactory("Controller")
       return Controller.deploy(treasury)

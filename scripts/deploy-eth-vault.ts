@@ -16,8 +16,12 @@ task("deploy:eth-vault", "Deploy ETH vault")
     await deploy(hre, "ETHVault", dev, async (_account, network) => {
       console.log(`Token: ETH`)
 
-      const controller = getAddress(config, network, dev, "controller")
-      const timeLock = getAddress(config, network, dev, "timeLock")
+      const controller = getAddress(
+        config,
+        network,
+        dev ? "dev_controller" : "controller"
+      )
+      const timeLock = getAddress(config, network, dev ? "dev_timeLock" : "timeLock")
 
       const ETHVault = await hre.ethers.getContractFactory("ETHVault")
       return ETHVault.deploy(controller, timeLock)

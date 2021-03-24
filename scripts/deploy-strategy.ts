@@ -22,8 +22,12 @@ task("deploy:strategy", "Deploy ER20 / ETH strategy")
     const dev = args.dev === "true"
 
     await deploy(hre, args.strategy, dev, async (_account, network) => {
-      const controller = getAddress(config, network, dev, "controller")
-      const vault = getAddress(config, network, dev, args.vault)
+      const controller = getAddress(
+        config,
+        network,
+        dev ? "dev_controller" : "controller"
+      )
+      const vault = getAddress(config, network, args.vault)
 
       console.log(`strategy: ${args.strategy}`)
       console.log(`${args.vault}: ${vault}`)
@@ -31,7 +35,7 @@ task("deploy:strategy", "Deploy ER20 / ETH strategy")
 
       const Strategy = await hre.ethers.getContractFactory(args.strategy)
       if (args.token) {
-        const token = getAddress(config, network, false, args.token)
+        const token = getAddress(config, network, args.token)
         return Strategy.deploy(controller, vault, token)
       } else {
         return Strategy.deploy(controller, vault)
