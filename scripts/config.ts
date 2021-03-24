@@ -197,8 +197,8 @@ const config: Config = {
     dev_strategyStEth: "0x6E1051876ea57e957FdB8A501c7445466Bb643bf",
     dev_strategyObtcWbtc: "0x83Db07ac03cB3d2FC5204507eA4b8c211E5B5383",
     dev_strategyCompLevDai: "0x6Fa810B5D14e2a4859FDBff3BA7E81761b395bDA",
-    dev_strategyCompLevUsdc: "0xC5d4e04059B736e95B198a3Be6D49eDc813cE361",
-    dev_strategyCompLevWbtc: "0x46E4628436b250d3Ebc4BDFFFf6b01306085Cd04",
+    dev_strategyCompLevUsdc: "0xE753d54C1Ea4C4af348B6D9c5427E8e0dfeE9187",
+    dev_strategyCompLevWbtc: "0x9Ddf4d9A0bd2d985b04cA6AF3dAcCA59067c90eD",
     dev_strategyCompLevEth: "0xD4039d16D3E501759C2b1776BFe2E1e7b0981eb5",
     // misc //
     dai: DAI,
