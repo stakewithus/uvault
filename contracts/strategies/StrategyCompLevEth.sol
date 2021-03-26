@@ -494,10 +494,12 @@ contract StrategyCompLevEth is StrategyETH_V3 {
 
     // @dev withdraw all creates dust in supplied
     function _withdrawAll() private {
-        uint available = _withdraw(type(uint).max);
-        // available should = address(this).balance
-        if (available > 0) {
-            _sendEthToVault(available);
+        _withdraw(type(uint).max);
+
+        // In case there is dust, re-calculate balance
+        uint bal = address(this).balance;
+        if (bal > 0) {
+            _sendEthToVault(bal);
             totalDebt = 0;
         }
     }

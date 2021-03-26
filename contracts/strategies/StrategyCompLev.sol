@@ -46,7 +46,6 @@ contract StrategyCompLev is StrategyERC20_V3 {
         require(_cToken != address(0), "cToken = zero address");
         cToken = _cToken;
 
-        // TODO: remove infinite approval?
         IERC20(_underlying).safeApprove(_cToken, type(uint).max);
 
         // These tokens are never held by this contract
@@ -60,19 +59,24 @@ contract StrategyCompLev is StrategyERC20_V3 {
     }
 
     function _increaseDebt(uint _amount) private {
-        totalDebt = totalDebt.add(_amount);
-        // WARNING: check underlying transfers _amount before deploying this contract
+        uint balBefore = IERC20(underlying).balanceOf(address(this));
         IERC20(underlying).safeTransferFrom(vault, address(this), _amount);
+        uint balAfter = IERC20(underlying).balanceOf(address(this));
+
+        totalDebt = totalDebt.add(balAfter.sub(balBefore));
     }
 
     function _decreaseDebt(uint _amount) private {
-        if (_amount >= totalDebt) {
+        uint balBefore = IERC20(underlying).balanceOf(address(this));
+        IERC20(underlying).safeTransfer(vault, _amount);
+        uint balAfter = IERC20(underlying).balanceOf(address(this));
+
+        uint diff = balBefore.sub(balAfter);
+        if (diff >= totalDebt) {
             totalDebt = 0;
         } else {
-            totalDebt -= _amount;
+            totalDebt -= diff;
         }
-        // WARNING: check underlying transfers _amount before deploying this contract
-        IERC20(underlying).safeTransfer(vault, _amount);
     }
 
     function _totalAssets() private view returns (uint) {
@@ -492,10 +496,12 @@ contract StrategyCompLev is StrategyERC20_V3 {
 
     // @dev withdraw all creates dust in supplied
     function _withdrawAll() private {
-        uint available = _withdraw(type(uint).max);
-        // available should = IERC20(underlying).balanceOf(address(this))
-        if (available > 0) {
-            IERC20(underlying).safeTransfer(vault, available);
+        _withdraw(type(uint).max);
+
+        // In case there is dust, re-calculate balance
+        uint bal = IERC20(underlying).balanceOf(address(this));
+        if (bal > 0) {
+            IERC20(underlying).safeTransfer(vault, bal);
             totalDebt = 0;
         }
     }
