@@ -36,12 +36,12 @@ source .env
 npx ganache-cli \
 -e 10000 \
 --fork https://mainnet.infura.io/v3/$INFURA_API_KEY \
---unlock $STABLE_COIN_HOLDER \
 --unlock $DAI_WHALE \
 --unlock $USDC_WHALE \
 --unlock $USDT_WHALE \
 --unlock $BUSD_WHALE \
 --unlock $GUSD_WHALE \
+--unlock $USDP_WHALE \
 --unlock $WBTC_WHALE \
 --networkId 999
 
