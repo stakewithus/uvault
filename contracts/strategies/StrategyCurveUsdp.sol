@@ -9,7 +9,6 @@ import "../interfaces/curve/StableSwapUsdp.sol";
 import "../interfaces/curve/StableSwap3Pool.sol";
 import "../interfaces/curve/DepositUsdp.sol";
 
-// TODO: code review
 contract StrategyCurveUsdp is StrategyERC20_V3 {
     // Uniswap //
     address private constant UNISWAP = 0x7a250d5630B4cF539739dF2C5dAcb4c659F2488D;
@@ -111,7 +110,6 @@ contract StrategyCurveUsdp is StrategyERC20_V3 {
     }
 
     function _totalAssets() private view returns (uint) {
-        // TODO: check dust
         uint lpBal = LiquidityGaugeV2(GAUGE).balanceOf(address(this));
         uint pricePerShare = StableSwapUsdp(SWAP).get_virtual_price();
 
