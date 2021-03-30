@@ -22,8 +22,11 @@ plugging some numbers
 31.08 = 4 * (7.01 + 4 - 0.75 * (9.08 - 4.76))
 */
 
-// TODO: code review
 contract StrategyCompLevEth is StrategyETH_V3 {
+    // Track ETH transfers
+    event Deposit(uint amount);
+    event Withdraw(uint amount);
+
     // Uniswap //
     address private constant UNISWAP = 0x7a250d5630B4cF539739dF2C5dAcb4c659F2488D;
     address private constant WETH = 0xC02aaA39b223FE8D0A0e5C4F27eAD9083C756Cc2;
@@ -63,6 +66,8 @@ contract StrategyCompLevEth is StrategyETH_V3 {
     function _sendEthToVault(uint _amount) private {
         (bool sent, ) = vault.call{value: _amount}("");
         require(sent, "Send ETH failed");
+
+        emit Withdraw(_amount);
     }
 
     function _increaseDebt(uint _amount) private {
@@ -141,6 +146,27 @@ contract StrategyCompLevEth is StrategyETH_V3 {
     {
         supplied = _getSupplied();
         borrowed = _getBorrowed();
+        marketCol = _getMarketCollateralRatio();
+        safeCol = _getSafeCollateralRatio(marketCol);
+    }
+
+    // @dev This returns balance last time someone transacted with cToken
+    function getCachedPosition()
+        external
+        view
+        returns (
+            uint supplied,
+            uint borrowed,
+            uint marketCol,
+            uint safeCol
+        )
+    {
+        // ignore first output, which is error code
+        (, uint cTokenBal, uint _borrowed, uint exchangeRate) =
+            CEth(cToken).getAccountSnapshot(address(this));
+
+        supplied = cTokenBal.mul(exchangeRate) / 1e18;
+        borrowed = _borrowed;
         marketCol = _getMarketCollateralRatio();
         safeCol = _getSafeCollateralRatio(marketCol);
     }
@@ -318,6 +344,8 @@ contract StrategyCompLevEth is StrategyETH_V3 {
 
         _increaseDebt(msg.value);
         _deposit();
+
+        emit Deposit(msg.value);
     }
 
     function _getRedeemAmount(
