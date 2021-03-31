@@ -10,6 +10,11 @@ import "../interfaces/curve/StableSwap3Pool.sol";
 import "../interfaces/curve/DepositUsdp.sol";
 
 contract StrategyCurveUsdp is StrategyERC20_V3 {
+    event Deposit(uint amount);
+    event Withdraw(uint amount);
+    event Harvest(uint profit);
+    event Skim(uint profit);
+
     // Uniswap //
     address private constant UNISWAP = 0x7a250d5630B4cF539739dF2C5dAcb4c659F2488D;
     address private constant WETH = 0xC02aaA39b223FE8D0A0e5C4F27eAD9083C756Cc2;
@@ -126,7 +131,10 @@ contract StrategyCurveUsdp is StrategyERC20_V3 {
         IERC20(underlying).safeTransferFrom(vault, address(this), _amount);
         uint balAfter = IERC20(underlying).balanceOf(address(this));
 
-        totalDebt = totalDebt.add(balAfter.sub(balBefore));
+        uint diff = balAfter.sub(balBefore);
+        totalDebt = totalDebt.add(diff);
+
+        emit Deposit(diff);
     }
 
     function _decreaseDebt(uint _amount) private {
@@ -141,6 +149,8 @@ contract StrategyCurveUsdp is StrategyERC20_V3 {
         } else {
             totalDebt -= diff;
         }
+
+        emit Withdraw(diff);
     }
 
     /*
@@ -263,6 +273,8 @@ contract StrategyCurveUsdp is StrategyERC20_V3 {
         if (bal > 0) {
             IERC20(underlying).safeTransfer(vault, bal);
             totalDebt = 0;
+
+            emit Withdraw(bal);
         }
     }
 
@@ -372,6 +384,8 @@ contract StrategyCurveUsdp is StrategyERC20_V3 {
             }
 
             _deposit(token, index);
+
+            emit Harvest(bal.sub(fee));
         }
     }
 
@@ -409,6 +423,8 @@ contract StrategyCurveUsdp is StrategyERC20_V3 {
                 IERC20(underlying).safeTransfer(vault, amountWithdrawn);
             }
         }
+
+        emit Skim(profit);
     }
 
     function exit() external override onlyAuthorized {

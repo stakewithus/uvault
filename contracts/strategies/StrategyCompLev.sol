@@ -23,6 +23,11 @@ plugging some numbers
 */
 
 contract StrategyCompLev is StrategyERC20_V3 {
+    event Deposit(uint amount);
+    event Withdraw(uint amount);
+    event Harvest(uint profit);
+    event Skim(uint profit);
+
     // Uniswap //
     address private constant UNISWAP = 0x7a250d5630B4cF539739dF2C5dAcb4c659F2488D;
     address private constant WETH = 0xC02aaA39b223FE8D0A0e5C4F27eAD9083C756Cc2;
@@ -62,7 +67,10 @@ contract StrategyCompLev is StrategyERC20_V3 {
         IERC20(underlying).safeTransferFrom(vault, address(this), _amount);
         uint balAfter = IERC20(underlying).balanceOf(address(this));
 
-        totalDebt = totalDebt.add(balAfter.sub(balBefore));
+        uint diff = balAfter.sub(balBefore);
+        totalDebt = totalDebt.add(diff);
+
+        emit Deposit(diff);
     }
 
     function _decreaseDebt(uint _amount) private {
@@ -76,6 +84,8 @@ contract StrategyCompLev is StrategyERC20_V3 {
         } else {
             totalDebt -= diff;
         }
+
+        emit Withdraw(diff);
     }
 
     function _totalAssets() private view returns (uint) {
@@ -523,6 +533,8 @@ contract StrategyCompLev is StrategyERC20_V3 {
         if (bal > 0) {
             IERC20(underlying).safeTransfer(vault, bal);
             totalDebt = 0;
+
+            emit Withdraw(bal);
         }
     }
 
@@ -588,7 +600,10 @@ contract StrategyCompLev is StrategyERC20_V3 {
             }
             // _supply() to decrease collateral ratio and earn interest
             // use _supply() instead of _deposit() to save gas
-            _supply(bal.sub(fee));
+            uint profit = bal.sub(fee);
+            _supply(profit);
+
+            emit Harvest(profit);
         }
     }
 
@@ -603,10 +618,14 @@ contract StrategyCompLev is StrategyERC20_V3 {
         uint total = bal.add(unleveraged);
         require(total > totalDebt, "total <= debt");
 
+        uint profit = total - totalDebt;
+
         // Incrementing totalDebt has the same effect as transferring profit
         // back to vault and then depositing into this strategy
         // Here we simply increment totalDebt to save gas
         totalDebt = total;
+
+        emit Skim(profit);
     }
 
     /*

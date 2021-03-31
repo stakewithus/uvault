@@ -23,9 +23,10 @@ plugging some numbers
 */
 
 contract StrategyCompLevEth is StrategyETH_V3 {
-    // Track ETH transfers
     event Deposit(uint amount);
     event Withdraw(uint amount);
+    event Harvest(uint profit);
+    event Skim(uint profit);
 
     // Uniswap //
     address private constant UNISWAP = 0x7a250d5630B4cF539739dF2C5dAcb4c659F2488D;
@@ -72,6 +73,7 @@ contract StrategyCompLevEth is StrategyETH_V3 {
 
     function _increaseDebt(uint _amount) private {
         totalDebt = totalDebt.add(_amount);
+        emit Deposit(_amount);
     }
 
     function _decreaseDebt(uint _amount) private {
@@ -344,8 +346,6 @@ contract StrategyCompLevEth is StrategyETH_V3 {
 
         _increaseDebt(msg.value);
         _deposit();
-
-        emit Deposit(msg.value);
     }
 
     function _getRedeemAmount(
@@ -590,7 +590,10 @@ contract StrategyCompLevEth is StrategyETH_V3 {
             }
             // _supply() to decrease collateral ratio and earn interest
             // use _supply() instead of _deposit() to save gas
-            _supply(bal.sub(fee));
+            uint profit = bal.sub(fee);
+            _supply(profit);
+
+            emit Harvest(profit);
         }
     }
 
@@ -605,10 +608,14 @@ contract StrategyCompLevEth is StrategyETH_V3 {
         uint total = bal.add(unleveraged);
         require(total > totalDebt, "total <= debt");
 
+        uint profit = total - totalDebt;
+
         // Incrementing totalDebt has the same effect as transferring profit
         // back to vault and then depositing into this strategy
         // Here we simply increment totalDebt to save gas
         totalDebt = total;
+
+        emit Skim(profit);
     }
 
     /*
