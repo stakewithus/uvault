@@ -183,6 +183,9 @@ contract StrategyCompLev is StrategyERC20_V3 {
         uint borrowed = _getBorrowed();
         uint marketCol = _getMarketCollateralRatio();
         uint safeCol = _getSafeCollateralRatio(marketCol);
+
+        // borrowed / supplied <= safe col
+        // supplied can = 0 so we check borrowed <= supplied * safe col
         // max borrow
         uint max = supplied.mul(safeCol) / 1e18;
         require(borrowed <= max, "borrowed > max");
