@@ -5,6 +5,10 @@ import { deploy, getAddress } from "./lib"
 
 /*
 usage:
+
+npm run clean
+npx hardhat compile
+
 env $(cat .env) npx hardhat deploy:strategy \
 --network ropsten \
 --dev true \

@@ -39,6 +39,10 @@ const TOKEN_TO_DEV_VAULT_NAME = {
 
 /*
 usage:
+
+npm run clean
+npx hardhat compile
+
 env $(cat .env) npx hardhat deploy:strategy-comp-lev \
 --network mainnet \
 --dev true \

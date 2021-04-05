@@ -5,6 +5,10 @@ import { deploy, getAddress } from "./lib"
 
 /*
 usage:
+
+npm run clean
+npx hardhat compile
+
 env $(cat .env) npx hardhat deploy:eth-vault --network ropsten --dev true
 */
 task("deploy:eth-vault", "Deploy ETH vault")

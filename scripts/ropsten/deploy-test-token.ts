@@ -4,6 +4,10 @@ import { deploy } from "../lib"
 
 /*
 usage:
+
+npm run clean
+npx hardhat compile
+
 env $(cat .env) npx hardhat deploy:test-token --network ropsten
 */
 task("deploy:test-token", "Deploy controller").setAction(async (_args, hre) => {

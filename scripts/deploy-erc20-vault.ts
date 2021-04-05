@@ -5,6 +5,10 @@ import { deploy, getAddress } from "./lib"
 
 /*
 usage:
+
+npm run clean
+npx hardhat compile
+
 env $(cat .env) npx hardhat deploy:erc20-vault --network ropsten --token testToken --dev true
 */
 task("deploy:erc20-vault", "Deploy ERC20 vault")
