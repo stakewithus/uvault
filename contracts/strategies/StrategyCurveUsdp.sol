@@ -99,7 +99,7 @@ contract StrategyCurveUsdp is StrategyERC20_V3 {
     }
 
     /*
-    @notice Set delta, used to calculate difference between totalAsset and totalDebt 
+    @notice Set delta, used to calculate difference between totalAsset and totalDebt
     @param _delta Numerator of delta / DELTA_MIN
     */
     function setDelta(uint _delta) external onlyAdmin {
@@ -239,13 +239,8 @@ contract StrategyCurveUsdp is StrategyERC20_V3 {
         if (shares > 0) {
             // withdraw LP from LiquidityGaugeV2
             LiquidityGaugeV2(GAUGE).withdraw(shares);
-            /*
-            underlying amount = (shares * price per shares) / (1e18 * precision div)
-            */
-            uint pricePerShare = StableSwapUsdp(SWAP).get_virtual_price();
-            uint underlyingAmount =
-                shares.mul(pricePerShare) / (PRECISION_DIV_UNDERLYING * 1e18);
-            uint min = underlyingAmount.mul(SLIPPAGE_MAX - slippage) / SLIPPAGE_MAX;
+
+            uint min = _amount.mul(SLIPPAGE_MAX - slippage) / SLIPPAGE_MAX;
             // withdraw creates LP dust
             return
                 DepositUsdp(DEPOSIT).remove_liquidity_one_coin(
