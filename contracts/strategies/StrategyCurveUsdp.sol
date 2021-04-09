@@ -125,7 +125,7 @@ contract StrategyCurveUsdp is StrategyERC20_V3 {
         return _totalAssets();
     }
 
-    function _increaseDebt(uint _amount) private {
+    function _increaseDebt(uint _amount) private returns (uint) {
         // USDT has transfer fee so we need to check balance after transfer
         uint balBefore = IERC20(underlying).balanceOf(address(this));
         IERC20(underlying).safeTransferFrom(vault, address(this), _amount);
@@ -134,10 +134,10 @@ contract StrategyCurveUsdp is StrategyERC20_V3 {
         uint diff = balAfter.sub(balBefore);
         totalDebt = totalDebt.add(diff);
 
-        emit Deposit(diff);
+        return diff;
     }
 
-    function _decreaseDebt(uint _amount) private {
+    function _decreaseDebt(uint _amount) private returns (uint) {
         // USDT has transfer fee so we need to check balance after transfer
         uint balBefore = IERC20(underlying).balanceOf(address(this));
         IERC20(underlying).safeTransfer(vault, _amount);
@@ -150,7 +150,7 @@ contract StrategyCurveUsdp is StrategyERC20_V3 {
             totalDebt -= diff;
         }
 
-        emit Withdraw(diff);
+        return diff;
     }
 
     /*
@@ -185,8 +185,10 @@ contract StrategyCurveUsdp is StrategyERC20_V3 {
     function deposit(uint _amount) external override onlyAuthorized {
         require(_amount > 0, "deposit = 0");
 
-        _increaseDebt(_amount);
+        uint diff = _increaseDebt(_amount);
         _deposit(underlying, UNDERLYING_INDEX);
+
+        emit Deposit(diff);
     }
 
     function _getTotalShares() private view returns (uint) {
@@ -254,10 +256,13 @@ contract StrategyCurveUsdp is StrategyERC20_V3 {
     }
 
     function withdraw(uint _amount) external override onlyAuthorized {
-        uint amountWithdrawn = _withdraw(_amount);
-        if (amountWithdrawn > 0) {
-            _decreaseDebt(amountWithdrawn);
+        uint available = _withdraw(_amount);
+        uint diff;
+        if (available > 0) {
+            diff = _decreaseDebt(available);
         }
+
+        emit Withdraw(diff);
     }
 
     function _withdrawAll() private {
@@ -268,9 +273,9 @@ contract StrategyCurveUsdp is StrategyERC20_V3 {
         if (bal > 0) {
             IERC20(underlying).safeTransfer(vault, bal);
             totalDebt = 0;
-
-            emit Withdraw(bal);
         }
+
+        emit Withdraw(bal);
     }
 
     function withdrawAll() external override onlyAuthorized {
