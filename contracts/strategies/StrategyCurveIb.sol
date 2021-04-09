@@ -29,7 +29,7 @@ contract StrategyCurveIb is StrategyERC20_V3 {
     uint private immutable PRECISION_DIV_UNDERLYING;
 
     // Curve //
-    // StableSwapIb
+    // StableSwap
     address private constant SWAP = 0x2dded6Da1BF5DBdF597C45fcFaa3194e53EcfeAF;
     // liquidity provider token
     address private constant LP = 0x5282a4eF67D9C33135340fB3289cc1711c13638C;
@@ -73,8 +73,6 @@ contract StrategyCurveIb is StrategyERC20_V3 {
         IERC20(USDT).safeApprove(SWAP, type(uint).max);
         // Approve LiquidityGaugeV2.deposit
         IERC20(LP).safeApprove(GAUGE, type(uint).max);
-        // approve StableSwapIb.remove_liquidity
-        // IERC20(LP).safeApprove(SWAP, type(uint).max);
 
         // These tokens are never held by this contract
         // so the risk of them getting stolen is minimal

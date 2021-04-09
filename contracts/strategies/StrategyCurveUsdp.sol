@@ -34,11 +34,11 @@ contract StrategyCurveUsdp is StrategyERC20_V3 {
     // Curve //
     // StableSwap3Pool
     address private constant BASE_POOL = 0xbEbc44782C7dB0a1A60Cb6fe97d0b483032FF1C7;
-    // StableSwapUsdp
+    // StableSwap
     address private constant SWAP = 0x42d7025938bEc20B69cBae5A77421082407f053A;
     // liquidity provider token (USDP / 3CRV)
     address private constant LP = 0x7Eb40E450b9655f4B3cC4259BCC731c63ff55ae6;
-    // DepositUsdp
+    // Deposit
     address private constant DEPOSIT = 0x3c8cAee4E09296800f8D29A68Fa3837e2dae4940;
     // LiquidityGaugeV2
     address private constant GAUGE = 0x055be5DDB7A925BfEF3417FC157f53CA77cA7222;
