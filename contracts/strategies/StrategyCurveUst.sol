@@ -34,11 +34,11 @@ contract StrategyCurveUst is StrategyERC20_V3 {
     // Curve //
     // StableSwap3Pool
     address private constant BASE_POOL = 0xbEbc44782C7dB0a1A60Cb6fe97d0b483032FF1C7;
-    // StableSwapUsdt
+    // StableSwapUst
     address private constant SWAP = 0x890f4e345B1dAED0367A877a1612f86A1f86985f;
     // liquidity provider token (UST / 3CRV)
     address private constant LP = 0x94e131324b6054c0D789b190b2dAC504e4361b53;
-    // DepositUsdt
+    // DepositUst
     address private constant DEPOSIT = 0xB0a0716841F2Fc03fbA72A891B8Bb13584F52F2d;
     // LiquidityGaugeV2
     address private constant GAUGE = 0x3B7020743Bc2A4ca9EaF9D0722d42E20d6935855;
