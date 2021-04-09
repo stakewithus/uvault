@@ -67,13 +67,10 @@ contract StrategyCompLevEth is StrategyETH_V3 {
     function _sendEthToVault(uint _amount) private {
         (bool sent, ) = vault.call{value: _amount}("");
         require(sent, "Send ETH failed");
-
-        emit Withdraw(_amount);
     }
 
     function _increaseDebt(uint _amount) private {
         totalDebt = totalDebt.add(_amount);
-        emit Deposit(_amount);
     }
 
     function _decreaseDebt(uint _amount) private {
@@ -349,6 +346,8 @@ contract StrategyCompLevEth is StrategyETH_V3 {
 
         _increaseDebt(msg.value);
         _deposit();
+
+        emit Deposit(msg.value);
     }
 
     function _getRedeemAmount(
@@ -521,6 +520,8 @@ contract StrategyCompLevEth is StrategyETH_V3 {
         if (available > 0) {
             _decreaseDebt(available);
         }
+
+        emit Withdraw(available);
     }
 
     // @dev withdraw all creates dust in supplied
@@ -533,6 +534,8 @@ contract StrategyCompLevEth is StrategyETH_V3 {
             _sendEthToVault(bal);
             totalDebt = 0;
         }
+
+        emit Withdraw(bal);
     }
 
     /*

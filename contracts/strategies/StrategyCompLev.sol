@@ -62,7 +62,7 @@ contract StrategyCompLev is StrategyERC20_V3 {
         buffer = _buffer;
     }
 
-    function _increaseDebt(uint _amount) private {
+    function _increaseDebt(uint _amount) private returns (uint) {
         uint balBefore = IERC20(underlying).balanceOf(address(this));
         IERC20(underlying).safeTransferFrom(vault, address(this), _amount);
         uint balAfter = IERC20(underlying).balanceOf(address(this));
@@ -70,10 +70,10 @@ contract StrategyCompLev is StrategyERC20_V3 {
         uint diff = balAfter.sub(balBefore);
         totalDebt = totalDebt.add(diff);
 
-        emit Deposit(diff);
+        return diff;
     }
 
-    function _decreaseDebt(uint _amount) private {
+    function _decreaseDebt(uint _amount) private returns (uint) {
         uint balBefore = IERC20(underlying).balanceOf(address(this));
         IERC20(underlying).safeTransfer(vault, _amount);
         uint balAfter = IERC20(underlying).balanceOf(address(this));
@@ -85,7 +85,7 @@ contract StrategyCompLev is StrategyERC20_V3 {
             totalDebt -= diff;
         }
 
-        emit Withdraw(diff);
+        return diff;
     }
 
     function _totalAssets() private view returns (uint) {
@@ -351,8 +351,10 @@ contract StrategyCompLev is StrategyERC20_V3 {
     function deposit(uint _amount) external override onlyAuthorized {
         require(_amount > 0, "deposit = 0");
 
-        _increaseDebt(_amount);
+        uint diff = _increaseDebt(_amount);
         _deposit();
+
+        emit Deposit(diff);
     }
 
     function _getRedeemAmount(
@@ -522,9 +524,12 @@ contract StrategyCompLev is StrategyERC20_V3 {
         require(_amount > 0, "withdraw = 0");
         // available <= _amount
         uint available = _withdraw(_amount);
+        uint diff;
         if (available > 0) {
-            _decreaseDebt(available);
+            diff = _decreaseDebt(available);
         }
+
+        emit Withdraw(diff);
     }
 
     // @dev withdraw all creates dust in supplied
@@ -536,9 +541,9 @@ contract StrategyCompLev is StrategyERC20_V3 {
         if (bal > 0) {
             IERC20(underlying).safeTransfer(vault, bal);
             totalDebt = 0;
-
-            emit Withdraw(bal);
         }
+
+        emit Withdraw(bal);
     }
 
     /*
