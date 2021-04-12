@@ -378,7 +378,7 @@ contract StrategyCurveUst is StrategyERC20_V3 {
             uint fee = bal.mul(performanceFee) / PERFORMANCE_FEE_MAX;
             if (fee > 0) {
                 address treasury = IController(controller).treasury();
-                require(treasury != address(0), "treasury = zero address");
+                require(treasury != address(0), "treasury = 0 address");
 
                 IERC20(token).safeTransfer(treasury, fee);
             }
