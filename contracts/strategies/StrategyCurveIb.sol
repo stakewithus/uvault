@@ -381,7 +381,8 @@ contract StrategyCurveIb is StrategyERC20_V3 {
             Withdrawing consumes high gas, so here we omit it and
             directly increase debt, as if withdraw and deposit were called.
             */
-            totalDebt = totalDebt.add(profit);
+            // total debt = total debt + profit = total
+            totalDebt = total;
         } else {
             /*
             Possible reasons for total underlying > max

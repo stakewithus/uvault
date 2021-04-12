@@ -32,10 +32,10 @@ export default (name: string, _setup: Setup, params: { DECIMALS: BN }) => {
       const tx = await strategy.harvest({ from: admin })
       const after = await snapshot()
 
-      for (const log of tx.logs) {
-        // @ts-ignore
-        console.log(`${log.args.message} ${log.args.val}`)
-      }
+      // for (const log of tx.logs) {
+      //   // @ts-ignore
+      //   console.log(`${log.args.message} ${log.args.val}`)
+      // }
 
       const CRV_DUST = pow(10, 18)
 
