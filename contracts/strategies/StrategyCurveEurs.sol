@@ -273,7 +273,7 @@ contract StrategyCurveEurs is StrategyERC20_V3 {
     /*
     @notice Returns address and index of token with lowest balance in Curve pool
     */
-    function _getMostPremiumToken() private view returns (address, uint) {
+    function _getMostPremiumToken() private pure returns (address, uint) {
         return (EURS, 0);
 
         // TODO: no liquidity for SEUR on Uniswap
