@@ -418,9 +418,9 @@ contract StrategyCurveUsdp is StrategyERC20_V3 {
             2. total underlying really did increase over max
             3. price was manipulated
             */
-            uint amountWithdrawn = _withdraw(profit);
-            if (amountWithdrawn > 0) {
-                IERC20(underlying).safeTransfer(vault, amountWithdrawn);
+            uint available = _withdraw(profit);
+            if (available > 0) {
+                IERC20(underlying).safeTransfer(vault, available);
             }
         }
 
