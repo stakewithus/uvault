@@ -31,7 +31,7 @@ contract StrategyCurveEurs is StrategyERC20_V3 {
     // StableSwap
     address private constant SWAP = 0x0Ce6a5fF5217e38315f87032CF90686C96627CAA;
     // liquidity provider token
-    address private constant LP = 0x194eBd173F6cDacE046C53eACc9B953F28411d1;
+    address private constant LP = 0x194eBd173F6cDacE046C53eACcE9B953F28411d1;
     // LiquidityGaugeV2
     address private constant GAUGE = 0x90Bb609649E0451E5aD952683D64BD2d1f245840;
     // Minter
