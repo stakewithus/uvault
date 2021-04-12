@@ -27,7 +27,7 @@ export default (name: string, _setup: Setup, params: { DECIMALS: BN }) => {
       await strategy.harvest({ from: admin })
     })
 
-    it("should skim - total assets > max", async () => {
+    it("should skim", async () => {
       const snapshot = getSnapshot(refs)
 
       const total = await strategy.totalAssets()
