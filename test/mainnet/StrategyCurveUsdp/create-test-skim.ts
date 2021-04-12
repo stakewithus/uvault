@@ -24,20 +24,18 @@ export default (name: string, _setup: Setup, params: { DECIMALS: BN }) => {
       await underlying.approve(strategy.address, DEPOSIT_AMOUNT, { from: vault })
       await strategy.deposit(DEPOSIT_AMOUNT, { from: vault })
 
-      // force total assets > debt
-      // force debt = 0
-      await strategy.withdrawAll({ from: admin })
-      // force total asset > 0
       await strategy.harvest({ from: admin })
     })
 
     it("should skim - total assets > max", async () => {
       const snapshot = getSnapshot(refs)
 
-      // calculate max using default delta
-      const max = frac(await strategy.totalDebt(), 10050, 10000)
-      if (lte(await strategy.totalAssets(), max)) {
-        console.log("Skipping test: total assets <= max")
+      const total = await strategy.totalAssets()
+      const debt = await strategy.totalDebt()
+      if (total.lte(debt)) {
+        console.log("Skipping test: total assets <= total debt")
+        console.log(`total assets: ${total}`)
+        console.log(`total debt: ${debt}`)
         return
       }
 
@@ -45,9 +43,13 @@ export default (name: string, _setup: Setup, params: { DECIMALS: BN }) => {
       await strategy.skim({ from: admin })
       const after = await snapshot()
 
-      assert(after.strategy.totalDebt.eq(before.strategy.totalDebt), "total debt")
-      assert(after.strategy.totalAssets.lt(before.strategy.totalAssets), "total assets")
-      assert(after.underlying.vault.gt(before.underlying.vault), "vault")
+      assert(after.strategy.totalDebt.gte(before.strategy.totalDebt), "total debt")
+      // maybe transfer profit back to vault
+      assert(
+        after.strategy.totalAssets.lte(before.strategy.totalAssets),
+        "total assets"
+      )
+      assert(after.underlying.vault.gte(before.underlying.vault), "vault")
     })
   })
 }
