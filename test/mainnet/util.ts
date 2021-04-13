@@ -20,3 +20,6 @@ export const USDP_TO_CURVE_DECIMALS = new BN(1)
 
 export const WBTC_DECIMALS = new BN(8)
 export const WBTC_TO_CURVE_DECIMALS = new BN(10)
+
+export const EURS_DECIMALS = new BN(2)
+export const EURS_TO_CURVE_DECIMALS = new BN(16)

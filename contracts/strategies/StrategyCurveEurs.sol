@@ -68,7 +68,6 @@ contract StrategyCurveEurs is StrategyERC20_V3 {
 
         // Approve StableSwapEurs.add_liquidity
         IERC20(EURS).safeApprove(SWAP, type(uint).max);
-        IERC20(SEUR).safeApprove(SWAP, type(uint).max);
         // Approve LiquidityGaugeV2.deposit
         IERC20(LP).safeApprove(GAUGE, type(uint).max);
 
@@ -281,23 +280,12 @@ contract StrategyCurveEurs is StrategyERC20_V3 {
     */
     function _getMostPremiumToken() private pure returns (address, uint) {
         return (EURS, 0);
-
-        // TODO: no liquidity for SEUR on Uniswap
-        // uint[2] memory balances;
-        // balances[0] = StableSwapEurs(SWAP).balances(0); // EURS
-        // balances[1] = StableSwapEurs(SWAP).balances(1).mul(1e12); // sEUR
-
-        // if (balances[0] <= balances[1]) {
-        //     return (EURS, 0);
-        // }
-
-        // return (SEUR, 1);
+        // no liquidity for SEUR on Uniswap
     }
 
     /*
     @dev Uniswap fails with zero address so no check is necessary here
     */
-    // TODO: no liquidity for SEUR on Uniswap
     function _swap(
         address _from,
         address _to,
