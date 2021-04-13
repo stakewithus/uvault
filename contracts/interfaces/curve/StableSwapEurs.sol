@@ -14,6 +14,7 @@ interface StableSwapEurs {
         external
         returns (uint);
 
+    // @dev returns amount of underlying token withdrawn
     function remove_liquidity_one_coin(
         uint _token_amount,
         int128 _i,

@@ -10,6 +10,7 @@ interface DepositUst {
     */
     function add_liquidity(uint[4] memory amounts, uint min) external returns (uint);
 
+    // @dev returns amount of underlying token withdrawn
     function remove_liquidity_one_coin(
         uint amount,
         int128 index,

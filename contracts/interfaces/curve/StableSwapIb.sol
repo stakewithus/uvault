@@ -17,6 +17,7 @@ interface StableSwapIb {
         bool _use_underlying
     ) external returns (uint);
 
+    // @dev returns amount of wrapped token withdrawn
     function remove_liquidity_one_coin(
         uint _token_amount,
         int128 _i,

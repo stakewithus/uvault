@@ -233,24 +233,35 @@ contract StrategyCurveIb is StrategyERC20_V3 {
             LiquidityGaugeV2(GAUGE).withdraw(shares);
 
             uint min = _amount.mul(SLIPPAGE_MAX - slippage) / SLIPPAGE_MAX;
+
+            uint balBefore = IERC20(underlying).balanceOf(address(this));
             // withdraw creates LP dust
-            return
-                StableSwapIb(SWAP).remove_liquidity_one_coin(
-                    shares,
-                    int128(UNDERLYING_INDEX),
-                    min,
-                    true
-                );
+            // ignore output (amount of wrapped token withdrawn)
+            StableSwapIb(SWAP).remove_liquidity_one_coin(
+                shares,
+                int128(UNDERLYING_INDEX),
+                min,
+                true
+            );
             // Now we have underlying
+            uint balAfter = IERC20(underlying).balanceOf(address(this));
+
+            return balAfter.sub(balBefore);
         }
         return 0;
     }
 
     function withdraw(uint _amount) external override onlyAuthorized {
-        uint available = _withdraw(_amount);
+        uint withdrawn = _withdraw(_amount);
+
+        if (withdrawn < _amount) {
+            _amount = withdrawn;
+        }
+        // if withdrawn > _amount, excess will be deposited when deposit() is called
+
         uint diff;
-        if (available > 0) {
-            diff = _decreaseDebt(available);
+        if (_amount > 0) {
+            diff = _decreaseDebt(_amount);
         }
 
         emit Withdraw(diff);
@@ -390,9 +401,9 @@ contract StrategyCurveIb is StrategyERC20_V3 {
             2. total underlying really did increase over max
             3. price was manipulated
             */
-            uint available = _withdraw(profit);
-            if (available > 0) {
-                IERC20(underlying).safeTransfer(vault, available);
+            uint withdrawn = _withdraw(profit);
+            if (withdrawn > 0) {
+                IERC20(underlying).safeTransfer(vault, withdrawn);
             }
         }
 

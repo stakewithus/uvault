@@ -256,10 +256,16 @@ contract StrategyCurveUst is StrategyERC20_V3 {
     }
 
     function withdraw(uint _amount) external override onlyAuthorized {
-        uint available = _withdraw(_amount);
+        uint withdrawn = _withdraw(_amount);
+
+        if (withdrawn < _amount) {
+            _amount = withdrawn;
+        }
+        // if withdrawn > _amount, excess will be deposited when deposit() is called
+
         uint diff;
-        if (available > 0) {
-            diff = _decreaseDebt(available);
+        if (_amount > 0) {
+            diff = _decreaseDebt(_amount);
         }
 
         emit Withdraw(diff);
@@ -419,9 +425,9 @@ contract StrategyCurveUst is StrategyERC20_V3 {
             2. total underlying really did increase over max
             3. price was manipulated
             */
-            uint available = _withdraw(profit);
-            if (available > 0) {
-                IERC20(underlying).safeTransfer(vault, available);
+            uint withdrawn = _withdraw(profit);
+            if (withdrawn > 0) {
+                IERC20(underlying).safeTransfer(vault, withdrawn);
             }
         }
 
