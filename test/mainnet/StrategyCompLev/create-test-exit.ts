@@ -6,7 +6,7 @@ import { StrategyInstance, Setup, getSnapshot } from "./lib"
 export default (name: string, _setup: Setup, params: { DECIMALS: BN }) => {
   contract(name, (accounts) => {
     const { DECIMALS } = params
-    const DEPOSIT_AMOUNT = pow(10, DECIMALS).mul(new BN(100))
+    const DEPOSIT_AMOUNT = pow(10, DECIMALS).mul(new BN(1000000))
 
     const refs = _setup(accounts)
     const { vault, whale } = refs
@@ -32,7 +32,7 @@ export default (name: string, _setup: Setup, params: { DECIMALS: BN }) => {
       await strategy.exit({ from: vault })
       const after = await snapshot()
 
-      const dust = frac(DEPOSIT_AMOUNT, 1, 1000000)
+      const dust = frac(pow(10, DECIMALS), 1, 1000)
 
       // check strategy dust is small
       assert(after.underlying.strategy.eq(new BN(0)), "underlying strategy")
@@ -40,8 +40,7 @@ export default (name: string, _setup: Setup, params: { DECIMALS: BN }) => {
       assert(after.strategy.totalDebt.eq(new BN(0)), "total debt")
       assert(after.strategy.supplied.lte(dust), "supplied")
       assert(after.strategy.borrowed.eq(new BN(0)), "borrowed")
-      console.log(`${after.cToken.strategy}`)
-      assert(after.cToken.strategy.lte(new BN(10 ** 8)), "cToken")
+      assert(after.cToken.strategy.lte(new BN(10 ** 4)), "cToken")
     })
   })
 }

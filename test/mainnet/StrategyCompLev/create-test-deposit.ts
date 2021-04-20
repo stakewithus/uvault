@@ -33,8 +33,11 @@ export default (name: string, _setup: Setup, params: { DECIMALS: BN }) => {
       const after = await snapshot()
 
       const minUnderlying = frac(DEPOSIT_AMOUNT, 9999, 10000)
-      // 1 / (1 - 0.70) * 0.99
-      const minSupplied = frac(DEPOSIT_AMOUNT, 330, 100)
+
+      const { 3: safeCol } = await strategy.getLivePosition.call() // use static call
+      // 1 / (1 - safeCol)
+      const maxLev = pow(10, 36).div(pow(10, 18).sub(safeCol))
+      const minSupplied = frac(maxLev.mul(DEPOSIT_AMOUNT).div(pow(10, 18)), 98, 100)
 
       // underlying transferred from vault to strategy
       assert(
