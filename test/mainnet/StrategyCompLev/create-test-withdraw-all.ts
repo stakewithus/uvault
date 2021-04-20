@@ -51,7 +51,7 @@ export default (name: string, _setup: Setup, params: { DECIMALS: BN }) => {
       assert(after.strategy.supplied.lte(dust), "supplied strategy")
       assert(after.strategy.borrowed.eq(new BN(0)), "supplied strategy")
       // check cToken dust is small
-      assert(after.cToken.strategy.lte(new BN(10)), "cToken strategy")
+      assert(after.cToken.strategy.lte(new BN(10 ** 8)), "cToken strategy")
     })
   })
 }

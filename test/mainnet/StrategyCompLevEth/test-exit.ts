@@ -32,6 +32,6 @@ contract("StrategyCompLevEth", (accounts) => {
     assert(after.strategy.totalDebt.eq(new BN(0)), "total debt")
     assert(after.strategy.supplied.lte(dust), "supplied")
     assert(after.strategy.borrowed.eq(new BN(0)), "borrowed")
-    assert(after.cToken.strategy.lte(new BN(10)), "cToken")
+    assert(after.cToken.strategy.lte(new BN(10 ** 8)), "cToken")
   })
 })
