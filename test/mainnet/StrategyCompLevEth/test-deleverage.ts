@@ -33,6 +33,9 @@ contract("StrategyCompLevEth", (accounts) => {
     // redeemable
     let r = s.sub(b.mul(pow(10, 18)).div(safeCol))
     for (let i = 0; i < 10; i++) {
+      if (r.gte(b)) {
+        r = b
+      }
       s = s.sub(r)
       b = b.sub(r)
       r = s.sub(b.mul(pow(10, 18)).div(safeCol))

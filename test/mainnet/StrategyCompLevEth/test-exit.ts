@@ -24,7 +24,7 @@ contract("StrategyCompLevEth", (accounts) => {
     await strategy.exit({ from: vault })
     const after = await snapshot()
 
-    const dust = frac(DEPOSIT_AMOUNT, 1, 1000000)
+    const dust = frac(pow(10, 18), 1, 1000)
 
     // check strategy dust is small
     assert(after.eth.strategy.eq(new BN(0)), "eth strategy")
@@ -32,6 +32,6 @@ contract("StrategyCompLevEth", (accounts) => {
     assert(after.strategy.totalDebt.eq(new BN(0)), "total debt")
     assert(after.strategy.supplied.lte(dust), "supplied")
     assert(after.strategy.borrowed.eq(new BN(0)), "borrowed")
-    assert(after.cToken.strategy.lte(new BN(10 ** 8)), "cToken")
+    assert(after.cToken.strategy.lte(new BN(10 ** 4)), "cToken")
   })
 })
