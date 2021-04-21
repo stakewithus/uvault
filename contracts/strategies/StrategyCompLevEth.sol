@@ -59,8 +59,8 @@ contract StrategyCompLevEth is StrategyETH_V3 {
         require(msg.sender != vault, "msg.sender = vault");
     }
 
-    function setBuffer(uint _buffer) external onlyAdmin {
-        require(_buffer > 0 && _buffer < 1e18, "buffer");
+    function setBuffer(uint _buffer) external onlyAuthorized {
+        require(_buffer > 0 && _buffer <= 1e18, "buffer");
         buffer = _buffer;
     }
 
@@ -120,7 +120,10 @@ contract StrategyCompLevEth is StrategyETH_V3 {
     }
 
     function _getSafeCollateralRatio(uint _marketCol) private view returns (uint) {
-        return _marketCol.sub(buffer);
+        if (_marketCol > buffer) {
+            return _marketCol - buffer;
+        }
+        return 0;
     }
 
     // Not view function

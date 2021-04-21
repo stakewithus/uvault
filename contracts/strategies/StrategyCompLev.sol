@@ -57,8 +57,8 @@ contract StrategyCompLev is StrategyERC20_V3 {
         IERC20(COMP).safeApprove(UNISWAP, type(uint).max);
     }
 
-    function setBuffer(uint _buffer) external onlyAdmin {
-        require(_buffer > 0 && _buffer < 1e18, "buffer");
+    function setBuffer(uint _buffer) external onlyAuthorized {
+        require(_buffer > 0 && _buffer <= 1e18, "buffer");
         buffer = _buffer;
     }
 
@@ -126,7 +126,10 @@ contract StrategyCompLev is StrategyERC20_V3 {
     }
 
     function _getSafeCollateralRatio(uint _marketCol) private view returns (uint) {
-        return _marketCol.sub(buffer);
+        if (_marketCol > buffer) {
+            return _marketCol - buffer;
+        }
+        return 0;
     }
 
     // Not view function
