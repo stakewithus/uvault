@@ -57,11 +57,6 @@ contract StrategyCompLev is StrategyERC20_V3 {
         IERC20(COMP).safeApprove(UNISWAP, type(uint).max);
     }
 
-    function setBuffer(uint _buffer) external onlyAuthorized {
-        require(_buffer > 0 && _buffer <= 1e18, "buffer");
-        buffer = _buffer;
-    }
-
     function _increaseDebt(uint _amount) private returns (uint) {
         uint balBefore = IERC20(underlying).balanceOf(address(this));
         IERC20(underlying).safeTransferFrom(vault, address(this), _amount);
@@ -114,6 +109,15 @@ contract StrategyCompLev is StrategyERC20_V3 {
     */
     function totalAssets() external view override returns (uint) {
         return _totalAssets();
+    }
+
+    /*
+    @dev buffer = 0 means safe collateral ratio = market collateral ratio
+         buffer = 1e18 means safe collateral ratio = 0
+    */
+    function setBuffer(uint _buffer) external onlyAuthorized {
+        require(_buffer > 0 && _buffer <= 1e18, "buffer");
+        buffer = _buffer;
     }
 
     function _getMarketCollateralRatio() private view returns (uint) {

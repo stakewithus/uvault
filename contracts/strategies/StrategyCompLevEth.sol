@@ -59,11 +59,6 @@ contract StrategyCompLevEth is StrategyETH_V3 {
         require(msg.sender != vault, "msg.sender = vault");
     }
 
-    function setBuffer(uint _buffer) external onlyAuthorized {
-        require(_buffer > 0 && _buffer <= 1e18, "buffer");
-        buffer = _buffer;
-    }
-
     function _sendEthToVault(uint _amount) private {
         (bool sent, ) = vault.call{value: _amount}("");
         require(sent, "Send ETH failed");
@@ -108,6 +103,15 @@ contract StrategyCompLevEth is StrategyETH_V3 {
     */
     function totalAssets() external view override returns (uint) {
         return _totalAssets();
+    }
+
+    /*
+    @dev buffer = 0 means safe collateral ratio = market collateral ratio
+         buffer = 1e18 means safe collateral ratio = 0
+    */
+    function setBuffer(uint _buffer) external onlyAuthorized {
+        require(_buffer > 0 && _buffer <= 1e18, "buffer");
+        buffer = _buffer;
     }
 
     function _getMarketCollateralRatio() private view returns (uint) {
