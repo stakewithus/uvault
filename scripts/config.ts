@@ -197,7 +197,7 @@ const config: Config = {
     dev_strategyStEth: "0x6E1051876ea57e957FdB8A501c7445466Bb643bf",
     dev_strategyObtcWbtc: "0x83Db07ac03cB3d2FC5204507eA4b8c211E5B5383",
     dev_strategyCompLevDai: "0xe8a04A1D7d4b15a247567e9A918F5E5aD618Fa94",
-    dev_strategyCompLevUsdc: "0x2299fCD7972ffa84Fdef5659765c62410Fca9C78",
+    dev_strategyCompLevUsdc: "0x4912303Fc3501c0B4CD7e2bD264eBb8ABA06404b",
     dev_strategyCompLevWbtc: "0x9Ddf4d9A0bd2d985b04cA6AF3dAcCA59067c90eD",
     dev_strategyCompLevEth: "0x69e4161E4c3bDB207162209578C4175ac05B6cAD",
     // misc //
