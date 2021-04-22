@@ -22,6 +22,33 @@ plugging some numbers
 31.08 = 4 * (7.01 + 4 - 0.75 * (9.08 - 4.76))
 */
 
+/*
+State transitions and valid transactions
+
+### State ###
+buff = buffer
+s = supplied
+b = borrowed
+
+### Transactions ###
+dl = deleverage
+l = leverage
+w = withdraw
+d = deposit
+s(x) = set butter to x
+
+### State Transitions ###
+
+                             s(max)
+(buf = max, s > 0, b > 0) <--------- (buf = min, s > 0, b > 0)
+          |                                      ^
+          | dl,w                                 | l, d
+          |                                      |
+          V                                      | 
+(buf = max, s > 0, b = 0) ---------> (buf = min, s > 0, b = 0)
+                             s(min)
+*/
+
 contract StrategyCompLev is StrategyERC20_V3 {
     event Deposit(uint amount);
     event Withdraw(uint amount);
@@ -296,6 +323,11 @@ contract StrategyCompLev is StrategyERC20_V3 {
         S_n <= S_0 + (cS_0 - B_0) / (1 - c)
     */
     function _leverage(uint _targetSupply) private checkCollateralRatio {
+        // buffer = 1e18 means safe collateral ratio = 0
+        if (buffer >= 1e18) {
+            return;
+        }
+
         uint supplied = _getSupplied();
         uint borrowed = _getBorrowed();
         uint unleveraged = supplied.sub(borrowed); // supply with 0 leverage
