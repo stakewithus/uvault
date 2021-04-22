@@ -41,10 +41,10 @@ s(x) = set butter to x
 
                              s(max)
 (buf = max, s > 0, b > 0) <--------- (buf = min, s > 0, b > 0)
-          |                                      ^
-          | dl,w                                 | l, d
-          |                                      |
-          V                                      | 
+          |                               |        ^
+          | dl, w                         | dl, w  | l, d
+          |                               |        |
+          V                               V        | 
 (buf = max, s > 0, b = 0) ---------> (buf = min, s > 0, b = 0)
                              s(min)
 */
