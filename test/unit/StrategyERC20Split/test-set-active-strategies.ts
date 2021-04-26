@@ -1,15 +1,15 @@
 import chai from "chai"
-import { StrategyERC20SplitInstance, StrategyERC20TestInstance } from "../../../types"
+import { StrategyERC20SplitInstance, StrategyERC20V3TestInstance } from "../../../types"
 import _setup from "./setup"
 
-const StrategyERC20Test = artifacts.require("StrategyERC20Test")
+const StrategyERC20_V3_Test = artifacts.require("StrategyERC20_V3_Test")
 
 contract("StrategyERC20Split", (accounts) => {
   const refs = _setup(accounts)
   const { keeper } = refs
 
   let split: StrategyERC20SplitInstance
-  let strategies: StrategyERC20TestInstance[]
+  let strategies: StrategyERC20V3TestInstance[]
   beforeEach(async () => {
     split = refs.split
     strategies = refs.strategies
@@ -43,10 +43,11 @@ contract("StrategyERC20Split", (accounts) => {
     })
 
     it("should reject if not active", async () => {
-      const strategy = await StrategyERC20Test.new(
+      const strategy = await StrategyERC20_V3_Test.new(
         refs.controller.address,
         refs.split.address,
         refs.underlying.address,
+        keeper,
         { from: keeper }
       )
 

@@ -3,13 +3,13 @@ import {
   TestTokenInstance,
   MockControllerInstance,
   StrategyERC20SplitInstance,
-  StrategyERC20TestInstance,
+  StrategyERC20V3TestInstance,
 } from "../../../types"
 
 const TestToken = artifacts.require("TestToken")
 const MockController = artifacts.require("MockController")
 const StrategyERC20Split = artifacts.require("StrategyERC20Split")
-const StrategyERC20Test = artifacts.require("StrategyERC20Test")
+const StrategyERC20_V3_Test = artifacts.require("StrategyERC20_V3_Test")
 
 export default (accounts: Truffle.Accounts) => {
   const admin = accounts[0]
@@ -28,7 +28,7 @@ export default (accounts: Truffle.Accounts) => {
     timeLock: string
     keeper: string
     split: StrategyERC20SplitInstance
-    strategies: StrategyERC20TestInstance[]
+    strategies: StrategyERC20V3TestInstance[]
   }
 
   const refs: Refs = {
@@ -64,10 +64,11 @@ export default (accounts: Truffle.Accounts) => {
     // NOTE: i should be >= 3 for testing setActiveStrategies
     for (let i = 0; i < 3; i++) {
       strategies.push(
-        await StrategyERC20Test.new(
+        await StrategyERC20_V3_Test.new(
           controller.address,
           split.address,
           underlying.address,
+          keeper,
           { from: admin }
         )
       )

@@ -2,7 +2,7 @@ import chai from "chai"
 import {
   TestTokenInstance,
   StrategyERC20SplitInstance,
-  StrategyERC20TestInstance,
+  StrategyERC20V3TestInstance,
 } from "../../../types"
 import { eq, pow, mul, frac } from "../../util"
 import _setup from "./setup"
@@ -12,7 +12,7 @@ contract("StrategyERC20Split", (accounts) => {
   const { admin } = refs
 
   let split: StrategyERC20SplitInstance
-  let strategies: StrategyERC20TestInstance[]
+  let strategies: StrategyERC20V3TestInstance[]
   let underlying: TestTokenInstance
   let vault: string
   beforeEach(() => {
@@ -54,6 +54,7 @@ contract("StrategyERC20Split", (accounts) => {
         const strat = await split.strategies(strategy.address)
         // @ts-ignore
         const deposit = frac(amount, strat.depositRatio, totalDepositRatio)
+        console.log(`${await strategy.totalAssets()} ${deposit}`)
         assert(eq(await strategy.totalAssets(), deposit), "strategy total assets")
       }
 

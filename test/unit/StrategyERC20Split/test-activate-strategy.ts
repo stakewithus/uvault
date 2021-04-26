@@ -1,22 +1,23 @@
 import chai from "chai"
-import { StrategyERC20SplitInstance, StrategyERC20TestInstance } from "../../../types"
+import { StrategyERC20SplitInstance, StrategyERC20V3TestInstance } from "../../../types"
 import { eq, add, sub } from "../../util"
 import _setup from "./setup"
 
-const StrategyERC20Test = artifacts.require("StrategyERC20Test")
+const StrategyERC20_V3_Test = artifacts.require("StrategyERC20_V3_Test")
 
 contract("StrategyERC20Split", (accounts) => {
   const refs = _setup(accounts)
-  const { admin, timeLock } = refs
+  const { admin, timeLock, keeper } = refs
 
   let split: StrategyERC20SplitInstance
-  let strategy: StrategyERC20TestInstance
+  let strategy: StrategyERC20V3TestInstance
   beforeEach(async () => {
     split = refs.split
-    strategy = await StrategyERC20Test.new(
+    strategy = await StrategyERC20_V3_Test.new(
       refs.controller.address,
       refs.split.address,
       refs.underlying.address,
+      keeper,
       { from: admin }
     )
 
@@ -71,10 +72,11 @@ contract("StrategyERC20Split", (accounts) => {
     })
 
     it("should reject if not approved", async () => {
-      const strategy = await StrategyERC20Test.new(
+      const strategy = await StrategyERC20_V3_Test.new(
         refs.controller.address,
         refs.split.address,
         refs.underlying.address,
+        keeper,
         { from: admin }
       )
 
@@ -106,10 +108,11 @@ contract("StrategyERC20Split", (accounts) => {
     it("should reject if active > max", async () => {
       // max = 10 - 3 (active) = 7
       for (let i = 0; i < 7; i++) {
-        const strategy = await StrategyERC20Test.new(
+        const strategy = await StrategyERC20_V3_Test.new(
           refs.controller.address,
           refs.split.address,
           refs.underlying.address,
+          keeper,
           { from: admin }
         )
 
@@ -117,10 +120,11 @@ contract("StrategyERC20Split", (accounts) => {
         await split.activateStrategy(strategy.address, 1, { from: admin })
       }
 
-      const strategy = await StrategyERC20Test.new(
+      const strategy = await StrategyERC20_V3_Test.new(
         refs.controller.address,
         refs.split.address,
         refs.underlying.address,
+        keeper,
         { from: admin }
       )
       await split.approveStrategy(strategy.address, { from: timeLock })

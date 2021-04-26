@@ -1,5 +1,5 @@
 import chai from "chai"
-import { StrategyERC20SplitInstance, StrategyERC20TestInstance } from "../../../types"
+import { StrategyERC20SplitInstance, StrategyERC20V3TestInstance } from "../../../types"
 import { eq } from "../../util"
 import _setup from "./setup"
 
@@ -8,7 +8,7 @@ contract("StrategyERC20Split", (accounts) => {
   const { keeper } = refs
 
   let split: StrategyERC20SplitInstance
-  let strategies: StrategyERC20TestInstance[]
+  let strategies: StrategyERC20V3TestInstance[]
   beforeEach(async () => {
     split = refs.split
     strategies = refs.strategies

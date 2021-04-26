@@ -3,7 +3,7 @@ import chai from "chai"
 import {
   TestTokenInstance,
   StrategyERC20SplitInstance,
-  StrategyERC20TestInstance,
+  StrategyERC20V3TestInstance,
 } from "../../../types"
 import { pow } from "../../util"
 import _setup from "./setup"
@@ -13,7 +13,7 @@ contract("StrategyERC20Split", (accounts) => {
   const { admin } = refs
 
   let split: StrategyERC20SplitInstance
-  let strategies: StrategyERC20TestInstance[]
+  let strategies: StrategyERC20V3TestInstance[]
   let underlying: TestTokenInstance
   let vault: string
   beforeEach(() => {
