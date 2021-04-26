@@ -306,8 +306,6 @@ contract ETHVault is IETHVault, ERC20, ReentrancyGuard {
         require(amount > 0, "available = 0");
 
         IStrategyETH(strategy).deposit{value: amount}();
-
-        // TODO: log invested amount
     }
 
     /*

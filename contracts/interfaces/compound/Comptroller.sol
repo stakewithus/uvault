@@ -11,10 +11,6 @@ interface Comptroller {
             bool
         );
 
-    // Claim all the COMP accrued by holder in all markets
-    function claimComp(address holder) external;
-
-    // TODO: use this to save gas?
     // Claim all the COMP accrued by holder in specific markets
     function claimComp(address holder, address[] calldata cTokens) external;
 }
