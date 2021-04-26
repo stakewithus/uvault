@@ -134,7 +134,6 @@ contract StrategyERC20Split is IStrategyERC20_V3 {
         Strategy storage strategy = strategies[_strategy];
 
         require(!strategy.approved, "approved");
-
         require(
             IStrategyERC20_V3(_strategy).vault() == address(this),
             "!strategy.vault"
@@ -192,8 +191,7 @@ contract StrategyERC20Split is IStrategyERC20_V3 {
         strategy.active = true;
         strategy.depositRatio = _depositRatio;
 
-        // TODO: infinite approval?
-        // IERC20(underlying).approve(_strategy, type(uint).max);
+        IERC20(underlying).approve(_strategy, type(uint).max);
     }
 
     /*
@@ -239,8 +237,7 @@ contract StrategyERC20Split is IStrategyERC20_V3 {
 
         require(balAfter.sub(balBefore) >= _min, "exit < min");
 
-        // TODO: infinite approval?
-        // IERC20(underlying).approve(_strategy, 0);
+        IERC20(underlying).approve(_strategy, 0);
     }
 
     /*
@@ -256,8 +253,9 @@ contract StrategyERC20Split is IStrategyERC20_V3 {
         // Check strategy is active and no duplicates
         for (uint i = 0; i < _strategies.length; i++) {
             Strategy storage strategy = strategies[_strategies[i]];
-            // if duplicate, this will fail
             require(strategy.active, "!active");
+            // temporary set active to false
+            // if duplicate, check above will fail
             strategy.active = false;
         }
 
@@ -281,7 +279,7 @@ contract StrategyERC20Split is IStrategyERC20_V3 {
             "!depositRatios.length"
         );
 
-        // totalDepositRatio, use memory to save gas from SSTORE
+        // totalDepositRatio, use memory to save gas
         uint total;
         for (uint i = 0; i < _depositRatios.length; i++) {
             uint depositRatio = _depositRatios[i];
@@ -308,15 +306,11 @@ contract StrategyERC20Split is IStrategyERC20_V3 {
     }
 
     function _totalAssets() private view returns (uint) {
-        // TODO: save gas?
         uint total = IERC20(underlying).balanceOf(address(this));
         for (uint i = 0; i < activeStrategies.length; i++) {
             total = total.add(IStrategyERC20_V3(activeStrategies[i]).totalAssets());
         }
         return total;
-        /*
-        total = bal + total deposited into strats + total profit - total loss
-        */
     }
 
     function totalAssets() external view override returns (uint) {
