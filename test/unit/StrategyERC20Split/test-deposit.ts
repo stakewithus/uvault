@@ -54,7 +54,6 @@ contract("StrategyERC20Split", (accounts) => {
         const strat = await split.strategies(strategy.address)
         // @ts-ignore
         const deposit = frac(amount, strat.depositRatio, totalDepositRatio)
-        console.log(`${await strategy.totalAssets()} ${deposit}`)
         assert(eq(await strategy.totalAssets(), deposit), "strategy total assets")
       }
 

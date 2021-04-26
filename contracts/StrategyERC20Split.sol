@@ -371,7 +371,7 @@ contract StrategyERC20Split is IStrategyERC20_V3 {
             uint amount =
                 bal.mul(strategies[addr].depositRatio).div(_totalDepositRatio);
             if (amount > 0) {
-                _depositStrategy(addr, _amount);
+                _depositStrategy(addr, amount);
             }
         }
     }
