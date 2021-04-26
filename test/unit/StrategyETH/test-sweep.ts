@@ -47,11 +47,5 @@ contract("StrategyETH", (accounts) => {
         .expect(strategy.sweep(token.address, { from: accounts[1] }))
         .to.be.rejectedWith("!admin")
     })
-
-    it("should reject if protected", async () => {
-      await chai
-        .expect(strategy.sweep(ETH, { from: admin }))
-        .to.be.rejectedWith("protected token")
-    })
   })
 })
