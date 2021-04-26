@@ -18,7 +18,7 @@ contract StrategyCurveEurs is StrategyERC20_V3 {
     address private constant WETH = 0xC02aaA39b223FE8D0A0e5C4F27eAD9083C756Cc2;
 
     address internal constant EURS = 0xdB25f211AB05b1c97D595516F45794528a807ad8;
-    address internal constant SEUR = 0xD71eCFF9342A5Ced620049e616c5035F1dB98620;
+    // address internal constant SEUR = 0xD71eCFF9342A5Ced620049e616c5035F1dB98620;
 
     // EURS = 0 | sEUR = 1
     uint private immutable UNDERLYING_INDEX;
