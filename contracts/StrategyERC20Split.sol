@@ -477,13 +477,13 @@ contract StrategyERC20Split is IStrategyERC20_V3 {
         totalDebt = totalDebt.add(total - totalDebt);
     }
 
+    // @dev Call from controller to guard against slippage
     function exit() external override onlyAuthorized {
         if (forceExit) {
             return;
         }
 
         for (uint i = 0; i < activeStrategies.length; i++) {
-            // Call from controller to guard against slippage
             IStrategyERC20_V3(activeStrategies[i]).exit();
         }
 
