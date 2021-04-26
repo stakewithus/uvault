@@ -116,6 +116,27 @@ contract StrategyERC20Split is IStrategyERC20_V3 {
         forceExit = _forceExit;
     }
 
+    function _increaseDebt(uint _amount) private {
+        uint balBefore = IERC20(underlying).balanceOf(address(this));
+        IERC20(underlying).safeTransferFrom(vault, address(this), _amount);
+        uint balAfter = IERC20(underlying).balanceOf(address(this));
+
+        totalDebt = totalDebt.add(balAfter.sub(balBefore));
+    }
+
+    function _decreaseDebt(uint _amount) private {
+        uint balBefore = IERC20(underlying).balanceOf(address(this));
+        IERC20(underlying).safeTransfer(vault, _amount);
+        uint balAfter = IERC20(underlying).balanceOf(address(this));
+
+        uint diff = balBefore.sub(balAfter);
+        if (diff >= totalDebt) {
+            totalDebt = 0;
+        } else {
+            totalDebt -= diff;
+        }
+    }
+
     /*
     @notice Approve strategy
     @param _strategy Address of strategy
@@ -319,17 +340,18 @@ contract StrategyERC20Split is IStrategyERC20_V3 {
 
     function _depositStrategy(address _strategy, uint _amount) private {
         require(_amount > 0, "deposit = 0");
-
-        Strategy storage strategy = strategies[_strategy];
-
-        require(strategy.active, "!active");
-
-        // TODO: inifinite approval?
-        // TODO: use approve() to save gas?
-        IERC20(underlying).safeApprove(_strategy, 0);
-        IERC20(underlying).safeApprove(_strategy, _amount);
+        require(strategies[_strategy].active, "!active");
 
         IStrategyERC20_V3(_strategy).deposit(_amount);
+    }
+
+    /*
+    @notice Deposit into strategy, in case deposit() hits gas limit
+    @param _strategy Address of strategy
+    @param _amount Amount of underlying to deposit
+    */
+    function depositStrateg(address _strategy, uint _amount) external onlyAuthorized {
+        _depositStrategy(_strategy, _amount);
     }
 
     /*
@@ -338,22 +360,30 @@ contract StrategyERC20Split is IStrategyERC20_V3 {
     */
     function deposit(uint _amount) external override onlyAuthorized {
         require(_amount > 0, "deposit = 0");
-    }
 
-    // TODO: depositStrategy(address _strategy) in case deposit hits gas limit
+        _increaseDebt(_amount);
+
+        uint bal = IERC20(underlying).balanceOf(address(this));
+
+        uint _totalDepositRatio = totalDepositRatio;
+        for (uint i = 0; i < activeStrategies.length; i++) {
+            address addr = activeStrategies[i];
+            uint amount =
+                bal.mul(strategies[addr].depositRatio).div(_totalDepositRatio);
+            if (amount > 0) {
+                _depositStrategy(addr, _amount);
+            }
+        }
+    }
 
     function withdraw(uint _amount) external override onlyAuthorized {
         require(_amount > 0, "withdraw = 0");
 
-        uint underlyingBal = IERC20(underlying).balanceOf(address(this));
-        if (underlyingBal < _amount) {
-            // TODO: vulnerable to price manipulation across active strategies?
-            // TODO: what if strategy.totalAssets() is low because of hack?
-            uint remaining = _amount - underlyingBal;
+        uint bal = IERC20(underlying).balanceOf(address(this));
+        if (bal < _amount) {
+            uint remaining = _amount - bal;
             for (uint i = 0; i < activeStrategies.length; i++) {
                 address strategy = activeStrategies[i];
-                // TODO: redundant (totalAssets() called inside Strategy.withdraw())
-                // TODO: implement withdraw(amount >= totalAssets) to withdraw all inside IStrategyERC20_V3?
                 uint total = IStrategyERC20_V3(strategy).totalAssets();
 
                 uint balBefore = IERC20(underlying).balanceOf(address(this));
@@ -375,22 +405,12 @@ contract StrategyERC20Split is IStrategyERC20_V3 {
         }
 
         // transfer underlying token to vault
-        uint underlyingBalAfter = IERC20(underlying).balanceOf(address(this));
-        if (underlyingBalAfter > 0) {
-            if (underlyingBalAfter < _amount) {
-                _amount = underlyingBalAfter;
+        uint balAfter = IERC20(underlying).balanceOf(address(this));
+        if (balAfter > 0) {
+            if (balAfter < _amount) {
+                _amount = balAfter;
             }
-
-            uint balBefore = IERC20(underlying).balanceOf(address(this));
-            IERC20(underlying).safeTransfer(vault, _amount);
-            uint balAfter = IERC20(underlying).balanceOf(address(this));
-
-            uint diff = balBefore.sub(balAfter);
-            if (diff >= totalDebt) {
-                totalDebt = 0;
-            } else {
-                totalDebt -= diff;
-            }
+            _decreaseDebt(_amount);
         }
     }
 
@@ -399,9 +419,9 @@ contract StrategyERC20Split is IStrategyERC20_V3 {
             IStrategyERC20_V3(activeStrategies[i]).withdrawAll();
         }
 
-        uint underlyingBal = IERC20(underlying).balanceOf(address(this));
-        if (underlyingBal > 0) {
-            IERC20(underlying).safeTransfer(vault, underlyingBal);
+        uint bal = IERC20(underlying).balanceOf(address(this));
+        if (bal > 0) {
+            IERC20(underlying).safeTransfer(vault, bal);
             totalDebt = 0;
         }
     }
