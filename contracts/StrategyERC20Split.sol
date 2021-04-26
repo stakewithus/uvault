@@ -421,12 +421,6 @@ contract StrategyERC20Split is IStrategyERC20_V3 {
 
     function skim() external override onlyAuthorized {
         /*
-        Don't loop strategy.skim() here.
-        Need to check strategy.totalAsset() > strategy.totalDebt()
-        This is called inside strategy.skim(), so we would be wasting gas here.
-        */
-
-        /*
         Note on how balance and total debt between this contract and strategy change
 
         bal = balance in this contract
@@ -465,16 +459,14 @@ contract StrategyERC20Split is IStrategyERC20_V3 {
         amount that totalDebt will increase if we transfer t back to vault
         and then deposit into this contract
         */
-        uint bal = IERC20(underlying).balanceOf(address(this));
-        uint total = bal;
+        uint total = IERC20(underlying).balanceOf(address(this));
         // sum total debt in strategies
         for (uint i = 0; i < activeStrategies.length; i++) {
             total = total.add(IStrategyERC20_V3(activeStrategies[i]).totalDebt());
         }
 
         require(total > totalDebt, "total <= debt");
-
-        totalDebt = totalDebt.add(total - totalDebt);
+        totalDebt = total;
     }
 
     // @dev Call from controller to guard against slippage
