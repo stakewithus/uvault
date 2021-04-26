@@ -487,9 +487,9 @@ contract StrategyERC20Split is IStrategyERC20_V3 {
             IStrategyERC20_V3(activeStrategies[i]).exit();
         }
 
-        uint underlyingBal = IERC20(underlying).balanceOf(address(this));
-        if (underlyingBal > 0) {
-            IERC20(underlying).safeTransfer(vault, underlyingBal);
+        uint bal = IERC20(underlying).balanceOf(address(this));
+        if (bal > 0) {
+            IERC20(underlying).safeTransfer(vault, bal);
             totalDebt = 0;
         }
     }
