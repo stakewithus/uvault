@@ -34,19 +34,19 @@ jobs:
       - name: Run solhint
         run: npm run solhint
 
-      - name: Set up python 3.8
-        uses: actions/setup-python@v2
-        with:
-          python-version: 3.8
+      # - name: Set up python 3.8
+      #   uses: actions/setup-python@v2
+      #   with:
+      #     python-version: 3.8
 
-      - name: Install Slither
-        run: pip install slither-analyzer
+      # - name: Install Slither
+      #   run: pip install slither-analyzer
 
-      - name: Run Slither
-        env:
-          INFURA_API_KEY: ${{ secrets.INFURA_API_KEY }}
-        # generate .secret, store placeholder private key.
-        # NEVER USE THIS private key IN PRODUCTION
-        run: |
-          echo 06802b60b0c116d3f58f1b3c0fa69c636b1c61913b5f068863b048252236d8ec > .secret
-          slither .
+      # - name: Run Slither
+      #   env:
+      #     INFURA_API_KEY: ${{ secrets.INFURA_API_KEY }}
+      #   # generate .secret, store placeholder private key.
+      #   # NEVER USE THIS private key IN PRODUCTION
+      #   run: |
+      #     echo 06802b60b0c116d3f58f1b3c0fa69c636b1c61913b5f068863b048252236d8ec > .secret
+      #     slither .

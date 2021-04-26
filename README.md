@@ -88,7 +88,7 @@ slither . --print function-summary
 slither . --print vars-and-auth
 
 # save warnings / erros to ignore
-slither . --triage
+slither . --triage-mode
 
 # reset Slither
 rm slither.db.json
