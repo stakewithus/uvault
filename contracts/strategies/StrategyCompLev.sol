@@ -225,6 +225,11 @@ contract StrategyCompLev is StrategyERC20_V3 {
         require(borrowed <= max, "borrowed > max");
     }
 
+    // @dev In case infinite approval is reduced so that strategy cannot function
+    function approve(uint _amount) external onlyAdmin {
+        IERC20(underlying).safeApprove(cToken, _amount);
+    }
+
     function _supply(uint _amount) private {
         require(CErc20(cToken).mint(_amount) == 0, "mint");
     }
