@@ -37,14 +37,17 @@ export interface Config {
     strategyNoOpDaiSafe: string
     strategyGusdDaiV2: string
     strategyAaveDai: string
+    strategyCompLevDai: string
     // USDC
     strategyNoOpUsdcSafe: string
     strategyGusdUsdcV2: string
     strategyAaveUsdc: string
+    strategyCompLevUsdc: string
     // USDT
     strategyNoOpUsdtSafe: string
     strategyGusdUsdtV2: string
     strategyAaveUsdt: string
+    strategyCurveUsdpUsdt: string
     // WBTC
     strategyNoOpWbtc: string
     strategyObtcWbtc: string
@@ -134,14 +137,17 @@ const config: Config = {
     strategyNoOpDaiSafe: "0xC13A321d800d2477D35BFE342f14368752Bdc82f",
     strategyGusdDaiV2: "0xAa6a0f286A0DEF717e9167B770C795Cb4D72c15B",
     strategyAaveDai: "0x8a539e173b5ecEe47401A82671f59DE95A082c56",
+    strategyCompLevDai: "0x61Bc30d0347DE4A5766beD1e6f7049543DA0CA77",
     // USDC
     strategyNoOpUsdcSafe: "0xc63942159F8aDf59D180EAB1333F23495aEF12Ad",
     strategyGusdUsdcV2: "0x85cb4Da19994f20cdd55527155C650CB3E613CA3",
     strategyAaveUsdc: "0x7F52020A55a24011cC54e4eadcF37Edc7e69F8F5",
+    strategyCompLevUsdc: "0xCC16943C30dFBbF53b3eB1FAb374a38FC79AC2F4",
     // USDT
     strategyNoOpUsdtSafe: "0x8c8C11C0caE2e5Da0407c7B2A823167B5436c746",
     strategyGusdUsdtV2: "0x7C420415803BEb2B8BE06973a1488f2F5cB02551",
     strategyAaveUsdt: "0x83fC00D3De9707Dc43a38224f37a525b89aB0C6A",
+    strategyCurveUsdpUsdt: "0xA0DBE01b746D10eB739E7f637F65fBc2e3e9D1Bc",
     // WBTC
     strategyNoOpWbtc: "0xeB49133796491205ac324D7b796D5ebD852377e3",
     strategyObtcWbtc: "0x1eda1B993860E2EEC59Bae8E0D8F646Ea9dd154F",
