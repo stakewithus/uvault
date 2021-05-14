@@ -8,27 +8,22 @@ contract("StrategyERC20_V3", (accounts) => {
   const { admin } = refs
 
   let strategy: StrategyERC20V3TestInstance
-  beforeEach(() => {
+  beforeEach(async () => {
     strategy = refs.strategy
+    await strategy.setNextAdmin(accounts[1], { from: admin })
   })
 
-  describe("setAdmin", () => {
+  describe("acceptAdmin", () => {
     it("should set admin", async () => {
-      await strategy.setAdmin(accounts[1], { from: admin })
-
+      await strategy.acceptAdmin({ from: accounts[1] })
       assert.equal(await strategy.admin(), accounts[1])
+      assert.equal(await strategy.nextAdmin(), ZERO_ADDRESS)
     })
 
-    it("should reject if caller not admin", async () => {
+    it("should reject if caller not next admin", async () => {
       await chai
-        .expect(strategy.setAdmin(accounts[1], { from: accounts[1] }))
-        .to.be.rejectedWith("!admin")
-    })
-
-    it("should reject zero address", async () => {
-      await chai
-        .expect(strategy.setAdmin(ZERO_ADDRESS, { from: admin }))
-        .to.be.rejectedWith("admin = zero address")
+        .expect(strategy.acceptAdmin({ from: accounts[2] }))
+        .to.be.rejectedWith("!next admin")
     })
   })
 })

@@ -22,6 +22,7 @@ abstract contract StrategyERC20_V3 is IStrategyERC20_V3 {
     using SafeMath for uint;
 
     address public override admin;
+    address public nextAdmin;
     address public override controller;
     address public immutable override vault;
     address public immutable override underlying;
@@ -74,9 +75,16 @@ abstract contract StrategyERC20_V3 is IStrategyERC20_V3 {
         _;
     }
 
-    function setAdmin(address _admin) external onlyAdmin {
-        require(_admin != address(0), "admin = zero address");
-        admin = _admin;
+    function setNextAdmin(address _nextAdmin) external onlyAdmin {
+        require(_nextAdmin != admin, "next admin = current");
+        // allow next admin = zero address (cancel next admin)
+        nextAdmin = _nextAdmin;
+    }
+
+    function acceptAdmin() external {
+        require(msg.sender == nextAdmin, "!next admin");
+        admin = msg.sender;
+        nextAdmin = address(0);
     }
 
     function setController(address _controller) external onlyAdmin {
