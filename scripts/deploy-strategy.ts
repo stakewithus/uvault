@@ -13,13 +13,15 @@ env $(cat .env) npx hardhat deploy:strategy \
 --network ropsten \
 --dev true \
 --strategy StrategyNoOpERC20 \
---vault vault
---token testToken
+--vault vault \
+--token testToken \
+--keeper keeper
 */
 task("deploy:strategy", "Deploy ER20 / ETH strategy")
   .addParam("strategy", "Name of strategy")
   .addParam("vault", "Name of vault")
   .addOptionalParam("token", "Name of token", "")
+  .addOptionalParam("keeper", "Address of keeper", "")
   .addOptionalParam("dev", "Use mainnet dev", "false")
   .setAction(async (args, hre) => {
     assert(args.dev === "false" || args.dev === "true", `invalid arg dev: ${args.dev}`)
@@ -41,6 +43,8 @@ task("deploy:strategy", "Deploy ER20 / ETH strategy")
       if (args.token) {
         const token = getAddress(config, network, args.token)
         return Strategy.deploy(controller, vault, token)
+      } else if (args.keeper) {
+        return Strategy.deploy(controller, vault, args.keeper)
       } else {
         return Strategy.deploy(controller, vault)
       }

@@ -147,7 +147,8 @@ const config: Config = {
     strategyNoOpUsdtSafe: "0x8c8C11C0caE2e5Da0407c7B2A823167B5436c746",
     strategyGusdUsdtV2: "0x7C420415803BEb2B8BE06973a1488f2F5cB02551",
     strategyAaveUsdt: "0x83fC00D3De9707Dc43a38224f37a525b89aB0C6A",
-    strategyCurveUsdpUsdt: "0xA0DBE01b746D10eB739E7f637F65fBc2e3e9D1Bc",
+    // strategyCurveUsdpUsdt: "0xA0DBE01b746D10eB739E7f637F65fBc2e3e9D1Bc", // old version
+    strategyCurveUsdpUsdt: "0xa0169497723b00EC41d30238f90f06715249e482",
     // WBTC
     strategyNoOpWbtc: "0xeB49133796491205ac324D7b796D5ebD852377e3",
     strategyObtcWbtc: "0x1eda1B993860E2EEC59Bae8E0D8F646Ea9dd154F",

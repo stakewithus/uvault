@@ -3,6 +3,7 @@ pragma solidity 0.6.11;
 
 import "./StrategyCurveUsdp.sol";
 
+// WARNING: DO NOT DEPLOY. USDP / ETH has low liquidity
 contract StrategyCurveUsdpUsdp is StrategyCurveUsdp {
     constructor(
         address _controller,

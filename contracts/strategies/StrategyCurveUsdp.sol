@@ -292,42 +292,39 @@ contract StrategyCurveUsdp is StrategyERC20_V3 {
     @notice Returns address and index of token with lowest balance in Curve pool
     */
     function _getMostPremiumToken() private view returns (address, uint) {
+        // WARNING: USDP disabled - Low ETH / USDP liquidity
+
         // meta pool balances
-        uint[2] memory balances;
-        balances[0] = StableSwapUsdp(SWAP).balances(0); // USDP
-        balances[1] = StableSwapUsdp(SWAP).balances(1); // 3CRV
+        // uint[2] memory balances;
+        // balances[0] = StableSwapUsdp(SWAP).balances(0); // USDP
+        // balances[1] = StableSwapUsdp(SWAP).balances(1); // 3CRV
 
-        if (balances[0] <= balances[1]) {
-            return (USDP, 0);
-        } else {
-            // base pool balances
-            uint[3] memory baseBalances;
-            baseBalances[0] = StableSwap3Pool(BASE_POOL).balances(0); // DAI
-            baseBalances[1] = StableSwap3Pool(BASE_POOL).balances(1).mul(1e12); // USDC
-            baseBalances[2] = StableSwap3Pool(BASE_POOL).balances(2).mul(1e12); // USDT
+        // if (balances[0] <= balances[1]) {
+        //     return (USDP, 0);
+        // } else {
+        // base pool balances
+        uint[3] memory baseBalances;
+        baseBalances[0] = StableSwap3Pool(BASE_POOL).balances(0); // DAI
+        baseBalances[1] = StableSwap3Pool(BASE_POOL).balances(1).mul(1e12); // USDC
+        baseBalances[2] = StableSwap3Pool(BASE_POOL).balances(2).mul(1e12); // USDT
 
-            /*
-            DAI  1
-            USDC 2
-            USDT 3
-            */
+        /*
+        DAI  1
+        USDC 2
+        USDT 3
+        */
 
-            // DAI
-            if (
-                baseBalances[0] <= baseBalances[1] && baseBalances[0] <= baseBalances[2]
-            ) {
-                return (DAI, 1);
-            }
-
-            // USDC
-            if (
-                baseBalances[1] <= baseBalances[0] && baseBalances[1] <= baseBalances[2]
-            ) {
-                return (USDC, 2);
-            }
-
-            return (USDT, 3);
+        // DAI
+        if (baseBalances[0] <= baseBalances[1] && baseBalances[0] <= baseBalances[2]) {
+            return (DAI, 1);
         }
+
+        // USDC
+        if (baseBalances[1] <= baseBalances[0] && baseBalances[1] <= baseBalances[2]) {
+            return (USDC, 2);
+        }
+
+        return (USDT, 3);
     }
 
     /*
