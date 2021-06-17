@@ -38,6 +38,7 @@ export interface Config {
     strategyGusdDaiV2: string
     strategyAaveDai: string
     strategyCompLevDai: string
+    strategyCurveUsdpDai: string
     // USDC
     strategyNoOpUsdcSafe: string
     strategyGusdUsdcV2: string
@@ -138,6 +139,7 @@ const config: Config = {
     strategyGusdDaiV2: "0xAa6a0f286A0DEF717e9167B770C795Cb4D72c15B",
     strategyAaveDai: "0x8a539e173b5ecEe47401A82671f59DE95A082c56",
     strategyCompLevDai: "0x61Bc30d0347DE4A5766beD1e6f7049543DA0CA77",
+    strategyCurveUsdpDai: "0xfDa4236ADF86eBF0058BAD69Fb2e5991cfd233a2",
     // USDC
     strategyNoOpUsdcSafe: "0xc63942159F8aDf59D180EAB1333F23495aEF12Ad",
     strategyGusdUsdcV2: "0x85cb4Da19994f20cdd55527155C650CB3E613CA3",
