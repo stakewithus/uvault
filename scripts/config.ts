@@ -52,6 +52,7 @@ export interface Config {
     // WBTC
     strategyNoOpWbtc: string
     strategyObtcWbtc: string
+    strategyBbtcWbtc: string
     // dev //
     dev_controller: string
     dev_treasury: string
@@ -154,6 +155,7 @@ const config: Config = {
     // WBTC
     strategyNoOpWbtc: "0xeB49133796491205ac324D7b796D5ebD852377e3",
     strategyObtcWbtc: "0x1eda1B993860E2EEC59Bae8E0D8F646Ea9dd154F",
+    strategyBbtcWbtc: "0xFf86a8979E310CbB6E7f6322de528DeEE5F2c5Aa",
 
     // v1 strategies //
     /*
