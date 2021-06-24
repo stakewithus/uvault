@@ -7,6 +7,7 @@ export default (name: string, _setup: Setup, params: { DECIMALS: BN }) => {
   contract(name, (accounts) => {
     const { DECIMALS } = params
     const DEPOSIT_AMOUNT = pow(10, DECIMALS).mul(new BN(10))
+    const CRV_DUST = pow(10, 18)
 
     const refs = _setup(accounts)
     const { admin, vault, whale } = refs
@@ -47,7 +48,7 @@ export default (name: string, _setup: Setup, params: { DECIMALS: BN }) => {
       )
       assert(after.gauge.strategy.gte(before.gauge.strategy), "gauge strategy")
       // Check CRV was liquidated
-      assert(after.crv.strategy.eq(new BN(0)), "crv strategy")
+      assert(after.crv.strategy.lte(CRV_DUST), "crv strategy")
     })
   })
 }
