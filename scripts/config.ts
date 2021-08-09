@@ -134,7 +134,8 @@ const config: Config = {
     // strategies //
     // ETH
     strategyNoOpEth: "0xF4Fe5Cc9425B58544AFd24D8a2b14D7EBa261019",
-    strategyStEth: "0xcF10DDfEd92d9538cA15ba5c1e89E5c6619a5d3c",
+    // strategyStEth: "0xcF10DDfEd92d9538cA15ba5c1e89E5c6619a5d3c",
+    strategyStEth: "0x2cF1ab3a110eD495e38dF9b5f67eE2381C7bB572",
     // DAI
     strategyNoOpDaiSafe: "0xC13A321d800d2477D35BFE342f14368752Bdc82f",
     strategyGusdDaiV2: "0xAa6a0f286A0DEF717e9167B770C795Cb4D72c15B",
