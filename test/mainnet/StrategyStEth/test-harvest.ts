@@ -23,6 +23,9 @@ contract("StrategyStEth", (accounts) => {
     await strategy.harvest({ from: admin })
     const after = await snapshot()
 
+    // console.log("before", `${before.strategy.totalAssets}`)
+    // console.log("after", `${after.strategy.totalAssets}`)
+
     assert(after.eth.treasury.gte(before.eth.treasury), "eth treasury")
     assert(
       after.strategy.totalAssets.gt(before.strategy.totalAssets),

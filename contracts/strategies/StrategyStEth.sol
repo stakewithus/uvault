@@ -11,6 +11,7 @@ import "../interfaces/lido/StETH.sol";
 contract StrategyStEth is StrategyETH {
     // Uniswap //
     address private constant UNISWAP = 0x7a250d5630B4cF539739dF2C5dAcb4c659F2488D;
+    address private constant SUSHI = 0xd9e1cE17f2641f24aE83637ab66a2cca9C378B9F;
     address private constant WETH = 0xC02aaA39b223FE8D0A0e5C4F27eAD9083C756Cc2;
 
     // Curve //
@@ -35,10 +36,10 @@ contract StrategyStEth is StrategyETH {
     {
         // These tokens are never held by this contract
         // so the risk of them getting stolen is minimal
-        IERC20(CRV).safeApprove(UNISWAP, uint(-1));
+        IERC20(CRV).safeApprove(SUSHI, uint(-1));
         // Minted on Gauge deposit, withdraw and claim_rewards
-        // only this contract can spend on UNISWAP
-        IERC20(LDO).safeApprove(UNISWAP, uint(-1));
+        // only this contract can spend on SUSHI
+        IERC20(LDO).safeApprove(SUSHI, uint(-1));
     }
 
     receive() external payable {
@@ -169,7 +170,7 @@ contract StrategyStEth is StrategyETH {
     }
 
     /*
-    @dev Uniswap fails with zero address so no check is necessary here
+    @dev SUSHI fails with zero address so no check is necessary here
     */
     function _swapToEth(address _from, uint _amount) private {
         // create dynamic array with 2 elements
@@ -177,7 +178,7 @@ contract StrategyStEth is StrategyETH {
         path[0] = _from;
         path[1] = WETH;
 
-        Uniswap(UNISWAP).swapExactTokensForETH(
+        Uniswap(SUSHI).swapExactTokensForETH(
             _amount,
             1,
             path,
@@ -192,7 +193,7 @@ contract StrategyStEth is StrategyETH {
         // claim CRV
         Minter(MINTER).mint(GAUGE);
 
-        // Infinity approval for Uniswap set inside constructor
+        // Infinity approval for SUSHI set inside constructor
         uint ldoBal = IERC20(LDO).balanceOf(address(this));
         if (ldoBal > 0) {
             _swapToEth(LDO, ldoBal);
